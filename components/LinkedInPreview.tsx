@@ -1,0 +1,328 @@
+
+import React, { useState, useMemo, useEffect } from 'react';
+import { AppLanguage, UserProfile, ViralAnalysis } from '../types';
+import { ThumbsUp, MessageCircle, Repeat, Send, Globe, MoreHorizontal, Plus, PenSquare, Check, TrendingUp, Activity, Zap, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { translations } from '../translations';
+
+interface LinkedInPreviewProps {
+  content: string;
+  user: UserProfile;
+  isLoading: boolean;
+  language?: AppLanguage;
+  onUpdate?: (newContent: string) => void;
+  viralScore?: number;
+  viralAnalysis?: ViralAnalysis;
+}
+
+const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content, user, isLoading, language = 'en', onUpdate, viralScore, viralAnalysis }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(content);
+  const [showAudit, setShowAudit] = useState(true);
+  
+  const t = translations[language].app.preview;
+
+  // Sync edit content if prop changes
+  useEffect(() => {
+    setEditContent(content);
+  }, [content]);
+
+  // Function to handle "See more" logic roughly
+  const truncatedContent = useMemo(() => {
+    if (!content) return "";
+    const lines = content.split('\n');
+    if (lines.length > 5) {
+      return lines.slice(0, 3).join('\n') + '...';
+    }
+    if (content.length > 210) {
+      return content.slice(0, 210) + '...';
+    }
+    return content;
+  }, [content]);
+
+  const displayContent = isExpanded ? content : truncatedContent;
+  const needsSeeMore = content.length > 210 || content.split('\n').length > 5;
+
+  const handleSave = () => {
+    if (onUpdate) {
+        onUpdate(editContent);
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditContent(content);
+    setIsEditing(false);
+  };
+
+  const getScoreColor = (score: number) => {
+      if (score >= 80) return 'text-green-600 bg-green-50 border-green-200';
+      if (score >= 50) return 'text-amber-600 bg-amber-50 border-amber-200';
+      return 'text-red-600 bg-red-50 border-red-200';
+  };
+
+  const getScoreGradient = (score: number) => {
+      if (score >= 80) return 'from-green-400 to-green-600';
+      if (score >= 50) return 'from-amber-400 to-amber-600';
+      return 'from-red-400 to-red-600';
+  };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white border border-slate-200 rounded-lg shadow-sm w-full max-w-xl mx-auto p-4 animate-pulse">
+        <div className="flex space-x-3 mb-4">
+          <div className="rounded-full bg-slate-200 h-12 w-12"></div>
+          <div className="flex-1 space-y-2 py-1">
+            <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+            <div className="h-3 bg-slate-200 rounded w-1/2"></div>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <div className="h-3 bg-slate-200 rounded"></div>
+          <div className="h-3 bg-slate-200 rounded"></div>
+          <div className="h-3 bg-slate-200 rounded"></div>
+          <div className="h-3 bg-slate-200 rounded w-5/6"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!content) {
+    return (
+        <div id="tour-preview" className="bg-white/40 backdrop-blur-md border border-white/50 border-dashed rounded-xl h-96 flex flex-col items-center justify-center text-slate-400 w-full max-w-xl mx-auto">
+            <div className="bg-indigo-50 p-5 rounded-full mb-4 shadow-sm animate-bounce duration-1000">
+                <Send className="w-8 h-8 text-brand-400 ml-1 mt-1" />
+            </div>
+            <p className="font-medium">{t.placeholder}</p>
+        </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4 w-full max-w-xl mx-auto">
+        
+        {/* VIRAL SCORECARD (NEW) */}
+        {viralScore !== undefined && (
+            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm animate-in slide-in-from-top-4 duration-500">
+                <div 
+                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors"
+                    onClick={() => setShowAudit(!showAudit)}
+                >
+                    <div className="flex items-center gap-4">
+                        <div className="relative w-14 h-14 flex items-center justify-center">
+                            {/* Circular Progress SVG */}
+                            <svg className="w-full h-full transform -rotate-90">
+                                <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-100" />
+                                <circle 
+                                    cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4" fill="transparent" 
+                                    className={`${getScoreColor(viralScore).split(' ')[0]}`}
+                                    strokeDasharray={150.79}
+                                    strokeDashoffset={150.79 - (150.79 * viralScore) / 100}
+                                    strokeLinecap="round"
+                                />
+                            </svg>
+                            <span className={`absolute text-sm font-bold ${getScoreColor(viralScore).split(' ')[0]}`}>
+                                {viralScore}
+                            </span>
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                                Viral Potential
+                                {viralScore > 80 && <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full uppercase font-bold tracking-wide">High</span>}
+                            </h4>
+                            <p className="text-xs text-slate-500">AI-estimated reach probability</p>
+                        </div>
+                    </div>
+                    <div className="p-2 rounded-full hover:bg-slate-200 transition-colors text-slate-400">
+                        {showAudit ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </div>
+                </div>
+
+                {/* Detailed Breakdown */}
+                {showAudit && viralAnalysis && (
+                    <div className="px-4 pb-4 border-t border-slate-100 bg-slate-50/50">
+                        <div className="grid grid-cols-3 gap-2 mt-4 mb-4">
+                            <ScoreBar label="Hook" score={viralAnalysis.hookScore} />
+                            <ScoreBar label="Readability" score={viralAnalysis.readabilityScore} />
+                            <ScoreBar label="Value" score={viralAnalysis.valueScore} />
+                        </div>
+                        
+                        <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 flex gap-3 items-start">
+                            <div className="p-1.5 bg-amber-100 rounded-md text-amber-600 mt-0.5">
+                                <Zap className="w-3.5 h-3.5 fill-current" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-bold uppercase text-amber-700 mb-0.5">Pro Tip</p>
+                                <p className="text-xs text-amber-900 leading-relaxed font-medium">
+                                    {viralAnalysis.feedback}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        )}
+
+        <div id="tour-preview" className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden transition-all duration-500 ease-in-out relative group">
+        
+        {/* Control Toolbar - Explicitly separated from LinkedIn UI for clarity */}
+        <div className="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+                <div className="flex space-x-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                </div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-2">Preview</span>
+            </div>
+
+            {isEditing ? (
+                <div className="flex items-center gap-2 animate-in fade-in duration-200">
+                    <button 
+                        onClick={handleCancel}
+                        className="px-3 py-1 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-200 transition-colors"
+                    >
+                        {t.cancel}
+                    </button>
+                    <button 
+                        onClick={handleSave}
+                        className="px-3 py-1 rounded-md bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 transition-colors shadow-sm flex items-center gap-1"
+                    >
+                        <Check className="w-3 h-3" />
+                        {t.save}
+                    </button>
+                </div>
+            ) : (
+                <button 
+                    onClick={() => setIsEditing(true)}
+                    className="px-3 py-1.5 rounded-md bg-white border border-slate-200 text-brand-600 text-xs font-bold hover:border-brand-300 hover:bg-brand-50 transition-all shadow-sm flex items-center gap-1.5"
+                >
+                    <PenSquare className="w-3.5 h-3.5" />
+                    {t.edit}
+                </button>
+            )}
+        </div>
+
+        {/* Post Header */}
+        <div className="p-4">
+            <div className="flex items-start justify-between mb-3">
+            <div className="flex space-x-3">
+                <div className="relative">
+                    <img src={user.avatarUrl} alt={user.name} className="w-12 h-12 rounded-full object-cover border border-slate-100" />
+                    {user.isPremium && <div className="absolute -bottom-1 -right-1 bg-amber-400 border-2 border-white w-4 h-4 rounded-full flex items-center justify-center"><div className="w-2 h-2 bg-white rounded-full"></div></div>}
+                </div>
+                
+                <div className="flex flex-col justify-center">
+                <div className="flex items-center gap-1">
+                    <span className="font-bold text-slate-900 text-sm hover:text-blue-600 hover:underline cursor-pointer">{user.name}</span>
+                    <span className="text-slate-500 text-xs">• 1st</span>
+                </div>
+                <p className="text-xs text-slate-500 line-clamp-1 max-w-[200px] sm:max-w-xs">{user.headline}</p>
+                <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
+                    <span>1h</span>
+                    <span>•</span>
+                    <Globe className="w-3 h-3 text-slate-500" />
+                </div>
+                </div>
+            </div>
+            <div className="flex items-center gap-2">
+                <button className="text-brand-600 font-bold text-sm hover:bg-blue-50 px-3 py-1 rounded-full transition-colors flex items-center gap-1">
+                    <Plus className="w-4 h-4" />
+                    {t.follow}
+                </button>
+                <button className="text-slate-500 hover:bg-slate-100 p-2 rounded-full transition-colors">
+                    <MoreHorizontal className="w-5 h-5" />
+                </button>
+            </div>
+            </div>
+
+            {/* Post Body */}
+            {isEditing ? (
+                <div className="relative">
+                    <textarea 
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                        className="w-full min-h-[250px] text-[14px] text-slate-900 leading-normal font-normal border-2 border-brand-300 rounded-lg p-3 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 outline-none resize-y bg-white transition-all"
+                        autoFocus
+                        placeholder="Type your post content here..."
+                    />
+                    <div className="absolute bottom-3 right-3 text-xs text-slate-400 font-medium bg-white/80 px-2 py-1 rounded backdrop-blur-sm pointer-events-none">
+                        {editContent.length} chars
+                    </div>
+                </div>
+            ) : (
+                <div className="text-[14px] text-slate-900 whitespace-pre-wrap leading-normal font-normal break-words">
+                {displayContent}
+                {!isExpanded && needsSeeMore && (
+                    <button 
+                    onClick={() => setIsExpanded(true)}
+                    className="text-slate-500 hover:text-brand-600 hover:underline ml-1 font-medium cursor-pointer"
+                    >
+                    {t.seeMore}
+                    </button>
+                )}
+                </div>
+            )}
+        </div>
+
+        {/* Engagement Metrics */}
+        <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <div className="flex items-center gap-1 group cursor-pointer">
+            <div className="flex -space-x-1">
+                <div className="w-4 h-4 rounded-full bg-[#1485BD] flex items-center justify-center z-10 ring-1 ring-white">
+                    <ThumbsUp className="w-2.5 h-2.5 text-white fill-white" />
+                </div>
+                <div className="w-4 h-4 rounded-full bg-[#D14836] flex items-center justify-center ring-1 ring-white">
+                    <span className="text-[8px] text-white">❤️</span>
+                </div>
+                <div className="w-4 h-4 rounded-full bg-[#6DAE4F] flex items-center justify-center ring-1 ring-white">
+                    <span className="text-[8px] text-white">👏</span>
+                </div>
+            </div>
+            <span className="hover:text-blue-600 hover:underline ml-1 group-hover:text-blue-600">1,243</span>
+            </div>
+            <div className="flex gap-2">
+            <span className="hover:text-blue-600 hover:underline cursor-pointer">89 comments</span>
+            <span>•</span>
+            <span className="hover:text-blue-600 hover:underline cursor-pointer">12 reposts</span>
+            </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="px-2 py-1 flex items-center justify-between">
+            <ActionButton icon={<ThumbsUp className="w-5 h-5 stroke-[1.5]" />} label="Like" />
+            <ActionButton icon={<MessageCircle className="w-5 h-5 stroke-[1.5]" />} label="Comment" />
+            <ActionButton icon={<Repeat className="w-5 h-5 stroke-[1.5]" />} label="Repost" />
+            <ActionButton icon={<Send className="w-5 h-5 stroke-[1.5]" />} label="Send" />
+        </div>
+        </div>
+    </div>
+  );
+};
+
+const ScoreBar: React.FC<{ label: string, score: number }> = ({ label, score }) => {
+    let colorClass = 'bg-red-500';
+    if (score >= 80) colorClass = 'bg-green-500';
+    else if (score >= 50) colorClass = 'bg-amber-500';
+
+    return (
+        <div className="space-y-1">
+            <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                <span>{label}</span>
+                <span className={score >= 50 ? 'text-slate-700' : 'text-red-500'}>{score}</span>
+            </div>
+            <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+                <div className={`h-full rounded-full ${colorClass}`} style={{ width: `${score}%` }}></div>
+            </div>
+        </div>
+    );
+};
+
+const ActionButton: React.FC<{ icon: React.ReactNode, label: string }> = ({ icon, label }) => (
+  <button className="flex items-center justify-center gap-2 px-2 sm:px-4 py-3.5 rounded-lg hover:bg-slate-100 flex-1 text-slate-500 font-semibold text-sm transition-all duration-200 group active:scale-95 active:bg-slate-200">
+    <span className="group-hover:scale-110 transition-transform duration-200 group-hover:text-slate-700">{icon}</span>
+    <span className="hidden sm:inline group-hover:text-slate-700">{label}</span>
+  </button>
+);
+
+export default LinkedInPreview;

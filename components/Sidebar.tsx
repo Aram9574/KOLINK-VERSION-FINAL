@@ -1,0 +1,199 @@
+
+
+
+
+import React from 'react';
+import { 
+  LayoutGrid, 
+  History as HistoryIcon, 
+  Settings as SettingsIcon, 
+  LogOut, 
+  Crown,
+  Sparkles,
+  Lightbulb,
+  Bot
+} from 'lucide-react';
+import { Post, UserProfile, AppLanguage } from '../types';
+import GamificationWidget from './GamificationWidget';
+import History from './History';
+import { translations } from '../translations';
+
+interface SidebarProps {
+  user: UserProfile;
+  posts: Post[];
+  currentPost: Post | null;
+  activeTab: 'create' | 'history' | 'settings' | 'ideas' | 'autopilot';
+  setActiveTab: (tab: 'create' | 'history' | 'settings' | 'ideas' | 'autopilot') => void;
+  onSelectPost: (post: Post) => void;
+  onDeletePost: (id: string, e: React.MouseEvent) => void;
+  onLogout: () => void;
+  onUpgrade: () => void;
+  onSettingsClick: () => void;
+  className?: string;
+  language: AppLanguage;
+  showCreditDeduction?: boolean;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({
+  user,
+  posts,
+  currentPost,
+  activeTab,
+  setActiveTab,
+  onSelectPost,
+  onDeletePost,
+  onLogout,
+  onUpgrade,
+  onSettingsClick,
+  className = '',
+  language,
+  showCreditDeduction = false
+}) => {
+  const t = translations[language].app.sidebar;
+
+  return (
+    <aside id="tour-sidebar" className={`bg-white border-r border-slate-200 flex flex-col h-full ${className}`}>
+        <div className="p-6 flex items-center gap-3 flex-shrink-0">
+          <div className="w-9 h-9 bg-gradient-to-tr from-brand-600 to-indigo-500 rounded-xl flex items-center justify-center text-white font-bold font-display text-xl shadow-lg shadow-brand-500/30">
+            K
+          </div>
+          <span className="font-display font-bold text-2xl text-slate-900 tracking-tight">Kolink</span>
+        </div>
+
+        <div className="px-4 mb-2 flex-shrink-0">
+             <GamificationWidget user={user} />
+        </div>
+
+        <div className="flex-1 px-4 py-2 space-y-1 overflow-y-auto no-scrollbar">
+            <button 
+                onClick={() => setActiveTab('create')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
+                ${activeTab === 'create' 
+                    ? 'bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200' 
+                    : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+                <LayoutGrid className="w-5 h-5" />
+                {t.studio}
+            </button>
+            <button 
+                onClick={() => setActiveTab('ideas')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
+                ${activeTab === 'ideas' 
+                    ? 'bg-amber-50 text-amber-700 shadow-sm ring-1 ring-amber-200' 
+                    : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+                <Lightbulb className="w-5 h-5" />
+                {t.ideas}
+            </button>
+            <button 
+                onClick={() => setActiveTab('autopilot')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
+                ${activeTab === 'autopilot' 
+                    ? 'bg-sky-50 text-sky-700 shadow-sm ring-1 ring-sky-200' 
+                    : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+                <Bot className="w-5 h-5" />
+                {t.autopilot}
+            </button>
+            <button 
+                onClick={() => setActiveTab('history')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
+                ${activeTab === 'history' 
+                    ? 'bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200' 
+                    : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+                <HistoryIcon className="w-5 h-5" />
+                {t.history}
+            </button>
+            <button 
+                onClick={() => setActiveTab('settings')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
+                ${activeTab === 'settings' 
+                    ? 'bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200' 
+                    : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+                <SettingsIcon className="w-5 h-5" />
+                {t.settings}
+            </button>
+            
+            <div className="pt-6 pb-2 px-4 flex items-center justify-between">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t.library}</p>
+                <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md">{posts.length}</span>
+            </div>
+             {/* Desktop History visible in sidebar - Only show if NOT in history tab to avoid redundancy */}
+             <div className={`hidden ${activeTab === 'history' ? 'hidden' : 'lg:block'}`}>
+                <History 
+                    posts={posts} 
+                    onSelect={onSelectPost}
+                    selectedId={currentPost?.id}
+                    onDelete={onDeletePost}
+                    language={language}
+                />
+             </div>
+        </div>
+
+        <div className="p-4 border-t border-slate-100 bg-slate-50/30 backdrop-blur-sm flex-shrink-0">
+          {!user.isPremium && (
+              <div 
+                onClick={onUpgrade}
+                className="bg-slate-900 rounded-2xl p-5 text-white mb-5 relative overflow-hidden group cursor-pointer shadow-xl shadow-slate-900/10 transition-transform hover:-translate-y-1"
+              >
+                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <Crown className="w-20 h-20 rotate-12 translate-x-4 -translate-y-4" />
+                </div>
+                <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-2">
+                        <Sparkles className="w-4 h-4 text-amber-300" />
+                        <h4 className="font-bold text-sm">{t.goPremium}</h4>
+                    </div>
+                    <p className="text-xs text-slate-300 mb-3 leading-relaxed">{t.unlockDesc}</p>
+                    <button className="text-xs bg-white text-slate-900 font-bold px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors w-full">
+                        {t.upgradeNow}
+                    </button>
+                </div>
+              </div>
+          )}
+          
+          <div className="flex items-center gap-3 px-1">
+            <img src={user.avatarUrl} alt="User" className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" />
+            <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1">
+                    <p className="text-sm font-bold text-slate-900 truncate">{user.name}</p>
+                    {user.isPremium && <Crown className="w-3 h-3 text-amber-500 fill-current" />}
+                </div>
+                <div className="relative inline-block">
+                    <p 
+                        id="tour-credits" 
+                        className={`text-xs transition-all duration-300 ${showCreditDeduction ? 'text-red-600 font-bold scale-105' : 'text-slate-500'}`}
+                    >
+                        {user.credits} {t.creditsLeft}
+                    </p>
+                    {showCreditDeduction && (
+                        <div className="absolute -top-4 left-0 text-xs font-bold text-red-600 animate-bounce whitespace-nowrap">
+                            -1
+                        </div>
+                    )}
+                </div>
+            </div>
+            <div className="flex gap-1">
+                <button 
+                    onClick={onSettingsClick}
+                    className={`p-2 hover:bg-slate-200 rounded-full transition-colors ${activeTab === 'settings' ? 'text-brand-600 bg-brand-50' : 'text-slate-400'}`}
+                >
+                    <SettingsIcon className="w-4 h-4" />
+                </button>
+                <button 
+                    onClick={onLogout}
+                    className="p-2 hover:bg-red-50 rounded-full transition-colors text-slate-400 hover:text-red-500"
+                    title={t.logout}
+                >
+                    <LogOut className="w-4 h-4" />
+                </button>
+            </div>
+          </div>
+        </div>
+    </aside>
+  );
+};
+
+export default Sidebar;
