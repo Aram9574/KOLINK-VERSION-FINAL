@@ -15,7 +15,12 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ onClose, onUpgrade, current
     const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
 
     return (
-        <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div
+            className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+            onClick={(e) => {
+                if (e.target === e.currentTarget) onClose();
+            }}
+        >
             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl overflow-hidden relative animate-in fade-in zoom-in duration-200 my-8">
                 <button
                     onClick={onClose}

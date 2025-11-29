@@ -319,6 +319,14 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
                 console.warn("Background credit sync failed, using optimistic value:", dbError);
             }
 
+            // Update local state
+            setUser(prev => prev ? { ...prev, credits: newCreditCount } : null);
+
+            // If credits dropped to 0, prompt for upgrade
+            if (newCreditCount === 0 && !user.cancelAtPeriodEnd) {
+                setTimeout(() => setShowUpgradeModal(true), 1500); // Small delay for better UX
+            }
+
             const newPost: Post = {
                 id: Date.now().toString(),
                 content: result.content,

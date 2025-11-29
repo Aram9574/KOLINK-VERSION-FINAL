@@ -86,9 +86,7 @@ const App: React.FC = () => {
             <Toaster position="top-center" richColors />
             <Routes>
                 <Route path="/" element={
-                    // If user is logged in, redirect to dashboard
-                    user.id && !user.id.startsWith('mock-') ? <Navigate to="/dashboard" replace /> :
-                        <LandingPage language={language} setLanguage={setLanguage} />
+                    <LandingPage language={language} setLanguage={setLanguage} user={user} />
                 } />
                 <Route path="/login" element={
                     // If user is logged in, redirect to dashboard

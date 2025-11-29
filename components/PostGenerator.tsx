@@ -47,7 +47,8 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({ onGenerate, isGenerating,
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (credits <= 0 || isCancelled) return;
+    if (isCancelled) return;
+    // Allow proceeding even with 0 credits to trigger upgrade modal in parent
     onGenerate(params);
   };
 
@@ -285,11 +286,13 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({ onGenerate, isGenerating,
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={isGenerating || credits <= 0 || isCancelled}
+          disabled={isGenerating || isCancelled}
           className={`w-full py-4 px-4 rounded-xl text-white font-bold shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-brand-500/40
-            ${isGenerating || credits <= 0 || isCancelled
+            ${isGenerating || isCancelled
               ? 'bg-slate-400 cursor-not-allowed shadow-none hover:translate-y-0 hover:shadow-none'
-              : 'bg-gradient-to-r from-brand-600 to-indigo-600'
+              : credits <= 0
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600'
+                : 'bg-gradient-to-r from-brand-600 to-indigo-600'
             }`}
         >
           {isGenerating ? (
@@ -300,7 +303,10 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({ onGenerate, isGenerating,
           ) : isCancelled ? (
             <span>Subscription Cancelled - Credits Frozen</span>
           ) : credits <= 0 ? (
-            <span>{t.noCreditsBtn}</span>
+            <>
+              <Zap className="w-5 h-5 fill-current" />
+              <span>{language === 'es' ? 'Conseguir más créditos' : 'Get more credits'}</span>
+            </>
           ) : (
             <>
               <Wand2 className="w-5 h-5" />

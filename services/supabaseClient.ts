@@ -19,6 +19,7 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
   }
 
   // Map DB snake_case to frontend camelCase
+  console.log('Fetched profile raw data:', data);
   return {
     ...data,
     name: data.full_name || data.name || 'User',
@@ -28,6 +29,7 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
     cancelAtPeriodEnd: data.cancel_at_period_end,
     twoFactorEnabled: data.two_factor_enabled,
     securityNotifications: data.security_notifications,
+    hasOnboarded: data.has_onboarded,
   } as unknown as UserProfile;
 };
 
@@ -75,6 +77,12 @@ export const updateUserProfile = async (userId: string, updates: Partial<UserPro
   if (updates.securityNotifications !== undefined) {
     dbUpdates.security_notifications = updates.securityNotifications;
     delete dbUpdates.securityNotifications;
+  }
+
+  // Handle hasOnboarded mapping
+  if (updates.hasOnboarded !== undefined) {
+    dbUpdates.has_onboarded = updates.hasOnboarded;
+    delete dbUpdates.hasOnboarded;
   }
 
   console.log('Updating profile for:', userId, 'with updates:', dbUpdates);
