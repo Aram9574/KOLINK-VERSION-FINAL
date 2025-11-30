@@ -250,7 +250,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ language, setLanguage, user }
                                 K
                             </div>
                         </div>
-                        <span className="hidden sm:inline">Kolink</span>
+                        <span className="font-display font-bold text-xl text-slate-900 tracking-tight ml-2">Kolink</span>
                     </div>
 
                     <div className="hidden lg:flex items-center gap-1 p-1 rounded-full bg-slate-100/50 border border-slate-200/50 backdrop-blur-md">

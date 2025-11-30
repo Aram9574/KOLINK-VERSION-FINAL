@@ -115,8 +115,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
 
             <div className="bg-white w-full max-w-md p-8 rounded-3xl shadow-xl border border-slate-100 animate-in fade-in zoom-in duration-300">
                 <div className="text-center mb-8">
-                    <div className="w-12 h-12 bg-gradient-to-tr from-brand-600 to-indigo-500 rounded-xl flex items-center justify-center text-white font-bold font-display text-xl shadow-lg shadow-brand-500/30 mx-auto mb-4">
-                        K
+                    <div className="flex items-center justify-center gap-3 mb-6">
+                        <div className="w-10 h-10 bg-gradient-to-tr from-brand-600 to-indigo-500 rounded-xl flex items-center justify-center text-white font-bold font-display text-xl shadow-lg shadow-brand-500/30">
+                            K
+                        </div>
+                        <span className="font-display font-bold text-3xl text-slate-900 tracking-tight">Kolink</span>
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900">
                         {isLoginMode ? "Bienvenido de nuevo" : "Crea tu cuenta"}
