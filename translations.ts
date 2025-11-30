@@ -842,4 +842,5 @@ export const translations = {
         }
       }
     }
-  };
+  }
+};
