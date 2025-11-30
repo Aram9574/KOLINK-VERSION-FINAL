@@ -85,7 +85,7 @@ export const translations = {
       totalPrice: "€2,648/mo",
       kolinkLabel: "All of this is included when you join Kolink.",
       kolinkPlan: "Kolink Creator Pro:",
-      kolinkPrice: "€29/mo"
+      kolinkPrice: "€19/mo"
     },
     testimonials: {
       title: "Creators are growing fast",
@@ -495,7 +495,7 @@ export const translations = {
       totalPrice: "€2,648/mes",
       kolinkLabel: "Todo esto incluido al unirte a Kolink.",
       kolinkPlan: "Plan Creador Pro:",
-      kolinkPrice: "€29/mes"
+      kolinkPrice: "€19/mes"
     },
     testimonials: {
       title: "Creadores creciendo rápido",

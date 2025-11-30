@@ -76,7 +76,7 @@ export const PLANS: SubscriptionPlan[] = [
   {
     id: 'pro',
     name: 'Creador Pro',
-    price: 29,
+    price: 19,
     description: 'Para automatizar tu marca personal',
     credits: 100,
     features: [
@@ -88,7 +88,7 @@ export const PLANS: SubscriptionPlan[] = [
       'Soporte Prioritario 24h'
     ],
     highlight: true,
-    stripePriceId: 'price_1SZDgbE0zDGmS9ih1AOLBbkt'
+    stripePriceId: 'price_1SZJKhE0zDGmS9ihOiYOzLa1'
   },
   {
     id: 'viral',
@@ -139,9 +139,9 @@ export const MOCK_USER: UserProfile = {
 };
 
 export const MOCK_INVOICES: Invoice[] = [
-  { id: 'inv_001', date: '2023-10-24', amount: '€29.00', status: 'Paid', planName: 'Creador Pro' },
-  { id: 'inv_002', date: '2023-09-24', amount: '€29.00', status: 'Paid', planName: 'Creador Pro' },
-  { id: 'inv_003', date: '2023-08-24', amount: '€29.00', status: 'Paid', planName: 'Creador Pro' },
+  { id: 'inv_001', date: '2023-10-24', amount: '€19.00', status: 'Paid', planName: 'Creador Pro' },
+  { id: 'inv_002', date: '2023-09-24', amount: '€19.00', status: 'Paid', planName: 'Creador Pro' },
+  { id: 'inv_003', date: '2023-08-24', amount: '€19.00', status: 'Paid', planName: 'Creador Pro' },
 ];
 
 export const INITIAL_POST_ID = 'init-1';
