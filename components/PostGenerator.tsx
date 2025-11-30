@@ -28,6 +28,23 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({ onGenerate, isGenerating,
     includeCTA: true,
   });
 
+  // Load saved params on mount
+  useEffect(() => {
+    const savedParams = localStorage.getItem('kolink_generator_params');
+    if (savedParams && !initialParams && !initialTopic) {
+      try {
+        setParams(JSON.parse(savedParams));
+      } catch (e) {
+        console.error("Failed to parse saved params", e);
+      }
+    }
+  }, []);
+
+  // Save params to local storage whenever they change
+  useEffect(() => {
+    localStorage.setItem('kolink_generator_params', JSON.stringify(params));
+  }, [params]);
+
   // Effect to update params if initialParams provided (e.g. from history reuse)
   useEffect(() => {
     if (initialParams) {

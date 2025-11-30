@@ -90,15 +90,78 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
     const [levelUpData, setLevelUpData] = useState<{ leveledUp: boolean, newLevel: number, newAchievements: string[] } | null>(null);
     const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
+    // Ref to track the ID of a newly generated post to enforce its display
+    const justGeneratedPostId = React.useRef<string | null>(null);
+
+    useEffect(() => {
+        // Enforce display of newly generated post
+        if (justGeneratedPostId.current && posts.length > 0) {
+            const targetPost = posts.find(p => p.id === justGeneratedPostId.current);
+            if (targetPost && currentPost?.id !== targetPost.id) {
+                console.log("Enforcing display of generated post:", targetPost.id);
+                setCurrentPost(targetPost);
+                // Clear the ref so we don't block navigation to other posts later
+                justGeneratedPostId.current = null;
+            }
+        }
+    }, [posts, currentPost]);
+
     useEffect(() => {
         // Fallback: If we are in 'create' mode, have posts, but no currentPost is selected,
-        // automatically select the most recent one. This fixes the issue where generation
-        // succeeds but the preview remains empty.
-        if (activeTab === 'create' && !currentPost && posts.length > 0) {
-            console.log("Fallback: Setting currentPost to latest history item");
-            setCurrentPost(posts[0]);
+        // automatically select the most recent one.
+        // CRITICAL: Do NOT do this if we are currently generating or recovering a session!
+        const isRecovering = !!localStorage.getItem('kolink_is_generating');
+
+        if (activeTab === 'create' && posts.length > 0 && !isGenerating && !isRecovering) {
+            const latestPost = posts[0];
+            const isBrandNew = (Date.now() - latestPost.createdAt) < 10000; // Created in last 10s
+
+            // Scenario 1: No post selected -> Select latest
+            if (!currentPost) {
+                console.log("Fallback: Setting currentPost to latest history item");
+                setCurrentPost(latestPost);
+            }
+            // Scenario 2: Brand new post exists but not selected -> Force select
+            else if (isBrandNew && currentPost.id !== latestPost.id) {
+                console.log("Auto-switching to brand new post:", latestPost.id);
+                setCurrentPost(latestPost);
+                // Also update the ref to prevent fighting
+                justGeneratedPostId.current = null;
+            }
         }
-    }, [activeTab, currentPost, posts]);
+    }, [activeTab, currentPost, posts, isGenerating]);
+
+    // Persist activeTab
+    useEffect(() => {
+        const savedTab = localStorage.getItem('kolink_active_tab');
+        if (savedTab) {
+            setActiveTab(savedTab as any);
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('kolink_active_tab', activeTab);
+    }, [activeTab]);
+
+    // Persist currentPost ID
+    useEffect(() => {
+        const savedPostId = localStorage.getItem('kolink_current_post_id');
+        // Only restore if we have posts and NO current post selected
+        if (savedPostId && posts.length > 0 && !currentPost) {
+            const savedPost = posts.find(p => p.id === savedPostId);
+            if (savedPost) {
+                setCurrentPost(savedPost);
+            }
+        }
+    }, [posts, currentPost]); // Run when posts load or currentPost changes
+
+    useEffect(() => {
+        if (currentPost) {
+            localStorage.setItem('kolink_current_post_id', currentPost.id);
+        } else {
+            localStorage.removeItem('kolink_current_post_id');
+        }
+    }, [currentPost]);
 
     useEffect(() => {
         // Load history from local storage on mount (User scoped)
@@ -150,6 +213,75 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
             }
         };
         trackSession();
+
+        // RECOVERY MECHANISM: Check if a generation was interrupted (e.g. by reload)
+        const checkRecovery = async () => {
+            const genTimestamp = localStorage.getItem('kolink_is_generating');
+            if (genTimestamp && user.id) {
+                const startTime = parseInt(genTimestamp);
+                // If generation started less than 5 minutes ago
+                if (Date.now() - startTime < 5 * 60 * 1000) {
+                    console.log("Attempting to recover interrupted generation...");
+                    setIsGenerating(true); // Show loading state while recovering
+
+                    // Wait a bit to ensure DB consistency if it just finished
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    try {
+                        const { data: latestPosts } = await supabase
+                            .from('posts')
+                            .select('*')
+                            .eq('user_id', user.id)
+                            .order('created_at', { ascending: false })
+                            .limit(1);
+
+                        if (latestPosts && latestPosts.length > 0) {
+                            const recoveredPost = latestPosts[0];
+                            const postTime = new Date(recoveredPost.created_at).getTime();
+
+                            // If the post was created AFTER the generation started
+                            if (postTime > startTime) {
+                                toast.success("¡Post recuperado! Se generó mientras no estabas.");
+
+                                // Map DB post to frontend Post type
+                                const mappedPost: Post = {
+                                    id: recoveredPost.id,
+                                    content: recoveredPost.content,
+                                    params: recoveredPost.generation_params || {},
+                                    createdAt: postTime,
+                                    likes: 0,
+                                    views: 0,
+                                    isAutoPilot: false,
+                                    viralScore: recoveredPost.viral_score,
+                                    viralAnalysis: recoveredPost.viral_analysis
+                                };
+
+                                setCurrentPost(mappedPost);
+                                setPosts(prev => {
+                                    // Avoid duplicates
+                                    if (prev.some(p => p.id === mappedPost.id)) return prev;
+                                    return [mappedPost, ...prev];
+                                });
+                                localStorage.removeItem('kolink_is_generating');
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Recovery failed", e);
+                    } finally {
+                        setIsGenerating(false);
+                        // Clear flag if it's too old or we checked
+                        if (Date.now() - startTime > 60000) {
+                            localStorage.removeItem('kolink_is_generating');
+                        }
+                    }
+                } else {
+                    // Too old, clear it
+                    localStorage.removeItem('kolink_is_generating');
+                }
+            }
+        };
+
+        checkRecovery();
     }, [user.id]);
 
     useEffect(() => {
@@ -315,6 +447,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
         }
 
         setIsGenerating(true);
+        localStorage.setItem('kolink_is_generating', Date.now().toString());
         if (!isAutoPilot) setShowCreditDeduction(false);
 
         try {
@@ -348,10 +481,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
                 viralScore: result.viralScore,
                 viralAnalysis: result.viralAnalysis
             };
-
-            // CRITICAL: Always show the result for manual generation immediately
-            setCurrentPost(newPost);
-            setActiveTab('create');
 
             const updatedPosts = [newPost, ...posts];
             savePostToHistory(newPost);
@@ -390,11 +519,22 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
             // Refresh history
             setPrefilledParams(null);
 
+            // CRITICAL: Finalize state updates at the very end to ensure consistency
+            console.log("Finalizing generation, setting current post:", newPost.id);
+            setCurrentPost(newPost);
+            localStorage.setItem('kolink_current_post_id', newPost.id);
+            justGeneratedPostId.current = newPost.id;
+            setActiveTab('create');
+
+            // Scroll to top to ensure preview is visible
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
         } catch (error) {
             console.error("Failed to generate", error);
             if (!isAutoPilot) toast.error("Error al generar contenido. Por favor revisa tu conexión.");
         } finally {
             setIsGenerating(false);
+            localStorage.removeItem('kolink_is_generating');
         }
     };
 
