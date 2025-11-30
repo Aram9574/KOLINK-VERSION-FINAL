@@ -1176,19 +1176,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ language, setLanguage, user }
                             Kolink
                         </div>
                         <p className="max-w-xs text-center md:text-left">
-                            Architecting viral moments for the world's most ambitious creators.
+                            {t.footer.description}
                         </p>
                     </div>
                     <div className="flex flex-wrap justify-center gap-8 md:gap-12 font-medium">
-                        <a href="#" className="hover:text-brand-600 transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-brand-600 transition-colors">Terms of Service</a>
-                        <a href="#" className="hover:text-brand-600 transition-colors">Twitter</a>
-                        <a href="#" className="hover:text-brand-600 transition-colors">LinkedIn</a>
-                        <a href="#" className="hover:text-brand-600 transition-colors">Contact</a>
+                        <Link to="/privacy" className="hover:text-brand-600 transition-colors">{t.footer.privacy}</Link>
+                        <Link to="/terms" className="hover:text-brand-600 transition-colors">{t.footer.terms}</Link>
+                        <a href="https://www.linkedin.com/company/kolink-ai/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-600 transition-colors">LinkedIn</a>
+                        <a href="mailto:info@kolink.es" className="hover:text-brand-600 transition-colors">{t.footer.contact}</a>
                     </div>
                 </div>
                 <div className="max-w-7xl mx-auto px-6 mt-12 pt-8 border-t border-slate-200 text-center md:text-left">
-                    <p>© 2024 Kolink Inc. All rights reserved.</p>
+                    <p>{t.footer.rights}</p>
                 </div>
             </footer>
         </div>

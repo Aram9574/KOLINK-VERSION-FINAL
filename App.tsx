@@ -6,6 +6,8 @@ import { MOCK_USER, MARKETING_DOMAIN, APP_DOMAIN } from './constants';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import Dashboard from './components/Dashboard';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
 import { Toaster } from 'sonner';
 
 const App: React.FC = () => {
@@ -91,6 +93,14 @@ const App: React.FC = () => {
 
     // 1. Marketing Domain Logic (kolink.es)
     if (isMarketingDomain) {
+        // Allow Legal Pages
+        if (location.pathname === '/privacy') {
+            return <PrivacyPolicy language={language} />;
+        }
+        if (location.pathname === '/terms') {
+            return <TermsOfService language={language} />;
+        }
+
         // Force Landing Page at root
         if (location.pathname === '/') {
             return (
