@@ -412,16 +412,15 @@ export const translations = {
           [EmojiDensity.HIGH]: { label: 'High' }
         }
       }
+    },
+    footer: {
+      privacy: "Privacy Policy",
+      terms: "Terms of Service",
+      contact: "Contact",
+      rights: "© 2024 Kolink Inc. All rights reserved.",
+      description: "Architecting viral moments for the world's most ambitious creators."
     }
   },
-  footer: {
-    privacy: "Privacy Policy",
-    terms: "Terms of Service",
-    contact: "Contact",
-    rights: "© 2024 Kolink Inc. All rights reserved.",
-    description: "Architecting viral moments for the world's most ambitious creators."
-  }
-},
   es: {
     nav: {
       howItWorks: "Cómo Funciona",
@@ -839,8 +838,8 @@ export const translations = {
           [EmojiDensity.MINIMAL]: { label: 'Mínimo' },
           [EmojiDensity.MODERATE]: { label: 'Balanceado' },
           [EmojiDensity.HIGH]: { label: 'Alto' }
+
         }
       }
     }
-  }
-};
+  };
