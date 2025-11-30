@@ -88,7 +88,7 @@ export const PLANS: SubscriptionPlan[] = [
       'Soporte Prioritario 24h'
     ],
     highlight: true,
-    stripePriceId: 'price_1SWjNzE0zDGmS9ihxnqg7rYk'
+    stripePriceId: 'price_1SZDgbE0zDGmS9ih1AOLBbkt'
   },
   {
     id: 'viral',
@@ -104,7 +104,7 @@ export const PLANS: SubscriptionPlan[] = [
       'Integración Buffer/Hootsuite',
       'Gerente de Cuenta Dedicado'
     ],
-    stripePriceId: 'price_1SWjO7E0zDGmS9ihOwn3Kx21'
+    stripePriceId: 'price_1SZDgvE0zDGmS9ihnRXmmx4T'
   }
 ];
 
