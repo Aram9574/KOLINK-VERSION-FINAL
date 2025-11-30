@@ -1,13 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import Stripe from 'https://esm.sh/stripe?target=deno'
+import Stripe from 'npm:stripe@^14.0.0'
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
+console.log("Create Checkout Session Function Initialized")
+
 serve(async (req) => {
+    // Handle CORS preflight requests
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
     }
@@ -85,19 +89,58 @@ serve(async (req) => {
         }
 
         // 5. Create Session
+        // 5. Create Session
         console.log('Creating session for customer:', customerId, 'price:', priceId);
-        const session = await stripe.checkout.sessions.create({
-            customer: customerId,
-            line_items: [
-                {
-                    price: priceId,
-                    quantity: 1,
-                },
-            ],
-            mode: 'subscription',
-            success_url: `${req.headers.get('origin')}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${req.headers.get('origin')}/pricing`,
-        })
+        let session;
+        try {
+            session = await stripe.checkout.sessions.create({
+                customer: customerId,
+                line_items: [
+                    {
+                        price: priceId,
+                        quantity: 1,
+                    },
+                ],
+                mode: 'subscription',
+                success_url: `${req.headers.get('origin')}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${req.headers.get('origin')}/pricing`,
+            })
+        } catch (stripeError) {
+            // Self-healing: If customer not found (e.g. switching between Test/Live mode), create a new one
+            if (stripeError.code === 'resource_missing' && stripeError.message.includes('No such customer')) {
+                console.warn('Customer not found in Stripe (likely mode mismatch). Creating new customer...');
+
+                const customer = await stripe.customers.create({
+                    email: user.email,
+                    metadata: { supabase_uid: user.id },
+                })
+                customerId = customer.id
+
+                // Update profile with new customer ID
+                await supabaseClient
+                    .from('profiles')
+                    .update({ stripe_customer_id: customerId })
+                    .eq('id', user.id)
+
+                console.log('New customer created:', customerId, '. Retrying session creation...');
+
+                // Retry session creation
+                session = await stripe.checkout.sessions.create({
+                    customer: customerId,
+                    line_items: [
+                        {
+                            price: priceId,
+                            quantity: 1,
+                        },
+                    ],
+                    mode: 'subscription',
+                    success_url: `${req.headers.get('origin')}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+                    cancel_url: `${req.headers.get('origin')}/pricing`,
+                })
+            } else {
+                throw stripeError; // Re-throw other errors
+            }
+        }
 
         return new Response(
             JSON.stringify({ sessionId: session.id, url: session.url }),

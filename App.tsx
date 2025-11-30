@@ -20,14 +20,17 @@ const App: React.FC = () => {
 
     useEffect(() => {
         // Check active session
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        supabase.auth.getSession().then(async ({ data: { session } }) => {
             if (session) {
-                fetchUserProfile(session.user.id).then(profile => {
+                try {
+                    const profile = await fetchUserProfile(session.user.id);
                     if (profile) {
                         setUser(prev => ({ ...prev, ...profile }));
                         setLanguage(profile.language || 'es');
                     }
-                });
+                } catch (error) {
+                    console.error("Error fetching profile:", error);
+                }
             }
             setLoading(false);
         });
