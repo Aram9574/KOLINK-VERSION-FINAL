@@ -103,7 +103,7 @@ serve(async (req) => {
                 ],
                 mode: 'subscription',
                 success_url: `${req.headers.get('origin')}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-                cancel_url: `${req.headers.get('origin')}/pricing`,
+                cancel_url: `${req.headers.get('origin')}/dashboard`,
             })
         } catch (stripeError) {
             // Self-healing: If customer not found (e.g. switching between Test/Live mode), create a new one

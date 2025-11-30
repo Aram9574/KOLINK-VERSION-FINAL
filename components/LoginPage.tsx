@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Lock, Mail, ArrowRight, UserPlus, LogIn, Linkedin } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
+import { MARKETING_DOMAIN } from '../constants';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Helmet } from 'react-helmet-async';
@@ -103,13 +104,14 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
                 <meta name="description" content="Accede a Kolink para crear contenido viral para LinkedIn." />
             </Helmet>
             {/* Back Button */}
-            <Link
-                to="/"
+            {/* Back Button */}
+            <a
+                href={`https://${MARKETING_DOMAIN}`}
                 className="absolute top-6 left-6 flex items-center gap-2 text-slate-500 font-bold hover:text-slate-800 transition-colors"
             >
                 <ArrowLeft className="w-5 h-5" />
                 Volver al Inicio
-            </Link>
+            </a>
 
             <div className="bg-white w-full max-w-md p-8 rounded-3xl shadow-xl border border-slate-100 animate-in fade-in zoom-in duration-300">
                 <div className="text-center mb-8">

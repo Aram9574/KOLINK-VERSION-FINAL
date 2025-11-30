@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { supabase, fetchUserProfile } from './services/supabaseClient';
 import { UserProfile, AppLanguage } from './types';
-import { MOCK_USER } from './constants';
+import { MOCK_USER, MARKETING_DOMAIN, APP_DOMAIN } from './constants';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import Dashboard from './components/Dashboard';
@@ -84,13 +84,35 @@ const App: React.FC = () => {
 
     if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50">Loading...</div>;
 
+    // Domain-based Routing Logic
+    const hostname = window.location.hostname;
+    const isMarketingDomain = hostname.includes(MARKETING_DOMAIN);
+    const isAppDomain = hostname.includes(APP_DOMAIN) || hostname.includes('localhost'); // Treat localhost as app domain for dev
+
+    // 1. Marketing Domain Logic (kolink.es)
+    if (isMarketingDomain) {
+        // Force Landing Page at root
+        if (location.pathname === '/') {
+            return (
+                <>
+                    <Toaster position="top-center" richColors />
+                    <LandingPage language={language} setLanguage={setLanguage} user={user} />
+                </>
+            );
+        }
+        // Redirect any other path to App Domain
+        window.location.href = `https://${APP_DOMAIN}${location.pathname}`;
+        return null;
+    }
+
+    // 2. App Domain Logic (kolink-jade.vercel.app)
     return (
         <>
             <Toaster position="top-center" richColors />
             <Routes>
-                <Route path="/" element={
-                    <LandingPage language={language} setLanguage={setLanguage} user={user} />
-                } />
+                {/* Redirect root to Login on App Domain */}
+                <Route path="/" element={<Navigate to="/login" replace />} />
+
                 <Route path="/login" element={
                     // If user is logged in, redirect to dashboard
                     user.id && !user.id.startsWith('mock-') ? <Navigate to="/dashboard" replace /> :
@@ -107,7 +129,7 @@ const App: React.FC = () => {
                         />
                     </ProtectedRoute>
                 } />
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </>
     );

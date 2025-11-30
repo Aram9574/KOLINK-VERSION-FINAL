@@ -146,6 +146,9 @@ export const MOCK_INVOICES: Invoice[] = [
 
 export const INITIAL_POST_ID = 'init-1';
 
+export const MARKETING_DOMAIN = 'kolink.es';
+export const APP_DOMAIN = 'kolink-jade.vercel.app';
+
 export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'first_step',

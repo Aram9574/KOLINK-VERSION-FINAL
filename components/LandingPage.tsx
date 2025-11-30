@@ -45,7 +45,7 @@ import {
     History
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
-import { PLANS } from '../constants';
+import { PLANS, APP_DOMAIN } from '../constants';
 import { translations } from '../translations';
 import { AppLanguage, UserProfile } from '../types';
 import { Link } from 'react-router-dom';
@@ -296,19 +296,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ language, setLanguage, user }
                         </button>
 
                         {user?.id && !user.id.startsWith('mock-') ? (
-                            <Link to="/dashboard" className="group bg-brand-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 hover:-translate-y-0.5 flex items-center gap-2 active:scale-95 text-sm">
+                            <a href={`https://${APP_DOMAIN}/dashboard`} className="group bg-brand-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 hover:-translate-y-0.5 flex items-center gap-2 active:scale-95 text-sm">
                                 {language === 'es' ? 'Ir al Dashboard' : 'Go to Dashboard'}
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </Link>
+                            </a>
                         ) : (
                             <>
-                                <Link to="/login" className="hidden sm:block text-slate-600 font-bold hover:text-brand-600 transition-colors px-4 text-sm">
+                                <a href={`https://${APP_DOMAIN}/login`} className="hidden sm:block text-slate-600 font-bold hover:text-brand-600 transition-colors px-4 text-sm">
                                     {t.nav.login}
-                                </Link>
-                                <Link to="/login" className="group bg-brand-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 hover:-translate-y-0.5 flex items-center gap-2 active:scale-95 text-sm">
+                                </a>
+                                <a href={`https://${APP_DOMAIN}/login`} className="group bg-brand-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 hover:-translate-y-0.5 flex items-center gap-2 active:scale-95 text-sm">
                                     {t.nav.getStarted}
                                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </Link>
+                                </a>
                             </>
                         )}
                     </div>
@@ -336,10 +336,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ language, setLanguage, user }
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-                        <Link to={user?.id && !user.id.startsWith('mock-') ? "/dashboard" : "/login"} className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-brand-600 to-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-brand-500/40 hover:shadow-brand-500/60 transition-all hover:-translate-y-1 flex items-center justify-center gap-2 text-lg group">
+                        <a href={user?.id && !user.id.startsWith('mock-') ? `https://${APP_DOMAIN}/dashboard` : `https://${APP_DOMAIN}/login`} className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-brand-600 to-indigo-600 text-white font-bold rounded-2xl shadow-xl shadow-brand-500/40 hover:shadow-brand-500/60 transition-all hover:-translate-y-1 flex items-center justify-center gap-2 text-lg group">
                             {user?.id && !user.id.startsWith('mock-') ? (language === 'es' ? 'Ir al Dashboard' : 'Go to Dashboard') : t.hero.ctaPrimary}
                             <Sparkles className="w-5 h-5 group-hover:animate-spin-slow" />
-                        </Link>
+                        </a>
                         <button className="w-full sm:w-auto px-8 py-4 bg-white text-slate-700 font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-2 text-lg shadow-sm hover:shadow-md">
                             <Play className="w-5 h-5 fill-slate-700" />
                             {t.hero.ctaSecondary}
