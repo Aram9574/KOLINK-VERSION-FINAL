@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { supabase, fetchUserProfile } from './services/supabaseClient';
+import { supabase, fetchUserProfile, syncUserProfile } from './services/supabaseClient';
 import { UserProfile, AppLanguage } from './types';
 import { MOCK_USER, MARKETING_DOMAIN, APP_DOMAIN } from './constants';
 import LandingPage from './components/LandingPage';
@@ -37,12 +37,30 @@ const App: React.FC = () => {
             setLoading(false);
         });
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (session) {
+                // Sync profile data from provider (LinkedIn)
+                if (event === 'SIGNED_IN') {
+                    await syncUserProfile(session.user);
+                }
+
                 fetchUserProfile(session.user.id).then(profile => {
                     if (profile) {
                         setUser(prev => ({ ...prev, ...profile }));
                         setLanguage(profile.language || 'es');
+
+                        // Redirect logic for new users
+                        // If we are on the login page, redirect based on onboarding status
+                        if (location.pathname === '/login' || location.pathname === '/') {
+                            if (!profile.hasOnboarded) {
+                                // For now, we don't have a dedicated /onboarding route, so we send to dashboard
+                                // But ideally: navigate('/onboarding');
+                                navigate('/dashboard');
+                                toast.success("¡Bienvenido! Configura tu perfil para empezar.");
+                            } else {
+                                navigate('/dashboard');
+                            }
+                        }
                     }
                 });
             } else {

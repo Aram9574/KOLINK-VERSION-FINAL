@@ -190,3 +190,39 @@ export const fetchUserPosts = async (userId: string): Promise<any[]> => {
     viralAnalysis: post.viral_analysis
   }));
 };
+
+export const syncUserProfile = async (user: any) => {
+  if (!user || !user.id) return;
+
+  const metadata = user.user_metadata || {};
+
+  // Map LinkedIn OIDC data to our schema
+  // LinkedIn OIDC provides: name, picture, email, sub (id)
+  const updates: any = {
+    id: user.id,
+    email: user.email,
+    updated_at: new Date().toISOString(),
+  };
+
+  // Only update fields if they exist in metadata to avoid overwriting with null
+  if (metadata.full_name || metadata.name) {
+    updates.full_name = metadata.full_name || metadata.name;
+  }
+
+  if (metadata.avatar_url || metadata.picture) {
+    updates.avatar_url = metadata.avatar_url || metadata.picture;
+  }
+
+  // If it's a new user (we can check if created_at is very recent, or just upsert)
+  // We'll just upsert. If they already exist, we update their info.
+
+  console.log('Syncing user profile from auth provider:', updates);
+
+  const { error } = await supabase
+    .from('profiles')
+    .upsert(updates, { onConflict: 'id' });
+
+  if (error) {
+    console.error('Error syncing user profile:', error);
+  }
+};
