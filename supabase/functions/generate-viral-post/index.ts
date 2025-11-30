@@ -209,7 +209,7 @@ serve(async (req) => {
 
     let { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
-      .select('credits, brand_voice, company_name, industry, language, headline, xp')
+      .select('*')
       .eq('id', user.id)
       .single()
 
@@ -230,7 +230,7 @@ serve(async (req) => {
           current_streak: 0,
           has_onboarded: false
         })
-        .select('credits, brand_voice, company_name, industry, language, headline, xp')
+        .select('*')
         .single();
 
       if (createError) {
@@ -392,8 +392,12 @@ serve(async (req) => {
 
   } catch (error) {
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({
+        error: error.message,
+        stack: error.stack,
+        details: "Handled exception in generate-viral-post"
+      }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })

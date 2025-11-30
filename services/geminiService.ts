@@ -84,6 +84,7 @@ export const generateViralPost = async (params: GenerationParams, user: UserProf
   });
 
   if (error) throw new Error(error.message);
+  if (data.error) throw new Error(`Backend Error: ${data.error}`);
 
   return {
     content: data.postContent,

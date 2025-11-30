@@ -91,6 +91,16 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
     const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
     useEffect(() => {
+        // Fallback: If we are in 'create' mode, have posts, but no currentPost is selected,
+        // automatically select the most recent one. This fixes the issue where generation
+        // succeeds but the preview remains empty.
+        if (activeTab === 'create' && !currentPost && posts.length > 0) {
+            console.log("Fallback: Setting currentPost to latest history item");
+            setCurrentPost(posts[0]);
+        }
+    }, [activeTab, currentPost, posts]);
+
+    useEffect(() => {
         // Load history from local storage on mount (User scoped)
         if (user.id) {
             const storageKey = `kolink_history_${user.id}`;
@@ -339,39 +349,46 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
                 viralAnalysis: result.viralAnalysis
             };
 
-            if (!isAutoPilot) setCurrentPost(newPost);
+            // CRITICAL: Always show the result for manual generation immediately
+            setCurrentPost(newPost);
+            setActiveTab('create');
+
             const updatedPosts = [newPost, ...posts];
             savePostToHistory(newPost);
-            const gamificationResult = processGamification(user, newPost, updatedPosts);
 
-            setUser(prev => ({
-                ...prev,
-                credits: Math.max(0, newCreditCount),
-                xp: gamificationResult.newXP,
-                level: gamificationResult.newLevel,
-                currentStreak: gamificationResult.newStreak,
-                lastPostDate: Date.now(),
-                unlockedAchievements: [...prev.unlockedAchievements, ...gamificationResult.newAchievements]
-            }));
+            try {
+                const gamificationResult = processGamification(user, newPost, updatedPosts);
 
-            if (!isAutoPilot) {
-                setShowCreditDeduction(true);
-                setTimeout(() => setShowCreditDeduction(false), 2500);
+                setUser(prev => ({
+                    ...prev,
+                    credits: Math.max(0, newCreditCount),
+                    xp: gamificationResult.newXP,
+                    level: gamificationResult.newLevel,
+                    currentStreak: gamificationResult.newStreak,
+                    lastPostDate: Date.now(),
+                    unlockedAchievements: [...prev.unlockedAchievements, ...gamificationResult.newAchievements]
+                }));
+
+                if (!isAutoPilot) {
+                    setShowCreditDeduction(true);
+                    setTimeout(() => setShowCreditDeduction(false), 2500);
+                }
+
+                if (!isAutoPilot && (gamificationResult.leveledUp || gamificationResult.newAchievements.length > 0)) {
+                    setLevelUpData({
+                        leveledUp: gamificationResult.leveledUp,
+                        newLevel: gamificationResult.newLevel,
+                        newAchievements: gamificationResult.newAchievements
+                    });
+                }
+            } catch (gamificationError) {
+                console.error("Gamification error:", gamificationError);
+                // Still update credits if gamification fails
+                setUser(prev => prev ? { ...prev, credits: Math.max(0, newCreditCount) } : null);
             }
 
-            if (!isAutoPilot && (gamificationResult.leveledUp || gamificationResult.newAchievements.length > 0)) {
-                setLevelUpData({
-                    leveledUp: gamificationResult.leveledUp,
-                    newLevel: gamificationResult.newLevel,
-                    newAchievements: gamificationResult.newAchievements
-                });
-            }
-
-            if (!isAutoPilot) {
-                setActiveTab('create');
-                setPrefilledTopic('');
-                setPrefilledParams(null);
-            }
+            // Refresh history
+            setPrefilledParams(null);
 
         } catch (error) {
             console.error("Failed to generate", error);
@@ -667,6 +684,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
                             <div className={`transition-all duration-500 ease-in-out mx-auto w-full ${previewMode === 'mobile' ? 'max-w-[375px]' : 'max-w-xl'
                                 }`}>
                                 <LinkedInPreview
+                                    key={currentPost?.id || 'empty'}
                                     content={currentPost?.content || ''}
                                     user={user}
                                     isLoading={isGenerating}

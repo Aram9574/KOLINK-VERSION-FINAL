@@ -56,7 +56,10 @@ serve(async (req) => {
                 last_seen: new Date().toISOString()
             }, { onConflict: 'user_id, device_id' })
 
-        if (upsertError) throw upsertError
+        if (upsertError) {
+            console.error("Session tracking failed:", upsertError);
+            // Ignore error to prevent blocking the client
+        }
 
         return new Response(
             JSON.stringify({ success: true, deviceInfo }),
