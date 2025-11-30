@@ -22,10 +22,16 @@ const App: React.FC = () => {
 
     useEffect(() => {
         // Check active session
-        supabase.auth.getSession().then(async ({ data: { session } }) => {
+        const checkSession = async () => {
+            console.log("Checking session...");
+            const { data: { session } } = await supabase.auth.getSession();
+            console.log("Session check complete:", session ? "Found" : "None");
+
             if (session) {
                 try {
+                    console.log("Fetching profile...");
                     const profile = await fetchUserProfile(session.user.id);
+                    console.log("Profile fetched:", profile ? "Found" : "Not Found");
                     if (profile) {
                         setUser(prev => ({ ...prev, ...profile }));
                         setLanguage(profile.language || 'es');
@@ -35,9 +41,27 @@ const App: React.FC = () => {
                 }
             }
             setLoading(false);
-        });
+        };
 
+        checkSession();
+
+        // Safety timeout in case Supabase hangs
+        const timeout = setTimeout(() => {
+            setLoading(prev => {
+                if (prev) {
+                    console.warn("Forcing loading to false due to timeout");
+                    return false;
+                }
+                return prev;
+            });
+        }, 5000);
+
+        return () => clearTimeout(timeout);
+    }, []);
+
+    useEffect(() => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log("Auth state change:", event);
             if (session) {
                 // Sync profile data from provider (LinkedIn)
                 if (event === 'SIGNED_IN') {
