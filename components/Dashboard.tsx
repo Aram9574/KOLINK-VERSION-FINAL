@@ -510,6 +510,37 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
                         newAchievements: gamificationResult.newAchievements
                     });
                 }
+
+                // Persist gamification updates to DB
+                if (!isAutoPilot) {
+                    handleUpdateUser({
+                        xp: gamificationResult.newXP,
+                        level: gamificationResult.newLevel,
+                        currentStreak: gamificationResult.newStreak,
+                        lastPostDate: Date.now(),
+                        unlockedAchievements: [...user.unlockedAchievements, ...gamificationResult.newAchievements]
+                    });
+
+                    // Show XP Toast
+                    const xpGained = gamificationResult.newXP - user.xp;
+                    console.log("XP Debug:", { oldXP: user.xp, newXP: gamificationResult.newXP, xpGained });
+
+                    if (xpGained > 0) {
+                        console.log("Triggering XP Toast");
+                        toast.success(`+${xpGained} XP`, {
+                            description: "¡Sigue así para subir de nivel!",
+                            icon: "⭐"
+                        });
+                    }
+
+                    // Force fetch latest profile to ensure UI sync
+                    fetchUserProfile(user.id).then(updatedProfile => {
+                        if (updatedProfile) {
+                            console.log("Refreshed profile from DB:", updatedProfile);
+                            setUser(prev => ({ ...prev, ...updatedProfile }));
+                        }
+                    });
+                }
             } catch (gamificationError) {
                 console.error("Gamification error:", gamificationError);
                 // Still update credits if gamification fails

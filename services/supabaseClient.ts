@@ -30,6 +30,12 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
     twoFactorEnabled: data.two_factor_enabled,
     securityNotifications: data.security_notifications,
     hasOnboarded: data.has_onboarded,
+    xp: data.xp || 0,
+    level: data.level || 1,
+    currentStreak: data.current_streak || 0,
+    lastPostDate: data.last_post_date ? new Date(data.last_post_date).getTime() : undefined,
+    unlockedAchievements: data.unlocked_achievements || [],
+    autoPilot: data.auto_pilot || { enabled: false, topics: [], frequency: 'daily' },
   } as unknown as UserProfile;
 };
 
@@ -84,6 +90,33 @@ export const updateUserProfile = async (userId: string, updates: Partial<UserPro
     dbUpdates.has_onboarded = updates.hasOnboarded;
     delete dbUpdates.hasOnboarded;
   }
+
+  // Handle Gamification Fields
+  if (updates.currentStreak !== undefined) {
+    dbUpdates.current_streak = updates.currentStreak;
+    delete dbUpdates.currentStreak;
+  }
+
+  if (updates.lastPostDate !== undefined) {
+    // Convert number timestamp to ISO string for DB
+    dbUpdates.last_post_date = new Date(updates.lastPostDate).toISOString();
+    delete dbUpdates.lastPostDate;
+  }
+
+  if (updates.unlockedAchievements !== undefined) {
+    dbUpdates.unlocked_achievements = updates.unlockedAchievements;
+    delete dbUpdates.unlockedAchievements;
+  }
+
+  if (updates.autoPilot !== undefined) {
+    dbUpdates.auto_pilot = updates.autoPilot;
+    delete dbUpdates.autoPilot;
+  }
+
+  // xp and level match DB names (if we ignore case, but let's be safe)
+  // DB is lowercase, JS is lowercase. No mapping needed for 'xp' and 'level' 
+  // IF they are passed as 'xp' and 'level'.
+  // Let's verify UserProfile interface.
 
   console.log('Updating profile for:', userId, 'with updates:', dbUpdates);
 
