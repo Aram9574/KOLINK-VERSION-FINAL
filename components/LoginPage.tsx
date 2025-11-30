@@ -79,7 +79,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
 
         // 🟢 API INTEGRATION POINT: SOCIAL OAUTH
         const { error } = await supabase.auth.signInWithOAuth({
-            provider: provider,
+            provider: provider === 'linkedin' ? 'linkedin_oidc' : provider,
             options: {
                 redirectTo: window.location.origin
             }
