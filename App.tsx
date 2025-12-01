@@ -115,7 +115,14 @@ const App: React.FC = () => {
 
     // Protected Route wrapper
     const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-        if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50">Loading...</div>;
+        if (loading) {
+            return (
+                <div className="h-screen w-screen flex flex-col items-center justify-center bg-slate-50">
+                    <div className="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin mb-4"></div>
+                    <p className="text-slate-500 font-medium animate-pulse">Cargando tu estudio...</p>
+                </div>
+            );
+        }
 
         // If user is not authenticated (using mock ID check as proxy for now, ideally check session)
         // But since we set MOCK_USER on logout, we need to check if it's a real user ID
@@ -126,7 +133,8 @@ const App: React.FC = () => {
         return <>{children}</>;
     };
 
-    if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50">Loading...</div>;
+    // REMOVED: Global loading block that blocked the Landing Page
+    // if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50">Loading...</div>;
 
     // Domain-based Routing Logic
     const hostname = window.location.hostname;
