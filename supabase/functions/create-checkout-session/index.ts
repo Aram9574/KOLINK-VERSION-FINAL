@@ -102,8 +102,10 @@ serve(async (req) => {
                     },
                 ],
                 mode: 'subscription',
-                success_url: `${req.headers.get('origin')}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-                cancel_url: `${req.headers.get('origin')}/dashboard`,
+                // Use hardcoded APP_DOMAIN to ensure we always redirect to the app, not the marketing site
+                // This fixes the issue where users on kolink.es might be redirected back to kolink.es/dashboard (which doesn't exist)
+                success_url: `https://kolink-jade.vercel.app/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `https://kolink-jade.vercel.app/dashboard`,
             })
         } catch (stripeError) {
             // Self-healing: If customer not found (e.g. switching between Test/Live mode), create a new one
@@ -134,8 +136,8 @@ serve(async (req) => {
                         },
                     ],
                     mode: 'subscription',
-                    success_url: `${req.headers.get('origin')}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-                    cancel_url: `${req.headers.get('origin')}/pricing`,
+                    success_url: `https://kolink-jade.vercel.app/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+                    cancel_url: `https://kolink-jade.vercel.app/pricing`,
                 })
             } else {
                 throw stripeError; // Re-throw other errors
