@@ -23,6 +23,10 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
   return {
     ...data,
     name: data.full_name || data.name || 'User',
+    avatarUrl: data.avatar_url,
+    headline: data.headline,
+    industry: data.industry,
+    position: data.position,
     brandVoice: data.brand_voice,
     companyName: data.company_name,
     planTier: data.plan_tier,

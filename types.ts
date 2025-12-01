@@ -118,6 +118,7 @@ export interface UserProfile {
   brandVoice?: string; // User defined brand voice description
   companyName?: string;
   industry?: string;
+  position?: string;
   language: AppLanguage;
   // Security Settings
   twoFactorEnabled?: boolean;
