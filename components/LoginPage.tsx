@@ -120,13 +120,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
             </Helmet>
             {/* Back Button */}
             {/* Back Button */}
-            <Link
-                to="/"
+            <a
+                href={`https://${MARKETING_DOMAIN}`}
                 className="absolute top-6 left-6 flex items-center gap-2 text-slate-500 font-bold hover:text-slate-800 transition-colors"
             >
                 <ArrowLeft className="w-5 h-5" />
                 Volver al Inicio
-            </Link>
+            </a>
 
             <div className="bg-white w-full max-w-md p-8 rounded-3xl shadow-xl border border-slate-100 animate-in fade-in zoom-in duration-300">
                 <div className="text-center mb-8">

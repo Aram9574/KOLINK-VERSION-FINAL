@@ -20,6 +20,10 @@ const App: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // Domain Logic
+    const hostname = window.location.hostname;
+    const isMarketingDomain = hostname.includes(MARKETING_DOMAIN);
+
     useEffect(() => {
         // Check active session
         const checkSession = async () => {
@@ -69,7 +73,9 @@ const App: React.FC = () => {
                 // IMMEDIATE UNBLOCK: Stop loading and redirect NOW. 
                 // Don't wait for profile fetch.
                 setLoading(false);
-                if (location.pathname === '/login' || location.pathname === '/') {
+
+                // ONLY redirect if NOT on marketing domain
+                if (!isMarketingDomain && (location.pathname === '/login' || location.pathname === '/')) {
                     navigate('/dashboard');
                 }
 
@@ -104,7 +110,7 @@ const App: React.FC = () => {
         });
 
         return () => subscription.unsubscribe();
-    }, [location.pathname]);
+    }, [location.pathname, isMarketingDomain]);
 
     // Keep user language in sync with app state
     useEffect(() => {
@@ -146,11 +152,6 @@ const App: React.FC = () => {
     // REMOVED: Global loading block that blocked the Landing Page
     // if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50">Loading...</div>;
 
-    // Domain-based Routing Logic
-    const hostname = window.location.hostname;
-    const isMarketingDomain = hostname.includes(MARKETING_DOMAIN);
-    const isAppDomain = hostname.includes(APP_DOMAIN) || hostname.includes('localhost'); // Treat localhost as app domain for dev
-
     // 1. Marketing Domain Logic (kolink.es)
     if (isMarketingDomain) {
         // Allow Legal Pages
@@ -180,10 +181,8 @@ const App: React.FC = () => {
         <>
             <Toaster position="top-center" richColors />
             <Routes>
-                {/* Show Landing Page at root even on App Domain */}
-                <Route path="/" element={
-                    <LandingPage language={language} setLanguage={setLanguage} user={user} />
-                } />
+                {/* Redirect root to Login on App Domain */}
+                <Route path="/" element={<Navigate to="/login" replace />} />
 
                 <Route path="/login" element={
                     // If user is logged in, redirect to dashboard
