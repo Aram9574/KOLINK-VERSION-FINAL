@@ -113,10 +113,13 @@ const App: React.FC = () => {
     }, [language]);
 
     const handleLogout = async () => {
+        // Optimistic logout: Clear state immediately so the router knows we are out
+        setUser({ ...EMPTY_USER, language });
+
         await supabase.auth.signOut();
         localStorage.removeItem('kolink_history');
         localStorage.removeItem('kolink_device_id');
-        navigate('/');
+        navigate('/login');
     };
 
     // Protected Route wrapper
