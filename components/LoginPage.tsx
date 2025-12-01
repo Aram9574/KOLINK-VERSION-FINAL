@@ -36,13 +36,23 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
             // 🟢 API INTEGRATION POINT: EMAIL/PASSWORD
             let result;
 
+            // Helper to add timeout to promises
+            const withTimeout = (promise: Promise<any>, ms: number = 15000) => {
+                return Promise.race([
+                    promise,
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error("La solicitud tardó demasiado. Por favor verifica tu conexión.")), ms)
+                    )
+                ]);
+            };
+
             if (isLoginMode) {
-                result = await supabase.auth.signInWithPassword({
+                result = await withTimeout(supabase.auth.signInWithPassword({
                     email,
                     password
-                });
+                }));
             } else {
-                result = await supabase.auth.signUp({
+                result = await withTimeout(supabase.auth.signUp({
                     email,
                     password,
                     options: {
@@ -51,7 +61,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
                             avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
                         }
                     }
-                });
+                }));
             }
 
             const { data, error } = result;
