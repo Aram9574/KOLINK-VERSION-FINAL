@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Lock, Mail, ArrowRight, UserPlus, LogIn, Linkedin } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
-import { MARKETING_DOMAIN } from '../constants';
+import { MARKETING_DOMAIN, APP_DOMAIN } from '../constants';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Helmet } from 'react-helmet-async';
@@ -96,7 +96,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
         const { error } = await supabase.auth.signInWithOAuth({
             provider: provider === 'linkedin' ? 'linkedin_oidc' : provider,
             options: {
-                redirectTo: `${window.location.origin}/dashboard`
+                redirectTo: `https://${APP_DOMAIN}/dashboard`
             }
         });
 
