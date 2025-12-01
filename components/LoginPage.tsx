@@ -24,6 +24,10 @@ const GoogleLogo = () => (
 const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
     const navigate = useNavigate();
     const [isForgotPasswordMode, setIsForgotPasswordMode] = useState(false);
+    const [isLoginMode, setIsLoginMode] = useState(true);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
