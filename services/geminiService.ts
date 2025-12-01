@@ -67,6 +67,7 @@ const sanitizeInput = (input: string): string => {
 };
 
 export interface GeneratedPostResult {
+  id?: string; // Optional because legacy posts might not have it immediately available if not saved
   content: string;
   viralScore: number;
   viralAnalysis: {
@@ -87,6 +88,7 @@ export const generateViralPost = async (params: GenerationParams, user: UserProf
   if (data.error) throw new Error(`Backend Error: ${data.error}`);
 
   return {
+    id: data.id,
     content: data.postContent,
     viralScore: data.viralScore,
     viralAnalysis: data.viralAnalysis

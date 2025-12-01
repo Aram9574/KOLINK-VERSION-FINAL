@@ -405,9 +405,11 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
 
             try {
                 const generatedResult = await generateViralPost(params, updatedUser);
+                // Edge Function already deducted credit, so we just update local state
                 currentCredits--;
+
                 const newPost: Post = {
-                    id: Date.now().toString() + '-' + i,
+                    id: generatedResult.id || Date.now().toString() + '-' + i, // Use real ID if available
                     content: generatedResult.content,
                     params: params,
                     createdAt: Date.now(),
@@ -457,15 +459,14 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
         // 3. Update User State immediately
         setUser(finalUserData);
 
-        // 4. Background Sync (Fire and Forget / Safe)
+        // 4. Background Sync (Only sync non-credit fields, as credits were handled by Edge Function)
         (async () => {
             try {
-                // Deduct credits in DB
-                for (const p of newPosts) {
-                    await deductUserCredit(user.id);
-                }
+                // We do NOT call deductUserCredit here anymore because the Edge Function does it.
 
-                // Sync User Profile
+                // Sync User Profile (Gamification & Autopilot schedule)
+                // Note: We send credits: currentCredits just to be safe/consistent, 
+                // but the DB source of truth was already updated by the Edge Function.
                 await handleUpdateUser({
                     autoPilot: finalUserData.autoPilot,
                     credits: currentCredits,

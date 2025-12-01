@@ -342,7 +342,7 @@ serve(async (req) => {
     const json = JSON.parse(text);
 
     // 3. Save Post to Database
-    const { error: insertError } = await supabaseAdmin
+    const { data: insertedPost, error: insertError } = await supabaseAdmin
       .from('posts')
       .insert({
         user_id: user.id,
@@ -357,6 +357,8 @@ serve(async (req) => {
         params: params,
         created_at: new Date().toISOString()
       })
+      .select('id')
+      .single();
 
     if (insertError) {
       console.error("Failed to save post:", insertError);
@@ -378,6 +380,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({
+        id: insertedPost?.id, // Return the real DB ID
         postContent: json.post_content,
         viralScore: json.overall_viral_score,
         viralAnalysis: {
