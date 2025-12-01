@@ -81,7 +81,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
         const { error } = await supabase.auth.signInWithOAuth({
             provider: provider === 'linkedin' ? 'linkedin_oidc' : provider,
             options: {
-                redirectTo: window.location.origin
+                redirectTo: `${window.location.origin}/dashboard`
             }
         });
 
