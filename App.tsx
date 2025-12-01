@@ -154,6 +154,14 @@ const App: React.FC = () => {
 
     // 1. Marketing Domain Logic (kolink.es)
     if (isMarketingDomain) {
+        // CRITICAL: If we receive an OAuth callback here (e.g. Supabase redirected to Site URL instead of App Domain),
+        // we must forward it to the App Domain so the session is established there.
+        if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error'))) {
+            console.log("OAuth callback detected on Marketing Domain. Forwarding to App Domain...");
+            window.location.href = `https://${APP_DOMAIN}/dashboard${window.location.hash}`;
+            return null;
+        }
+
         // Allow Legal Pages
         if (location.pathname === '/privacy') {
             return <PrivacyPolicy language={language} />;
