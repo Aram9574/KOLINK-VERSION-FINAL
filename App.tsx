@@ -40,7 +40,15 @@ const App: React.FC = () => {
                     console.error("Error fetching profile:", error);
                 }
             }
-            setLoading(false);
+
+            // CRITICAL: If we have a hash with access_token, we are likely in an OAuth callback.
+            // Do NOT turn off loading yet, let onAuthStateChange handle it to avoid race conditions.
+            const isOAuthCallback = window.location.hash && window.location.hash.includes('access_token');
+            if (!session && isOAuthCallback) {
+                console.log("OAuth callback detected, waiting for onAuthStateChange...");
+            } else {
+                setLoading(false);
+            }
         };
 
         checkSession();
@@ -86,6 +94,8 @@ const App: React.FC = () => {
                             }
                         }
                     }
+                    // Ensure loading is turned off once we have the user
+                    setLoading(false);
                 });
             } else {
                 // Reset to mock/initial state on logout
@@ -93,6 +103,10 @@ const App: React.FC = () => {
                     ...MOCK_USER,
                     language: 'es'
                 });
+                // If we signed out, we can stop loading
+                if (event === 'SIGNED_OUT') {
+                    setLoading(false);
+                }
             }
         });
 
