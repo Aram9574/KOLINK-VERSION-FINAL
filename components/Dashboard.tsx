@@ -501,15 +501,9 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
 
         try {
             const result = await generateViralPost(params, user);
-            let newCreditCount = user.credits - 1;
-            try {
-                const apiResult = await deductUserCredit(user.id);
-                if (typeof apiResult === 'number' && apiResult >= 0) {
-                    newCreditCount = apiResult;
-                }
-            } catch (dbError) {
-                console.warn("Background credit sync failed, using optimistic value:", dbError);
-            }
+            // Credit deduction is handled by the Edge Function 'generate-viral-post'
+            // We only need to update the local state optimistically
+            const newCreditCount = Math.max(0, user.credits - 1);
 
             // Update local state
             setUser(prev => prev ? { ...prev, credits: newCreditCount } : null);

@@ -48,20 +48,33 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onUpgrade, onSave }) 
 
         setIsSaving(true);
         try {
+            // 1. Verify session is active before update
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError || !session) {
+                throw new Error("Tu sesión ha expirado. Por favor inicia sesión nuevamente.");
+            }
+
+            // 2. Attempt Update
             const { data, error } = await supabase.auth.updateUser({ password: newPassword });
             console.log("Update User Result:", data, error);
+
             if (error) throw error;
 
             if (data.user && data.user.aud === 'authenticated') {
                 toast.success("Contraseña actualizada exitosamente");
+                // Optional: Clear form
+                setShowChangePassword(false);
+                setNewPassword('');
+                setConfirmPassword('');
             } else {
                 toast.info("Revisa tu correo para confirmar el cambio.");
             }
-            setShowChangePassword(false);
-            setNewPassword('');
-            setConfirmPassword('');
         } catch (error: any) {
+            console.error("Password change error:", error);
             toast.error(error.message || "Error al actualizar contraseña");
+
+            // If session expired, maybe redirect? 
+            // For now, the error message is enough.
         } finally {
             setIsSaving(false);
         }
