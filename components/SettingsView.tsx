@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { UserProfile, AppLanguage } from '../types';
-import { ACHIEVEMENTS, PLANS, MOCK_INVOICES } from '../constants';
+import { ACHIEVEMENTS, PLANS } from '../constants';
 import { User, CreditCard, Shield, Save, Bell, Zap, Trophy, Lock, Download, ChevronRight, Mic, Check, Smartphone, AlertTriangle, LogOut, Globe, Building2, Briefcase } from 'lucide-react';
 import { translations } from '../translations';
 import Tooltip from './Tooltip';
@@ -477,46 +477,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onUpgrade, onSave }) 
                     </div>
                 </div>
 
-                {/* Invoice History */}
-                <div className="relative z-10">
-                    <h3 className="text-sm font-bold text-slate-900 mb-4">{t.invoiceHistory}</h3>
-                    {user.planTier === 'free' && MOCK_INVOICES.length === 0 ? (
-                        <p className="text-sm text-slate-500 italic">No invoices yet.</p>
-                    ) : (
-                        <div className="overflow-hidden rounded-xl border border-slate-200">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-200">
-                                    <tr>
-                                        <th className="px-4 py-3">Date</th>
-                                        <th className="px-4 py-3">Plan</th>
-                                        <th className="px-4 py-3">Amount</th>
-                                        <th className="px-4 py-3">Status</th>
-                                        <th className="px-4 py-3 text-right">Invoice</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 bg-white">
-                                    {MOCK_INVOICES.map((inv) => (
-                                        <tr key={inv.id} className="hover:bg-slate-50/50 transition-colors">
-                                            <td className="px-4 py-3 text-slate-600">{new Date(inv.date).toLocaleDateString()}</td>
-                                            <td className="px-4 py-3 font-medium text-slate-900">{inv.planName}</td>
-                                            <td className="px-4 py-3 text-slate-600">{inv.amount}</td>
-                                            <td className="px-4 py-3">
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-700 border border-green-100">
-                                                    {inv.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-3 text-right">
-                                                <button className="text-slate-400 hover:text-brand-600 transition-colors p-1">
-                                                    <Download className="w-4 h-4" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </div>
+                {/* Invoice History Removed as per request */}
             </div>
 
             <div className="flex justify-end pt-4">
