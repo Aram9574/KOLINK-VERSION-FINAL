@@ -180,8 +180,10 @@ const App: React.FC = () => {
         <>
             <Toaster position="top-center" richColors />
             <Routes>
-                {/* Redirect root to Login on App Domain */}
-                <Route path="/" element={<Navigate to="/login" replace />} />
+                {/* Show Landing Page at root even on App Domain */}
+                <Route path="/" element={
+                    <LandingPage language={language} setLanguage={setLanguage} user={user} />
+                } />
 
                 <Route path="/login" element={
                     // If user is logged in, redirect to dashboard
