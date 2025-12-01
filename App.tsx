@@ -8,7 +8,7 @@ import LoginPage from './components/LoginPage';
 import Dashboard from './components/Dashboard';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 
 const App: React.FC = () => {
     const [language, setLanguage] = useState<AppLanguage>('es');

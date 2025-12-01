@@ -32,44 +32,49 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
         e.preventDefault();
         setIsLoading(true);
 
-        // 🟢 API INTEGRATION POINT: EMAIL/PASSWORD
-        let result;
+        try {
+            // 🟢 API INTEGRATION POINT: EMAIL/PASSWORD
+            let result;
 
-        if (isLoginMode) {
-            result = await supabase.auth.signInWithPassword({
-                email,
-                password
-            });
-        } else {
-            result = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        full_name: email.split('@')[0], // Default name
-                        avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
+            if (isLoginMode) {
+                result = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+            } else {
+                result = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: email.split('@')[0], // Default name
+                            avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
+                        }
+                    }
+                });
+            }
+
+            const { data, error } = result;
+
+            if (error) {
+                toast.error(error.message);
+            } else {
+                if (isLoginMode) {
+                    toast.success("¡Bienvenido de nuevo!");
+                    // Navigation handled by App.tsx auth listener
+                } else {
+                    if (data.session) {
+                        toast.success("¡Cuenta creada exitosamente!");
+                    } else {
+                        toast.info("Revisa tu email para confirmar tu cuenta.");
                     }
                 }
-            });
-        }
-
-        const { data, error } = result;
-
-        setIsLoading(false);
-
-        if (error) {
-            toast.error(error.message);
-        } else {
-            if (isLoginMode) {
-                toast.success("¡Bienvenido de nuevo!");
-                // Navigation handled by App.tsx auth listener
-            } else {
-                if (data.session) {
-                    toast.success("¡Cuenta creada exitosamente!");
-                } else {
-                    toast.info("Revisa tu email para confirmar tu cuenta.");
-                }
             }
+        } catch (err) {
+            console.error("Login error:", err);
+            toast.error("Ocurrió un error inesperado. Intenta de nuevo.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
