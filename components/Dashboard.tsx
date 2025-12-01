@@ -428,16 +428,14 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
         setIsGenerating(false);
         if (newPosts.length === 0) return;
 
-        for (const p of newPosts) {
-            await deductUserCredit(user.id);
-        }
-
+        // 1. Optimistic UI Update: Show posts immediately
         setPosts(prev => {
             const combined = [...newPosts, ...prev];
             localStorage.setItem('kolink_history', JSON.stringify(combined));
             return combined;
         });
 
+        // 2. Calculate new user state (Gamification, etc.)
         const lastPost = newPosts[newPosts.length - 1];
         const allPostsWithNew = [...newPosts, ...posts];
         const gamificationResult = processGamification(updatedUser, lastPost, allPostsWithNew);
@@ -456,14 +454,30 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
             autoPilot: { ...user.autoPilot, nextRun }
         };
 
+        // 3. Update User State immediately
         setUser(finalUserData);
-        handleUpdateUser({
-            autoPilot: finalUserData.autoPilot,
-            credits: currentCredits,
-            xp: totalNewXP,
-            level: finalUserData.level,
-            lastPostDate: finalUserData.lastPostDate
-        });
+
+        // 4. Background Sync (Fire and Forget / Safe)
+        (async () => {
+            try {
+                // Deduct credits in DB
+                for (const p of newPosts) {
+                    await deductUserCredit(user.id);
+                }
+
+                // Sync User Profile
+                await handleUpdateUser({
+                    autoPilot: finalUserData.autoPilot,
+                    credits: currentCredits,
+                    xp: totalNewXP,
+                    level: finalUserData.level,
+                    lastPostDate: finalUserData.lastPostDate
+                });
+            } catch (syncError) {
+                console.error("Background sync failed:", syncError);
+                toast.error("Tu post se generó, pero hubo un error al sincronizar con la nube.");
+            }
+        })();
     };
 
     const handleGenerate = async (params: GenerationParams, isAutoPilot = false) => {
