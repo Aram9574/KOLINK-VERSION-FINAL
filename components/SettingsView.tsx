@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { UserProfile, AppLanguage } from '../types';
 import { ACHIEVEMENTS, PLANS } from '../constants';
 import { User, CreditCard, Shield, Save, Bell, Zap, Trophy, Lock, Download, ChevronRight, Mic, Check, Smartphone, AlertTriangle, LogOut, Globe, Building2, Briefcase } from 'lucide-react';
