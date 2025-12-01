@@ -17,7 +17,7 @@ import { Helmet } from 'react-helmet-async';
 import { Post, GenerationParams, UserProfile, SubscriptionPlan, AppLanguage, AutoPilotConfig, ViralFramework, PostLength, EmojiDensity } from '../types';
 import { ALGORITHM_TIPS_CONTENT } from '../constants';
 import { generateViralPost } from '../services/geminiService';
-import { deductUserCredit, updateUserProfile, fetchUserPosts, supabase } from '../services/supabaseClient';
+import { deductUserCredit, updateUserProfile, fetchUserPosts, fetchUserProfile, supabase } from '../services/supabaseClient';
 import { processGamification, calculateLevel } from '../services/gamificationEngine';
 import PostGenerator from '../components/PostGenerator';
 import LinkedInPreview from '../components/LinkedInPreview';
