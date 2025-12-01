@@ -193,13 +193,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
 
     useEffect(() => {
         // Sync local onboarding state with user profile
-        // If user HAS onboarded, force false.
-        // If user HAS NOT onboarded, force true.
-        // This handles the "optimistic" initial state where hasOnboarded might be false temporarily.
-        if (user.hasOnboarded) {
+        // If user HAS onboarded (true), force false.
+        // If user HAS NOT onboarded (false), force true.
+        // If undefined (loading), do nothing.
+        if (user.hasOnboarded === true) {
             setIsOnboarding(false);
-        } else if (user.id && !user.id.startsWith('mock-')) {
-            // Only trigger onboarding if we have a real user ID and they haven't onboarded
+        } else if (user.hasOnboarded === false && user.id && !user.id.startsWith('mock-')) {
+            // Only trigger onboarding if we have a real user ID and they explicitly haven't onboarded
             setIsOnboarding(true);
         }
     }, [user.hasOnboarded, user.id]);

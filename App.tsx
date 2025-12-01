@@ -76,7 +76,8 @@ const App: React.FC = () => {
                 // 2. Sync & Fetch Profile in Background
                 if (event === 'SIGNED_IN') {
                     // Sync LinkedIn/Auth provider metadata to DB
-                    syncUserProfile(session.user).catch(console.error);
+                    // Await it to ensure photo is saved before fetching profile
+                    await syncUserProfile(session.user).catch(console.error);
                 }
 
                 fetchUserProfile(session.user.id)

@@ -117,7 +117,7 @@ export const EMPTY_USER: UserProfile = {
   maxCredits: 5,
   isPremium: false,
   planTier: 'free',
-  hasOnboarded: false,
+  // hasOnboarded is undefined by default to indicate "loading" state
   language: 'es',
   xp: 0,
   level: 1,

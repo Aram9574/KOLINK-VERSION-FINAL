@@ -114,7 +114,7 @@ export interface UserProfile {
   planTier: PlanTier;
   nextBillingDate?: number;
   cancelAtPeriodEnd?: boolean;
-  hasOnboarded: boolean;
+  hasOnboarded?: boolean;
   brandVoice?: string; // User defined brand voice description
   companyName?: string;
   industry?: string;
