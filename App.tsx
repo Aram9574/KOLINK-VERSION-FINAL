@@ -59,13 +59,19 @@ const App: React.FC = () => {
             console.log("Auth state change:", event);
             if (session) {
                 // 1. IMMEDIATE UPDATE: Allow access immediately using Auth data
-                // This prevents "hanging" if the database profile fetch is slow/fails
                 setUser(prev => ({
                     ...prev,
                     id: session.user.id,
                     email: session.user.email,
                     // Keep existing defaults for other fields until profile loads
                 }));
+
+                // IMMEDIATE UNBLOCK: Stop loading and redirect NOW. 
+                // Don't wait for profile fetch.
+                setLoading(false);
+                if (location.pathname === '/login' || location.pathname === '/') {
+                    navigate('/dashboard');
+                }
 
                 // 2. Sync & Fetch Profile in Background
                 if (event === 'SIGNED_IN') {
@@ -82,15 +88,7 @@ const App: React.FC = () => {
                     })
                     .catch(err => {
                         console.error("Error loading profile:", err);
-                        toast.error("Tu perfil tardó en cargar, pero ya estás dentro.");
-                    })
-                    .finally(() => {
-                        setLoading(false);
-
-                        // Redirect logic moved here to ensure it happens after state update
-                        if (location.pathname === '/login' || location.pathname === '/') {
-                            navigate('/dashboard');
-                        }
+                        // No need to toast error here usually, as it might just be a blip
                     });
             } else {
                 // Reset to mock/initial state on logout
@@ -105,117 +103,102 @@ const App: React.FC = () => {
         });
 
         return () => subscription.unsubscribe();
-    }, [location.pathname]); // Added location dependency for redirect logic
-} else {
-    // Reset to mock/initial state on logout
-    setUser({
-        ...MOCK_USER,
-        language: 'es'
-    });
-// If we signed out, we can stop loading
-if (event === 'SIGNED_OUT') {
-    setLoading(false);
-}
-            }
-        });
+    }, [location.pathname]);
 
-return () => subscription.unsubscribe();
-    }, []);
+    // Keep user language in sync with app state
+    useEffect(() => {
+        if (user.language !== language) {
+            setUser(prev => ({ ...prev, language }));
+        }
+    }, [language]);
 
-// Keep user language in sync with app state
-useEffect(() => {
-    if (user.language !== language) {
-        setUser(prev => ({ ...prev, language }));
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        localStorage.removeItem('kolink_history');
+        localStorage.removeItem('kolink_device_id');
+        navigate('/');
+    };
+
+    // Protected Route wrapper
+    const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+        if (loading) {
+            return (
+                <div className="h-screen w-screen flex flex-col items-center justify-center bg-slate-50">
+                    <div className="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin mb-4"></div>
+                    <p className="text-slate-500 font-medium animate-pulse">Cargando tu estudio...</p>
+                </div>
+            );
+        }
+
+        // If user is not authenticated (using mock ID check as proxy for now, ideally check session)
+        // But since we set MOCK_USER on logout, we need to check if it's a real user ID
+        // Real Supabase IDs are UUIDs, Mock IDs start with 'mock-'
+        if (!user.id || user.id.startsWith('mock-')) {
+            return <Navigate to="/login" replace />;
+        }
+        return <>{children}</>;
+    };
+
+    // REMOVED: Global loading block that blocked the Landing Page
+    // if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50">Loading...</div>;
+
+    // Domain-based Routing Logic
+    const hostname = window.location.hostname;
+    const isMarketingDomain = hostname.includes(MARKETING_DOMAIN);
+    const isAppDomain = hostname.includes(APP_DOMAIN) || hostname.includes('localhost'); // Treat localhost as app domain for dev
+
+    // 1. Marketing Domain Logic (kolink.es)
+    if (isMarketingDomain) {
+        // Allow Legal Pages
+        if (location.pathname === '/privacy') {
+            return <PrivacyPolicy language={language} />;
+        }
+        if (location.pathname === '/terms') {
+            return <TermsOfService language={language} />;
+        }
+
+        // Force Landing Page at root
+        if (location.pathname === '/') {
+            return (
+                <>
+                    <Toaster position="top-center" richColors />
+                    <LandingPage language={language} setLanguage={setLanguage} user={user} />
+                </>
+            );
+        }
+        // Redirect any other path to App Domain
+        window.location.href = `https://${APP_DOMAIN}${location.pathname}`;
+        return null;
     }
-}, [language]);
 
-const handleLogout = async () => {
-    await supabase.auth.signOut();
-    localStorage.removeItem('kolink_history');
-    localStorage.removeItem('kolink_device_id');
-    navigate('/');
-};
+    // 2. App Domain Logic (kolink-jade.vercel.app)
+    return (
+        <>
+            <Toaster position="top-center" richColors />
+            <Routes>
+                {/* Redirect root to Login on App Domain */}
+                <Route path="/" element={<Navigate to="/login" replace />} />
 
-// Protected Route wrapper
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    if (loading) {
-        return (
-            <div className="h-screen w-screen flex flex-col items-center justify-center bg-slate-50">
-                <div className="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin mb-4"></div>
-                <p className="text-slate-500 font-medium animate-pulse">Cargando tu estudio...</p>
-            </div>
-        );
-    }
-
-    // If user is not authenticated (using mock ID check as proxy for now, ideally check session)
-    // But since we set MOCK_USER on logout, we need to check if it's a real user ID
-    // Real Supabase IDs are UUIDs, Mock IDs start with 'mock-'
-    if (!user.id || user.id.startsWith('mock-')) {
-        return <Navigate to="/login" replace />;
-    }
-    return <>{children}</>;
-};
-
-// REMOVED: Global loading block that blocked the Landing Page
-// if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50">Loading...</div>;
-
-// Domain-based Routing Logic
-const hostname = window.location.hostname;
-const isMarketingDomain = hostname.includes(MARKETING_DOMAIN);
-const isAppDomain = hostname.includes(APP_DOMAIN) || hostname.includes('localhost'); // Treat localhost as app domain for dev
-
-// 1. Marketing Domain Logic (kolink.es)
-if (isMarketingDomain) {
-    // Allow Legal Pages
-    if (location.pathname === '/privacy') {
-        return <PrivacyPolicy language={language} />;
-    }
-    if (location.pathname === '/terms') {
-        return <TermsOfService language={language} />;
-    }
-
-    // Force Landing Page at root
-    if (location.pathname === '/') {
-        return (
-            <>
-                <Toaster position="top-center" richColors />
-                <LandingPage language={language} setLanguage={setLanguage} user={user} />
-            </>
-        );
-    }
-    // Redirect any other path to App Domain
-    window.location.href = `https://${APP_DOMAIN}${location.pathname}`;
-    return null;
-}
-
-// 2. App Domain Logic (kolink-jade.vercel.app)
-return (
-    <>
-        <Toaster position="top-center" richColors />
-        <Routes>
-            {/* Redirect root to Login on App Domain */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
-
-            <Route path="/login" element={
-                // If user is logged in, redirect to dashboard
-                user.id && !user.id.startsWith('mock-') ? <Navigate to="/dashboard" replace /> :
-                    <LoginPage language={language} />
-            } />
-            <Route path="/dashboard" element={
-                <ProtectedRoute>
-                    <Dashboard
-                        user={user}
-                        setUser={setUser}
-                        language={language}
-                        setLanguage={setLanguage}
-                        onLogout={handleLogout}
-                    />
-                </ProtectedRoute>
-            } />
-            <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-    </>
-);
+                <Route path="/login" element={
+                    // If user is logged in, redirect to dashboard
+                    user.id && !user.id.startsWith('mock-') ? <Navigate to="/dashboard" replace /> :
+                        <LoginPage language={language} />
+                } />
+                <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                        <Dashboard
+                            user={user}
+                            setUser={setUser}
+                            language={language}
+                            setLanguage={setLanguage}
+                            onLogout={handleLogout}
+                        />
+                    </ProtectedRoute>
+                } />
+                <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+        </>
+    );
 };
 
 export default App;
