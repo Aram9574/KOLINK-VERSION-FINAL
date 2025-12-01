@@ -17,7 +17,7 @@ interface AutoPilotViewProps {
 }
 
 const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, onUpdateConfig, language, posts, onForceRun, isGenerating, onViewPost }) => {
-    const config = user.autoPilot || {
+    const defaultConfig: AutoPilotConfig = {
         enabled: false,
         frequency: 'weekly',
         nextRun: Date.now(),
@@ -26,6 +26,8 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, onUpdateConfig, lan
         targetAudience: '',
         postCount: 1
     };
+
+    const config = { ...defaultConfig, ...(user.autoPilot || {}) };
 
     const [isEnabled, setIsEnabled] = useState(config.enabled);
     const [frequency, setFrequency] = useState(config.frequency);
