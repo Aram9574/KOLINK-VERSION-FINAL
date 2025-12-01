@@ -351,26 +351,51 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
     };
 
     const triggerAutoPilotRun = async () => {
-        if (user.cancelAtPeriodEnd) return;
-        const config = user.autoPilot;
+        if (user.cancelAtPeriodEnd) {
+            toast.error("Autopilot disabled for cancelled plans.");
+            return;
+        }
+
+        // Safety: Ensure config exists
+        const config = user.autoPilot || {
+            enabled: false,
+            frequency: 'weekly',
+            nextRun: Date.now(),
+            topics: [],
+            tone: 'Professional',
+            targetAudience: '',
+            postCount: 1
+        };
+
         const count = config.postCount || 1;
         let currentCredits = user.credits;
+
+        if (currentCredits <= 0) {
+            toast.error("No tienes créditos suficientes para ejecutar Autopilot.");
+            setShowUpgradeModal(true);
+            return;
+        }
+
         const newPosts: Post[] = [];
         let updatedUser = { ...user };
 
         setIsGenerating(true);
+        toast.info(`Iniciando Autopilot: Generando ${count} post(s)...`);
 
         for (let i = 0; i < count; i++) {
             if (currentCredits <= 0) break;
-            const topics = user.autoPilot.topics.length > 0
-                ? user.autoPilot.topics
+
+            // Safety: Ensure topics array exists
+            const topicsList = (config.topics && config.topics.length > 0)
+                ? config.topics
                 : ["Industry Trends", "Leadership Lessons", "Productivity"];
-            const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+
+            const randomTopic = topicsList[Math.floor(Math.random() * topicsList.length)];
 
             const params: GenerationParams = {
                 topic: randomTopic,
-                audience: user.autoPilot.targetAudience || 'Professional Network',
-                tone: user.autoPilot.tone,
+                audience: config.targetAudience || 'Professional Network',
+                tone: config.tone || 'Professional',
                 framework: [ViralFramework.PAS, ViralFramework.CONTRARIAN, ViralFramework.STORY][Math.floor(Math.random() * 3)],
                 length: PostLength.MEDIUM,
                 creativityLevel: 60,
@@ -396,6 +421,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
                 updatedUser = { ...updatedUser, credits: currentCredits };
             } catch (e) {
                 console.error("AutoPilot generation failed for one item:", e);
+                toast.error(`Error generando post ${i + 1}: ${e instanceof Error ? e.message : 'Unknown error'}`);
             }
         }
 
