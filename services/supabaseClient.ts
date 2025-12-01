@@ -213,6 +213,16 @@ export const syncUserProfile = async (user: any) => {
     updates.avatar_url = metadata.avatar_url || metadata.picture;
   }
 
+  // Map extended LinkedIn fields
+  if (metadata.headline) updates.headline = metadata.headline;
+  if (metadata.industry) updates.industry = metadata.industry;
+  if (metadata.company) updates.company_name = metadata.company;
+  if (metadata.position) updates.position = metadata.position;
+  if (metadata.iss && metadata.sub) {
+    // Construct public profile URL if possible, or store ID
+    // updates.linkedin_url = ... (OIDC often doesn't give public URL directly)
+  }
+
   // If it's a new user (we can check if created_at is very recent, or just upsert)
   // We'll just upsert. If they already exist, we update their info.
 
