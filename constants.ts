@@ -108,6 +108,32 @@ export const PLANS: SubscriptionPlan[] = [
   }
 ];
 
+export const EMPTY_USER: UserProfile = {
+  id: '',
+  name: '',
+  headline: '',
+  avatarUrl: '',
+  credits: 0,
+  maxCredits: 5,
+  isPremium: false,
+  planTier: 'free',
+  hasOnboarded: false,
+  language: 'es',
+  xp: 0,
+  level: 1,
+  currentStreak: 0,
+  lastPostDate: null,
+  unlockedAchievements: [],
+  autoPilot: {
+    enabled: false,
+    frequency: 'weekly',
+    nextRun: 0,
+    topics: [],
+    tone: ViralTone.PROFESSIONAL,
+    targetAudience: '',
+    postCount: 1
+  }
+};
 export const MOCK_USER: UserProfile = {
   id: "mock-user-uuid-123456",
   name: "Alex Rivera",

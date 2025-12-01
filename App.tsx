@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { supabase, fetchUserProfile, syncUserProfile } from './services/supabaseClient';
 import { UserProfile, AppLanguage } from './types';
-import { MOCK_USER, MARKETING_DOMAIN, APP_DOMAIN } from './constants';
+import { MOCK_USER, EMPTY_USER, MARKETING_DOMAIN, APP_DOMAIN } from './constants';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import Dashboard from './components/Dashboard';
@@ -13,7 +13,7 @@ import { Toaster, toast } from 'sonner';
 const App: React.FC = () => {
     const [language, setLanguage] = useState<AppLanguage>('es');
     const [user, setUser] = useState<UserProfile>({
-        ...MOCK_USER,
+        ...EMPTY_USER,
         language: 'es'
     });
     const [loading, setLoading] = useState(true);
@@ -91,9 +91,9 @@ const App: React.FC = () => {
                         // No need to toast error here usually, as it might just be a blip
                     });
             } else {
-                // Reset to mock/initial state on logout
+                // Reset to empty state on logout
                 setUser({
-                    ...MOCK_USER,
+                    ...EMPTY_USER,
                     language: 'es'
                 });
                 if (event === 'SIGNED_OUT') {
