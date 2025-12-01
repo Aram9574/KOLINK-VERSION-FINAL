@@ -48,9 +48,15 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onUpgrade, onSave }) 
 
         setIsSaving(true);
         try {
-            const { error } = await supabase.auth.updateUser({ password: newPassword });
+            const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+            console.log("Update User Result:", data, error);
             if (error) throw error;
-            toast.success("Contraseña actualizada exitosamente");
+
+            if (data.user && data.user.aud === 'authenticated') {
+                toast.success("Contraseña actualizada exitosamente");
+            } else {
+                toast.info("Revisa tu correo para confirmar el cambio.");
+            }
             setShowChangePassword(false);
             setNewPassword('');
             setConfirmPassword('');
