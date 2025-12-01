@@ -23,13 +23,38 @@ const GoogleLogo = () => (
 
 const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
     const navigate = useNavigate();
-    const [isLoginMode, setIsLoginMode] = useState(true); // Toggle between Login and SignUp
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isForgotPasswordMode, setIsForgotPasswordMode] = useState(false);
+
+    const handleResetPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `https://${APP_DOMAIN}/dashboard?reset_password=true`,
+            });
+
+            if (error) {
+                toast.error(error.message);
+            } else {
+                toast.success("Correo de recuperación enviado. Revisa tu bandeja de entrada.");
+                setIsForgotPasswordMode(false);
+            }
+        } catch (err) {
+            console.error("Reset password error:", err);
+            toast.error("Error al enviar el correo. Intenta de nuevo.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isForgotPasswordMode) {
+            await handleResetPassword(e);
+            return;
+        }
+
         setIsLoading(true);
 
         try {
@@ -108,6 +133,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
 
     const toggleMode = () => {
         setIsLoginMode(!isLoginMode);
+        setIsForgotPasswordMode(false);
         setEmail('');
         setPassword('');
     };
@@ -115,7 +141,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
     return (
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative">
             <Helmet>
-                <title>{isLoginMode ? 'Iniciar Sesión' : 'Crear Cuenta'} - Kolink</title>
+                <title>{isForgotPasswordMode ? 'Recuperar Contraseña' : (isLoginMode ? 'Iniciar Sesión' : 'Crear Cuenta')} - Kolink</title>
                 <meta name="description" content="Accede a Kolink para crear contenido viral para LinkedIn." />
             </Helmet>
             {/* Back Button */}
@@ -137,44 +163,50 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
                         <span className="font-display font-bold text-3xl text-slate-900 tracking-tight">Kolink</span>
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900">
-                        {isLoginMode ? "Bienvenido de nuevo" : "Crea tu cuenta"}
+                        {isForgotPasswordMode ? "Recuperar Contraseña" : (isLoginMode ? "Bienvenido de nuevo" : "Crea tu cuenta")}
                     </h2>
                     <p className="text-slate-500">
-                        {isLoginMode ? "Ingresa tus datos para acceder a tu estudio." : "Comienza tu viaje viral hoy."}
+                        {isForgotPasswordMode
+                            ? "Ingresa tu correo para recibir un enlace de recuperación."
+                            : (isLoginMode ? "Ingresa tus datos para acceder a tu estudio." : "Comienza tu viaje viral hoy.")}
                     </p>
                 </div>
 
-                {/* Social Login Buttons */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                    <button
-                        type="button"
-                        onClick={() => handleSocialLogin('google')}
-                        disabled={isLoading}
-                        className="flex items-center justify-center gap-2 py-2.5 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors font-medium text-slate-700 text-sm disabled:opacity-50"
-                    >
-                        <GoogleLogo />
-                        Google
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => handleSocialLogin('linkedin')}
-                        disabled={isLoading}
-                        className="flex items-center justify-center gap-2 py-2.5 px-4 border border-slate-200 rounded-xl hover:bg-[#0077b5]/5 hover:border-[#0077b5]/30 transition-colors font-medium text-[#0077b5] text-sm disabled:opacity-50"
-                    >
-                        <Linkedin className="w-5 h-5 fill-current" />
-                        LinkedIn
-                    </button>
-                </div>
+                {!isForgotPasswordMode && (
+                    <>
+                        {/* Social Login Buttons */}
+                        <div className="grid grid-cols-2 gap-3 mb-6">
+                            <button
+                                type="button"
+                                onClick={() => handleSocialLogin('google')}
+                                disabled={isLoading}
+                                className="flex items-center justify-center gap-2 py-2.5 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors font-medium text-slate-700 text-sm disabled:opacity-50"
+                            >
+                                <GoogleLogo />
+                                Google
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleSocialLogin('linkedin')}
+                                disabled={isLoading}
+                                className="flex items-center justify-center gap-2 py-2.5 px-4 border border-slate-200 rounded-xl hover:bg-[#0077b5]/5 hover:border-[#0077b5]/30 transition-colors font-medium text-[#0077b5] text-sm disabled:opacity-50"
+                            >
+                                <Linkedin className="w-5 h-5 fill-current" />
+                                LinkedIn
+                            </button>
+                        </div>
 
-                {/* Divider */}
-                <div className="relative mb-6">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-slate-200"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-slate-400 font-medium">O continúa con email</span>
-                    </div>
-                </div>
+                        {/* Divider */}
+                        <div className="relative mb-6">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-slate-200"></div>
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                                <span className="px-2 bg-white text-slate-400 font-medium">O continúa con email</span>
+                            </div>
+                        </div>
+                    </>
+                )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
@@ -192,20 +224,33 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-700">Contraseña</label>
-                        <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                            <input
-                                type="password"
-                                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
+                    {!isForgotPasswordMode && (
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <label className="text-sm font-bold text-slate-700">Contraseña</label>
+                                {isLoginMode && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsForgotPasswordMode(true)}
+                                        className="text-xs font-bold text-brand-600 hover:underline"
+                                    >
+                                        ¿Olvidaste tu contraseña?
+                                    </button>
+                                )}
+                            </div>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <input
+                                    type="password"
+                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     <button
                         type="submit"
@@ -216,8 +261,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
                             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         ) : (
                             <>
-                                {isLoginMode ? "Iniciar Sesión" : "Crear Cuenta"}
-                                {isLoginMode ? <LogIn className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
+                                {isForgotPasswordMode ? "Enviar Correo" : (isLoginMode ? "Iniciar Sesión" : "Crear Cuenta")}
+                                {isForgotPasswordMode ? <Mail className="w-5 h-5" /> : (isLoginMode ? <LogIn className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />)}
                             </>
                         )}
                     </button>
@@ -225,10 +270,18 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
 
                 <div className="mt-6 text-center">
                     <p className="text-sm text-slate-500">
-                        {isLoginMode ? "¿No tienes cuenta? " : "¿Ya tienes cuenta? "}
-                        <button onClick={toggleMode} className="text-brand-600 font-bold hover:underline">
-                            {isLoginMode ? "Crea una" : "Inicia sesión"}
-                        </button>
+                        {isForgotPasswordMode ? (
+                            <button onClick={() => setIsForgotPasswordMode(false)} className="text-brand-600 font-bold hover:underline">
+                                Volver al inicio de sesión
+                            </button>
+                        ) : (
+                            <>
+                                {isLoginMode ? "¿No tienes cuenta? " : "¿Ya tienes cuenta? "}
+                                <button onClick={toggleMode} className="text-brand-600 font-bold hover:underline">
+                                    {isLoginMode ? "Crea una" : "Inicia sesión"}
+                                </button>
+                            </>
+                        )}
                     </p>
                 </div>
             </div>

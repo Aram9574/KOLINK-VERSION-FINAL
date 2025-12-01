@@ -30,6 +30,35 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onUpgrade, onSave }) 
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [sessions, setSessions] = useState<any[]>([]);
     const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
+    const [showChangePassword, setShowChangePassword] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+
+    const handleChangePassword = async () => {
+        if (newPassword !== confirmPassword) {
+            setPasswordError("Las contraseñas no coinciden");
+            return;
+        }
+        if (newPassword.length < 6) {
+            setPasswordError("La contraseña debe tener al menos 6 caracteres");
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
+            if (error) throw error;
+            toast.success("Contraseña actualizada exitosamente");
+            setShowChangePassword(false);
+            setNewPassword('');
+            setConfirmPassword('');
+        } catch (error: any) {
+            toast.error(error.message || "Error al actualizar contraseña");
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     useEffect(() => {
         const fetchSessions = async () => {
@@ -346,6 +375,72 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onUpgrade, onSave }) 
                                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                             </label>
                         </div>
+                    </div>
+
+                    {/* Change Password Section */}
+                    <div className="border-t border-slate-100 pt-6">
+                        <h3 className="text-sm font-bold text-slate-900 mb-4">Contraseña</h3>
+                        {!showChangePassword ? (
+                            <button
+                                onClick={() => setShowChangePassword(true)}
+                                className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-100 transition-colors"
+                            >
+                                <Lock className="w-4 h-4" />
+                                Cambiar Contraseña
+                            </button>
+                        ) : (
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4 animate-in fade-in slide-in-from-top-2">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-slate-500">Nueva Contraseña</label>
+                                        <input
+                                            type="password"
+                                            value={newPassword}
+                                            onChange={(e) => {
+                                                setNewPassword(e.target.value);
+                                                setPasswordError('');
+                                            }}
+                                            className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none"
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-slate-500">Confirmar Contraseña</label>
+                                        <input
+                                            type="password"
+                                            value={confirmPassword}
+                                            onChange={(e) => {
+                                                setConfirmPassword(e.target.value);
+                                                setPasswordError('');
+                                            }}
+                                            className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none"
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
+                                </div>
+                                {passwordError && <p className="text-xs text-red-500 font-medium">{passwordError}</p>}
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={handleChangePassword}
+                                        disabled={isSaving || !newPassword || !confirmPassword}
+                                        className="px-4 py-2 bg-brand-600 text-white text-sm font-bold rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors"
+                                    >
+                                        {isSaving ? 'Guardando...' : 'Actualizar Contraseña'}
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setShowChangePassword(false);
+                                            setNewPassword('');
+                                            setConfirmPassword('');
+                                            setPasswordError('');
+                                        }}
+                                        className="px-4 py-2 text-slate-500 text-sm font-medium hover:text-slate-700"
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Active Sessions */}
