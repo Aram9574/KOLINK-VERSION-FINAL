@@ -72,9 +72,26 @@ const App: React.FC = () => {
                     attempts++;
                     console.log(`OAuth Recovery Attempt ${attempts}...`);
                     const { data: { session: recoverySession } } = await supabase.auth.getSession();
+
                     if (recoverySession) {
-                        console.log("Recovered session via polling!");
+                        console.log("Recovered session via polling! Updating state immediately.");
                         clearInterval(recoveryInterval);
+
+                        // FORCE STATE UPDATE
+                        const metadata = recoverySession.user.user_metadata || {};
+                        setUser(prev => ({
+                            ...prev,
+                            id: recoverySession.user.id,
+                            email: recoverySession.user.email,
+                            name: metadata.full_name || metadata.name || prev.name || 'Creator',
+                            avatarUrl: metadata.avatar_url || metadata.picture || prev.avatarUrl,
+                        }));
+                        setLoading(false);
+
+                        // Sync profile in background
+                        fetchUserProfile(recoverySession.user.id).then(profile => {
+                            if (profile) setUser(prev => ({ ...prev, ...profile }));
+                        });
                     }
                     if (attempts > 10) clearInterval(recoveryInterval);
                 }, 1000);
@@ -89,14 +106,30 @@ const App: React.FC = () => {
 
         // SAFETY TIMEOUT: Force stop loading after 8 seconds.
         // We avoid await here to prevent hanging if Supabase is unresponsive.
-        const safetyTimeout = setTimeout(() => {
-            setLoading(prev => {
-                if (prev) {
-                    console.warn("Loading state timed out. Forcing render.");
-                    return false;
-                }
-                return prev;
-            });
+        const safetyTimeout = setTimeout(async () => {
+            console.warn("Loading state timed out. Checking session one last time...");
+            const { data: { session: timeoutSession } } = await supabase.auth.getSession();
+
+            if (timeoutSession) {
+                console.log("Session found during timeout check. Recovering...");
+                const metadata = timeoutSession.user.user_metadata || {};
+                setUser(prev => ({
+                    ...prev,
+                    id: timeoutSession.user.id,
+                    email: timeoutSession.user.email,
+                    name: metadata.full_name || metadata.name || prev.name || 'Creator',
+                    avatarUrl: metadata.avatar_url || metadata.picture || prev.avatarUrl,
+                }));
+                setLoading(false);
+            } else {
+                setLoading(prev => {
+                    if (prev) {
+                        console.warn("Loading state timed out. Forcing render.");
+                        return false;
+                    }
+                    return prev;
+                });
+            }
         }, 8000);
 
         return () => clearTimeout(safetyTimeout);
