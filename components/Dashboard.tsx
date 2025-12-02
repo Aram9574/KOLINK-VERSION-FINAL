@@ -673,8 +673,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
     };
 
     const handleUpgrade = async (plan: SubscriptionPlan) => {
+        console.log("handleUpgrade called for:", plan);
         if (plan.id === 'free') return;
+
+        const toastId = toast.loading("Iniciando pasarela de pago...");
+
         try {
+            console.log("Invoking create-checkout-session with priceId:", plan.stripePriceId);
             const { data, error } = await supabase.functions.invoke('create-checkout-session', {
                 body: { priceId: plan.stripePriceId }
             });
@@ -685,10 +690,14 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
             }
 
             if (data?.url) {
+                console.log("Redirecting to Stripe:", data.url);
                 window.location.href = data.url;
+            } else {
+                throw new Error("No URL returned from checkout session");
             }
         } catch (e: any) {
             console.error("Checkout failed", e);
+            toast.dismiss(toastId);
             toast.error(e.message || "Error al iniciar el pago. Intenta de nuevo.");
         }
     };

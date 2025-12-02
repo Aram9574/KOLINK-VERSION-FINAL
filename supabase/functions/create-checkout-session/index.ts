@@ -95,7 +95,10 @@ serve(async (req) => {
         try {
             // Use origin from request if available, otherwise fallback to production
             // This supports localhost testing and production
-            const origin = req.headers.get('origin') || 'https://kolink-jade.vercel.app';
+            // Use origin from request if available, otherwise fallback to production
+            // This supports localhost testing and production
+            const origin = req.headers.get('origin') || req.headers.get('referer') || 'https://kolink-jade.vercel.app';
+            console.log("Using origin for redirect:", origin);
 
             session = await stripe.checkout.sessions.create({
                 customer: customerId,

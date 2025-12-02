@@ -102,13 +102,8 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ onClose, onUpgrade, current
 
                                     <button
                                         onClick={() => {
-                                            const planLevels = { free: 0, pro: 1, viral: 2 };
-                                            const currentLevel = planLevels[currentPlanId as keyof typeof planLevels] || 0;
-                                            const targetLevel = planLevels[plan.id as keyof typeof planLevels] || 0;
-
-                                            if (targetLevel > currentLevel) {
-                                                onUpgrade(plan);
-                                            }
+                                            console.log("Upgrade button clicked for plan:", plan.id);
+                                            onUpgrade(plan);
                                         }}
                                         disabled={(() => {
                                             const planLevels = { free: 0, pro: 1, viral: 2 };
