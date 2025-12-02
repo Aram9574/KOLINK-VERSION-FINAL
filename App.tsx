@@ -74,18 +74,23 @@ const App: React.FC = () => {
 
                     if (access_token && refresh_token) {
                         console.log("Tokens found in hash. Setting session manually...");
-                        const { data, error } = await supabase.auth.setSession({
-                            access_token,
-                            refresh_token,
-                        });
 
-                        if (data.session) {
+                        // Race setSession against a timeout
+                        const setSessionPromise = supabase.auth.setSession({ access_token, refresh_token });
+                        const timeoutPromise = new Promise<{ data: { session: any }, error: any }>((resolve) =>
+                            setTimeout(() => resolve({ data: { session: null }, error: new Error("Timeout setting session") }), 3000)
+                        );
+
+                        const { data, error } = await Promise.race([setSessionPromise, timeoutPromise]);
+
+                        if (data?.session) {
                             console.log("Manual hash session set successful!");
                             toast.success("¡Sesión iniciada!");
                             session = data.session;
-                        } else if (error) {
-                            console.error("Manual hash setSession failed:", error);
-                            toast.error("Error al establecer la sesión.");
+                        } else {
+                            console.error("Manual hash setSession failed or timed out:", error);
+                            // If timeout, we might still have the session in local storage from a previous attempt? 
+                            // Or maybe we should just proceed and let the background fetch try.
                         }
                     } else {
                         console.warn("Hash detected but missing tokens.");
@@ -142,7 +147,10 @@ const App: React.FC = () => {
                 const recoveryInterval = setInterval(async () => {
                     attempts++;
                     console.log(`OAuth Recovery Attempt ${attempts}...`);
-                    const { data: { session: recoverySession } } = await supabase.auth.getSession();
+                    // Race getSession here too
+                    const p1 = supabase.auth.getSession();
+                    const p2 = new Promise<{ data: { session: null } }>(r => setTimeout(() => r({ data: { session: null } }), 1000));
+                    const { data: { session: recoverySession } } = await Promise.race([p1, p2]);
 
                     if (recoverySession) {
                         console.log("Recovered session via polling! Updating state immediately.");
@@ -179,7 +187,13 @@ const App: React.FC = () => {
         // We avoid await here to prevent hanging if Supabase is unresponsive.
         const safetyTimeout = setTimeout(async () => {
             console.warn("Loading state timed out. Checking session one last time...");
-            const { data: { session: timeoutSession } } = await supabase.auth.getSession();
+
+            // Race getSession against timeout
+            const sessionPromise = supabase.auth.getSession();
+            const timeoutPromise = new Promise<{ data: { session: null } }>((resolve) => setTimeout(() => resolve({ data: { session: null } }), 1500));
+
+            const { data } = await Promise.race([sessionPromise, timeoutPromise]);
+            const timeoutSession = data?.session;
 
             if (timeoutSession) {
                 console.log("Session found during timeout check. Recovering...");
@@ -193,13 +207,8 @@ const App: React.FC = () => {
                 }));
                 setLoading(false);
             } else {
-                setLoading(prev => {
-                    if (prev) {
-                        console.warn("Loading state timed out. Forcing render.");
-                        return false;
-                    }
-                    return prev;
-                });
+                console.warn("No session found (or timeout). Forcing render.");
+                setLoading(false); // FORCE UNBLOCK
             }
         }, 8000);
 
