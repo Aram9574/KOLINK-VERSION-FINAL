@@ -27,9 +27,26 @@ const App: React.FC = () => {
     useEffect(() => {
         // Check active session
         const checkSession = async () => {
-            console.log("Checking session...");
-            const { data: { session } } = await supabase.auth.getSession();
-            console.log("Session check complete:", session ? "Found" : "None");
+            // CRITICAL: If we have a hash with access_token OR a code query param (PKCE), we are in an OAuth callback.
+            const isOAuthCallback = (window.location.hash && window.location.hash.includes('access_token')) ||
+                (window.location.search && window.location.search.includes('code='));
+
+            let session = null;
+
+            // If NOT in OAuth callback, try to get session normally.
+            // If IN OAuth callback, skip initial getSession to avoid race/hang, and let the listener/poller handle it.
+            if (!isOAuthCallback) {
+                console.log("Checking session (Standard)...");
+                // Add a small timeout to getSession so it doesn't hang forever
+                const sessionPromise = supabase.auth.getSession();
+                const timeoutPromise = new Promise<{ data: { session: null } }>((resolve) => setTimeout(() => resolve({ data: { session: null } }), 2000));
+
+                const { data } = await Promise.race([sessionPromise, timeoutPromise]);
+                session = data.session;
+                console.log("Session check complete:", session ? "Found" : "None/Timeout");
+            } else {
+                console.log("OAuth callback detected. Skipping initial getSession to prevent hang.");
+            }
 
             if (session) {
                 try {
