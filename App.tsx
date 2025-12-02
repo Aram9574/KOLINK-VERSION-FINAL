@@ -56,6 +56,20 @@ const App: React.FC = () => {
         };
 
         checkSession();
+
+        // SAFETY TIMEOUT: If for some reason auth hangs (e.g. OAuth callback fails), 
+        // force stop loading after 8 seconds to allow user to retry or see error.
+        const safetyTimeout = setTimeout(() => {
+            setLoading(prev => {
+                if (prev) {
+                    console.warn("Loading state timed out. Forcing render.");
+                    return false;
+                }
+                return prev;
+            });
+        }, 8000);
+
+        return () => clearTimeout(safetyTimeout);
     }, []);
 
     useEffect(() => {
