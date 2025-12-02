@@ -63,11 +63,14 @@ const App: React.FC = () => {
             console.log("Auth state change:", event);
             if (session) {
                 // 1. IMMEDIATE UPDATE: Allow access immediately using Auth data
+                const metadata = session.user.user_metadata || {};
                 setUser(prev => ({
                     ...prev,
                     id: session.user.id,
                     email: session.user.email,
-                    // Keep existing defaults for other fields until profile loads
+                    // Optimistically set name/avatar from metadata to unblock Dashboard
+                    name: metadata.full_name || metadata.name || prev.name || 'Creator',
+                    avatarUrl: metadata.avatar_url || metadata.picture || prev.avatarUrl,
                 }));
 
                 // IMMEDIATE UNBLOCK: Stop loading and redirect NOW. 

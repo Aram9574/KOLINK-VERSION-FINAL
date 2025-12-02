@@ -39,6 +39,11 @@ class ErrorBoundary extends Component<Props, State> {
                         <div className="bg-slate-50 p-4 rounded-xl mb-6 text-left overflow-auto max-h-32">
                             <code className="text-xs text-slate-600 font-mono">
                                 {this.state.error?.message}
+                                {this.state.error?.stack && (
+                                    <div className="mt-2 pt-2 border-t border-slate-200 whitespace-pre-wrap">
+                                        {this.state.error.stack}
+                                    </div>
+                                )}
                             </code>
                         </div>
                         <button
