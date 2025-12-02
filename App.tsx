@@ -124,112 +124,111 @@ const App: React.FC = () => {
                     setLoading(false);
                 }
             }
-        }
         });
 
-    return () => subscription.unsubscribe();
-}, []); // CRITICAL: Empty dependency array to ensure listener survives URL changes (hash removal)
+        return () => subscription.unsubscribe();
+    }, []); // CRITICAL: Empty dependency array to ensure listener survives URL changes (hash removal)
 
-// Keep user language in sync with app state
-useEffect(() => {
-    if (user.language !== language) {
-        setUser(prev => ({ ...prev, language }));
-    }
-}, [language]);
+    // Keep user language in sync with app state
+    useEffect(() => {
+        if (user.language !== language) {
+            setUser(prev => ({ ...prev, language }));
+        }
+    }, [language]);
 
-const handleLogout = async () => {
-    // Optimistic logout: Clear state immediately so the router knows we are out
-    setUser({ ...EMPTY_USER, language });
+    const handleLogout = async () => {
+        // Optimistic logout: Clear state immediately so the router knows we are out
+        setUser({ ...EMPTY_USER, language });
 
-    await supabase.auth.signOut();
-    localStorage.removeItem('kolink_history');
-    localStorage.removeItem('kolink_device_id');
-    navigate('/login');
-};
+        await supabase.auth.signOut();
+        localStorage.removeItem('kolink_history');
+        localStorage.removeItem('kolink_device_id');
+        navigate('/login');
+    };
 
-// Protected Route wrapper
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    if (loading) {
-        return (
-            <div className="h-screen w-screen flex flex-col items-center justify-center bg-slate-50">
-                <div className="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin mb-4"></div>
-                <p className="text-slate-500 font-medium animate-pulse">Cargando tu estudio...</p>
-            </div>
-        );
-    }
+    // Protected Route wrapper
+    const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+        if (loading) {
+            return (
+                <div className="h-screen w-screen flex flex-col items-center justify-center bg-slate-50">
+                    <div className="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin mb-4"></div>
+                    <p className="text-slate-500 font-medium animate-pulse">Cargando tu estudio...</p>
+                </div>
+            );
+        }
 
-    // If user is not authenticated (using mock ID check as proxy for now, ideally check session)
-    // But since we set MOCK_USER on logout, we need to check if it's a real user ID
-    // Real Supabase IDs are UUIDs, Mock IDs start with 'mock-'
-    if (!user.id || user.id.startsWith('mock-')) {
-        return <Navigate to="/login" replace />;
-    }
-    return <>{children}</>;
-};
+        // If user is not authenticated (using mock ID check as proxy for now, ideally check session)
+        // But since we set MOCK_USER on logout, we need to check if it's a real user ID
+        // Real Supabase IDs are UUIDs, Mock IDs start with 'mock-'
+        if (!user.id || user.id.startsWith('mock-')) {
+            return <Navigate to="/login" replace />;
+        }
+        return <>{children}</>;
+    };
 
-// REMOVED: Global loading block that blocked the Landing Page
-// if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50">Loading...</div>;
+    // REMOVED: Global loading block that blocked the Landing Page
+    // if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50">Loading...</div>;
 
-// 1. Marketing Domain Logic (kolink.es)
-if (isMarketingDomain) {
-    // CRITICAL: If we receive an OAuth callback here (e.g. Supabase redirected to Site URL instead of App Domain),
-    // we must forward it to the App Domain so the session is established there.
-    if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error'))) {
-        console.log("OAuth callback detected on Marketing Domain. Forwarding to App Domain...");
-        window.location.href = `https://${APP_DOMAIN}/dashboard${window.location.hash}`;
+    // 1. Marketing Domain Logic (kolink.es)
+    if (isMarketingDomain) {
+        // CRITICAL: If we receive an OAuth callback here (e.g. Supabase redirected to Site URL instead of App Domain),
+        // we must forward it to the App Domain so the session is established there.
+        if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error'))) {
+            console.log("OAuth callback detected on Marketing Domain. Forwarding to App Domain...");
+            window.location.href = `https://${APP_DOMAIN}/dashboard${window.location.hash}`;
+            return null;
+        }
+
+        // Allow Legal Pages
+        if (location.pathname === '/privacy') {
+            return <PrivacyPolicy language={language} />;
+        }
+        if (location.pathname === '/terms') {
+            return <TermsOfService language={language} />;
+        }
+
+        // Force Landing Page at root
+        if (location.pathname === '/') {
+            return (
+                <>
+                    <Toaster position="top-center" richColors />
+                    <LandingPage language={language} setLanguage={setLanguage} user={user} />
+                </>
+            );
+        }
+        // Redirect any other path to App Domain
+        window.location.href = `https://${APP_DOMAIN}${location.pathname}`;
         return null;
     }
 
-    // Allow Legal Pages
-    if (location.pathname === '/privacy') {
-        return <PrivacyPolicy language={language} />;
-    }
-    if (location.pathname === '/terms') {
-        return <TermsOfService language={language} />;
-    }
+    // 2. App Domain Logic (kolink-jade.vercel.app)
+    return (
+        <>
+            <Toaster position="top-center" richColors />
+            <Routes>
+                {/* Redirect root to Login on App Domain */}
+                <Route path="/" element={<Navigate to="/login" replace />} />
 
-    // Force Landing Page at root
-    if (location.pathname === '/') {
-        return (
-            <>
-                <Toaster position="top-center" richColors />
-                <LandingPage language={language} setLanguage={setLanguage} user={user} />
-            </>
-        );
-    }
-    // Redirect any other path to App Domain
-    window.location.href = `https://${APP_DOMAIN}${location.pathname}`;
-    return null;
-}
-
-// 2. App Domain Logic (kolink-jade.vercel.app)
-return (
-    <>
-        <Toaster position="top-center" richColors />
-        <Routes>
-            {/* Redirect root to Login on App Domain */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
-
-            <Route path="/login" element={
-                // If user is logged in, redirect to dashboard
-                user.id && !user.id.startsWith('mock-') ? <Navigate to="/dashboard" replace /> :
-                    <LoginPage language={language} />
-            } />
-            <Route path="/dashboard" element={
-                <ProtectedRoute>
-                    <Dashboard
-                        user={user}
-                        setUser={setUser}
-                        language={language}
-                        setLanguage={setLanguage}
-                        onLogout={handleLogout}
-                    />
-                </ProtectedRoute>
-            } />
-            <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-    </>
-);
+                <Route path="/login" element={
+                    // If user is logged in, redirect to dashboard
+                    user.id && !user.id.startsWith('mock-') ? <Navigate to="/dashboard" replace /> :
+                        <LoginPage language={language} />
+                } />
+                <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                        <Dashboard
+                            user={user}
+                            setUser={setUser}
+                            language={language}
+                            setLanguage={setLanguage}
+                            onLogout={handleLogout}
+                        />
+                    </ProtectedRoute>
+                } />
+                <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+        </>
+    );
 };
 
 export default App;
