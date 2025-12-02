@@ -141,16 +141,50 @@ const App: React.FC = () => {
                 }));
                 setLoading(false);
 
+                // 2. BACKGROUND SYNC: Fetch full profile (credits, plan, etc.)
                 try {
-                    console.log("Fetching profile...");
-                    const profile = await fetchUserProfile(session.user.id);
-                    console.log("Profile fetched:", profile ? "Found" : "Not Found");
-                    if (profile) {
-                        setUser(prev => ({ ...prev, ...profile }));
-                        setLanguage(profile.language || 'es');
+                    console.log("Syncing user profile from auth provider (INLINED):", session.user.id);
+
+                    // Inline fetch to guarantee execution and logging
+                    const { data: profileData, error: profileError } = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', session.user.id)
+                        .single();
+
+                    if (profileError) {
+                        console.error("Error fetching profile (INLINED):", profileError);
+                        // If error is "PGRST116" (no rows), it means profile doesn't exist yet (maybe new user?)
+                    } else if (profileData) {
+                        console.log("Profile synced successfully (INLINED):", profileData);
+                        console.log("Credits from DB:", profileData.credits);
+
+                        // Map and update state
+                        const mappedProfile: Partial<UserProfile> = {
+                            credits: profileData.credits ?? 0, // Handle null safely
+                            planTier: profileData.plan_tier,
+                            stripeCustomerId: profileData.stripe_customer_id,
+                            xp: profileData.xp ?? 0,
+                            level: profileData.level ?? 1,
+                            currentStreak: profileData.current_streak ?? 0,
+                            // Add other fields as needed
+                        };
+
+                        setUser(prev => ({
+                            ...prev,
+                            ...mappedProfile,
+                            // Ensure we don't overwrite name/avatar if they are missing in DB but present in metadata
+                            name: profileData.full_name || prev.name,
+                            avatarUrl: profileData.avatar_url || prev.avatarUrl,
+                        }));
+
+                        // Toast to confirm credits loaded (Debugging/User Assurance)
+                        if (mappedProfile.credits !== undefined) {
+                            // toast.success(`Perfil sincronizado: ${mappedProfile.credits} créditos`);
+                        }
                     }
                 } catch (error) {
-                    console.error("Error fetching profile:", error);
+                    console.error("Error syncing profile (Exception):", error);
                 }
             } else if (isOAuthCallback) {
                 // Fallback polling if manual exchange failed or if it was a hash-based flow
