@@ -24,7 +24,14 @@ const App: React.FC = () => {
     const hostname = window.location.hostname;
     const isMarketingDomain = hostname.includes(MARKETING_DOMAIN);
 
+    // Ref to prevent double-execution in Strict Mode
+    const authCheckPerformed = React.useRef(false);
+
     useEffect(() => {
+        // Prevent running this effect twice
+        if (authCheckPerformed.current) return;
+        authCheckPerformed.current = true;
+
         // Check active session
         const checkSession = async () => {
             // CRITICAL: If we have a hash with access_token OR a code query param (PKCE), we are in an OAuth callback.
@@ -37,16 +44,20 @@ const App: React.FC = () => {
             // If we have a code, we MUST exchange it manually if the auto-detection fails.
             if (code) {
                 console.log("OAuth Code detected. Attempting manual exchange...");
+                toast.loading("Procesando inicio de sesión con LinkedIn...");
                 try {
                     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
                     if (data.session) {
                         console.log("Manual code exchange successful!");
+                        toast.success("¡Sesión recuperada exitosamente!");
                         session = data.session;
                     } else if (error) {
                         console.error("Manual code exchange failed:", error);
+                        toast.error(`Error de autenticación: ${error.message}`);
                     }
-                } catch (err) {
+                } catch (err: any) {
                     console.error("Error during manual code exchange:", err);
+                    toast.error(`Error inesperado: ${err.message || err}`);
                 }
             }
 
