@@ -41,7 +41,6 @@ const App: React.FC = () => {
             let session = null;
 
             // MANUAL CODE EXCHANGE (PKCE)
-            // If we have a code, we MUST exchange it manually if the auto-detection fails.
             if (code) {
                 console.log("OAuth Code detected. Attempting manual exchange...");
                 toast.loading("Procesando inicio de sesión con LinkedIn...");
@@ -58,6 +57,41 @@ const App: React.FC = () => {
                 } catch (err: any) {
                     console.error("Error during manual code exchange:", err);
                     toast.error(`Error inesperado: ${err.message || err}`);
+                }
+            }
+
+            // MANUAL HASH PARSING (Implicit Flow)
+            // Fallback if code is missing but we have an access_token in the hash
+            if (!session && !code && window.location.hash && window.location.hash.includes('access_token')) {
+                console.log("OAuth Hash detected. Attempting manual parsing...");
+                toast.loading("Finalizando autenticación...");
+                try {
+                    // Remove the '#' character
+                    const hashStr = window.location.hash.substring(1);
+                    const params = new URLSearchParams(hashStr);
+                    const access_token = params.get('access_token');
+                    const refresh_token = params.get('refresh_token');
+
+                    if (access_token && refresh_token) {
+                        console.log("Tokens found in hash. Setting session manually...");
+                        const { data, error } = await supabase.auth.setSession({
+                            access_token,
+                            refresh_token,
+                        });
+
+                        if (data.session) {
+                            console.log("Manual hash session set successful!");
+                            toast.success("¡Sesión iniciada!");
+                            session = data.session;
+                        } else if (error) {
+                            console.error("Manual hash setSession failed:", error);
+                            toast.error("Error al establecer la sesión.");
+                        }
+                    } else {
+                        console.warn("Hash detected but missing tokens.");
+                    }
+                } catch (err) {
+                    console.error("Error parsing hash:", err);
                 }
             }
 
