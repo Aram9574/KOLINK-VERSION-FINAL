@@ -156,8 +156,7 @@ const App: React.FC = () => {
                         console.error("Error fetching profile (INLINED):", profileError);
                         // If error is "PGRST116" (no rows), it means profile doesn't exist yet (maybe new user?)
                     } else if (profileData) {
-                        console.log("Profile synced successfully (INLINED):", profileData);
-                        console.log("Credits from DB:", profileData.credits);
+                        console.log("Profile synced successfully (INLINED). Credits:", profileData.credits);
 
                         // Map and update state
                         const mappedProfile: Partial<UserProfile> = {
@@ -170,13 +169,16 @@ const App: React.FC = () => {
                             // Add other fields as needed
                         };
 
-                        setUser(prev => ({
-                            ...prev,
-                            ...mappedProfile,
-                            // Ensure we don't overwrite name/avatar if they are missing in DB but present in metadata
-                            name: profileData.full_name || prev.name,
-                            avatarUrl: profileData.avatar_url || prev.avatarUrl,
-                        }));
+                        setUser(prev => {
+                            console.log("Updating user state with new profile data:", mappedProfile);
+                            return {
+                                ...prev,
+                                ...mappedProfile,
+                                // Ensure we don't overwrite name/avatar if they are missing in DB but present in metadata
+                                name: profileData.full_name || prev.name,
+                                avatarUrl: profileData.avatar_url || prev.avatarUrl,
+                            };
+                        });
 
                         // Toast to confirm credits loaded (Debugging/User Assurance)
                         if (mappedProfile.credits !== undefined) {

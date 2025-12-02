@@ -683,6 +683,9 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
             const { data, error } = await supabase.functions.invoke('create-checkout-session', {
                 body: { priceId: plan.stripePriceId }
             });
+
+            console.log("Checkout session response:", { data, error });
+
             if (error) throw error;
 
             if (data?.error) {
@@ -698,7 +701,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
         } catch (e: any) {
             console.error("Checkout failed", e);
             toast.dismiss(toastId);
-            toast.error(e.message || "Error al iniciar el pago. Intenta de nuevo.");
+            toast.error("Error al iniciar pago: " + (e.message || "Desconocido"));
         }
     };
 
