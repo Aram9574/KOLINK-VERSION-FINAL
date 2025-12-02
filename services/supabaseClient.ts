@@ -7,40 +7,57 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
+  try {
+    console.log(`Fetching profile for ${userId}...`);
 
-  if (error) {
-    console.error('Error fetching profile:', error);
+    // Race against a timeout to prevent hanging
+    const fetchPromise = supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    const timeoutPromise = new Promise<{ data: null, error: any }>((_, reject) =>
+      setTimeout(() => reject(new Error('Profile fetch timeout')), 5000)
+    );
+
+    const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
+
+    if (error) {
+      console.error('Error fetching profile:', error);
+      return null;
+    }
+
+    // Map DB snake_case to frontend camelCase
+    console.log('Fetched profile raw data:', data);
+    console.log('Credits from DB:', data.credits);
+
+    return {
+      ...data,
+      name: data.full_name || data.name || 'User',
+      avatarUrl: data.avatar_url,
+      credits: data.credits !== undefined ? data.credits : 0, // Explicitly map credits
+      headline: data.headline,
+      industry: data.industry,
+      position: data.position,
+      brandVoice: data.brand_voice,
+      companyName: data.company_name,
+      planTier: data.plan_tier,
+      cancelAtPeriodEnd: data.cancel_at_period_end,
+      twoFactorEnabled: data.two_factor_enabled,
+      securityNotifications: data.security_notifications,
+      hasOnboarded: data.has_onboarded,
+      xp: data.xp || 0,
+      level: data.level || 1,
+      currentStreak: data.current_streak || 0,
+      lastPostDate: data.last_post_date ? new Date(data.last_post_date).getTime() : undefined,
+      unlockedAchievements: data.unlocked_achievements || [],
+      autoPilot: data.auto_pilot || { enabled: false, topics: [], frequency: 'daily' },
+    } as unknown as UserProfile;
+  } catch (err) {
+    console.error("Exception in fetchUserProfile:", err);
     return null;
   }
-
-  // Map DB snake_case to frontend camelCase
-  console.log('Fetched profile raw data:', data);
-  return {
-    ...data,
-    name: data.full_name || data.name || 'User',
-    avatarUrl: data.avatar_url,
-    headline: data.headline,
-    industry: data.industry,
-    position: data.position,
-    brandVoice: data.brand_voice,
-    companyName: data.company_name,
-    planTier: data.plan_tier,
-    cancelAtPeriodEnd: data.cancel_at_period_end,
-    twoFactorEnabled: data.two_factor_enabled,
-    securityNotifications: data.security_notifications,
-    hasOnboarded: data.has_onboarded,
-    xp: data.xp || 0,
-    level: data.level || 1,
-    currentStreak: data.current_streak || 0,
-    lastPostDate: data.last_post_date ? new Date(data.last_post_date).getTime() : undefined,
-    unlockedAchievements: data.unlocked_achievements || [],
-    autoPilot: data.auto_pilot || { enabled: false, topics: [], frequency: 'daily' },
-  } as unknown as UserProfile;
 };
 
 export const updateUserProfile = async (userId: string, updates: Partial<UserProfile>) => {
