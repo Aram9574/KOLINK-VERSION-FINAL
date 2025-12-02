@@ -93,6 +93,10 @@ serve(async (req) => {
         console.log('Creating session for customer:', customerId, 'price:', priceId);
         let session;
         try {
+            // Use origin from request if available, otherwise fallback to production
+            // This supports localhost testing and production
+            const origin = req.headers.get('origin') || 'https://kolink-jade.vercel.app';
+
             session = await stripe.checkout.sessions.create({
                 customer: customerId,
                 line_items: [
@@ -102,10 +106,8 @@ serve(async (req) => {
                     },
                 ],
                 mode: 'subscription',
-                // Use hardcoded APP_DOMAIN to ensure we always redirect to the app, not the marketing site
-                // This fixes the issue where users on kolink.es might be redirected back to kolink.es/dashboard (which doesn't exist)
-                success_url: `https://kolink-jade.vercel.app/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-                cancel_url: `https://kolink-jade.vercel.app/dashboard`,
+                success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${origin}/dashboard`,
             })
         } catch (stripeError) {
             // Self-healing: If customer not found (e.g. switching between Test/Live mode), create a new one
@@ -126,6 +128,8 @@ serve(async (req) => {
 
                 console.log('New customer created:', customerId, '. Retrying session creation...');
 
+                const origin = req.headers.get('origin') || 'https://kolink-jade.vercel.app';
+
                 // Retry session creation
                 session = await stripe.checkout.sessions.create({
                     customer: customerId,
@@ -136,8 +140,8 @@ serve(async (req) => {
                         },
                     ],
                     mode: 'subscription',
-                    success_url: `https://kolink-jade.vercel.app/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-                    cancel_url: `https://kolink-jade.vercel.app/pricing`,
+                    success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+                    cancel_url: `${origin}/dashboard`,
                 })
             } else {
                 throw stripeError; // Re-throw other errors

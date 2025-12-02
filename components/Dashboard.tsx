@@ -77,6 +77,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
     const [isGenerating, setIsGenerating] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'create' | 'history' | 'settings' | 'ideas' | 'autopilot'>('create');
+    const [isPublishing, setIsPublishing] = useState(false);
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [showCreditDeduction, setShowCreditDeduction] = useState(false);
     const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
@@ -631,6 +632,43 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
         localStorage.setItem('kolink_history', JSON.stringify(updatedPosts));
     };
 
+    const handlePublish = async () => {
+        if (!currentPost) return;
+
+        setIsPublishing(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const providerToken = session?.provider_token;
+
+            if (!providerToken) {
+                toast.error("No se detectó conexión con LinkedIn. Por favor inicia sesión nuevamente con LinkedIn.");
+                return;
+            }
+
+            const { data, error } = await supabase.functions.invoke('publish-to-linkedin', {
+                body: {
+                    content: currentPost.content,
+                    providerToken: providerToken,
+                    visibility: 'PUBLIC'
+                }
+            });
+
+            if (error) throw error;
+
+            if (data && !data.success) {
+                throw new Error(data.error || "Error desconocido al publicar");
+            }
+
+            toast.success("¡Post publicado exitosamente en LinkedIn!");
+            // Optional: Mark post as published in DB?
+        } catch (error: any) {
+            console.error("Publishing error:", error);
+            toast.error(error.message || "Error al publicar en LinkedIn");
+        } finally {
+            setIsPublishing(false);
+        }
+    };
+
     const handleUpgrade = async (plan: SubscriptionPlan) => {
         if (plan.id === 'free') return;
         try {
@@ -915,14 +953,16 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
                                             Guardar Borrador
                                         </button>
                                         <button
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(currentPost.content);
-                                                toast.success("¡Copiado al portapapeles!");
-                                            }}
-                                            className="py-3.5 rounded-xl bg-brand-600 text-white font-bold hover:bg-brand-700 hover:-translate-y-0.5 transition-all shadow-lg shadow-brand-500/30 text-sm flex items-center justify-center gap-2"
+                                            onClick={handlePublish}
+                                            disabled={isPublishing}
+                                            className="py-3.5 rounded-xl bg-brand-600 text-white font-bold hover:bg-brand-700 hover:-translate-y-0.5 transition-all shadow-lg shadow-brand-500/30 text-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait"
                                         >
-                                            <Zap className="w-4 h-4 fill-current" />
-                                            Copiar y Publicar
+                                            {isPublishing ? (
+                                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            ) : (
+                                                <Zap className="w-4 h-4 fill-current" />
+                                            )}
+                                            {isPublishing ? 'Publicando...' : 'Publicar en LinkedIn'}
                                         </button>
                                     </div>
                                 )}

@@ -125,7 +125,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ language }) => {
         const { error } = await supabase.auth.signInWithOAuth({
             provider: provider === 'linkedin' ? 'linkedin_oidc' : provider,
             options: {
-                redirectTo: `https://${APP_DOMAIN}/dashboard`
+                redirectTo: `https://${APP_DOMAIN}/dashboard`,
+                scopes: provider === 'linkedin' ? 'w_member_social profile email openid' : undefined
             }
         });
 

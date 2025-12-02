@@ -80,22 +80,22 @@ const App: React.FC = () => {
                 }
 
                 // 2. Sync & Fetch Profile in Background
-                if (event === 'SIGNED_IN') {
-                    // Sync LinkedIn/Auth provider metadata to DB
-                    // Await it to ensure photo is saved before fetching profile
-                    await syncUserProfile(session.user).catch(console.error);
-                }
+                // Always sync on session presence to ensure profile exists (e.g. after DB reset or hard refresh)
+                await syncUserProfile(session.user).catch(console.error);
 
                 fetchUserProfile(session.user.id)
                     .then(profile => {
                         if (profile) {
                             setUser(prev => ({ ...prev, ...profile }));
                             setLanguage(profile.language || 'es');
+                        } else {
+                            console.error("Profile missing for authenticated user. Logging out.");
+                            handleLogout();
                         }
                     })
                     .catch(err => {
                         console.error("Error loading profile:", err);
-                        // No need to toast error here usually, as it might just be a blip
+                        // If error is critical, maybe logout? For now, keep session but log error.
                     });
             } else {
                 // Reset to empty state on logout

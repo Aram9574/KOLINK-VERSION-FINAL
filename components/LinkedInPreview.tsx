@@ -3,6 +3,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { AppLanguage, UserProfile, ViralAnalysis } from '../types';
 import { ThumbsUp, MessageCircle, Repeat, Send, Globe, MoreHorizontal, Plus, PenSquare, Check, TrendingUp, Activity, Zap, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { translations } from '../translations';
+import { supabase } from '../services/supabaseClient';
+import { toast } from 'sonner';
 
 interface LinkedInPreviewProps {
     content: string;
@@ -19,6 +21,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content, user, isLoad
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState(content);
     const [showAudit, setShowAudit] = useState(true);
+    const [isPublishing, setIsPublishing] = useState(false);
 
     const t = translations[language].app.preview;
 
@@ -53,6 +56,41 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content, user, isLoad
     const handleCancel = () => {
         setEditContent(content);
         setIsEditing(false);
+    };
+
+    const handlePublish = async () => {
+        setIsPublishing(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const providerToken = session?.provider_token;
+
+            if (!providerToken) {
+                toast.error("No se detectó conexión con LinkedIn. Por favor inicia sesión nuevamente con LinkedIn.");
+                return;
+            }
+
+            const { data, error } = await supabase.functions.invoke('publish-to-linkedin', {
+                body: {
+                    content: displayContent,
+                    providerToken: providerToken,
+                    visibility: 'PUBLIC'
+                }
+            });
+
+            if (error) throw error;
+
+            if (data && !data.success) {
+                throw new Error(data.error || "Error desconocido al publicar");
+            }
+
+            toast.success("¡Post publicado exitosamente en LinkedIn!");
+            // Optional: Add link to view post? data.data.id might have the URN
+        } catch (error: any) {
+            console.error("Publishing error:", error);
+            toast.error(error.message || "Error al publicar en LinkedIn");
+        } finally {
+            setIsPublishing(false);
+        }
     };
 
     const getScoreColor = (score: number) => {
@@ -193,13 +231,28 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content, user, isLoad
                             </button>
                         </div>
                     ) : (
-                        <button
-                            onClick={() => setIsEditing(true)}
-                            className="px-3 py-1.5 rounded-md bg-white border border-slate-200 text-brand-600 text-xs font-bold hover:border-brand-300 hover:bg-brand-50 transition-all shadow-sm flex items-center gap-1.5"
-                        >
-                            <PenSquare className="w-3.5 h-3.5" />
-                            {t.edit}
-                        </button>
+
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setIsEditing(true)}
+                                className="px-3 py-1.5 rounded-md bg-white border border-slate-200 text-brand-600 text-xs font-bold hover:border-brand-300 hover:bg-brand-50 transition-all shadow-sm flex items-center gap-1.5"
+                            >
+                                <PenSquare className="w-3.5 h-3.5" />
+                                {t.edit}
+                            </button>
+                            <button
+                                onClick={handlePublish}
+                                disabled={isPublishing}
+                                className="px-3 py-1.5 rounded-md bg-[#0077b5] text-white text-xs font-bold hover:bg-[#006097] transition-all shadow-sm flex items-center gap-1.5 disabled:opacity-70 disabled:cursor-wait"
+                            >
+                                {isPublishing ? (
+                                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                ) : (
+                                    <Send className="w-3.5 h-3.5" />
+                                )}
+                                {isPublishing ? 'Publicando...' : 'Publicar en LinkedIn'}
+                            </button>
+                        </div>
                     )}
                 </div>
 
