@@ -28,14 +28,30 @@ const App: React.FC = () => {
         // Check active session
         const checkSession = async () => {
             // CRITICAL: If we have a hash with access_token OR a code query param (PKCE), we are in an OAuth callback.
-            const isOAuthCallback = (window.location.hash && window.location.hash.includes('access_token')) ||
-                (window.location.search && window.location.search.includes('code='));
+            const code = new URLSearchParams(window.location.search).get('code');
+            const isOAuthCallback = (window.location.hash && window.location.hash.includes('access_token')) || !!code;
 
             let session = null;
 
-            // If NOT in OAuth callback, try to get session normally.
-            // If IN OAuth callback, skip initial getSession to avoid race/hang, and let the listener/poller handle it.
-            if (!isOAuthCallback) {
+            // MANUAL CODE EXCHANGE (PKCE)
+            // If we have a code, we MUST exchange it manually if the auto-detection fails.
+            if (code) {
+                console.log("OAuth Code detected. Attempting manual exchange...");
+                try {
+                    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+                    if (data.session) {
+                        console.log("Manual code exchange successful!");
+                        session = data.session;
+                    } else if (error) {
+                        console.error("Manual code exchange failed:", error);
+                    }
+                } catch (err) {
+                    console.error("Error during manual code exchange:", err);
+                }
+            }
+
+            // If NOT in OAuth callback (and manual exchange didn't already get session), try to get session normally.
+            if (!isOAuthCallback && !session) {
                 console.log("Checking session (Standard)...");
                 // Add a small timeout to getSession so it doesn't hang forever
                 const sessionPromise = supabase.auth.getSession();
@@ -44,11 +60,22 @@ const App: React.FC = () => {
                 const { data } = await Promise.race([sessionPromise, timeoutPromise]);
                 session = data.session;
                 console.log("Session check complete:", session ? "Found" : "None/Timeout");
-            } else {
-                console.log("OAuth callback detected. Skipping initial getSession to prevent hang.");
+            } else if (isOAuthCallback && !session) {
+                console.log("OAuth callback detected but no session yet. Waiting for listener...");
             }
 
             if (session) {
+                // Immediate update if we have the session (from manual exchange or standard check)
+                const metadata = session.user.user_metadata || {};
+                setUser(prev => ({
+                    ...prev,
+                    id: session.user.id,
+                    email: session.user.email,
+                    name: metadata.full_name || metadata.name || prev.name || 'Creator',
+                    avatarUrl: metadata.avatar_url || metadata.picture || prev.avatarUrl,
+                }));
+                setLoading(false);
+
                 try {
                     console.log("Fetching profile...");
                     const profile = await fetchUserProfile(session.user.id);
@@ -60,11 +87,10 @@ const App: React.FC = () => {
                 } catch (error) {
                     console.error("Error fetching profile:", error);
                 }
-            }
-
-
-
-            if (!session && isOAuthCallback) {
+            } else if (isOAuthCallback) {
+                // Fallback polling if manual exchange failed or if it was a hash-based flow
+                // ... existing polling logic could go here, but let's rely on the listener + safety timeout for now to avoid complexity
+                // actually, let's keep a simplified poller just in case
                 console.log("OAuth callback detected (Hash or PKCE), waiting for onAuthStateChange...");
                 // MANUAL RECOVERY: Poll for session
                 let attempts = 0;
