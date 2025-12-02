@@ -45,13 +45,13 @@ const App: React.FC = () => {
                 }
             }
 
-            // CRITICAL: If we have a hash with access_token, we are likely in an OAuth callback.
-            const isOAuthCallback = window.location.hash && window.location.hash.includes('access_token');
+            // CRITICAL: If we have a hash with access_token OR a code query param (PKCE), we are in an OAuth callback.
+            const isOAuthCallback = (window.location.hash && window.location.hash.includes('access_token')) ||
+                (window.location.search && window.location.search.includes('code='));
 
             if (!session && isOAuthCallback) {
-                console.log("OAuth callback detected, waiting for onAuthStateChange...");
-                // MANUAL RECOVERY: Sometimes onAuthStateChange doesn't fire for hash. 
-                // We poll for session a few times.
+                console.log("OAuth callback detected (Hash or PKCE), waiting for onAuthStateChange...");
+                // MANUAL RECOVERY: Poll for session
                 let attempts = 0;
                 const recoveryInterval = setInterval(async () => {
                     attempts++;
@@ -60,31 +60,28 @@ const App: React.FC = () => {
                     if (recoverySession) {
                         console.log("Recovered session via polling!");
                         clearInterval(recoveryInterval);
-                        // The onAuthStateChange listener should handle the rest, 
-                        // but we can force a state update here just in case.
                     }
-                    if (attempts > 5) clearInterval(recoveryInterval);
+                    if (attempts > 10) clearInterval(recoveryInterval);
                 }, 1000);
             } else {
+                // If we have a session, or if we are NOT in an OAuth flow, stop loading.
+                // If session exists, we already fetched profile above.
                 setLoading(false);
             }
         };
 
         checkSession();
 
-        // SAFETY TIMEOUT: If for some reason auth hangs (e.g. OAuth callback fails), 
-        // force stop loading after 8 seconds to allow user to retry or see error.
-        const safetyTimeout = setTimeout(async () => {
-            console.warn("Loading state timed out. Checking session one last time...");
-            const { data: { session } } = await supabase.auth.getSession();
-
-            if (session) {
-                console.log("Session found during timeout check. recovering...");
-                // Let the auth listener handle it, or force it here if needed
-            } else {
-                console.warn("No session found after timeout. Forcing render (will likely redirect to login).");
-                setLoading(false);
-            }
+        // SAFETY TIMEOUT: Force stop loading after 8 seconds.
+        // We avoid await here to prevent hanging if Supabase is unresponsive.
+        const safetyTimeout = setTimeout(() => {
+            setLoading(prev => {
+                if (prev) {
+                    console.warn("Loading state timed out. Forcing render.");
+                    return false;
+                }
+                return prev;
+            });
         }, 8000);
 
         return () => clearTimeout(safetyTimeout);
