@@ -62,9 +62,7 @@ const App: React.FC = () => {
                 }
             }
 
-            // CRITICAL: If we have a hash with access_token OR a code query param (PKCE), we are in an OAuth callback.
-            const isOAuthCallback = (window.location.hash && window.location.hash.includes('access_token')) ||
-                (window.location.search && window.location.search.includes('code='));
+
 
             if (!session && isOAuthCallback) {
                 console.log("OAuth callback detected (Hash or PKCE), waiting for onAuthStateChange...");
