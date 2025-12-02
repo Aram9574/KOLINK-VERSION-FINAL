@@ -43,7 +43,7 @@ serve(async (req) => {
             console.error('Auth Error:', authError);
             return new Response(
                 JSON.stringify({ error: 'Unauthorized', details: authError?.message }),
-                { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             )
         }
 
@@ -54,7 +54,7 @@ serve(async (req) => {
         } catch (e) {
             return new Response(
                 JSON.stringify({ error: 'Invalid JSON body' }),
-                { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             )
         }
 
@@ -62,7 +62,7 @@ serve(async (req) => {
         if (!priceId) {
             return new Response(
                 JSON.stringify({ error: 'Missing priceId' }),
-                { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             )
         }
 
@@ -157,7 +157,7 @@ serve(async (req) => {
         console.error('General Error:', error);
         return new Response(
             JSON.stringify({ error: error.message }),
-            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
     }
 })

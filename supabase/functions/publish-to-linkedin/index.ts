@@ -17,21 +17,21 @@ serve(async (req) => {
         if (!content) throw new Error('Content is required')
         if (!providerToken) throw new Error('LinkedIn Access Token (providerToken) is required')
 
-        // 1. Fetch LinkedIn User URN (ID)
-        const profileResp = await fetch('https://api.linkedin.com/v2/me', {
+        // 1. Fetch LinkedIn User URN (ID) via OIDC UserInfo endpoint
+        const profileResp = await fetch('https://api.linkedin.com/v2/userinfo', {
             headers: {
                 'Authorization': `Bearer ${providerToken}`,
-                'X-Restli-Protocol-Version': '2.0.0'
             }
         })
 
         if (!profileResp.ok) {
             const errorText = await profileResp.text()
-            throw new Error(`Failed to fetch LinkedIn profile: ${profileResp.status} ${errorText}`)
+            throw new Error(`Failed to fetch LinkedIn profile (userinfo): ${profileResp.status} ${errorText}`)
         }
 
         const profileData = await profileResp.json()
-        const personUrn = `urn:li:person:${profileData.id}`
+        // The 'sub' field contains the member ID in OIDC
+        const personUrn = `urn:li:person:${profileData.sub}`
 
         // 2. Prepare Post Body (UGC API)
         const postBody = {
@@ -76,7 +76,8 @@ serve(async (req) => {
     } catch (error) {
         return new Response(
             JSON.stringify({ success: false, error: error.message }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
         )
     }
 })
+

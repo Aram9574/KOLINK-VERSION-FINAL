@@ -94,6 +94,18 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
     // Ref to track the ID of a newly generated post to enforce its display
     const justGeneratedPostId = React.useRef<string | null>(null);
 
+    // If user has ID but no name, it means profile is still loading
+    if (user.id && !user.name) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin"></div>
+                    <p className="text-slate-500 font-medium animate-pulse">Sincronizando perfil...</p>
+                </div>
+            </div>
+        );
+    }
+
     useEffect(() => {
         // Enforce display of newly generated post
         if (justGeneratedPostId.current && posts.length > 0) {
@@ -676,12 +688,17 @@ const Dashboard: React.FC<DashboardProps> = ({ user, setUser, language, setLangu
                 body: { priceId: plan.stripePriceId }
             });
             if (error) throw error;
+
+            if (data?.error) {
+                throw new Error(data.error);
+            }
+
             if (data?.url) {
                 window.location.href = data.url;
             }
-        } catch (e) {
+        } catch (e: any) {
             console.error("Checkout failed", e);
-            toast.error("Error al iniciar el pago. Intenta de nuevo.");
+            toast.error(e.message || "Error al iniciar el pago. Intenta de nuevo.");
         }
     };
 
