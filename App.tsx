@@ -73,24 +73,39 @@ const App: React.FC = () => {
                     const refresh_token = params.get('refresh_token');
 
                     if (access_token && refresh_token) {
-                        console.log("Tokens found in hash. Setting session manually...");
+                        console.log("Tokens found in hash. Verifying with getUser...");
 
-                        // Race setSession against a timeout
-                        const setSessionPromise = supabase.auth.setSession({ access_token, refresh_token });
-                        const timeoutPromise = new Promise<{ data: { session: any }, error: any }>((resolve) =>
-                            setTimeout(() => resolve({ data: { session: null }, error: new Error("Timeout setting session") }), 3000)
-                        );
+                        // Bypass setSession and verify token directly
+                        const { data: userData, error: userError } = await supabase.auth.getUser(access_token);
 
-                        const { data, error } = await Promise.race([setSessionPromise, timeoutPromise]);
-
-                        if (data?.session) {
-                            console.log("Manual hash session set successful!");
+                        if (userData?.user) {
+                            console.log("Token verified! Manually setting session...");
                             toast.success("¡Sesión iniciada!");
-                            session = data.session;
+                            session = {
+                                access_token,
+                                refresh_token,
+                                user: userData.user,
+                                token_type: 'bearer',
+                                expires_in: 3600 // approximate
+                            } as any;
+
+                            // Manually persist to localStorage to survive refresh
+                            const projectRef = 'enqcokspbxiopijjzfes'; // From MCP
+                            const storageKey = `sb-${projectRef}-auth-token`;
+                            localStorage.setItem(storageKey, JSON.stringify({
+                                access_token,
+                                refresh_token,
+                                user: userData.user,
+                                expires_at: Math.floor(Date.now() / 1000) + 3600,
+                                token_type: 'bearer'
+                            }));
+
+                            // Force update Supabase client state if possible (optional, but good)
+                            supabase.auth.setSession({ access_token, refresh_token }).catch(e => console.warn("Background setSession failed", e));
+
                         } else {
-                            console.error("Manual hash setSession failed or timed out:", error);
-                            // If timeout, we might still have the session in local storage from a previous attempt? 
-                            // Or maybe we should just proceed and let the background fetch try.
+                            console.error("Token verification failed:", userError);
+                            toast.error("Error al verificar el token.");
                         }
                     } else {
                         console.warn("Hash detected but missing tokens.");
