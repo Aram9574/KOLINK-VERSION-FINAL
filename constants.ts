@@ -65,9 +65,9 @@ export const PLANS: SubscriptionPlan[] = [
     name: 'Plan Inicial',
     price: 0,
     description: 'Acceso mínimo viable para experimentar',
-    credits: 15,
+    credits: 10,
     features: [
-      '15 Créditos IA / mes',
+      '10 Créditos IA / mes',
       'Generador de Ideas Básico',
       '3 Tonos Predefinidos',
       'Soporte por Email Estándar'
@@ -114,7 +114,7 @@ export const EMPTY_USER: UserProfile = {
   name: '',
   headline: '',
   avatarUrl: '',
-  credits: 0,
+  credits: 10,
   maxCredits: 5,
   isPremium: false,
   planTier: 'free',
