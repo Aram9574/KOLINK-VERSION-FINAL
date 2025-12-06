@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { Toaster } from 'sonner';
 import { useUser } from './context/UserContext';
 import ProtectedRoute from './components/features/auth/ProtectedRoute';
+import DomainEnforcer from './components/features/auth/DomainEnforcer';
 
 // Lazy load components for better performance
 const LandingPage = lazy(() => import('./components/landing/LandingPage'));
@@ -51,6 +52,7 @@ const App: React.FC = () => {
 
     return (
         <>
+            <DomainEnforcer />
             <Toaster position="top-center" richColors />
             <Routes>
                 {/* Public Routes */}
