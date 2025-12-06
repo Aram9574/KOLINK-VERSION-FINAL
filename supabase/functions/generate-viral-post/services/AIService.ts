@@ -34,7 +34,7 @@ export interface UserProfileContext {
  */
 export class AIService {
     private ai: GoogleGenAI;
-    private model = 'gemini-1.5-pro';
+    private model = 'gemini-3-pro-preview';
 
     /**
      * @param apiKey - The Google Gemini API Key.
