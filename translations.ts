@@ -64,7 +64,13 @@ export const translations = {
       toneBad: "Robotic, academic, and dry.",
       toneGood: "Human, witty, and authentic.",
       promptBad: "Requires complex prompt engineering.",
-      promptGood: "One-click frameworks. No skills needed."
+      promptGood: "One-click frameworks. No skills needed.",
+      feature1Title: "Human & Viral",
+      feature2Title: "Psychological Hooks",
+      feature3Title: "Zero Learning Curve",
+      visualList1: "Systematize output",
+      visualList2: "Leverage psychology",
+      viralBadge: "Viral"
     },
     roi: {
       title: "Stop burning money on multiple tools",
@@ -114,7 +120,19 @@ export const translations = {
       speedDesc: "Stop wasting hours. Our workflow takes you from a messy thought to a polished, viral-ready asset instantly.",
       noWritersBlock: "No Writer's Block",
       mobileOptimized: "Mobile Optimized",
-      readyToPost: "Ready to Post"
+      readyToPost: "Ready to Post",
+      frameworks: {
+        pas: { name: "Problem-Agitate-Solution", desc: "Conversion" },
+        bab: { name: "Before-After-Bridge", desc: "Storytelling" },
+        contrarian: { name: "The Contrarian Take", desc: "Engagement" },
+        listicle: { name: "The Listicle", desc: "Reach" }
+      },
+      brandVoice: {
+        aiModel: "AI Model",
+        you: "YOU",
+        ai: "AI",
+        match: "100% Match"
+      }
     },
     pricing: {
       title: "Simple, transparent pricing",
@@ -153,6 +171,66 @@ export const translations = {
       send: "Send Report",
       sending: "Sending...",
       success: "Thanks! We're on it."
+    },
+    onboarding: {
+      step1: {
+        title: "Welcome to Kolink!",
+        subtitle: "Let's personalize your studio. What's your name?",
+        firstName: "First Name",
+        firstNamePlaceholder: "John",
+        lastName: "Last Name",
+        lastNamePlaceholder: "Doe",
+        jobTitle: "Profession / Job Title",
+        jobTitlePlaceholder: "e.g. Founder, Marketing Manager, Developer",
+        next: "Next Step"
+      },
+      step2: {
+        title: "What is your goal?",
+        subtitle: "This helps our AI select the best viral frameworks.",
+        intents: {
+          personal_brand: { label: "Personal Brand", desc: "Build authority and network" },
+          company: { label: "Company Page", desc: "Promote my startup" },
+          agency: { label: "Client Work", desc: "Ghostwriting for others" },
+          sales: { label: "Sales / Leads", desc: "Social selling" },
+          job_hunt: { label: "Job Hunt", desc: "Get seen by recruiters" },
+          content_creator: { label: "Content Creator", desc: "Monetize audience" }
+        },
+        next: "Next Step"
+      },
+      step3: {
+        title: "One last thing...",
+        subtitle: "How did you hear about Kolink?",
+        sources: {
+          linkedin: "LinkedIn",
+          twitter: "Twitter / X",
+          friend: "Friend / Colleague",
+          youtube: "YouTube",
+          google: "Search Engine",
+          other: "Other"
+        },
+        start: "Start Creating"
+      },
+      footer: "We use this information to personalize your viral frameworks."
+    },
+    levelUp: {
+      title: "Level Up!",
+      subtitle: "You are now Level {{level}}",
+      achievements: "Achievements Unlocked",
+      xp: "XP",
+      awesome: "Awesome!"
+    },
+    productTour: {
+      skip: "Skip Tour",
+      back: "Back",
+      next: "Next",
+      start: "Start",
+      steps: {
+        create: { title: "Create", desc: "Start here to create new viral posts." },
+        history: { title: "History", desc: "View and manage your past posts." },
+        ideas: { title: "Ideas", desc: "Get AI-powered inspiration tailored to you." },
+        autopilot: { title: "AutoPilot", desc: "Schedule and automate your content strategy." },
+        levelUp: { title: "Level Up", desc: "Earn XP and rewards by posting consistently." }
+      }
     },
     // APP INTERFACE TRANSLATIONS
     app: {
@@ -225,6 +303,7 @@ export const translations = {
           topicsTooltip: "AutoPilot will randomly pick one of these topics for each run.",
           topicsPlaceholder: "Type topic and press Enter...",
           audienceLabel: "Target Audience",
+          audiencePlaceholder: "e.g. SaaS Founders, Marketing Directors...",
           postCountLabel: "Post Quantity per Run",
           postCountTooltip: "Number of posts to generate each time AutoPilot runs (1 credit per post).",
           save: "Update Configuration"
@@ -284,7 +363,16 @@ export const translations = {
         cancel: "Cancel",
         placeholder: "Your viral masterpiece will appear here...",
         follow: "Follow",
-        seeMore: "...see more"
+        seeMore: "...see more",
+        viralPotential: "Viral Potential",
+        aiEstimate: "AI-estimated reach probability",
+        high: "High",
+        medium: "Medium",
+        low: "Low",
+        hook: "HOOK",
+        readability: "READABILITY",
+        value: "VALUE",
+        proTip: "PRO TIP"
       },
       history: {
         title: "Recent Creations",
@@ -383,6 +471,19 @@ export const translations = {
           confirmBtn: "Confirm Cancellation",
           canceling: "Canceling..."
         }
+      },
+      upgrade: {
+        title: "Choose Your Viral Plan",
+        subtitle: "Unlock advanced AI models, unlimited generations, and secret viral frameworks used by top creators.",
+        monthly: "Monthly",
+        yearly: "Yearly",
+        save: "Save 20%",
+        mostPopular: "Most Popular",
+        currentPlan: "Current Plan",
+        included: "Included in your Plan",
+        upgradeNow: "Upgrade Now",
+        billedYearly: "Billed {{amount}} yearly",
+        securePayment: "Secure payment via Stripe. Cancel anytime. By upgrading, you agree to our Terms of Service. For custom enterprise plans, contact sales."
       },
       constants: {
         tones: {
@@ -489,7 +590,13 @@ export const translations = {
       toneBad: "Robótico, académico y seco.",
       toneGood: "Humano, ingenioso y auténtico.",
       promptBad: "Requiere ingeniería de prompts.",
-      promptGood: "Marcos de un clic. Sin habilidades."
+      promptGood: "Marcos de un clic. Sin habilidades.",
+      feature1Title: "Humano y Viral",
+      feature2Title: "Ganchos Psicológicos",
+      feature3Title: "Cero Curva de Aprendizaje",
+      visualList1: "Sistematizar output",
+      visualList2: "Apalancar psicología",
+      viralBadge: "Viral"
     },
     roi: {
       title: "Deja de quemar dinero en múltiples herramientas",
@@ -538,7 +645,19 @@ export const translations = {
       speedDesc: "Deja de perder horas. Nuestro flujo te lleva de un pensamiento desordenado a un activo viral listo al instante.",
       noWritersBlock: "Sin Bloqueo Creativo",
       mobileOptimized: "Optimizado para Móvil",
-      readyToPost: "Listo para Publicar"
+      readyToPost: "Listo para Publicar",
+      frameworks: {
+        pas: { name: "Problem-Agitate-Solution", desc: "Conversión" },
+        bab: { name: "Before-After-Bridge", desc: "Storytelling" },
+        contrarian: { name: "The Contrarian Take", desc: "Engagement" },
+        listicle: { name: "The Listicle", desc: "Alcance" }
+      },
+      brandVoice: {
+        aiModel: "Modelo IA",
+        you: "TÚ",
+        ai: "IA",
+        match: "100% Coincidencia"
+      }
     },
     pricing: {
       title: "Precios simples y transparentes",
@@ -577,6 +696,66 @@ export const translations = {
       send: "Enviar Reporte",
       sending: "Enviando...",
       success: "¡Gracias! Lo revisaremos."
+    },
+    onboarding: {
+      step1: {
+        title: "¡Bienvenido a Kolink!",
+        subtitle: "Personalicemos tu estudio. ¿Cómo te llamas?",
+        firstName: "Nombre",
+        firstNamePlaceholder: "Juan",
+        lastName: "Apellido",
+        lastNamePlaceholder: "Pérez",
+        jobTitle: "Profesión / Cargo",
+        jobTitlePlaceholder: "ej. Fundador, Marketing Manager, Desarrollador",
+        next: "Siguiente Paso"
+      },
+      step2: {
+        title: "¿Cuál es tu objetivo?",
+        subtitle: "Esto ayuda a nuestra IA a seleccionar los mejores marcos virales.",
+        intents: {
+          personal_brand: { label: "Marca Personal", desc: "Construir autoridad y red" },
+          company: { label: "Página de Empresa", desc: "Promocionar mi startup" },
+          agency: { label: "Trabajo para Clientes", desc: "Ghostwriting para otros" },
+          sales: { label: "Ventas / Leads", desc: "Venta social" },
+          job_hunt: { label: "Búsqueda de Empleo", desc: "Ser visto por reclutadores" },
+          content_creator: { label: "Creador de Contenido", desc: "Monetizar audiencia" }
+        },
+        next: "Siguiente Paso"
+      },
+      step3: {
+        title: "Una última cosa...",
+        subtitle: "¿Cómo te enteraste de Kolink?",
+        sources: {
+          linkedin: "LinkedIn",
+          twitter: "Twitter / X",
+          friend: "Amigo / Colega",
+          youtube: "YouTube",
+          google: "Buscador",
+          other: "Otro"
+        },
+        start: "Empezar a Crear"
+      },
+      footer: "Usamos esta información para personalizar tus marcos virales."
+    },
+    levelUp: {
+      title: "¡Subiste de Nivel!",
+      subtitle: "Ahora eres Nivel {{level}}",
+      achievements: "Logros Desbloqueados",
+      xp: "XP",
+      awesome: "¡Genial!"
+    },
+    productTour: {
+      skip: "Saltar Tour",
+      back: "Atrás",
+      next: "Siguiente",
+      start: "Empezar",
+      steps: {
+        create: { title: "Crear", desc: "Empieza aquí para crear nuevos posts virales." },
+        history: { title: "Historial", desc: "Gestiona tus posts pasados." },
+        ideas: { title: "Ideas", desc: "Inspiración con IA a tu medida." },
+        autopilot: { title: "AutoPilot", desc: "Automatiza tu estrategia de contenido." },
+        levelUp: { title: "Subir Nivel", desc: "Gana XP y recompensas por publicar." }
+      }
     },
     settings: {
       language: "Idioma",
@@ -653,6 +832,7 @@ export const translations = {
           topicsTooltip: "AutoPilot elegirá aleatoriamente uno de estos temas para cada ejecución.",
           topicsPlaceholder: "Escribe tema y presiona Enter...",
           audienceLabel: "Audiencia Objetivo",
+          audiencePlaceholder: "ej. Fundadores SaaS, Directores de Marketing...",
           postCountLabel: "Cantidad de Posts por Ejecución",
           postCountTooltip: "Número de posts a generar cada vez que se ejecute AutoPilot (1 crédito por post).",
           save: "Actualizar Configuración"
@@ -712,7 +892,16 @@ export const translations = {
         cancel: "Cancelar",
         placeholder: "Tu obra maestra viral aparecerá aquí...",
         follow: "Seguir",
-        seeMore: "...ver más"
+        seeMore: "...ver más",
+        viralPotential: "Potencial Viral",
+        aiEstimate: "Probabilidad de alcance estimada por IA",
+        high: "Alto",
+        medium: "Medio",
+        low: "Bajo",
+        hook: "GANCHO",
+        readability: "LEGIBILIDAD",
+        value: "VALOR",
+        proTip: "CONSEJO PRO"
       },
       history: {
         title: "Creaciones Recientes",
@@ -811,6 +1000,19 @@ export const translations = {
           confirmBtn: "Confirmar Cancelación",
           canceling: "Cancelando..."
         }
+      },
+      upgrade: {
+        title: "Elige tu Plan Viral",
+        subtitle: "Desbloquea modelos de IA avanzados, generaciones ilimitadas y los marcos virales secretos usados por los mejores creadores.",
+        monthly: "Mensual",
+        yearly: "Anual",
+        save: "Ahorra 20%",
+        mostPopular: "Más Popular",
+        currentPlan: "Plan Actual",
+        included: "Incluido en tu Plan",
+        upgradeNow: "Mejorar Ahora",
+        billedYearly: "Facturado {{amount}} anualmente",
+        securePayment: "Pago seguro vía Stripe. Cancela cuando quieras. Al mejorar, aceptas nuestros Términos de Servicio. Para planes empresariales personalizados, contacta a ventas."
       },
       constants: {
         tones: {

@@ -2,7 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import ErrorBoundary from './components/ErrorBoundary';
+import ErrorBoundary from './components/ui/ErrorBoundary';
+import { AuthProvider } from './context/UserContext';
+import { UserProfileProvider } from './context/UserProfileContext';
 import App from './App';
 import './index.css';
 
@@ -17,7 +19,11 @@ root.render(
     <ErrorBoundary>
       <HelmetProvider>
         <BrowserRouter>
-          <App />
+          <AuthProvider>
+            <UserProfileProvider>
+              <App />
+            </UserProfileProvider>
+          </AuthProvider>
         </BrowserRouter>
       </HelmetProvider>
     </ErrorBoundary>

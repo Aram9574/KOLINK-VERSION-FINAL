@@ -84,7 +84,13 @@ export const generateViralPost = async (params: GenerationParams, user: UserProf
     body: { params }
   });
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (error.status === 406) {
+      console.error("Server API returned 406 Not Acceptable. This usually means the function crashed or returned invalid content types.");
+      throw new Error("Server configuration error (406). Please try again or contact support.");
+    }
+    throw new Error(error.message);
+  }
   if (data.error) throw new Error(`Backend Error: ${data.error}`);
 
   return {
@@ -110,101 +116,32 @@ export interface IdeaParams {
 
 export const generatePostIdeas = async (user: UserProfile, language: AppLanguage = 'es', options?: IdeaParams): Promise<IdeaResult> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    const model = 'gemini-3-pro-preview';
-
-    const niche = options?.niche || user.headline || "Business";
-    const style = options?.style || 'trending';
-    const source = options?.source || 'news';
-    const count = options?.count || 4;
-    const customContext = options?.customContext || [];
-
-    const langInstruction = language === 'es' ? 'SPANISH' : 'ENGLISH';
-    const tools = source === 'news' ? [{ googleSearch: {} }] : undefined;
-
-    let styleInstruction = "";
-    switch (style) {
-      case 'trending': styleInstruction = "Focus on BREAKING NEWS and viral trends."; break;
-      case 'contrarian': styleInstruction = "Focus on unpopular opinions and challenging status quo."; break;
-      case 'educational': styleInstruction = "Focus on 'How-to' and frameworks."; break;
-      case 'story': styleInstruction = "Focus on personal lessons and failure stories."; break;
-      case 'predictions': styleInstruction = "Focus on future trends."; break;
-    }
-
-    const searchInstruction = source === 'news'
-      ? `1. USE THE GOOGLE SEARCH TOOL to find latest news in "${niche}" from last 48 hours.`
-      : `1. Retrieve timeless principles in "${niche}".`;
-
-    let contextPrompt = "";
-    const parts: any[] = [];
-
-    if (customContext.length > 0) {
-      contextPrompt += "\n\n### USER CONTEXT:\n";
-      customContext.forEach((ctx, index) => {
-        if (ctx.type === 'image') {
-          parts.push({
-            inlineData: { mimeType: 'image/jpeg', data: ctx.content }
-          });
-          contextPrompt += `\n[Ref Image ${index + 1}]`;
-        } else if (ctx.type === 'link') {
-          contextPrompt += `\n- Link: ${ctx.content}`;
-        } else if (ctx.type === 'text') {
-          contextPrompt += `\n- Note: "${ctx.content}"`;
-        } else if (ctx.type === 'drive') {
-          contextPrompt += `\n- Drive Doc: "${ctx.name}". Excerpt: "${ctx.content.substring(0, 5000)}..."`;
-        }
-      });
-      contextPrompt += "\n\n**INSTRUCTION:** Use provided context to inspire ideas.";
-    }
-
-    const promptText = `
-      Act as an Idea Generator.
-      **Task:**
-      ${searchInstruction}
-      2. Generate ${count} viral LinkedIn post hooks for ${niche} based on ${styleInstruction}.
-      ${contextPrompt}
-      
-      **Output:**
-      - Language: ${langInstruction}.
-      - Simple numbered list (1., 2., ...).
-      - Just the hooks/headlines.
-    `;
-
-    parts.push({ text: promptText });
-
-    const response = await ai.models.generateContent({
-      model: model,
-      contents: { parts: parts },
-      config: { tools: tools, temperature: 0.7 },
+    // Call Supabase Edge Function
+    const { data, error } = await supabase.functions.invoke('generate-ideas', {
+      body: {
+        user_id: user.id,
+        language,
+        params: options
+      }
     });
 
-    const text = response.text || "";
-    const ideas = text.split(/\d+\.\s+/).filter(line => line.trim().length > 10).slice(0, count);
+    if (error) throw new Error(error.message);
+    if (data.error) throw new Error(data.error);
 
-    let sources: { title: string; uri: string }[] = [];
-    if (source === 'news') {
-      const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-      sources = groundingChunks
-        .map((chunk: any) => chunk.web)
-        .filter((web: any) => web && web.uri && web.title)
-        .slice(0, 3);
-    }
-
-    return { ideas, sources };
+    return {
+      ideas: data.ideas || [],
+      sources: data.sources || []
+    };
 
   } catch (error) {
     console.error("Idea Generator Error:", error);
-    const fallbackIdeas = language === 'es' ? [
-      `El costo oculto de la multitarea en ${options?.niche || "tu industria"}`,
-      `Por qué el consejo estándar sobre ${options?.niche || "este tema"} está equivocado`,
-      "Un fracaso personal que me enseñó más que cualquier éxito",
-      `El futuro del ${options?.niche || "trabajo"} en la era de la IA`
-    ] : [
-      `The hidden cost of multitasking in ${options?.niche || "your industry"}`,
-      `Why standard advice about ${options?.niche || "this topic"} is wrong`,
-      "A personal failure that taught me more than any success",
-      `The future of ${options?.niche || "work"} in the age of AI`
-    ];
-    return { ideas: fallbackIdeas, sources: [] };
+    // Fallback in case of error (e.g., allow user to see something if network fails, or just return empty)
+    // Actually, distinct error handling is better, but let's keep the fallback for UI resilience if desired,
+    // OR just rethrow. The original code had a fallback. Let's keep a simple fallback if cost fails? 
+    // No, if credit check fails, we shouldn't give free ideas.
+    // However, for safety against API errors, we can return the structure.
+
+    // For now, let's allow the error to propagate so the UI knows it failed (e.g. "No credits").
+    throw error;
   }
 };

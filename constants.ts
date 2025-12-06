@@ -110,6 +110,7 @@ export const PLANS: SubscriptionPlan[] = [
 
 export const EMPTY_USER: UserProfile = {
   id: '',
+  email: '',
   name: '',
   headline: '',
   avatarUrl: '',
@@ -136,6 +137,7 @@ export const EMPTY_USER: UserProfile = {
 };
 export const MOCK_USER: UserProfile = {
   id: "mock-user-uuid-123456",
+  email: "alex@kolink.ai",
   name: "Alex Rivera",
   headline: "Fundador @ Kolink | Ayudando a 10k+ creadores a ser virales",
   avatarUrl: "https://picsum.photos/150/150",

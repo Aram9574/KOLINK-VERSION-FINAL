@@ -95,7 +95,13 @@ serve(async (req) => {
             headers: { 'Content-Type': 'application/json' },
         })
     } catch (err) {
-        return new Response(err.message, { status: 400 })
+        // Secure Error Handling: Log internally, return generic error to client
+        console.error("Stripe Webhook Processing Error:", err);
+
+        return new Response(
+            JSON.stringify({ error: "Webhook processing failed. Please check logs for details." }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+        )
     }
 })
 

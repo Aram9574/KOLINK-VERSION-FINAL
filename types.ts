@@ -105,6 +105,7 @@ export interface AutoPilotConfig {
 
 export interface UserProfile {
   id: string;
+  email?: string; // Added for context convenience
   name: string;
   headline: string;
   avatarUrl: string;
@@ -115,6 +116,8 @@ export interface UserProfile {
   nextBillingDate?: number;
   cancelAtPeriodEnd?: boolean;
   hasOnboarded?: boolean;
+  stripeCustomerId?: string;
+  subscriptionId?: string;
   brandVoice?: string; // User defined brand voice description
   companyName?: string;
   industry?: string;
@@ -130,7 +133,7 @@ export interface UserProfile {
   lastPostDate: number | null; // Timestamp
   unlockedAchievements: string[]; // Array of Achievement IDs
   // AutoPilot
-  autoPilot: AutoPilotConfig;
+  autoPilot?: AutoPilotConfig;
 }
 
 export interface CustomSource {
@@ -139,4 +142,11 @@ export interface CustomSource {
   content: string; // URL, Base64 Image, Text content, or File ID
   name?: string; // Filename or Link title
   mimeType?: string; // Useful for drive files
+}
+
+export interface TourStep {
+  targetId: string;
+  title: string;
+  description: string;
+  position?: 'top' | 'right' | 'bottom' | 'left';
 }

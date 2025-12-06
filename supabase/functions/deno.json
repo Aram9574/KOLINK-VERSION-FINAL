@@ -5,5 +5,8 @@
             "deno.window"
         ],
         "strict": true
+    },
+    "imports": {
+        "zod": "https://esm.sh/zod@3.22.4"
     }
 }
