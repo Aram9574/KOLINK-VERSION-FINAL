@@ -133,6 +133,29 @@ You have two simultaneous roles:
       3. **The Resolution (Climax):** How you fixed it / what you learned. The "Aha!" moment.
       4. **The Lesson (Takeaway):** The universal truth for the reader.
       **Why this works:** Humans are wired for stories. It builds deep trust and connection.
+      `,
+    'STANDARD': `
+      **Structure: The Standard LinkedIn Post**
+      1. **The Hook:** Clear, value-driven statement. (e.g., "Here is how to X.")
+      2. **The Context:** Briefly explain why this matters.
+      3. **The Content:** 3-5 short paragraphs delivering the core message.
+      4. **The Takeaway:** A concluding thought or summary.
+      **Why this works:** Safe, professional, and consistent. Good for general updates.
+      `,
+    'CASE_STUDY': `
+      **Structure: The Case Study (Social Proof)**
+      1. **The Result (Hook):** Start with the impressive outcome. (e.g. "We generated $50k in 3 days.")
+      2. **The Problem:** What was the situation before? (The struggle).
+      3. **The Solution:** What exactly did we do? (The mechanism).
+      4. **The Outcome:** Reiterate the success or a secondary benefit.
+      **Why this works:** Proof builds authority. It moves people from "interested" to "sold".
+      `,
+    'VS_COMPARISON': `
+      **Structure: This vs That (Comparison)**
+      1. **The Conflict (Hook):** X is dead. Long live Y. (e.g., "SEO vs LinkedIn ads.")
+      2. **The Analysis:** Compare them side-by-side. Pros and Cons.
+      3. **The Winner:** Declare a winner based on a specific context (e.g., "For startups, Ads win.").
+      **Why this works:** It helps people make decisions. It positions you as an expert guide.
       `
   },
   emojis: {
@@ -173,6 +196,7 @@ You have two simultaneous roles:
     - **Creativity Level:** {{creativity_level}}%
     - **Emoji Density:** {{emoji_density}} (See rules below)
     - **Post Length:** {{length}} (See rules below)
+    - **Hashtags:** {{hashtag_instruction}}
     - **Call to Action:** {{cta_instruction}}
     
     {{author_persona}}

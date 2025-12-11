@@ -16,6 +16,7 @@ export interface GenerationParams {
     emojiDensity: string;
     length: string;
     creativityLevel: number;
+    hashtagCount: number;
     includeCTA: boolean;
 }
 
@@ -59,9 +60,7 @@ export class AIService {
 
         const templates = getTemplates();
 
-        const ctaInstruction = params.includeCTA
-            ? templates.cta_yes
-            : templates.cta_no;
+        const ctaInstruction = templates.cta_yes;
 
         const voiceInstruction = (profile.brand_voice && profile.brand_voice.length > 0)
             ? templates.voice_custom.replace('{{brand_voice}}', profile.brand_voice)
@@ -70,6 +69,8 @@ export class AIService {
         const langInstruction = profile.language === 'es'
             ? templates.lang_es
             : templates.lang_en;
+
+        const hashtagInstruction = `Use strictly ${params.hashtagCount} hashtags at the end of the post. They must be SEO optimized and relevant to the topic.`;
 
         // Construct Author Persona
         const authorPersona = templates.author_persona
@@ -85,14 +86,15 @@ export class AIService {
             .replace('{{creativity_level}}', params.creativityLevel.toString())
             .replace('{{emoji_density}}', params.emojiDensity)
             .replace('{{length}}', params.length)
-            .replace('{{cta_instruction}}', params.includeCTA ? "YES (Question)" : "NO (Statement)")
+            .replace('{{cta_instruction}}', "YES (Auto-generated)")
             .replace('{{author_persona}}', authorPersona)
             .replace('{{viral_example}}', viralExample)
             .replace('{{framework_rules}}', frameworkRules)
             .replace('{{length_rules}}', lengthRules)
             .replace('{{emoji_rules}}', emojiRules)
             .replace('{{cta_instruction_detail}}', ctaInstruction)
-            .replace('{{lang_instruction}}', langInstruction);
+            .replace('{{lang_instruction}}', langInstruction)
+            .replace('{{hashtag_instruction}}', hashtagInstruction);
 
         const response = await this.ai.models.generateContent({
             model: this.model,

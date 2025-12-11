@@ -4,20 +4,25 @@ import { ViralTone, ViralFramework, EmojiDensity, PostLength, UserProfile, Achie
 
 export const TONES = [
   { value: ViralTone.PROFESSIONAL, label: '👔 Profesional', desc: 'Limpio, corporativo, liderazgo.' },
-  { value: ViralTone.CONTROVERSIAL, label: '🔥 Controvertido', desc: 'Opiniones polarizantes.' },
-  { value: ViralTone.EMPATHETIC, label: '❤️ Empático', desc: 'Historias vulnerables.' },
+  { value: ViralTone.CONTROVERSIAL, label: '🔥 Controversial/Debate', desc: 'Opiniones polarizantes.' },
+  { value: ViralTone.INSPIRATIONAL, label: '✨ Inspiracional', desc: 'Motivador, visionario.' },
   { value: ViralTone.EDUCATIONAL, label: '📚 Educativo', desc: 'Alto valor, consejos accionables.' },
-  { value: ViralTone.HUMOROUS, label: '😂 Humorístico', desc: 'Alegre, memes, identificable.' },
+  { value: ViralTone.HUMOROUS, label: '😂 Humorístico/Casual', desc: 'Alegre, memes, identificable.' },
+  { value: ViralTone.PROMOTIONAL, label: '💰 Venta/Promocional', desc: 'Persuasivo, enfocado en conversión.' },
+  { value: ViralTone.EMPATHETIC, label: '❤️ Empático/Vulnerable', desc: 'Historias reales y conexión humana.' },
   { value: ViralTone.STORYTELLING, label: '📖 Storytelling', desc: 'Narrativa profunda.' },
 ];
 
 export const FRAMEWORKS = [
+  { value: ViralFramework.STANDARD, label: 'Estándar', desc: 'Estructura sólida y balanceada.' },
   { value: ViralFramework.PAS, label: 'Problema-Agitación-Solución', desc: 'Fórmula clásica de conversión.' },
   { value: ViralFramework.AIDA, label: 'AIDA', desc: 'Atención, Interés, Deseo, Acción.' },
   { value: ViralFramework.BAB, label: 'Antes-Después-Puente', desc: 'Muestra la transformación.' },
-  { value: ViralFramework.LISTICLE, label: 'Lista (Listicle)', desc: 'Puntos escaneables (Alto CTR).' },
+  { value: ViralFramework.LISTICLE, label: 'Lista/Puntos', desc: 'Puntos escaneables (Alto CTR).' },
+  { value: ViralFramework.STORY, label: 'Historia Personal', desc: 'Anécdota personal con lección.' },
+  { value: ViralFramework.CASE_STUDY, label: 'Caso de Estudio', desc: 'Prueba social y resultados reales.' },
   { value: ViralFramework.CONTRARIAN, label: 'Opinión Impopular', desc: 'Desafía el status quo.' },
-  { value: ViralFramework.STORY, label: 'Micro-Historia', desc: 'Anécdota personal con lección.' },
+  { value: ViralFramework.VS_COMPARISON, label: 'Comparativa (Vs)', desc: 'Este vs Aquel.' },
 ];
 
 export const LENGTH_OPTIONS = [

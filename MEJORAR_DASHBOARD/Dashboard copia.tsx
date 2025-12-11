@@ -199,7 +199,6 @@ const DashboardContent: React.FC = () => {
                                             length: 'Medium' as any,
                                             creativityLevel: 50,
                                             emojiDensity: 'Moderate' as any,
-                                            hashtagCount: 3,
                                             includeCTA: true
                                         },
                                         createdAt: Date.now(),

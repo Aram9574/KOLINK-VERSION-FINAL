@@ -155,7 +155,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     <option value="question">{language === 'es' ? 'Pregunta Retórica' : 'Rhetorical Question'}</option>
                                     <option value="statistic">{language === 'es' ? 'Dato/Estadística Impactante' : 'Shocking Statistic'}</option>
                                     <option value="negative">{language === 'es' ? 'Negativo/Advertencia' : 'Negative/Warning'}</option>
-                                    <option value="story">{language === 'es' ? 'Inicio de Historia ("Ayer me pasó...")' : 'Story Opener'}</option>
+                                    <option value="story">{language === 'es' ? 'Inicio de Historia ("Ayer...")' : 'Story Opener'}</option>
                                     <option value="assertion">{language === 'es' ? 'Afirmación Directa' : 'Direct Assertion'}</option>
                                 </select>
                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
@@ -230,7 +230,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     onChange={(e) => onUpdateParams({ outputLanguage: e.target.value as 'es' | 'en' })}
                                 >
                                     <option value="es">Español</option>
-                                    <option value="en">Inglés</option>
+                                    <option value="en">English</option>
                                 </select>
                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -310,58 +310,54 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                         </div>
                     </div>
 
-                    {/* Emojis & Hashtags Row */}<div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                        {/* Emoji Density Dropdown */}
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-slate-700 ml-1">
+                    {/* Checkboxes Row */}
+                    <div className="flex flex-wrap gap-4 pt-2">
+                        {/* Emojis Checkbox */}
+                        <label className="flex items-center gap-2 px-4 py-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 transition-all flex-1 min-w-[140px]">
+                            <div className="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    className="peer h-5 w-5 rounded-md border-slate-300 text-brand-600 focus:ring-brand-500/20 transition-all"
+                                    checked={params.emojiDensity !== EmojiDensity.MINIMAL}
+                                    onChange={(e) => onUpdateParams({ emojiDensity: e.target.checked ? EmojiDensity.MODERATE : EmojiDensity.MINIMAL })}
+                                />
+                            </div>
+                            <span className="text-sm font-medium text-slate-700 select-none flex items-center gap-1.5">
                                 {t.emojiLabel}
-                            </label>
-                            <div className="relative group">
-                                <select
-                                    className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
-                                    value={params.emojiDensity}
-                                    onChange={(e) => onUpdateParams({ emojiDensity: e.target.value as EmojiDensity })}
-                                >
-                                    {EMOJI_OPTIONS.map((opt) => (
-                                        <option key={opt.value} value={opt.value}>
-                                            {language === 'es' && opt.value === 'MINIMAL' ? 'Mínimo (Profesional)' :
-                                                language === 'es' && opt.value === 'MODERATE' ? 'Moderado (Atractivo)' :
-                                                    language === 'es' && opt.value === 'HIGH' ? 'Alto (Visual/Divertido)' :
-                                                        opt.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <Smile className="w-4 h-4" />
-                                </div>
-                            </div>
-                        </div>
+                                <Tooltip>{t.emojiTooltip}</Tooltip>
+                                <span className="text-lg">😁</span>
+                            </span>
+                        </label>
 
-                        {/* Hashtags Count Dropdown */}
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-slate-700 ml-1">
-                                # Hashtags (SEO)
-                            </label>
-                            <div className="relative group">
-                                <select
-                                    className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
-                                    value={params.hashtagCount || 3}
-                                    onChange={(e) => onUpdateParams({ hashtagCount: parseInt(e.target.value) })}
-                                >
-                                    <option value="0">0 (Ninguno)</option>
-                                    <option value="1">1 (Marca Persona)</option>
-                                    <option value="2">2 (Balanceado)</option>
-                                    <option value="3">3 (Recomendado)</option>
-                                    <option value="4">4 (Alto Alcance)</option>
-                                    <option value="5">5 (Máximo)</option>
-                                </select>
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
+                        {/* Hashtags Checkbox (Visual Only) */}
+                        <label className="flex items-center gap-2 px-4 py-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-brand-300 transition-all flex-1 min-w-[140px]">
+                            <div className="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    className="peer h-5 w-5 rounded-md border-slate-300 text-brand-600 focus:ring-brand-500/20 transition-all"
+                                    defaultChecked={true}
+                                />
                             </div>
-                        </div>
+                            <span className="text-sm font-medium text-slate-700 select-none">
+                                # Hashtags
+                            </span>
+                        </label>
                     </div>
 
+                    {/* CTA Checkbox */}
+                    <label className="flex items-center gap-2 ml-1 cursor-pointer w-fit">
+                        <div className="relative flex items-center">
+                            <input
+                                type="checkbox"
+                                className="peer h-5 w-5 rounded-md border-slate-300 text-brand-600 focus:ring-brand-500/20 transition-all"
+                                checked={params.includeCTA}
+                                onChange={(e) => onUpdateParams({ includeCTA: e.target.checked })}
+                            />
+                        </div>
+                        <span className="text-sm font-medium text-slate-700 select-none">
+                            {t.ctaLabel}
+                        </span>
+                    </label>
                 </div>
 
                 {/* Generate Button */}

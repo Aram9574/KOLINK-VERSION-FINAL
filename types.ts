@@ -6,16 +6,21 @@ export enum ViralTone {
   EMPATHETIC = 'Empathetic & Vulnerable',
   EDUCATIONAL = 'Educational & Insightful',
   HUMOROUS = 'Witty & Humorous',
-  STORYTELLING = 'Narrative & Personal'
+  STORYTELLING = 'Narrative & Personal',
+  INSPIRATIONAL = 'Inspirational & Uplifting',
+  PROMOTIONAL = 'Sales & Promotional'
 }
 
 export enum ViralFramework {
-  PAS = 'Problem - Agitate - Solution',
-  AIDA = 'Attention - Interest - Desire - Action',
-  BAB = 'Before - After - Bridge',
+  STANDARD = 'Standard / General',
   LISTICLE = 'Listicle / Bullet Points',
+  STORY = 'Hero\'s Journey (Micro-Story)',
+  CASE_STUDY = 'Case Study / Proof',
   CONTRARIAN = 'Contrarian Take (The "Unpopular Opinion")',
-  STORY = 'Hero\'s Journey (Micro-Story)'
+  VS_COMPARISON = 'Comparison (This vs That)',
+  PAS = 'Problem - Agitate - Solution', // Keeping for backward compat if needed, but UI will use STANDARD
+  AIDA = 'Attention - Interest - Desire - Action',
+  BAB = 'Before - After - Bridge'
 }
 
 export enum EmojiDensity {
@@ -38,6 +43,7 @@ export interface GenerationParams {
   length: PostLength;
   creativityLevel: number; // 0 to 100
   emojiDensity: EmojiDensity;
+  hashtagCount: number; // 0 to 5 (SEO Optimized)
   includeCTA: boolean;
 }
 

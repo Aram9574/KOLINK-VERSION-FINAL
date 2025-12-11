@@ -97,13 +97,6 @@ export const updateUserProfile = async (userId: string, updates: Partial<UserPro
         dbUpdates.unlocked_achievements = updates.unlockedAchievements;
         delete dbUpdates.unlockedAchievements;
     }
-    if (updates.autoPilot !== undefined) {
-        dbUpdates.auto_pilot = updates.autoPilot;
-        delete dbUpdates.autoPilot;
-    }
-
-    console.log('Updating profile for:', userId, 'with updates:', dbUpdates);
-
     const { data, error } = await supabase
         .from('profiles')
         .update(dbUpdates)
@@ -174,4 +167,47 @@ export const syncUserProfile = async (user: any) => {
     if (error) {
         console.error('Error syncing user profile:', error);
     }
+};
+
+export const fetchBrandVoices = async (userId: string): Promise<any[]> => {
+    const { data, error } = await supabase
+        .from('brand_voices')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching brand voices:', error);
+        return [];
+    }
+    return data || [];
+};
+
+export const createBrandVoice = async (userId: string, name: string, description: string): Promise<any> => {
+    const { data, error } = await supabase
+        .from('brand_voices')
+        .insert([{ user_id: userId, name, description }])
+        .select()
+        .single();
+    if (error) throw error;
+    return data;
+};
+
+export const updateBrandVoice = async (id: string, updates: { name?: string; description?: string }): Promise<any> => {
+    const { data, error } = await supabase
+        .from('brand_voices')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+    if (error) throw error;
+    return data;
+};
+
+export const deleteBrandVoice = async (id: string): Promise<void> => {
+    const { error } = await supabase
+        .from('brand_voices')
+        .delete()
+        .eq('id', id);
+    if (error) throw error;
 };
