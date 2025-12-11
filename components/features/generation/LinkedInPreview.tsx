@@ -363,6 +363,17 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content = '', user, i
                     <ActionButton icon={<Send className="w-5 h-5 stroke-[1.5]" />} label="Send" />
                 </div>
             </div>
+
+            <ScheduleModal
+                isOpen={isScheduling}
+                onClose={() => setIsScheduling(false)}
+                onConfirm={(date) => {
+                    if (onSchedule) onSchedule(date);
+                    setIsScheduling(false);
+                    toast.success(language === 'es' ? 'Publicación programada' : 'Post scheduled');
+                }}
+                language={language}
+            />
         </div>
     );
 };
