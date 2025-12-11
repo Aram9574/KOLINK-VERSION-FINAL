@@ -3,6 +3,7 @@ import { UserProfile, AppLanguage } from '../../../types';
 import { ACHIEVEMENTS } from '../../../constants';
 import { Trophy, Zap, Lock, Save, Check } from 'lucide-react';
 import { translations } from '../../../translations';
+import { toast } from 'sonner';
 import ProfileSettings from './ProfileSettings';
 import SecuritySettings from './SecuritySettings';
 import BillingSettings from './BillingSettings';
@@ -35,6 +36,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onUpgrade, onSave }) 
 
         setIsSavingProfile(false);
         setShowSaved(true);
+        toast.success(language === 'es' ? 'Se han guardado los cambios con éxito.' : 'Changes saved successfully.');
         setTimeout(() => setShowSaved(false), 2000);
     };
 

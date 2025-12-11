@@ -324,9 +324,9 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                 >
                                     {EMOJI_OPTIONS.map((opt) => (
                                         <option key={opt.value} value={opt.value}>
-                                            {language === 'es' && opt.value === 'MINIMAL' ? 'Mínimo (Profesional)' :
-                                                language === 'es' && opt.value === 'MODERATE' ? 'Moderado (Atractivo)' :
-                                                    language === 'es' && opt.value === 'HIGH' ? 'Alto (Visual/Divertido)' :
+                                            {language === 'es' && opt.value === EmojiDensity.MINIMAL ? 'Mínimo (Profesional)' :
+                                                language === 'es' && opt.value === EmojiDensity.MODERATE ? 'Moderado (Atractivo)' :
+                                                    language === 'es' && opt.value === EmojiDensity.HIGH ? 'Alto (Visual/Divertido)' :
                                                         opt.label}
                                         </option>
                                     ))}

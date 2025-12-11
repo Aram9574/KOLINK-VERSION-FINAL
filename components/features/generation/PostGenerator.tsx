@@ -95,6 +95,17 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
     }
   };
 
+  const handleSchedule = (date: Date) => {
+    if (currentPost) {
+      updatePost({
+        ...currentPost,
+        status: 'scheduled',
+        scheduledDate: date.getTime()
+      });
+      // Optionally reset or navigate? For now keeping on page but updated.
+    }
+  };
+
   return (
     <div className="flex flex-col h-full animate-in fade-in duration-500">
 
@@ -207,6 +218,7 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
               isLoading={isGenerating}
               language={language}
               onUpdate={handleUpdateContent}
+              onSchedule={handleSchedule}
               viralScore={currentPost?.viralScore}
               viralAnalysis={currentPost?.viralAnalysis}
             />

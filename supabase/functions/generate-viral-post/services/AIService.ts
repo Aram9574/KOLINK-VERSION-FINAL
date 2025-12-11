@@ -1,3 +1,4 @@
+// @ts-ignore
 import { GoogleGenAI, Type } from 'https://esm.sh/@google/genai'
 import {
     SYSTEM_INSTRUCTION,
@@ -56,7 +57,7 @@ export class AIService {
         const frameworkRules = getFrameworkInstructions(params.framework);
         const emojiRules = getEmojiInstructions(params.emojiDensity);
         const lengthRules = getLengthInstructions(params.length);
-        const viralExample = VIRAL_EXAMPLES[params.framework] || "";
+        const viralExample = VIRAL_EXAMPLES[params.framework as keyof typeof VIRAL_EXAMPLES] || "";
 
         const templates = getTemplates();
 

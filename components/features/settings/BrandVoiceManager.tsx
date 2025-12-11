@@ -5,6 +5,7 @@ import { translations } from '../../../translations';
 import { fetchBrandVoices, createBrandVoice, updateBrandVoice, deleteBrandVoice, setBrandVoiceActive } from '../../../services/userRepository';
 import { Plus, Trash2, Edit2, CheckCircle, Circle, Mic2, Star, MoreVertical } from 'lucide-react';
 import VoiceAnalyzer from './VoiceAnalyzer';
+import VoiceExamples from './VoiceExamples';
 import { BrandVoiceAnalysisResult } from '../../../services/geminiService';
 import { toast } from 'sonner';
 
@@ -67,10 +68,7 @@ const BrandVoiceManager: React.FC<BrandVoiceManagerProps> = ({ userId, language 
                 toast.success("Voice updated");
             }
         } else {
-            const newVoice = await createBrandVoice(userId, {
-                name: formName,
-                description: formDescription
-            });
+            const newVoice = await createBrandVoice(userId, formName, formDescription);
             if (newVoice) {
                 setVoices(prev => [newVoice, ...prev]);
                 setIsCreating(false);
@@ -172,6 +170,14 @@ const BrandVoiceManager: React.FC<BrandVoiceManagerProps> = ({ userId, language 
                                         : 'This text will be sent to the AI to instruct it on how to write.'}
                                 </p>
                             </div>
+
+                            {formDescription && (
+                                <VoiceExamples
+                                    language={language}
+                                    styleName={formName}
+                                    description={formDescription}
+                                />
+                            )}
 
                             <div className="flex justify-end gap-3 pt-2">
                                 <button

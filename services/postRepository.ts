@@ -35,6 +35,31 @@ export const fetchUserPosts = async (userId: string, page: number = 0, limit: nu
         views: 0,
         isAutoPilot: false,
         viralScore: post.viral_score,
-        viralAnalysis: post.viral_analysis
+        viralAnalysis: post.viral_analysis,
+        tags: post.tags || [],
+        isFavorite: post.is_favorite || false,
+        status: post.status || 'published',
+        scheduledDate: post.scheduled_date ? new Date(post.scheduled_date).getTime() : undefined
     }));
+};
+
+export const updatePost = async (postId: string, updates: any): Promise<boolean> => {
+    // Map frontend camelCase to DB snake_case
+    const dbUpdates: any = {};
+    if (updates.isFavorite !== undefined) dbUpdates.is_favorite = updates.isFavorite;
+    if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
+    if (updates.status !== undefined) dbUpdates.status = updates.status;
+    if (updates.scheduledDate !== undefined) dbUpdates.scheduled_date = new Date(updates.scheduledDate).toISOString();
+    if (updates.content !== undefined) dbUpdates.content = updates.content;
+
+    const { error } = await supabase
+        .from('posts')
+        .update(dbUpdates)
+        .eq('id', postId);
+
+    if (error) {
+        console.error('Error updating post:', error);
+        return false;
+    }
+    return true;
 };

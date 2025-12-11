@@ -169,7 +169,9 @@ export const syncUserProfile = async (user: any) => {
     }
 };
 
-export const fetchBrandVoices = async (userId: string): Promise<any[]> => {
+import { BrandVoice } from '../types';
+
+export const fetchBrandVoices = async (userId: string): Promise<BrandVoice[]> => {
     const { data, error } = await supabase
         .from('brand_voices')
         .select('*')
@@ -180,7 +182,28 @@ export const fetchBrandVoices = async (userId: string): Promise<any[]> => {
         console.error('Error fetching brand voices:', error);
         return [];
     }
-    return data || [];
+
+    // Map snake_case to camelCase
+    return (data || []).map((v: any) => ({
+        ...v,
+        isActive: v.is_active
+    }));
+};
+
+export const setBrandVoiceActive = async (userId: string, voiceId: string): Promise<void> => {
+    // 1. Deactivate all for this user
+    await supabase
+        .from('brand_voices')
+        .update({ is_active: false })
+        .eq('user_id', userId);
+
+    // 2. Activate the selected one
+    const { error } = await supabase
+        .from('brand_voices')
+        .update({ is_active: true })
+        .eq('id', voiceId);
+
+    if (error) throw error;
 };
 
 export const createBrandVoice = async (userId: string, name: string, description: string): Promise<any> => {

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { UserProfile, AppLanguage } from '../../../types';
 import { translations } from '../../../translations';
-import { Shield, Smartphone, AlertTriangle, Lock, LogOut } from 'lucide-react';
+import { Shield, Lock } from 'lucide-react';
 import { supabase } from '../../../services/supabaseClient';
 import { toast } from 'sonner';
 
@@ -12,45 +12,14 @@ interface SecuritySettingsProps {
 }
 
 const SecuritySettings: React.FC<SecuritySettingsProps> = ({ user, language, onSave }) => {
-    const [twoFactor, setTwoFactor] = useState<boolean>(user.twoFactorEnabled || false);
-    const [securityNotifs, setSecurityNotifs] = useState<boolean>(user.securityNotifications || true);
+
     const [showChangePassword, setShowChangePassword] = useState(false);
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [isSavingPassword, setIsSavingPassword] = useState(false);
-    const [sessions, setSessions] = useState<any[]>([]);
-    const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
 
     const t = translations[language].app.settings;
-
-    useEffect(() => {
-        const fetchSessions = async () => {
-            const deviceId = localStorage.getItem('kolink_device_id');
-            setCurrentDeviceId(deviceId);
-
-            const { data } = await supabase
-                .from('user_sessions')
-                .select('*')
-                .order('last_seen', { ascending: false });
-
-            if (data) setSessions(data);
-        };
-
-        fetchSessions();
-    }, []);
-
-    const handleRevokeSession = async (sessionId: string) => {
-        const { error } = await supabase
-            .from('user_sessions')
-            .delete()
-            .eq('id', sessionId);
-
-        if (!error) {
-            setSessions(prev => prev.filter(s => s.id !== sessionId));
-        }
-    };
-
     const handleChangePassword = async () => {
         if (newPassword !== confirmPassword) {
             setPasswordError("Las contraseñas no coinciden");
@@ -98,59 +67,22 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ user, language, onS
                 <div className="p-2 bg-red-50 rounded-lg">
                     <Shield className="w-5 h-5 text-red-600" />
                 </div>
-                {t.securityTitle}
+                {language === 'es' ? 'Credenciales' : 'Credentials'}
             </h2>
 
             <div className="space-y-6">
                 <div className="grid gap-4">
-                    {/* 2FA Toggle */}
-                    <div className="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:border-slate-200 transition-colors bg-slate-50/30">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm">
-                                <Smartphone className="w-4 h-4 text-slate-500" />
-                            </div>
-                            <div>
-                                <p className="font-bold text-sm text-slate-900">{t.twoFactor}</p>
-                                <p className="text-xs text-slate-500">{t.twoFactorDesc}</p>
-                            </div>
+                    {/* Email Display */}
+                    <div className="flex items-center justify-between p-4 border border-slate-100 rounded-xl bg-slate-50/50">
+                        <div>
+                            <p className="font-bold text-sm text-slate-900">Email</p>
+                            <p className="text-xs text-slate-500">
+                                {language === 'es' ? 'Dirección asociada a tu cuenta' : 'Address associated with your account'}
+                            </p>
                         </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                className="sr-only peer"
-                                checked={twoFactor}
-                                onChange={(e) => {
-                                    setTwoFactor(e.target.checked);
-                                    onSave({ twoFactorEnabled: e.target.checked });
-                                }}
-                            />
-                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-                        </label>
-                    </div>
-
-                    {/* Security Notifications */}
-                    <div className="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:border-slate-200 transition-colors bg-slate-50/30">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm">
-                                <AlertTriangle className="w-4 h-4 text-slate-500" />
-                            </div>
-                            <div>
-                                <p className="font-bold text-sm text-slate-900">{t.securityAlerts}</p>
-                                <p className="text-xs text-slate-500">{t.securityAlertsDesc}</p>
-                            </div>
+                        <div className="text-sm font-medium text-slate-700 bg-white px-3 py-1.5 rounded-lg border border-slate-200">
+                            {user.email || 'No email found'}
                         </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                className="sr-only peer"
-                                checked={securityNotifs}
-                                onChange={(e) => {
-                                    setSecurityNotifs(e.target.checked);
-                                    onSave({ securityNotifications: e.target.checked });
-                                }}
-                            />
-                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-                        </label>
                     </div>
                 </div>
 
@@ -220,46 +152,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ user, language, onS
                     )}
                 </div>
 
-                {/* Active Sessions */}
-                <div className="border-t border-slate-100 pt-6">
-                    <h3 className="text-sm font-bold text-slate-900 mb-4">{t.activeSessions}</h3>
-                    <div className="space-y-3">
-                        {sessions.length === 0 ? (
-                            <p className="text-sm text-slate-500 italic">No active sessions found.</p>
-                        ) : (
-                            sessions.map((session) => {
-                                const isCurrent = session.device_id === currentDeviceId;
 
-                                return (
-                                    <div key={session.id} className={`flex items-center justify-between text-sm ${!isCurrent ? 'opacity-80' : ''}`}>
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-2 h-2 rounded-full ${isCurrent ? 'bg-green-500' : 'bg-slate-300'}`}></div>
-                                            <div>
-                                                <p className="font-medium text-slate-700">
-                                                    {session.device_info?.device === 'Desktop' ? 'Desktop' : session.device_info?.device || 'Unknown Device'}
-                                                    {isCurrent && ' (This device)'}
-                                                </p>
-                                                <p className="text-xs text-slate-400">
-                                                    {session.device_info?.os} • {session.device_info?.browser} • {session.ip_address}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        {isCurrent ? (
-                                            <span className="text-xs text-slate-500">Active now</span>
-                                        ) : (
-                                            <button
-                                                onClick={() => handleRevokeSession(session.id)}
-                                                className="text-xs text-red-500 hover:underline flex items-center gap-1"
-                                            >
-                                                <LogOut className="w-3 h-3" /> Revoke
-                                            </button>
-                                        )}
-                                    </div>
-                                );
-                            })
-                        )}
-                    </div>
-                </div>
             </div>
         </div>
     );

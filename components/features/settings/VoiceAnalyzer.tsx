@@ -87,7 +87,7 @@ const VoiceAnalyzer: React.FC<VoiceAnalyzerProps> = ({ language, onAnalysisCompl
                     className={`px-3 py-1.5 text-sm rounded-md transition-all flex items-center gap-2 ${mode === 'manual' ? 'bg-brand-50 text-brand-700 font-medium' : 'text-slate-500 hover:text-slate-700'}`}
                 >
                     <FileText className="w-4 h-4" />
-                    {language === 'es' ? 'Texto Manual' : 'Manual Text'}
+                    {language === 'es' ? 'Pegar Contenido' : 'Paste Content'}
                 </button>
             </div>
 
@@ -129,17 +129,28 @@ const VoiceAnalyzer: React.FC<VoiceAnalyzerProps> = ({ language, onAnalysisCompl
                 </div>
             ) : (
                 <div className="space-y-3 mb-6">
-                    <p className="text-sm text-slate-500">
-                        {language === 'es'
-                            ? 'Pega ejemplos de tu contenido, correos o artículos que representen tu voz.'
-                            : 'Paste examples of your content, emails, or articles that represent your voice.'}
-                    </p>
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 flex gap-3 items-start">
+                        <div className="min-w-fit mt-0.5">
+                            <History className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <p className="text-xs text-blue-800 leading-relaxed">
+                            {language === 'es'
+                                ? 'Tip: Ve a tu perfil de LinkedIn, busca tus posts con más likes/comentarios, copia el texto y pégalo aquí. ¡Cuanto más contenido, mejor la IA imitará tu estilo!'
+                                : 'Tip: Go to your LinkedIn profile, find your most engaged posts, copy the text and paste it here. The more content, the better the AI clones your style!'}
+                        </p>
+                    </div>
+
                     <textarea
                         value={manualText}
                         onChange={(e) => setManualText(e.target.value)}
-                        className="w-full h-40 p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
-                        placeholder="..."
+                        className="w-full h-48 p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm leading-relaxed"
+                        placeholder={language === 'es'
+                            ? "Pega aquí tus mejores posts...\n\nEjemplo:\nAcabo de aprender una lección valiosa sobre..."
+                            : "Paste your best posts here...\n\nExample:\nI just learned a valuable lesson about..."}
                     />
+                    <div className="text-xs text-right text-slate-400">
+                        {manualText.length} chars (Recommended: &gt; 500)
+                    </div>
                 </div>
             )}
 

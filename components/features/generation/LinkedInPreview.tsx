@@ -1,10 +1,11 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { AppLanguage, UserProfile, ViralAnalysis } from '../../../types';
-import { ThumbsUp, MessageCircle, Repeat, Send, Globe, MoreHorizontal, Plus, PenSquare, Check, TrendingUp, Activity, Zap, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { ThumbsUp, MessageCircle, Repeat, Send, Globe, MoreHorizontal, Plus, PenSquare, Check, TrendingUp, Activity, Zap, AlertCircle, ChevronDown, ChevronUp, Clock } from 'lucide-react';
 import { translations } from '../../../translations';
 import { supabase } from '../../../services/supabaseClient';
 import { toast } from 'sonner';
+import ScheduleModal from '../../modals/ScheduleModal';
 
 interface LinkedInPreviewProps {
     content: string;
@@ -12,6 +13,7 @@ interface LinkedInPreviewProps {
     isLoading: boolean;
     language?: AppLanguage;
     onUpdate?: (newContent: string) => void;
+    onSchedule?: (date: Date) => void;
     viralScore?: number;
     viralAnalysis?: ViralAnalysis;
 }
@@ -22,6 +24,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content = '', user, i
     const [editContent, setEditContent] = useState(content || '');
     const [showAudit, setShowAudit] = useState(true);
     const [isPublishing, setIsPublishing] = useState(false);
+    const [isScheduling, setIsScheduling] = useState(false);
 
     const t = translations[language].app.preview;
 
@@ -233,6 +236,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content = '', user, i
                         </div>
                     ) : (
 
+
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setIsEditing(true)}
@@ -240,6 +244,13 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content = '', user, i
                             >
                                 <PenSquare className="w-3.5 h-3.5" />
                                 {t.edit}
+                            </button>
+                            <button
+                                onClick={() => setIsScheduling(true)}
+                                className="px-3 py-1.5 rounded-md bg-white border border-slate-200 text-slate-600 text-xs font-bold hover:border-slate-300 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-1.5"
+                            >
+                                <Clock className="w-3.5 h-3.5" />
+                                {language === 'es' ? 'Programar' : 'Schedule'}
                             </button>
                             <button
                                 onClick={handlePublish}
@@ -251,11 +262,22 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content = '', user, i
                                 ) : (
                                     <Send className="w-3.5 h-3.5" />
                                 )}
-                                {isPublishing ? 'Publicando...' : 'Publicar en LinkedIn'}
+                                {isPublishing ? 'Publicando...' : 'Publicar'}
                             </button>
                         </div>
                     )}
                 </div>
+
+                <ScheduleModal
+                    isOpen={isScheduling}
+                    onClose={() => setIsScheduling(false)}
+                    onConfirm={(date) => {
+                        if (onSchedule) onSchedule(date);
+                        setIsScheduling(false);
+                        toast.success(language === 'es' ? 'Publicación programada' : 'Post scheduled');
+                    }}
+                    language={language}
+                />
 
                 {/* Post Header */}
                 <div className="p-4">

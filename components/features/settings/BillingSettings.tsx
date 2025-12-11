@@ -42,7 +42,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpg
                 </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 relative z-10">
+            <div className="max-w-2xl mx-auto mb-8 relative z-10">
                 {/* Current Plan Card */}
                 <div className="bg-slate-50/80 rounded-xl p-6 border border-slate-200 flex flex-col justify-between">
                     <div>
@@ -69,7 +69,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpg
                                 onClick={() => setShowCancelModal(true)}
                                 className="text-xs font-medium text-slate-400 hover:text-red-500 hover:underline flex items-center gap-1 w-fit transition-colors"
                             >
-                                Cancel Subscription
+                                Cancelar Suscripción
                             </button>
                         )}
 
@@ -81,34 +81,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpg
                     </div>
                 </div>
 
-                {/* Payment Method Card */}
-                <div className="bg-slate-50/80 rounded-xl p-6 border border-slate-200 flex flex-col justify-between">
-                    <div>
-                        <p className="text-xs font-bold uppercase text-slate-400 tracking-wider mb-4">{t.paymentMethod}</p>
-                        {user.planTier !== 'free' ? (
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-8 bg-slate-800 rounded-md flex items-center justify-center text-white/90 text-[8px] font-mono tracking-widest relative overflow-hidden">
-                                    <div className="absolute top-0 left-0 w-full h-full opacity-20 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.4),transparent)]"></div>
-                                    •••• 4242
-                                </div>
-                                <div>
-                                    <p className="text-sm font-bold text-slate-900">Visa ending in 4242</p>
-                                    <p className="text-xs text-slate-500">Expires 12/25</p>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex items-center gap-3 opacity-60">
-                                <div className="w-12 h-8 bg-slate-200 rounded-md border border-slate-300"></div>
-                                <p className="text-sm text-slate-500">No payment method linked.</p>
-                            </div>
-                        )}
-                    </div>
-                    <div className="mt-6 pt-4 border-t border-slate-200/60">
-                        <button className="text-sm font-bold text-slate-500 hover:text-slate-700 hover:underline">
-                            {t.updatePayment}
-                        </button>
-                    </div>
-                </div>
+
             </div>
 
             <CancellationModal

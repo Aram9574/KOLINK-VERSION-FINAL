@@ -145,3 +145,24 @@ export const generatePostIdeas = async (user: UserProfile, language: AppLanguage
     throw error;
   }
 };
+
+export interface BrandVoiceAnalysisResult {
+  styleName: string;
+  toneDescription: string;
+  keywords?: string[];
+}
+
+export const analyzeBrandVoice = async (payload: { contentSamples: string[], language: string }): Promise<BrandVoiceAnalysisResult> => {
+  const { data, error } = await supabase.functions.invoke('analyze-brand-voice', {
+    body: payload
+  });
+
+  if (error) {
+    console.error("Analysis Error:", error);
+    throw new Error(error.message);
+  }
+
+  if (data.error) throw new Error(data.error);
+
+  return data;
+};

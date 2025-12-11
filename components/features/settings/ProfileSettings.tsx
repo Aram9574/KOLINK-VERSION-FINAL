@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { UserProfile, AppLanguage } from '../../../types';
 import { translations } from '../../../translations';
-import { User, Building2, Briefcase, Mic } from 'lucide-react';
+import { User, Building2, Briefcase } from 'lucide-react';
 import Tooltip from '../../ui/Tooltip';
+import BrandVoiceManager from './BrandVoiceManager';
 
 interface ProfileSettingsProps {
     user: UserProfile;
@@ -16,10 +17,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
     const [headline, setHeadline] = useState(user.headline || '');
     const [companyName, setCompanyName] = useState(user.companyName || '');
     const [industry, setIndustry] = useState(user.industry || '');
-    const [brandVoice, setBrandVoice] = useState(user.brandVoice || '');
-
     const t = translations[language].app.settings;
-    const CHAR_LIMIT = 500;
 
     // We expose a ref or callback to parent if we want parent to trigger save,
     // but for now let's assume parent handles the "Save" button and we just sync state up?
@@ -74,45 +72,9 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
                 </div>
             </div>
 
-            {/* Brand Voice Section */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm ring-1 ring-slate-900/5">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        <div className="p-2 bg-purple-50 rounded-lg">
-                            <Mic className="w-5 h-5 text-purple-600" />
-                        </div>
-                        {t.brandVoiceTitle}
-                        <Tooltip>{t.brandVoiceTooltip}</Tooltip>
-                    </h2>
-                    {user.planTier === 'free' && (
-                        <span className="px-2 py-1 bg-slate-100 text-slate-500 text-xs font-bold rounded uppercase tracking-wide">
-                            {t.premiumFeature}
-                        </span>
-                    )}
-                </div>
-                <div className="space-y-4">
-                    <p className="text-sm text-slate-500">
-                        {t.brandVoiceDesc}
-                    </p>
-                    <div className="relative">
-                        <textarea
-                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all text-sm font-medium h-32 resize-none placeholder-slate-400 text-slate-700"
-                            placeholder={t.brandVoicePlaceholder}
-                            value={brandVoice}
-                            maxLength={CHAR_LIMIT}
-                            onChange={(e) => {
-                                setBrandVoice(e.target.value);
-                                onSave({ brandVoice: e.target.value });
-                            }}
-                        />
-                        <div className="absolute bottom-3 right-3 flex items-center gap-2 pointer-events-none bg-slate-50/80 pl-2 rounded-md backdrop-blur-sm">
-                            <span className={`text-xs font-medium transition-colors ${brandVoice.length >= CHAR_LIMIT ? 'text-red-500' : 'text-slate-400'}`}>
-                                {brandVoice.length}/{CHAR_LIMIT}
-                            </span>
-                            <Mic className="w-4 h-4 text-slate-300" />
-                        </div>
-                    </div>
-                </div>
+            {/* Brand Voice Manager */}
+            <div className="bg-white border boundary-slate-200 rounded-2xl p-6 shadow-sm ring-1 ring-slate-900/5">
+                <BrandVoiceManager userId={user.id} language={language} />
             </div>
 
             {/* Profile Section */}

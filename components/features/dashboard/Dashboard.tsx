@@ -151,7 +151,7 @@ const DashboardContent: React.FC = () => {
             onDeletePost={handleDeletePost}
         >
             <div className={`h-full ${activeTab === 'history' ? 'overflow-hidden' : 'overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent'}`}>
-                <div className={`max-w-7xl mx-auto p-4 lg:p-8 ${activeTab === 'history' ? 'h-full pb-0' : 'pb-24'}`}>
+                <div className={`${activeTab === 'history' ? 'h-full ml-1' : 'max-w-7xl mx-auto p-4 lg:p-8 pb-24'}`}>
                     {activeTab === 'create' && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <PostCreator
@@ -160,6 +160,8 @@ const DashboardContent: React.FC = () => {
                                 credits={user.credits}
                                 language={user.language || 'en'}
                                 showCreditDeduction={showCreditDeduction}
+                                initialParams={currentPost?.params}
+                                initialTopic={currentPost?.params?.topic}
                             />
                         </div>
                     )}
@@ -172,7 +174,14 @@ const DashboardContent: React.FC = () => {
                                     setActiveTab('create');
                                 }}
                                 onReuse={(params) => {
-                                    console.log("Reuse params:", params);
+                                    setCurrentPost({
+                                        id: 'draft-' + Date.now(),
+                                        content: '', // Start clear for new generation
+                                        params: params,
+                                        createdAt: Date.now(),
+                                        likes: 0,
+                                        views: 0
+                                    });
                                     setActiveTab('create');
                                 }}
                                 onDelete={handleDeletePost}

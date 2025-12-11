@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Calendar, TrendingUp, Copy, RotateCcw, Trash2 } from 'lucide-react';
+import { Calendar, TrendingUp, Copy, RotateCcw, Trash2, Star, Clock, FileEdit, CheckCircle } from 'lucide-react';
 import { Post, AppLanguage, GenerationParams } from '../../../types';
 import { translations } from '../../../translations';
+import { toast } from 'sonner';
 
 interface HistoryCardProps {
     post: Post;
@@ -9,9 +10,17 @@ interface HistoryCardProps {
     onSelect: (post: Post) => void;
     onReuse: (params: GenerationParams) => void;
     onDelete: (id: string, e: React.MouseEvent) => void;
+    onToggleFavorite: (id: string, isFavorite: boolean) => void;
 }
 
-const HistoryCard: React.FC<HistoryCardProps> = ({ post, language, onSelect, onReuse, onDelete }) => {
+const HistoryCard: React.FC<HistoryCardProps> = ({
+    post,
+    language,
+    onSelect,
+    onReuse,
+    onDelete,
+    onToggleFavorite
+}) => {
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const t = translations[language].app.history;
     const tConstants = translations[language].app.constants;
@@ -20,7 +29,13 @@ const HistoryCard: React.FC<HistoryCardProps> = ({ post, language, onSelect, onR
         e.stopPropagation();
         navigator.clipboard.writeText(content);
         setCopiedId(id);
+        toast.success(language === 'es' ? 'Contenido copiado' : 'Content copied');
         setTimeout(() => setCopiedId(null), 2000);
+    };
+
+    const handleFavoriteClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onToggleFavorite(post.id, !post.isFavorite);
     };
 
     const getScoreColor = (score: number) => {
@@ -38,8 +53,30 @@ const HistoryCard: React.FC<HistoryCardProps> = ({ post, language, onSelect, onR
             onClick={() => onSelect(post)}
             className="break-inside-avoid group bg-white rounded-2xl border border-slate-200 p-6 hover:border-brand-300 hover:shadow-xl hover:shadow-brand-500/5 transition-all duration-300 cursor-pointer flex flex-col hover:-translate-y-1 relative overflow-hidden"
         >
+            {/* Status Icons & Action */}
+            <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+                <button
+                    onClick={handleFavoriteClick}
+                    className={`p-1.5 rounded-full transition-colors ${post.isFavorite ? 'text-amber-400 bg-amber-50 hover:bg-amber-100' : 'text-slate-300 hover:text-amber-400 hover:bg-slate-50'}`}
+                >
+                    <Star className={`w-4 h-4 ${post.isFavorite ? 'fill-current' : ''}`} />
+                </button>
+            </div>
+
             {/* Badges */}
-            <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
+            <div className="flex flex-wrap items-center mb-4 gap-2 pr-8">
+                {post.status === 'scheduled' && (
+                    <span className="flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider rounded-md border border-blue-100">
+                        <Clock className="w-3 h-3" />
+                        {language === 'es' ? 'Prog' : 'Sched'}
+                    </span>
+                )}
+                {post.status === 'draft' && (
+                    <span className="flex items-center gap-1 px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider rounded-md border border-slate-200">
+                        <FileEdit className="w-3 h-3" />
+                        {language === 'es' ? 'Borrador' : 'Draft'}
+                    </span>
+                )}
                 <div className="flex gap-2">
                     <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider rounded-md border border-slate-200 group-hover:bg-brand-50 group-hover:text-brand-700 group-hover:border-brand-200 transition-colors">
                         {toneLabel}
@@ -48,46 +85,51 @@ const HistoryCard: React.FC<HistoryCardProps> = ({ post, language, onSelect, onR
                         {frameworkLabel.split(' ')[0]}
                     </span>
                 </div>
-                <span className="flex items-center gap-1.5 text-xs text-slate-400 font-medium whitespace-nowrap">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {new Date(post.createdAt).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { month: 'short', day: 'numeric' })}
-                </span>
             </div>
 
             {/* Content */}
             <div className="mb-6">
-                <h3 className="text-base font-bold text-slate-900 mb-2 line-clamp-2" title={post.params.topic}>
-                    {post.params.topic}
-                </h3>
+                <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-base font-bold text-slate-900 line-clamp-2 pr-2" title={post.params.topic}>
+                        {post.params.topic}
+                    </h3>
+                </div>
                 <p className="text-sm text-slate-500 leading-relaxed line-clamp-[8] font-normal whitespace-pre-line">
                     {post.content}
                 </p>
+                {/* Tags (Future proofing UI) */}
+                {post.tags && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-3">
+                        {post.tags.slice(0, 3).map(tag => (
+                            <span key={tag} className="text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                                #{tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Footer Stats & Actions */}
             <div className="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
                 <div className="flex items-center gap-4">
-                    {score > 0 ? (
-                        <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md border ${getScoreColor(score)} text-xs font-bold`}>
-                            <TrendingUp className="w-3.5 h-3.5" />
-                            Score: {score}
+                    <span className="flex items-center gap-1.5 text-xs text-slate-400 font-medium whitespace-nowrap">
+                        <Calendar className="w-3.5 h-3.5" />
+                        {new Date(post.createdAt).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { month: 'short', day: 'numeric' })}
+                    </span>
+                    {score > 0 && (
+                        <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded border ${getScoreColor(score)} text-[10px] font-bold`}>
+                            <TrendingUp className="w-3 h-3" />
+                            {score}
                         </div>
-                    ) : (
-                        <span className="text-xs text-slate-400 italic">{t.noScore}</span>
                     )}
                 </div>
 
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <button
                         onClick={(e) => handleCopy(post.id, post.content, e)}
-                        className="p-2 hover:bg-brand-50 text-slate-400 hover:text-brand-600 rounded-lg transition-colors relative"
+                        className="p-2 hover:bg-brand-50 text-slate-400 hover:text-brand-600 rounded-lg transition-colors"
                         title={t.copy}
                     >
-                        {copiedId === post.id && (
-                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded shadow-lg whitespace-nowrap animate-in fade-in zoom-in">
-                                {t.actions.copied}
-                            </span>
-                        )}
                         <Copy className="w-4 h-4" />
                     </button>
                     <button

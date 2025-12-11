@@ -35,6 +35,8 @@ export enum PostLength {
   LONG = 'Long'
 }
 
+export type ViralHook = 'auto' | 'question' | 'statistic' | 'negative' | 'story' | 'assertion';
+
 export interface GenerationParams {
   topic: string;
   audience: string;
@@ -45,6 +47,9 @@ export interface GenerationParams {
   emojiDensity: EmojiDensity;
   hashtagCount: number; // 0 to 5 (SEO Optimized)
   includeCTA: boolean;
+  hookStyle?: ViralHook;
+  brandVoiceId?: string;
+  outputLanguage?: 'en' | 'es';
 }
 
 export interface ViralAnalysis {
@@ -64,6 +69,10 @@ export interface Post {
   isAutoPilot?: boolean; // New flag for automated posts
   viralScore?: number; // 0-100 (Calculated by AI)
   viralAnalysis?: ViralAnalysis;
+  tags?: string[];
+  isFavorite?: boolean;
+  status?: 'draft' | 'scheduled' | 'published';
+  scheduledDate?: number;
 }
 
 export interface Achievement {
@@ -155,4 +164,13 @@ export interface TourStep {
   title: string;
   description: string;
   position?: 'top' | 'right' | 'bottom' | 'left';
+}
+
+export interface BrandVoice {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string;
+  isActive?: boolean;
+  created_at?: string;
 }
