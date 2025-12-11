@@ -268,16 +268,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content = '', user, i
                     )}
                 </div>
 
-                <ScheduleModal
-                    isOpen={isScheduling}
-                    onClose={() => setIsScheduling(false)}
-                    onConfirm={(date) => {
-                        if (onSchedule) onSchedule(date);
-                        setIsScheduling(false);
-                        toast.success(language === 'es' ? 'Publicación programada' : 'Post scheduled');
-                    }}
-                    language={language}
-                />
+
 
                 {/* Post Header */}
                 <div className="p-4">
