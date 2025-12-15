@@ -3,6 +3,7 @@ import { Zap, Clock, AlertTriangle, TrendingUp, Smartphone, Monitor, Lightbulb, 
 import { UserProfile, AppLanguage } from '../../../types';
 import { ALGORITHM_TIPS_CONTENT } from '../../../constants';
 import FeedbackModal from '../../modals/FeedbackModal';
+import { getAvatarUrl } from '../../../utils';
 
 interface DashboardHeaderProps {
     user: UserProfile;
@@ -15,18 +16,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ user, language, setLa
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
     const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
-    // Keep the tip interval logic if needed for other things, or remove if truly unused. 
-    // The previous code had it. I'll keep it to be safe or remove if I'm sure.
-    // The user asked to remove the *UI*, not necessarily the logic if it's used elsewhere?
-    // But since the UI was removed, the state is likely useless. 
-    // HOWEVER, I will produce a clean file that compiles.
-
     return (
         <>
             <header className="hidden lg:flex items-center justify-between px-8 py-5 bg-white border-b border-slate-200 shadow-sm z-10">
                 <div className="flex items-center gap-4">
                     <h1 className="text-2xl font-display font-bold text-slate-900">
-                        {activeTab === 'create' && (language === 'es' ? 'Estudio Viral' : 'Viral Studio')}
+                        {activeTab === 'create' && (language === 'es' ? 'Estudio' : 'Studio')}
                         {activeTab === 'history' && (language === 'es' ? 'Historial' : 'History')}
                         {activeTab === 'settings' && (language === 'es' ? 'Ajustes' : 'Settings')}
                         {activeTab === 'ideas' && (language === 'es' ? 'Generador de Ideas' : 'Idea Generator')}
@@ -64,11 +59,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ user, language, setLa
                             </div>
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 p-0.5 shadow-md">
                                 <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
-                                    {user.avatarUrl ? (
-                                        <img src={user.avatarUrl} alt="Profile" className="w-full h-full object-cover" />
-                                    ) : (
-                                        <span className="font-bold text-brand-600 text-lg">{user.name?.charAt(0) || 'U'}</span>
-                                    )}
+                                    <img src={getAvatarUrl(user)} alt="Profile" className="w-full h-full object-cover" />
                                 </div>
                             </div>
                         </div>

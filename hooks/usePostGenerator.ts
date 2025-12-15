@@ -11,11 +11,13 @@ export const usePostGenerator = ({ initialTopic = '', initialParams = null }: Us
     const [params, setParams] = useState<GenerationParams>({
         topic: initialTopic,
         audience: '',
-        tone: ToneEnum.PROFESSIONAL,
-        framework: FrameworkEnum.PAS,
-        length: LengthEnum.MEDIUM,
+        tone: 'random',
+        framework: 'random',
+        length: 'random',
         creativityLevel: 50,
-        emojiDensity: DensityEnum.MODERATE,
+        emojiDensity: 'random',
+        hashtagCount: 3,
+        hookStyle: 'random',
         includeCTA: true,
     });
 

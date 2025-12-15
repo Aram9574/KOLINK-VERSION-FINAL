@@ -2,14 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Monitor, Smartphone, Layout, Clock, TrendingUp, AlertTriangle, Lightbulb } from 'lucide-react';
 
-import { GenerationParams, AppLanguage } from '../../../types';
+import { GenerationParams, AppLanguage, ViralTone, ViralFramework, EmojiDensity, PostLength, ViralHook } from '../../../types';
 import { usePostGenerator } from '../../../hooks/usePostGenerator';
 import { useUser } from '../../../context/UserContext';
 import { usePosts } from '../../../context/PostContext';
-import { ALGORITHM_TIPS_CONTENT } from '../../../constants';
+import { ALGORITHM_TIPS_CONTENT, TONES, FRAMEWORKS, EMOJI_OPTIONS, LENGTH_OPTIONS } from '../../../constants';
 
 import GeneratorForm from './GeneratorForm';
 import LinkedInPreview from './LinkedInPreview';
+
+// Helper to pick random from array, excluding the 'random' option itself if present
+const pickRandom = <T extends { value: string }>(options: T[]): string => {
+  // Filter out the "random" option (value === 'random')
+  const valid = options.filter(o => o.value !== 'random');
+  if (valid.length === 0) return options[0].value;
+  const index = Math.floor(Math.random() * valid.length);
+  return valid[index].value;
+};
+
+// Hooks are hardcoded in GeneratorForm, but we can define them here for random picking
+const HOOK_OPTIONS = [
+  'auto', 'question', 'statistic', 'negative', 'story', 'assertion'
+];
 
 interface PostGeneratorProps {
   onGenerate: (params: GenerationParams) => void;
@@ -55,7 +69,19 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
   const [activeView, setActiveView] = useState<'editor' | 'preview'>('editor'); // For mobile only
 
   const handleGenerate = () => {
-    onGenerate(params);
+    // Resolve random values
+    const finalParams: GenerationParams = {
+      ...params,
+      tone: params.tone === 'random' ? pickRandom(TONES) as ViralTone : params.tone,
+      framework: params.framework === 'random' ? pickRandom(FRAMEWORKS) as ViralFramework : params.framework,
+      length: params.length === 'random' ? pickRandom(LENGTH_OPTIONS) as PostLength : params.length,
+      emojiDensity: params.emojiDensity === 'random' ? pickRandom(EMOJI_OPTIONS) as EmojiDensity : params.emojiDensity,
+      hookStyle: params.hookStyle === 'random'
+        ? HOOK_OPTIONS[Math.floor(Math.random() * HOOK_OPTIONS.length)] as ViralHook
+        : params.hookStyle
+    };
+
+    onGenerate(finalParams);
     if (window.innerWidth < 1024) {
       setActiveView('preview'); // Switch to preview on mobile after generate
     }

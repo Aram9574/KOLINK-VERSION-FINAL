@@ -22,10 +22,10 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose, onUpgrade,
     const t = translations[language].app.upgrade;
 
     return (
-        <BaseModal isOpen={isOpen} onClose={onClose}>
+        <BaseModal isOpen={isOpen} onClose={onClose} maxWidth="max-w-6xl">
             <UpgradeHeader />
 
-            <div className="p-6 lg:p-12 pt-0 lg:pt-0 text-center">
+            <div className="p-6 pt-0 text-center">
                 <BillingToggle billingInterval={billingInterval} onChange={setBillingInterval} />
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">

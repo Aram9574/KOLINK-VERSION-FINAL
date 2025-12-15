@@ -164,7 +164,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                         value={params.hookStyle || 'auto'}
                                         onChange={(e) => onUpdateParams({ hookStyle: e.target.value as ViralHook })}
                                     >
-                                        <option value="auto">{language === 'es' ? 'Automático (IA decide)' : 'Automatic (AI decides)'}</option>
+                                        <option value="random">{language === 'es' ? '🎲 Aleatorio (Sorpréndeme)' : '🎲 Random (Surprise Me)'}</option>
                                         <option value="question">{language === 'es' ? 'Pregunta Retórica' : 'Rhetorical Question'}</option>
                                         <option value="statistic">{language === 'es' ? 'Dato/Estadística Impactante' : 'Shocking Statistic'}</option>
                                         <option value="negative">{language === 'es' ? 'Negativo/Advertencia' : 'Negative/Warning'}</option>

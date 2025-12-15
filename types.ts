@@ -40,14 +40,14 @@ export type ViralHook = 'auto' | 'question' | 'statistic' | 'negative' | 'story'
 export interface GenerationParams {
   topic: string;
   audience: string;
-  tone: ViralTone;
-  framework: ViralFramework;
-  length: PostLength;
+  tone: ViralTone | 'random';
+  framework: ViralFramework | 'random';
+  length: PostLength | 'random';
   creativityLevel: number; // 0 to 100
-  emojiDensity: EmojiDensity;
+  emojiDensity: EmojiDensity | 'random';
   hashtagCount: number; // 0 to 5 (SEO Optimized)
   includeCTA: boolean;
-  hookStyle?: ViralHook;
+  hookStyle?: ViralHook | 'random';
   brandVoiceId?: string;
   outputLanguage?: 'en' | 'es';
 }

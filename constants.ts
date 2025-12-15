@@ -2,7 +2,10 @@
 
 import { ViralTone, ViralFramework, EmojiDensity, PostLength, UserProfile, Achievement, SubscriptionPlan, Invoice } from './types';
 
+export const RANDOM = { value: 'random', label: '🎲 Aleatorio (Sorpréndeme)', desc: 'La IA elegirá la mejor opción.' };
+
 export const TONES = [
+  RANDOM,
   { value: ViralTone.PROFESSIONAL, label: '👔 Profesional', desc: 'Limpio, corporativo, liderazgo.' },
   { value: ViralTone.CONTROVERSIAL, label: '🔥 Controversial/Debate', desc: 'Opiniones polarizantes.' },
   { value: ViralTone.INSPIRATIONAL, label: '✨ Inspiracional', desc: 'Motivador, visionario.' },
@@ -14,6 +17,7 @@ export const TONES = [
 ];
 
 export const FRAMEWORKS = [
+  RANDOM,
   { value: ViralFramework.STANDARD, label: 'Estándar', desc: 'Estructura sólida y balanceada.' },
   { value: ViralFramework.PAS, label: 'Problema-Agitación-Solución', desc: 'Fórmula clásica de conversión.' },
   { value: ViralFramework.AIDA, label: 'AIDA', desc: 'Atención, Interés, Deseo, Acción.' },
@@ -26,12 +30,14 @@ export const FRAMEWORKS = [
 ];
 
 export const LENGTH_OPTIONS = [
+  RANDOM,
   { value: PostLength.SHORT, label: 'Corto e Impactante', desc: '< 100 palabras' },
   { value: PostLength.MEDIUM, label: 'Estándar', desc: '100-250 palabras' },
   { value: PostLength.LONG, label: 'Profundo', desc: '300+ palabras' },
 ];
 
 export const EMOJI_OPTIONS = [
+  RANDOM,
   { value: EmojiDensity.MINIMAL, label: 'Mínimo' },
   { value: EmojiDensity.MODERATE, label: 'Balanceado' },
   { value: EmojiDensity.HIGH, label: 'Alto' },
@@ -69,28 +75,29 @@ export const PLANS: SubscriptionPlan[] = [
     id: 'free',
     name: 'Plan Inicial',
     price: 0,
-    description: 'Acceso mínimo viable para experimentar',
-    credits: 15,
+    description: 'Para probar el poder de la IA',
+    credits: 10,
     features: [
-      '15 Créditos IA / mes',
+      '10 Créditos de Prueba',
       'Generador de Ideas Básico',
       '3 Tonos Predefinidos',
-      'Soporte por Email Estándar'
+      'Acceso a Comunidad',
+      'Sin Tarjeta de Crédito'
     ]
   },
   {
     id: 'pro',
     name: 'Creador Pro',
     price: 19,
-    description: 'Para automatizar tu marca personal',
-    credits: 100,
+    description: 'Automatiza tu marca personal',
+    credits: 99999,
     features: [
-      '100 Créditos IA / mes',
-      'Autopilot (Generación Programada)',
-      'Generador de Ideas Ilimitado',
-      'Personalización de Voz de Marca',
-      'Integración LinkedIn Directa',
-      'Soporte Prioritario 24h'
+      'Todo lo del Plan Inicial, más:',
+      'Créditos IA ILIMITADOS',
+      'Generador de Ideas ILIMITADO',
+      'Autopilot (Programación)',
+      'Análisis de Voz de Marca',
+      'Soporte Prioritario'
     ],
     highlight: true,
     stripePriceId: 'price_1SZJKhE0zDGmS9ihOiYOzLa1'
@@ -99,15 +106,15 @@ export const PLANS: SubscriptionPlan[] = [
     id: 'viral',
     name: 'Dios Viral',
     price: 79,
-    description: 'Para agencias y power users',
-    credits: 350,
+    description: 'Para escalar sin límites',
+    credits: 99999,
     features: [
-      '350 Créditos IA / mes',
-      'Modelado de Voz (LLM Exclusivo)',
-      'Acceso Anticipado a Modelos',
+      'Todo lo del Creador Pro, más:',
+      'Multi-Cuenta (Agencias)',
+      'Auditoría de Perfil Mensual',
       'A/B Testing de Ganchos',
       'Integración Buffer/Hootsuite',
-      'Gerente de Cuenta Dedicado'
+      'Soporte VIP Dedicado 24/7'
     ],
     stripePriceId: 'price_1SZDgvE0zDGmS9ihnRXmmx4T'
   }

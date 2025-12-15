@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { AppLanguage, UserProfile, ViralAnalysis } from '../../../types';
 import { ThumbsUp, MessageCircle, Repeat, Send, Globe, MoreHorizontal, Plus, PenSquare, Check, TrendingUp, Activity, Zap, AlertCircle, ChevronDown, ChevronUp, Clock } from 'lucide-react';
@@ -6,6 +5,7 @@ import { translations } from '../../../translations';
 import { supabase } from '../../../services/supabaseClient';
 import { toast } from 'sonner';
 import ScheduleModal from '../../modals/ScheduleModal';
+import { getAvatarUrl } from '../../../utils';
 
 interface LinkedInPreviewProps {
     content: string;
@@ -275,7 +275,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content = '', user, i
                     <div className="flex items-start justify-between mb-3">
                         <div className="flex space-x-3">
                             <div className="relative">
-                                <img src={user.avatarUrl} alt={user.name} className="w-12 h-12 rounded-full object-cover border border-slate-100" />
+                                <img src={getAvatarUrl(user)} alt={user?.name || 'User'} className="w-12 h-12 rounded-full object-cover border border-slate-100" />
                                 {user.isPremium && <div className="absolute -bottom-1 -right-1 bg-amber-400 border-2 border-white w-4 h-4 rounded-full flex items-center justify-center"><div className="w-2 h-2 bg-white rounded-full"></div></div>}
                             </div>
 
@@ -404,4 +404,3 @@ const ActionButton: React.FC<{ icon: React.ReactNode, label: string }> = ({ icon
 );
 
 export default LinkedInPreview;
-

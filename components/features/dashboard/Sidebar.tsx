@@ -1,7 +1,3 @@
-
-
-
-
 import React from 'react';
 import {
     LayoutGrid,
@@ -19,6 +15,7 @@ import History from '../history/History';
 import { translations } from '../../../translations';
 
 import { useUser } from '../../../context/UserContext';
+import { getAvatarUrl } from '../../../utils';
 
 interface SidebarProps {
     posts: Post[];
@@ -148,8 +145,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
                 <div className="flex items-center gap-3 px-1">
                     <img
-                        src={user.avatarUrl || '/default-avatar.png'}
-                        onError={(e) => { e.currentTarget.src = '/default-avatar.png'; }}
+                        src={getAvatarUrl(user)}
                         alt="User"
                         className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover"
                     />

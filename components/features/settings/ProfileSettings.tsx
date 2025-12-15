@@ -4,6 +4,7 @@ import { translations } from '../../../translations';
 import { User, Building2, Briefcase } from 'lucide-react';
 import Tooltip from '../../ui/Tooltip';
 import BrandVoiceManager from './BrandVoiceManager';
+import { getAvatarUrl } from '../../../utils';
 
 interface ProfileSettingsProps {
     user: UserProfile;
@@ -18,22 +19,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
     const [companyName, setCompanyName] = useState(user.companyName || '');
     const [industry, setIndustry] = useState(user.industry || '');
     const t = translations[language].app.settings;
-
-    // We expose a ref or callback to parent if we want parent to trigger save,
-    // but for now let's assume parent handles the "Save" button and we just sync state up?
-    // Actually, the original design had one big "Save" button at the bottom.
-    // To keep it simple, we can lift the state up OR just pass the state setters down?
-    // Better: Let's make this component controlled or use a form context.
-    // For this refactor, I will make it controlled by the parent to minimize logic changes,
-    // OR I will pass the setters.
-    //
-    // Wait, the original `SettingsView` had local state for these fields.
-    // To avoid prop drilling hell, I will keep the state here and expose a `getData` method?
-    // No, that's anti-pattern in React.
-    //
-    // Best approach for this refactor:
-    // Pass the state and setters from the parent `SettingsView` to this component.
-    // This keeps `SettingsView` as the "Controller" and `ProfileSettings` as the "View".
 
     return (
         <div className="space-y-6">
@@ -87,7 +72,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
                 </h2>
                 <div className="grid gap-6 max-w-2xl">
                     <div className="flex items-center gap-4">
-                        <img src={user.avatarUrl} alt={user.name} className="w-20 h-20 rounded-full object-cover border-4 border-slate-50 shadow-sm" />
+                        <img src={getAvatarUrl(user)} alt={user.name} className="w-20 h-20 rounded-full object-cover border-4 border-slate-50 shadow-sm" />
                         <div className="space-y-2">
                             <button className="text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-slate-100 px-4 py-2 rounded-lg transition-colors">
                                 {t.uploadPhoto}
