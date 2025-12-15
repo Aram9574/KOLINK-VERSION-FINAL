@@ -6,9 +6,36 @@ interface IdeaGeneratorProps {
     user: UserProfile;
     language: AppLanguage;
     onSelectIdea: (idea: string) => void;
+    onUpgrade?: () => void;
 }
 
-const IdeaGenerator: React.FC<IdeaGeneratorProps> = ({ user, language }) => {
+const IdeaGenerator: React.FC<IdeaGeneratorProps> = ({ user, language, onSelectIdea, onUpgrade }) => {
+    if (!user.isPremium) {
+        return (
+            <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl overflow-hidden relative">
+                <div className="relative z-10 text-center max-w-md bg-white p-8 rounded-3xl shadow-sm">
+                    <div className="mx-auto w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
+                        <Sparkles className="w-10 h-10 text-amber-500" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                        {language === 'es' ? 'Generador de Ideas Premium' : 'Premium Idea Generator'}
+                    </h2>
+                    <p className="text-slate-600 mb-6 text-sm">
+                        {language === 'es'
+                            ? 'Obtén ideas virales ilimitadas impulsadas por Gemini Pro 3.'
+                            : 'Get unlimited viral ideas powered by Gemini Pro 3.'}
+                    </p>
+                    <button
+                        onClick={onUpgrade}
+                        className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all transform hover:-translate-y-1"
+                    >
+                        {language === 'es' ? 'Desbloquear Ideas' : 'Unlock Ideas'}
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl overflow-hidden relative">
 

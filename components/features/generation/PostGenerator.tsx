@@ -3,10 +3,10 @@ import { useLocation } from 'react-router-dom';
 import { Monitor, Smartphone, Layout, Clock, TrendingUp, AlertTriangle, Lightbulb } from 'lucide-react';
 
 import { GenerationParams, AppLanguage, ViralTone, ViralFramework, EmojiDensity, PostLength, ViralHook } from '../../../types';
-import { usePostGenerator } from '../../../hooks/usePostGenerator';
+import { useGeneratorForm } from '../../../hooks/useGeneratorForm';
 import { useUser } from '../../../context/UserContext';
 import { usePosts } from '../../../context/PostContext';
-import { ALGORITHM_TIPS_CONTENT, TONES, FRAMEWORKS, EMOJI_OPTIONS, LENGTH_OPTIONS } from '../../../constants';
+import { ALGORITHM_TIPS_CONTENT, TONES, FRAMEWORKS, EMOJI_OPTIONS, LENGTH_OPTIONS, HOOK_STYLES } from '../../../constants';
 
 import GeneratorForm from './GeneratorForm';
 import LinkedInPreview from './LinkedInPreview';
@@ -19,11 +19,6 @@ const pickRandom = <T extends { value: string }>(options: T[]): string => {
   const index = Math.floor(Math.random() * valid.length);
   return valid[index].value;
 };
-
-// Hooks are hardcoded in GeneratorForm, but we can define them here for random picking
-const HOOK_OPTIONS = [
-  'auto', 'question', 'statistic', 'negative', 'story', 'assertion'
-];
 
 interface PostGeneratorProps {
   onGenerate: (params: GenerationParams) => void;
@@ -47,7 +42,7 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
   isCancelled = false
 }) => {
   const { user } = useUser();
-  const { params, updateParams } = usePostGenerator({ initialTopic, initialParams });
+  const { params, updateParams } = useGeneratorForm({ initialTopic, initialParams });
   const { currentPost, updatePost } = usePosts();
 
   // Legacy Tip Logic
@@ -69,15 +64,22 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
   const [activeView, setActiveView] = useState<'editor' | 'preview'>('editor'); // For mobile only
 
   const handleGenerate = () => {
+    const isFreeUser = user?.planTier === 'free';
+
+    // Filter options based on plan
+    const availableTones = isFreeUser ? TONES.filter(t => !t.isPremium) : TONES;
+    const availableFrameworks = isFreeUser ? FRAMEWORKS.filter(f => !f.isPremium) : FRAMEWORKS;
+    const availableHooks = isFreeUser ? HOOK_STYLES.filter(h => !h.isPremium) : HOOK_STYLES;
+
     // Resolve random values
     const finalParams: GenerationParams = {
       ...params,
-      tone: params.tone === 'random' ? pickRandom(TONES) as ViralTone : params.tone,
-      framework: params.framework === 'random' ? pickRandom(FRAMEWORKS) as ViralFramework : params.framework,
+      tone: params.tone === 'random' ? pickRandom(availableTones) as ViralTone : params.tone,
+      framework: params.framework === 'random' ? pickRandom(availableFrameworks) as ViralFramework : params.framework,
       length: params.length === 'random' ? pickRandom(LENGTH_OPTIONS) as PostLength : params.length,
       emojiDensity: params.emojiDensity === 'random' ? pickRandom(EMOJI_OPTIONS) as EmojiDensity : params.emojiDensity,
       hookStyle: params.hookStyle === 'random'
-        ? HOOK_OPTIONS[Math.floor(Math.random() * HOOK_OPTIONS.length)] as ViralHook
+        ? pickRandom(availableHooks) as ViralHook
         : params.hookStyle
     };
 

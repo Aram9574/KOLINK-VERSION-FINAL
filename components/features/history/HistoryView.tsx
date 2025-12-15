@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { usePosts } from '../../../context/PostContext';
+import { useUser } from '../../../context/UserContext';
 import { Post, AppLanguage, GenerationParams } from '../../../types';
 import { translations } from '../../../translations';
 import { FolderOpen, Calendar as CalendarIcon, List as ListIcon } from 'lucide-react';
@@ -14,13 +15,15 @@ interface HistoryViewProps {
     onReuse: (params: GenerationParams) => void;
     onDelete: (id: string, e: React.MouseEvent) => void;
     language: AppLanguage;
+    onUpgrade?: () => void;
 }
 
 const HistoryView: React.FC<HistoryViewProps> = ({
     onSelect,
     onReuse,
     onDelete,
-    language
+    language,
+    onUpgrade
 }) => {
     const {
         posts,
@@ -92,6 +95,34 @@ const HistoryView: React.FC<HistoryViewProps> = ({
             }
         }
     };
+
+    const { user } = useUser();
+
+    if (!user?.isPremium) {
+        return (
+            <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-50/50">
+                <div className="bg-white rounded-3xl p-12 text-center max-w-lg shadow-xl border border-slate-100">
+                    <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <FolderOpen className="w-10 h-10 text-indigo-500" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                        {language === 'es' ? 'Historial Premium' : 'Premium History'}
+                    </h2>
+                    <p className="text-slate-600 mb-6 text-sm">
+                        {language === 'es'
+                            ? 'Accede a todo tu historial de publicaciones, estadísticas y favoritos.'
+                            : 'Access your entire post history, analytics, and favorites.'}
+                    </p>
+                    <button
+                        onClick={onUpgrade}
+                        className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all transform hover:-translate-y-1"
+                    >
+                        {language === 'es' ? 'Desbloquear Historial' : 'Unlock History'}
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col md:flex-row h-full">

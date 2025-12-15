@@ -30,40 +30,61 @@ const OfferStep: React.FC<OfferStepProps> = ({ language, planPrice, discountType
 
 
     return (
-        <div className="space-y-6 text-center">
-            <div className={`w-16 h-16 ${iconBg} rounded-full flex items-center justify-center mx-auto mb-2 ${is30 ? 'animate-bounce' : 'animate-pulse'}`}>
-                <Icon className={`w-8 h-8 ${iconColor}`} />
+        <div className="space-y-8 text-center px-4">
+            {/* Header */}
+            <div className="space-y-4">
+                <div className={`w-16 h-16 ${iconBg} rounded-full flex items-center justify-center mx-auto shadow-sm`}>
+                    <Icon className={`w-8 h-8 ${iconColor}`} strokeWidth={1.5} />
+                </div>
+                <div>
+                    <h3 className="text-2xl font-display font-semibold text-slate-900">{offerData.title}</h3>
+                    <p className="text-slate-500 font-medium text-sm mt-2 max-w-sm mx-auto">
+                        {offerData.subtitle}
+                    </p>
+                </div>
             </div>
 
-            <div className="space-y-2">
-                <h3 className="text-2xl font-bold text-slate-900">{offerData.title}</h3>
-                <p className="text-slate-500">
-                    {offerData.subtitle}
-                </p>
-            </div>
+            {/* Premium Offer Card */}
+            <div className="bg-white border text-left border-amber-100 rounded-2xl p-6 shadow-xl shadow-amber-900/5 relative overflow-hidden group hover:border-amber-200 transition-colors">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl opacity-50"></div>
 
-            <div className={`bg-gradient-to-br ${gradient} border ${borderColor} rounded-2xl p-6 relative overflow-hidden`}>
-                <div className={`absolute top-0 right-0 ${badgeBg} text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl`}>
-                    {offerData.badge}
+                <div className="relative z-10 flex items-center justify-between mb-6">
+                    <div>
+                        <span className={`inline-flex items-center px-2.5 py-1rounded-full text-xs font-bold uppercase tracking-wide ${badgeBg} text-white rounded-md`}>
+                            {offerData.badge}
+                        </span>
+                        <p className="text-slate-500 text-xs mt-2 font-medium uppercase tracking-wider">{offerData.discountText}</p>
+                    </div>
+                    <div className="text-right">
+                        <div className="flex items-baseline justify-end gap-1">
+                            <span className="text-4xl font-display font-bold text-slate-900">€{(planPrice * discount).toFixed(0)}</span>
+                            <span className="text-slate-400 font-medium line-through decoration-slate-300">€{planPrice}</span>
+                        </div>
+                        <span className="text-xs text-slate-400 font-medium">/mes por 6 meses</span>
+                    </div>
                 </div>
-                <p className={`text-sm font-bold ${textColor} uppercase tracking-wider mb-2`}>{offerData.discountText}</p>
-                <div className="flex items-baseline justify-center gap-2 mb-4">
-                    <span className="text-3xl font-bold text-slate-900">€{(planPrice * discount).toFixed(2)}</span>
-                    <span className="text-lg text-slate-400 line-through">€{planPrice}</span>
-                    <span className="text-sm text-slate-500">/mo</span>
+
+                <div className="relative z-10">
+                    <button
+                        onClick={() => onApplyCoupon(couponId)}
+                        disabled={isLoading}
+                        className={`w-full py-3.5 ${btnBg} text-white font-bold rounded-xl shadow-lg ${shadowColor} transition-all hover:scale-[1.02] hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2`}
+                    >
+                        {isLoading ? (
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            offerData.claimBtn
+                        )}
+                    </button>
+                    <p className="text-[10px] text-slate-400 text-center mt-3 font-medium">
+                        Se aplica en tu próxima factura. Cancela cuando quieras.
+                    </p>
                 </div>
-                <button
-                    onClick={() => onApplyCoupon(couponId)}
-                    disabled={isLoading}
-                    className={`w-full py-3 ${btnBg} text-white font-bold rounded-xl shadow-lg ${shadowColor} transition-all transform hover:-translate-y-0.5`}
-                >
-                    {isLoading ? offerData.applying : offerData.claimBtn}
-                </button>
             </div>
 
             <button
                 onClick={onReject}
-                className="text-sm text-slate-400 hover:text-slate-600 font-medium"
+                className="text-slate-400 hover:text-slate-600 font-medium text-sm hover:underline transition-all"
             >
                 {offerData.reject}
             </button>

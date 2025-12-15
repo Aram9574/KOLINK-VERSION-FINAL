@@ -2,8 +2,8 @@ import React from 'react';
 import { GenerationParams, ViralTone, ViralFramework, ViralHook, EmojiDensity, PostLength, AppLanguage, BrandVoice } from '../../../types';
 import { useUser } from '../../../context/UserContext';
 import { fetchBrandVoices } from '../../../services/userRepository';
-import { TONES, FRAMEWORKS, EMOJI_OPTIONS, LENGTH_OPTIONS } from '../../../constants';
-import { Zap, Target, Type, Sliders, Smile, MessageSquare, Sparkles, AlignLeft, Wand2, Info } from 'lucide-react';
+import { TONES, FRAMEWORKS, EMOJI_OPTIONS, LENGTH_OPTIONS, HOOK_STYLES } from '../../../constants';
+import { Zap, Target, Type, Sliders, Smile, MessageSquare, Sparkles, AlignLeft, Wand2, Info, Lock } from 'lucide-react';
 import { translations } from '../../../translations';
 import Tooltip from '../../ui/Tooltip';
 
@@ -34,6 +34,15 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
     const t = translations[language].app.generator;
     const tConstants = translations[language].app.constants;
     const { user } = useUser();
+    const isFreeUser = user?.planTier === 'free';
+
+    const checkPremiumAccess = (option: { isPremium?: boolean }) => {
+        if (isFreeUser && option.isPremium) {
+            toast.error(language === 'es' ? "Esta opción es solo para usuarios Premium 🔒" : "This option is for Premium users only 🔒");
+            return false;
+        }
+        return true;
+    };
     const [voices, setVoices] = React.useState<BrandVoice[]>([]);
 
     React.useEffect(() => {
@@ -140,10 +149,23 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     <select
                                         className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
                                         value={params.framework}
-                                        onChange={(e) => onUpdateParams({ framework: e.target.value as ViralFramework })}
+                                        onChange={(e) => {
+                                            const selected = FRAMEWORKS.find(f => f.value === e.target.value);
+                                            if (selected && checkPremiumAccess(selected)) {
+                                                onUpdateParams({ framework: e.target.value as ViralFramework });
+                                            }
+                                        }}
                                     >
                                         {FRAMEWORKS.map((fOption) => (
-                                            <option key={fOption.value} value={fOption.value}>{tConstants.frameworks[fOption.value]?.label || fOption.label}</option>
+                                            <option
+                                                key={fOption.value}
+                                                value={fOption.value}
+                                                disabled={isFreeUser && fOption.isPremium}
+                                                className={isFreeUser && fOption.isPremium ? "text-slate-400" : ""}
+                                            >
+                                                {isFreeUser && fOption.isPremium ? "🔒 " : ""}
+                                                {tConstants.frameworks[fOption.value]?.label || fOption.label}
+                                            </option>
                                         ))}
                                     </select>
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
@@ -162,14 +184,24 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     <select
                                         className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
                                         value={params.hookStyle || 'auto'}
-                                        onChange={(e) => onUpdateParams({ hookStyle: e.target.value as ViralHook })}
+                                        onChange={(e) => {
+                                            const selected = HOOK_STYLES.find(h => h.value === e.target.value);
+                                            if (selected && checkPremiumAccess(selected)) {
+                                                onUpdateParams({ hookStyle: e.target.value as ViralHook });
+                                            }
+                                        }}
                                     >
-                                        <option value="random">{language === 'es' ? '🎲 Aleatorio (Sorpréndeme)' : '🎲 Random (Surprise Me)'}</option>
-                                        <option value="question">{language === 'es' ? 'Pregunta Retórica' : 'Rhetorical Question'}</option>
-                                        <option value="statistic">{language === 'es' ? 'Dato/Estadística Impactante' : 'Shocking Statistic'}</option>
-                                        <option value="negative">{language === 'es' ? 'Negativo/Advertencia' : 'Negative/Warning'}</option>
-                                        <option value="story">{language === 'es' ? 'Inicio de Historia ("Ayer me pasó...")' : 'Story Opener'}</option>
-                                        <option value="assertion">{language === 'es' ? 'Afirmación Directa' : 'Direct Assertion'}</option>
+                                        {HOOK_STYLES.map((hOption) => (
+                                            <option
+                                                key={hOption.value}
+                                                value={hOption.value}
+                                                disabled={isFreeUser && hOption.isPremium}
+                                                className={isFreeUser && hOption.isPremium ? "text-slate-400" : ""}
+                                            >
+                                                {isFreeUser && hOption.isPremium ? "🔒 " : ""}
+                                                {hOption.label}
+                                            </option>
+                                        ))}
                                     </select>
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -179,21 +211,29 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
 
                             {/* Brand Voice Selector */}
                             <div className="space-y-1.5">
-                                <label className="text-sm font-semibold text-slate-700 ml-1">
+                                <label className="text-sm font-semibold text-slate-700 ml-1 flex items-center gap-1.5">
                                     {language === 'es' ? 'Voz de Marca' : 'Brand Voice'}
+                                    {isFreeUser && <Lock className="w-3 h-3 text-amber-500" />}
                                     <Tooltip>{language === 'es' ? 'Selecciona una voz personalizada o usa un tono predefinido.' : 'Select a custom voice or use a preset tone.'}</Tooltip>
                                 </label>
-                                <div className="relative group">
+                                <div
+                                    className="relative group"
+                                    onClickCapture={() => {
+                                        if (isFreeUser) {
+                                            toast.error(language === 'es' ? "Las voces de marca son solo para usuarios Premium 🔒" : "Brand voices are for Premium users only 🔒");
+                                        }
+                                    }}
+                                >
                                     <select
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                        className={`w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 ${isFreeUser ? 'opacity-60 cursor-not-allowed bg-slate-100' : ''}`}
                                         value={params.brandVoiceId || ''}
                                         onChange={(e) => {
                                             const val = e.target.value;
                                             onUpdateParams({
                                                 brandVoiceId: val === '' ? undefined : val,
-                                                // If clearing voice, maybe revert to default tone? No need, tone is always there.
                                             });
                                         }}
+                                        disabled={isFreeUser}
                                     >
                                         <option value="">{language === 'es' ? 'Usar Tono (Abajo)' : 'Use Tone (Below)'}</option>
                                         {voices.map((voice) => (
@@ -203,7 +243,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                         ))}
                                     </select>
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                        <Wand2 className="w-4 h-4 opacity-50" />
+                                        {isFreeUser ? <Lock className="w-4 h-4 text-slate-400" /> : <Wand2 className="w-4 h-4 opacity-50" />}
                                     </div>
                                 </div>
                             </div>
@@ -218,11 +258,24 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     <select
                                         className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
                                         value={params.tone}
-                                        onChange={(e) => onUpdateParams({ tone: e.target.value as ViralTone })}
+                                        onChange={(e) => {
+                                            const selected = TONES.find(t => t.value === e.target.value);
+                                            if (selected && checkPremiumAccess(selected)) {
+                                                onUpdateParams({ tone: e.target.value as ViralTone });
+                                            }
+                                        }}
                                         disabled={!!params.brandVoiceId}
                                     >
                                         {TONES.map((tOption) => (
-                                            <option key={tOption.value} value={tOption.value}>{tConstants.tones[tOption.value]?.label || tOption.label}</option>
+                                            <option
+                                                key={tOption.value}
+                                                value={tOption.value}
+                                                disabled={isFreeUser && tOption.isPremium}
+                                                className={isFreeUser && tOption.isPremium ? "text-slate-400" : ""}
+                                            >
+                                                {isFreeUser && tOption.isPremium ? "🔒 " : ""}
+                                                {tConstants.tones[tOption.value]?.label || tOption.label}
+                                            </option>
                                         ))}
                                     </select>
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">

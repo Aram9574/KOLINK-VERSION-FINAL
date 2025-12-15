@@ -79,6 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 >
                     <Lightbulb className="w-5 h-5" />
                     {t.ideas}
+                    {!user.isPremium && <Crown className="w-4 h-4 text-amber-500 fill-amber-500/20 ml-auto flex-shrink-0" />}
                 </button>
                 <button
                     onClick={() => setActiveTab('autopilot')}
@@ -89,6 +90,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 >
                     <Bot className="w-5 h-5" />
                     {t.autopilot}
+                    {!user.isPremium && <Crown className="w-4 h-4 text-amber-500 fill-amber-500/20 ml-auto flex-shrink-0" />}
                 </button>
                 <button
                     onClick={() => setActiveTab('history')}
@@ -98,7 +100,12 @@ const Sidebar: React.FC<SidebarProps> = ({
                             : 'text-slate-600 hover:bg-slate-50'}`}
                 >
                     <HistoryIcon className="w-5 h-5" />
-                    {t.history}
+                    <div className="flex-1 text-left">{t.history}</div>
+                    {!user.isPremium && (
+                        <div className="flex-none text-amber-500 opacity-80" title="Premium Feature">
+                            <Crown className="w-3.5 h-3.5 fill-amber-500/10" />
+                        </div>
+                    )}
                 </button>
                 <button
                     onClick={() => setActiveTab('settings')}
@@ -108,7 +115,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                             : 'text-slate-600 hover:bg-slate-50'}`}
                 >
                     <SettingsIcon className="w-5 h-5" />
-                    {t.settings}
+                    <div className="flex-1 text-left">{t.settings}</div>
                 </button>
                 <button
                     onClick={logout}

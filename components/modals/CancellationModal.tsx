@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AppLanguage } from '../../types';
 import { supabase } from '../../services/supabaseClient';
-import ReasonStep from './cancellation/ReasonStep';
+import ReasonStep from './cancellation/ReasonStepV2';
 import OfferStep from './cancellation/OfferStep';
 import ConfirmStep from './cancellation/ConfirmStep';
 import BaseModal from './BaseModal';
@@ -29,6 +29,14 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
     const [reason, setReason] = useState('');
     const [loading, setLoading] = useState(false);
     const [discountType, setDiscountType] = useState<'30' | '50'>('30');
+
+    // Reset step when modal opens
+    React.useEffect(() => {
+        if (isOpen) {
+            setStep('reason');
+            setReason('');
+        }
+    }, [isOpen]);
 
     const handleApplyCoupon = async () => {
         if (!subscriptionId) return;
@@ -111,8 +119,12 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
     };
 
     return (
-        <BaseModal isOpen={isOpen} onClose={onClose} maxWidth="max-w-2xl">
-            {renderStep()}
+        <BaseModal isOpen={isOpen} onClose={onClose} maxWidth="max-w-xl">
+            <div className="bg-white rounded-3xl overflow-hidden">
+                <div className="p-1">
+                    {renderStep()}
+                </div>
+            </div>
         </BaseModal>
     );
 };

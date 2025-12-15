@@ -186,6 +186,7 @@ const DashboardContent: React.FC = () => {
                                 }}
                                 onDelete={handleDeletePost}
                                 language={language}
+                                onUpgrade={() => setShowUpgradeModal(true)}
                             />
                         </div>
                     )}
@@ -217,6 +218,7 @@ const DashboardContent: React.FC = () => {
                                     });
                                     setActiveTab('create');
                                 }}
+                                onUpgrade={() => setShowUpgradeModal(true)}
                             />
                         </div>
                     )}
@@ -230,6 +232,7 @@ const DashboardContent: React.FC = () => {
                                     setCurrentPost(post);
                                     setActiveTab('create');
                                 }}
+                                onUpgrade={() => setShowUpgradeModal(true)}
                             />
                         </div>
                     )}

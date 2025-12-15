@@ -770,7 +770,7 @@ export const translations = {
         history: "Historial",
         settings: "Ajustes",
         library: "Biblioteca",
-        goPremium: "Hazte Premium",
+        goPremium: "Planes que crecen contigo",
         upgradeNow: "Mejorar Plan",
         unlockDesc: "Desbloquea generaciones ilimitadas y modos virales avanzados.",
         creditsLeft: "créditos",

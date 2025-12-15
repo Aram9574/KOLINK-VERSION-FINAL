@@ -11,9 +11,10 @@ interface AutoPilotViewProps {
     user: UserProfile;
     language: AppLanguage;
     onViewPost?: (post: Post) => void;
+    onUpgrade?: () => void;
 }
 
-const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPost }) => {
+const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPost, onUpgrade }) => {
     const [isEnabled, setIsEnabled] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -172,7 +173,8 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPos
                     length: PostLength.MEDIUM,
                     creativityLevel: 80,
                     emojiDensity: EmojiDensity.MODERATE,
-                    includeCTA: true
+                    includeCTA: true,
+                    hashtagCount: 3
                 };
 
                 const postResult = await generateViralPost(generationParams, user);
@@ -223,6 +225,32 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPos
         navigate('/studio', { state: { initialContent: post.content, fromAutoPilot: true } });
         if (onViewPost) onViewPost(post);
     };
+
+    if (!user.isPremium) {
+        return (
+            <div className="w-full h-full flex flex-col items-center justify-center p-8">
+                <div className="bg-white rounded-3xl p-12 text-center max-w-lg shadow-xl border border-slate-100">
+                    <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <div className="w-12 h-12 text-amber-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg>
+                        </div>
+                    </div>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-4">{language === 'es' ? 'AutoPilot Premium' : 'Premium AutoPilot'}</h2>
+                    <p className="text-slate-600 mb-8 leading-relaxed">
+                        {language === 'es'
+                            ? 'Automatiza tu creación de contenido con IA. Define tus temas, frecuencia y tono, y deja que nuestra IA trabaje por ti.'
+                            : 'Automate your content creation with AI. Define your topics, frequency, and tone, and let our AI work for you.'}
+                    </p>
+                    <button
+                        onClick={onUpgrade}
+                        className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all transform hover:-translate-y-1"
+                    >
+                        {language === 'es' ? 'Desbloquear AutoPilot' : 'Unlock AutoPilot'}
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">

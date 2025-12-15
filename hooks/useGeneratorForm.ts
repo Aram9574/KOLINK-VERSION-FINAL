@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { GenerationParams, ViralTone, ViralFramework, EmojiDensity, PostLength } from '../types';
 import { ViralTone as ToneEnum, ViralFramework as FrameworkEnum, PostLength as LengthEnum, EmojiDensity as DensityEnum } from '../types';
 
-interface UsePostGeneratorProps {
+interface UseGeneratorFormProps {
     initialTopic?: string;
     initialParams?: GenerationParams | null;
 }
 
-export const usePostGenerator = ({ initialTopic = '', initialParams = null }: UsePostGeneratorProps = {}) => {
+export const useGeneratorForm = ({ initialTopic = '', initialParams = null }: UseGeneratorFormProps = {}) => {
     const [params, setParams] = useState<GenerationParams>({
         topic: initialTopic,
         audience: '',
