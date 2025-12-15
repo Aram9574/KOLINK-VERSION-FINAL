@@ -4,6 +4,7 @@ import { useUser } from '../../context/UserContext';
 import { usePosts } from '../../context/PostContext';
 import Sidebar from '../features/dashboard/Sidebar';
 import DashboardHeader from '../features/dashboard/DashboardHeader';
+import InsightWidget from '../features/dashboard/InsightWidget';
 import { Post } from '../../types';
 
 interface DashboardLayoutProps {
@@ -89,6 +90,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                     <div className="flex-1 overflow-hidden relative">
                         {children}
                     </div>
+
+                    {/* Floating Insight Widget */}
+                    <InsightWidget language={language} />
                 </main>
             </div>
         </div >

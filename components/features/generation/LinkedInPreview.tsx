@@ -18,7 +18,7 @@ interface LinkedInPreviewProps {
     viralAnalysis?: ViralAnalysis;
 }
 
-const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content = '', user, isLoading, language = 'en', onUpdate, viralScore, viralAnalysis }) => {
+const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({ content = '', user, isLoading, language = 'en', onUpdate, onSchedule, viralScore, viralAnalysis }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState(content || '');

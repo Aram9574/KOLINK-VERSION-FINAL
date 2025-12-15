@@ -42,6 +42,9 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
         }
     }, [user?.id]);
 
+    const [isStrategyOpen, setIsStrategyOpen] = React.useState(false);
+    const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (isCancelled) return;
@@ -111,257 +114,280 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
 
                 {/* Section 1: ESTRATEGIA DE CONTENIDO */}
                 <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider">
+                    <button
+                        type="button"
+                        onClick={() => setIsStrategyOpen(!isStrategyOpen)}
+                        className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider w-full hover:text-slate-600 transition-colors group cursor-pointer"
+                    >
                         <AlignLeft className="w-4 h-4" />
                         {language === 'es' ? 'ESTRATEGIA DE CONTENIDO' : 'CONTENT STRATEGY'}
-                    </div>
+                        <div className={`ml-auto transition-transform duration-200 ${isStrategyOpen ? 'rotate-180' : ''}`}>
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </button>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Formato (Framework) */}
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-slate-700 ml-1">
-                                {language === 'es' ? 'Formato' : 'Format'}
-                                <Tooltip>{currentFrameworkDesc || ""}</Tooltip>
-                            </label>
-                            <div className="relative group">
-                                <select
-                                    className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
-                                    value={params.framework}
-                                    onChange={(e) => onUpdateParams({ framework: e.target.value as ViralFramework })}
-                                >
-                                    {FRAMEWORKS.map((fOption) => (
-                                        <option key={fOption.value} value={fOption.value}>{tConstants.frameworks[fOption.value]?.label || fOption.label}</option>
-                                    ))}
-                                </select>
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                    {isStrategyOpen && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in slide-in-from-top-2 fade-in duration-200">
+                            {/* Formato (Framework) */}
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-semibold text-slate-700 ml-1">
+                                    {language === 'es' ? 'Formato' : 'Format'}
+                                    <Tooltip>{currentFrameworkDesc || ""}</Tooltip>
+                                </label>
+                                <div className="relative group">
+                                    <select
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                        value={params.framework}
+                                        onChange={(e) => onUpdateParams({ framework: e.target.value as ViralFramework })}
+                                    >
+                                        {FRAMEWORKS.map((fOption) => (
+                                            <option key={fOption.value} value={fOption.value}>{tConstants.frameworks[fOption.value]?.label || fOption.label}</option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Estilo de Gancho */}
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-semibold text-slate-700 ml-1">
+                                    {language === 'es' ? 'Estilo de Gancho (Hook)' : 'Hook Style'}
+                                    <Tooltip>{(t as any).hookStyleTooltip || "Choose how your post starts."}</Tooltip>
+                                </label>
+                                <div className="relative group">
+                                    <select
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                        value={params.hookStyle || 'auto'}
+                                        onChange={(e) => onUpdateParams({ hookStyle: e.target.value as ViralHook })}
+                                    >
+                                        <option value="auto">{language === 'es' ? 'Automático (IA decide)' : 'Automatic (AI decides)'}</option>
+                                        <option value="question">{language === 'es' ? 'Pregunta Retórica' : 'Rhetorical Question'}</option>
+                                        <option value="statistic">{language === 'es' ? 'Dato/Estadística Impactante' : 'Shocking Statistic'}</option>
+                                        <option value="negative">{language === 'es' ? 'Negativo/Advertencia' : 'Negative/Warning'}</option>
+                                        <option value="story">{language === 'es' ? 'Inicio de Historia ("Ayer me pasó...")' : 'Story Opener'}</option>
+                                        <option value="assertion">{language === 'es' ? 'Afirmación Directa' : 'Direct Assertion'}</option>
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Brand Voice Selector */}
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-semibold text-slate-700 ml-1">
+                                    {language === 'es' ? 'Voz de Marca' : 'Brand Voice'}
+                                    <Tooltip>{language === 'es' ? 'Selecciona una voz personalizada o usa un tono predefinido.' : 'Select a custom voice or use a preset tone.'}</Tooltip>
+                                </label>
+                                <div className="relative group">
+                                    <select
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                        value={params.brandVoiceId || ''}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            onUpdateParams({
+                                                brandVoiceId: val === '' ? undefined : val,
+                                                // If clearing voice, maybe revert to default tone? No need, tone is always there.
+                                            });
+                                        }}
+                                    >
+                                        <option value="">{language === 'es' ? 'Usar Tono (Abajo)' : 'Use Tone (Below)'}</option>
+                                        {voices.map((voice) => (
+                                            <option key={voice.id} value={voice.id}>
+                                                {voice.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <Wand2 className="w-4 h-4 opacity-50" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Tono (Disable if Brand Voice is selected) */}
+                            <div className={`space-y-1.5 ${params.brandVoiceId ? 'opacity-50 pointer-events-none grayscale' : ''}`}>
+                                <label className="text-sm font-semibold text-slate-700 ml-1">
+                                    {t.toneLabel}
+                                    <Tooltip>{t.toneTooltip}</Tooltip>
+                                </label>
+                                <div className="relative group">
+                                    <select
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                        value={params.tone}
+                                        onChange={(e) => onUpdateParams({ tone: e.target.value as ViralTone })}
+                                        disabled={!!params.brandVoiceId}
+                                    >
+                                        {TONES.map((tOption) => (
+                                            <option key={tOption.value} value={tOption.value}>{tConstants.tones[tOption.value]?.label || tOption.label}</option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Idioma */}
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-semibold text-slate-700 ml-1">
+                                    {language === 'es' ? 'Idioma' : 'Language'}
+                                </label>
+                                <div className="relative group">
+                                    <select
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                        value={params.outputLanguage || 'es'}
+                                        onChange={(e) => onUpdateParams({ outputLanguage: e.target.value as 'es' | 'en' })}
+                                    >
+                                        <option value="es">Español</option>
+                                        <option value="en">Inglés</option>
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Estilo de Gancho */}
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-slate-700 ml-1">
-                                {language === 'es' ? 'Estilo de Gancho (Hook)' : 'Hook Style'}
-                                <Tooltip>{(t as any).hookStyleTooltip || "Choose how your post starts."}</Tooltip>
-                            </label>
-                            <div className="relative group">
-                                <select
-                                    className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
-                                    value={params.hookStyle || 'auto'}
-                                    onChange={(e) => onUpdateParams({ hookStyle: e.target.value as ViralHook })}
-                                >
-                                    <option value="auto">{language === 'es' ? 'Automático (IA decide)' : 'Automatic (AI decides)'}</option>
-                                    <option value="question">{language === 'es' ? 'Pregunta Retórica' : 'Rhetorical Question'}</option>
-                                    <option value="statistic">{language === 'es' ? 'Dato/Estadística Impactante' : 'Shocking Statistic'}</option>
-                                    <option value="negative">{language === 'es' ? 'Negativo/Advertencia' : 'Negative/Warning'}</option>
-                                    <option value="story">{language === 'es' ? 'Inicio de Historia ("Ayer me pasó...")' : 'Story Opener'}</option>
-                                    <option value="assertion">{language === 'es' ? 'Afirmación Directa' : 'Direct Assertion'}</option>
-                                </select>
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Brand Voice Selector */}
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-slate-700 ml-1">
-                                {language === 'es' ? 'Voz de Marca' : 'Brand Voice'}
-                                <Tooltip>{language === 'es' ? 'Selecciona una voz personalizada o usa un tono predefinido.' : 'Select a custom voice or use a preset tone.'}</Tooltip>
-                            </label>
-                            <div className="relative group">
-                                <select
-                                    className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
-                                    value={params.brandVoiceId || ''}
-                                    onChange={(e) => {
-                                        const val = e.target.value;
-                                        onUpdateParams({
-                                            brandVoiceId: val === '' ? undefined : val,
-                                            // If clearing voice, maybe revert to default tone? No need, tone is always there.
-                                        });
-                                    }}
-                                >
-                                    <option value="">{language === 'es' ? 'Usar Tono (Abajo)' : 'Use Tone (Below)'}</option>
-                                    {voices.map((voice) => (
-                                        <option key={voice.id} value={voice.id}>
-                                            {voice.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <Wand2 className="w-4 h-4 opacity-50" />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Tono (Disable if Brand Voice is selected) */}
-                        <div className={`space-y-1.5 ${params.brandVoiceId ? 'opacity-50 pointer-events-none grayscale' : ''}`}>
-                            <label className="text-sm font-semibold text-slate-700 ml-1">
-                                {t.toneLabel}
-                                <Tooltip>{t.toneTooltip}</Tooltip>
-                            </label>
-                            <div className="relative group">
-                                <select
-                                    className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
-                                    value={params.tone}
-                                    onChange={(e) => onUpdateParams({ tone: e.target.value as ViralTone })}
-                                    disabled={!!params.brandVoiceId}
-                                >
-                                    {TONES.map((tOption) => (
-                                        <option key={tOption.value} value={tOption.value}>{tConstants.tones[tOption.value]?.label || tOption.label}</option>
-                                    ))}
-                                </select>
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Idioma */}
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-slate-700 ml-1">
-                                {language === 'es' ? 'Idioma' : 'Language'}
-                            </label>
-                            <div className="relative group">
-                                <select
-                                    className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
-                                    value={params.outputLanguage || 'es'}
-                                    onChange={(e) => onUpdateParams({ outputLanguage: e.target.value as 'es' | 'en' })}
-                                >
-                                    <option value="es">Español</option>
-                                    <option value="en">Inglés</option>
-                                </select>
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Section 2: DETALLES & AJUSTES */}
                 <div className="space-y-4 pt-2">
-                    <div className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider">
+                    <button
+                        type="button"
+                        onClick={() => setIsDetailsOpen(!isDetailsOpen)}
+                        className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider w-full hover:text-slate-600 transition-colors group cursor-pointer"
+                    >
                         <Sliders className="w-4 h-4" />
                         {language === 'es' ? 'DETALLES & AJUSTES' : 'DETAILS & SETTINGS'}
-                    </div>
-
-                    {/* Audience Input */}
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-slate-700 ml-1">
-                            {t.audienceLabel}
-                            <Tooltip>{t.audienceTooltip}</Tooltip>
-                        </label>
-                        <div className="relative">
-                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                                <Target className="w-4 h-4" />
-                            </div>
-                            <input
-                                type="text"
-                                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium transition-all text-slate-900"
-                                placeholder={t.audiencePlaceholder}
-                                value={params.audience}
-                                onChange={(e) => onUpdateParams({ audience: e.target.value })}
-                                required
-                            />
+                        <div className={`ml-auto transition-transform duration-200 ${isDetailsOpen ? 'rotate-180' : ''}`}>
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
                         </div>
-                    </div>
+                    </button>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-                        {/* Length */}
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-slate-700 ml-1">
-                                {t.lengthLabel}
-                            </label>
-                            <div className="relative group">
-                                <select
-                                    className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
-                                    value={params.length}
-                                    onChange={(e) => onUpdateParams({ length: e.target.value as PostLength })}
-                                >
-                                    {LENGTH_OPTIONS.map((option) => (
-                                        <option key={option.value} value={option.value}>{tConstants.lengths[option.value]?.label || option.label}</option>
-                                    ))}
-                                </select>
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                    {isDetailsOpen && (
+                        <div className="animate-in slide-in-from-top-2 fade-in duration-200">
+                            {/* Audience Input */}
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-semibold text-slate-700 ml-1">
+                                    {t.audienceLabel}
+                                    <Tooltip>{t.audienceTooltip}</Tooltip>
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                                        <Target className="w-4 h-4" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium transition-all text-slate-900"
+                                        placeholder={t.audiencePlaceholder}
+                                        value={params.audience}
+                                        onChange={(e) => onUpdateParams({ audience: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end mt-4">
+                                {/* Length */}
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-semibold text-slate-700 ml-1">
+                                        {t.lengthLabel}
+                                    </label>
+                                    <div className="relative group">
+                                        <select
+                                            className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                            value={params.length}
+                                            onChange={(e) => onUpdateParams({ length: e.target.value as PostLength })}
+                                        >
+                                            {LENGTH_OPTIONS.map((option) => (
+                                                <option key={option.value} value={option.value}>{tConstants.lengths[option.value]?.label || option.label}</option>
+                                            ))}
+                                        </select>
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Creativity Slider */}
+                                <div className="space-y-1.5 pb-1">
+                                    <div className="flex justify-between text-sm mb-1.5 ml-1">
+                                        <span className="font-semibold text-slate-700 flex items-center gap-1.5">
+                                            {t.creativityLabel}
+                                            <Tooltip>{t.creativityTooltip}</Tooltip>
+                                        </span>
+                                        <span className="text-brand-600 font-bold">{params.creativityLevel}%</span>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        value={params.creativityLevel}
+                                        onChange={handleSliderChange}
+                                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Emojis & Hashtags Row */}<div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 mt-2">
+                                {/* Emoji Density Dropdown */}
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-semibold text-slate-700 ml-1">
+                                        {t.emojiLabel}
+                                    </label>
+                                    <div className="relative group">
+                                        <select
+                                            className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                            value={params.emojiDensity}
+                                            onChange={(e) => onUpdateParams({ emojiDensity: e.target.value as EmojiDensity })}
+                                        >
+                                            {EMOJI_OPTIONS.map((opt) => (
+                                                <option key={opt.value} value={opt.value}>
+                                                    {language === 'es' && opt.value === EmojiDensity.MINIMAL ? 'Mínimo (Profesional)' :
+                                                        language === 'es' && opt.value === EmojiDensity.MODERATE ? 'Moderado (Atractivo)' :
+                                                            language === 'es' && opt.value === EmojiDensity.HIGH ? 'Alto (Visual/Divertido)' :
+                                                                opt.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                            <Smile className="w-4 h-4" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Hashtags Count Dropdown */}
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-semibold text-slate-700 ml-1">
+                                        # Hashtags (SEO)
+                                    </label>
+                                    <div className="relative group">
+                                        <select
+                                            className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                            value={params.hashtagCount || 3}
+                                            onChange={(e) => onUpdateParams({ hashtagCount: parseInt(e.target.value) })}
+                                        >
+                                            <option value="0">0 (Ninguno)</option>
+                                            <option value="1">1 (Marca Persona)</option>
+                                            <option value="2">2 (Balanceado)</option>
+                                            <option value="3">3 (Recomendado)</option>
+                                            <option value="4">4 (Alto Alcance)</option>
+                                            <option value="5">5 (Máximo)</option>
+                                        </select>
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Creativity Slider */}
-                        <div className="space-y-1.5 pb-1">
-                            <div className="flex justify-between text-sm mb-1.5 ml-1">
-                                <span className="font-semibold text-slate-700 flex items-center gap-1.5">
-                                    {t.creativityLabel}
-                                    <Tooltip>{t.creativityTooltip}</Tooltip>
-                                </span>
-                                <span className="text-brand-600 font-bold">{params.creativityLevel}%</span>
-                            </div>
-                            <input
-                                type="range"
-                                min="0"
-                                max="100"
-                                value={params.creativityLevel}
-                                onChange={handleSliderChange}
-                                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Emojis & Hashtags Row */}<div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                        {/* Emoji Density Dropdown */}
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-slate-700 ml-1">
-                                {t.emojiLabel}
-                            </label>
-                            <div className="relative group">
-                                <select
-                                    className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
-                                    value={params.emojiDensity}
-                                    onChange={(e) => onUpdateParams({ emojiDensity: e.target.value as EmojiDensity })}
-                                >
-                                    {EMOJI_OPTIONS.map((opt) => (
-                                        <option key={opt.value} value={opt.value}>
-                                            {language === 'es' && opt.value === EmojiDensity.MINIMAL ? 'Mínimo (Profesional)' :
-                                                language === 'es' && opt.value === EmojiDensity.MODERATE ? 'Moderado (Atractivo)' :
-                                                    language === 'es' && opt.value === EmojiDensity.HIGH ? 'Alto (Visual/Divertido)' :
-                                                        opt.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <Smile className="w-4 h-4" />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Hashtags Count Dropdown */}
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-slate-700 ml-1">
-                                # Hashtags (SEO)
-                            </label>
-                            <div className="relative group">
-                                <select
-                                    className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
-                                    value={params.hashtagCount || 3}
-                                    onChange={(e) => onUpdateParams({ hashtagCount: parseInt(e.target.value) })}
-                                >
-                                    <option value="0">0 (Ninguno)</option>
-                                    <option value="1">1 (Marca Persona)</option>
-                                    <option value="2">2 (Balanceado)</option>
-                                    <option value="3">3 (Recomendado)</option>
-                                    <option value="4">4 (Alto Alcance)</option>
-                                    <option value="5">5 (Máximo)</option>
-                                </select>
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                    )}
                 </div>
 
                 {/* Generate Button */}

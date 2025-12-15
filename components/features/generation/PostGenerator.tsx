@@ -133,12 +133,48 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
         </button>
       </div>
 
+      {/* Desktop Header Row (Aligns Title and Toggle) */}
+      <div className="hidden lg:flex justify-between items-end mb-6">
+        <div className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 tracking-tight">
+            {language === 'es' ? 'Estudio' : 'Studio'}
+          </h1>
+          <p className="text-slate-500">
+            {language === 'es' ? 'Diseña tu próximo éxito viral.' : 'Design your next viral hit.'}
+          </p>
+        </div>
+
+        {/* View Toggle (Moved from Right Col) */}
+        <div className="bg-slate-200/50 backdrop-blur-md p-1 rounded-xl inline-flex gap-1">
+          <button
+            onClick={() => setViewMode('desktop')}
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${viewMode === 'desktop'
+              ? 'bg-white shadow-sm text-slate-800'
+              : 'text-slate-500 hover:bg-white/50'
+              }`}
+          >
+            <Monitor className="w-3 h-3" />
+            Escritorio
+          </button>
+          <button
+            onClick={() => setViewMode('mobile')}
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${viewMode === 'mobile'
+              ? 'bg-white shadow-sm text-slate-800'
+              : 'text-slate-500 hover:bg-white/50'
+              }`}
+          >
+            <Smartphone className="w-3 h-3" />
+            Móvil
+          </button>
+        </div>
+      </div>
+
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
         {/* Left Column: Title, Form, Tips (lg:col-span-6) */}
         <div className={`lg:col-span-6 space-y-6 ${activeView === 'preview' ? 'hidden lg:block' : 'block'}`}>
 
-          {/* Title - Restored from Legacy */}
-          <div className="space-y-2 mb-4">
+          {/* Mobile Title (Hidden on Desktop) */}
+          <div className="lg:hidden space-y-2 mb-4">
             <h1 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 tracking-tight">
               {language === 'es' ? 'Estudio' : 'Studio'}
             </h1>
@@ -183,32 +219,8 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
           </div>
         </div>
 
-        {/* Right Column: Toggle, Preview (lg:col-span-6) */}
+        {/* Right Column: Preview (lg:col-span-6) */}
         <div className={`lg:col-span-6 flex flex-col h-full ${activeView === 'editor' ? 'hidden lg:flex' : 'flex'}`}>
-
-          {/* View Toggle - Restored Location */}
-          <div className="bg-slate-200/50 backdrop-blur-md p-1 rounded-xl mb-6 inline-flex self-center lg:self-end gap-1">
-            <button
-              onClick={() => setViewMode('desktop')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${viewMode === 'desktop'
-                ? 'bg-white shadow-sm text-slate-800'
-                : 'text-slate-500 hover:bg-white/50'
-                }`}
-            >
-              <Monitor className="w-3 h-3" />
-              Escritorio
-            </button>
-            <button
-              onClick={() => setViewMode('mobile')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${viewMode === 'mobile'
-                ? 'bg-white shadow-sm text-slate-800'
-                : 'text-slate-500 hover:bg-white/50'
-                }`}
-            >
-              <Smartphone className="w-3 h-3" />
-              Móvil
-            </button>
-          </div>
 
           <div className={`transition-all duration-500 ease-in-out mx-auto w-full ${viewMode === 'mobile' ? 'max-w-[375px]' : 'max-w-2xl'
             }`}>

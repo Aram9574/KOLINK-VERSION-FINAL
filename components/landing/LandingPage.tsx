@@ -12,11 +12,17 @@ import PricingSection from './PricingSection';
 import FaqSection from './FaqSection';
 import Footer from './Footer';
 import { useUser } from '../../context/UserContext';
+import { Navigate } from 'react-router-dom';
 
 const LandingPage: React.FC = () => {
     const { user, language, setLanguage } = useUser();
     const [activeSection, setActiveSection] = useState<string>('hero');
     const isEs = language === 'es';
+
+    // Redirect to dashboard if user is already logged in
+    if (user && user.id && !user.id.startsWith('mock-')) {
+        return <Navigate to="/dashboard" replace />;
+    }
 
     // Mock Content Localization
     const mockContent = isEs ? {
