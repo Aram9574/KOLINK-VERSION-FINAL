@@ -11,8 +11,7 @@ interface AutoPilotConfigProps {
     setFrequency: (freq: string) => void;
     tone: ViralTone;
     setTone: (tone: ViralTone) => void;
-    postCount: number;
-    setPostCount: (count: number) => void;
+
     audience: string;
     setAudience: (audience: string) => void;
     topics: string[];
@@ -27,8 +26,7 @@ const AutoPilotConfig: React.FC<AutoPilotConfigProps> = ({
     setFrequency,
     tone,
     setTone,
-    postCount,
-    setPostCount,
+
     audience,
     setAudience,
     topics,
@@ -107,34 +105,7 @@ const AutoPilotConfig: React.FC<AutoPilotConfigProps> = ({
                 </div>
             </div>
 
-            {/* Post Count Slider */}
-            <div className="space-y-2 mb-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <div className="flex justify-between items-center">
-                    <label className="text-xs font-bold text-slate-700 flex items-center gap-2">
-                        <Layers className="w-4 h-4 text-sky-500" />
-                        {t.config.postCountLabel}
-                        <Tooltip>{t.config.postCountTooltip}</Tooltip>
-                    </label>
-                    <span className="text-sm font-bold bg-white px-3 py-1 rounded-md shadow-sm border border-slate-200 text-sky-600">
-                        {postCount} {postCount === 1 ? t.activity.postUnit : t.activity.postsUnit}
-                    </span>
-                </div>
-                <input
-                    type="range"
-                    min="1"
-                    max="5"
-                    value={postCount}
-                    onChange={(e) => setPostCount(parseInt(e.target.value))}
-                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-500 mt-2"
-                />
-                <div className="flex justify-between text-[10px] text-slate-400 font-medium">
-                    <span>1 {t.activity.postUnit}</span>
-                    <span>5 {t.activity.postsUnit}</span>
-                </div>
-                <p className="text-[10px] text-slate-400 mt-1 italic">
-                    {t.activity.creditCostNote.replace('{{count}}', postCount.toString())}
-                </p>
-            </div>
+
 
             {/* Target Audience */}
             <div className="space-y-2 mb-6">

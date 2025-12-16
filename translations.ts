@@ -286,6 +286,7 @@ export const translations = {
       autopilot: {
         title: "AutoPilot",
         subtitle: "Put your LinkedIn growth on cruise control.",
+        description: "AutoPilot generates high-quality drafts automatically based on your topics. Click 'View Output' on any draft to open it in the Studio for editing and publishing.",
         statusCard: {
           active: "SYSTEM ACTIVE",
           inactive: "SYSTEM OFFLINE",
@@ -815,6 +816,7 @@ export const translations = {
       autopilot: {
         title: "AutoPilot",
         subtitle: "Pon tu crecimiento en LinkedIn en piloto automático.",
+        description: "AutoPilot genera borradores automáticamente basados en tus temas. Haz clic en 'Ver Resultado' en cualquier borrador para abrirlo en el Estudio, editarlo y publicarlo.",
         statusCard: {
           active: "SISTEMA ACTIVO",
           inactive: "SISTEMA OFFLINE",

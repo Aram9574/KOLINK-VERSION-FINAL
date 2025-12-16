@@ -6,6 +6,13 @@ interface UseGoogleDriveProps {
     onFileSelected: (file: CustomSource) => void;
 }
 
+declare global {
+    interface Window {
+        google: any;
+        gapi: any;
+    }
+}
+
 export const useGoogleDrive = ({ language, onFileSelected }: UseGoogleDriveProps) => {
     const [tokenClient, setTokenClient] = useState<any>(null);
     const [pickerInited, setPickerInited] = useState(false);

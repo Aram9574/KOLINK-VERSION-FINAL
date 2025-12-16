@@ -3,6 +3,9 @@ import { UserProfile, AppLanguage, AutoPilotConfig as AutoPilotConfigType, Post,
 import { generatePostIdeas, generateViralPost } from '../../../services/geminiService';
 import { supabase } from '../../../services/supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import { translations } from '../../../translations';
+// - [x] AutoPilot UX: Resize Status Bar (Move to Grid)
+// - [ ] AutoPilot UX: Move Description to Right Column
 import AutoPilotStatus from './AutoPilotStatus';
 import AutoPilotConfig from './AutoPilotConfig';
 import AutoPilotActivityLog from './AutoPilotActivityLog';
@@ -22,7 +25,7 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPos
     // Config State
     const [frequency, setFrequency] = useState('daily');
     const [tone, setTone] = useState<ViralTone>(ViralTone.PROFESSIONAL);
-    const [postCount, setPostCount] = useState(1);
+
     const [audience, setAudience] = useState('');
     const [topics, setTopics] = useState<string[]>([]);
 
@@ -40,6 +43,7 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPos
     const [automatedPosts, setAutomatedPosts] = useState<Post[]>([]);
 
     const navigate = useNavigate();
+    const t = translations[language].app.autopilot;
 
     // Load saved config and posts on mount
     useEffect(() => {
@@ -62,13 +66,13 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPos
                 topics: data.topics || [],
                 nextRun: data.next_run ? new Date(data.next_run).getTime() : Date.now() + 86400000,
                 targetAudience: data.target_audience || '',
-                postCount: data.post_count || 1
+                postCount: 1 // Enforce 1
             });
             setFrequency(data.frequency);
             setTone(data.tone as ViralTone);
             setTopics(data.topics || []);
             setAudience(data.target_audience || '');
-            setPostCount(data.post_count || 1);
+
             setIsEnabled(data.is_enabled);
         }
     };
@@ -114,7 +118,7 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPos
                     tone: newConfig.tone || tone,
                     topics: newConfig.topics || topics,
                     target_audience: newConfig.targetAudience || audience,
-                    post_count: newConfig.postCount || postCount,
+                    post_count: 1,
                     is_enabled: enabledState !== undefined ? enabledState : isEnabled,
                     updated_at: new Date().toISOString()
                 });
@@ -140,7 +144,6 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPos
             tone,
             topics,
             targetAudience: audience,
-            postCount
         });
     };
 
@@ -226,6 +229,26 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPos
         if (onViewPost) onViewPost(post);
     };
 
+    const handleDeletePost = async (postId: string) => {
+        if (!window.confirm(language === 'es' ? '¿Estás seguro de que quieres eliminar este post?' : 'Are you sure you want to delete this post?')) {
+            return;
+        }
+
+        try {
+            const { error } = await supabase
+                .from('autopilot_posts')
+                .delete()
+                .eq('id', postId);
+
+            if (error) throw error;
+
+            setAutomatedPosts(prev => prev.filter(p => p.id !== postId));
+        } catch (e) {
+            console.error('Error deleting post:', e);
+            alert(language === 'es' ? 'Error al eliminar post.' : 'Error deleting post.');
+        }
+    };
+
     if (!user.isPremium) {
         return (
             <div className="w-full h-full flex flex-col items-center justify-center p-8">
@@ -254,29 +277,30 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPos
 
     return (
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
-            {/* Status Card */}
-            <div className="mb-8">
-                <AutoPilotStatus
-                    user={user}
-                    config={config}
-                    isEnabled={isEnabled}
-                    toggleSystem={toggleSystem}
-                    language={language}
-                    automatedPosts={automatedPosts}
-                />
-            </div>
+
+
+
+
 
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* Configuration Column */}
                 <div className="lg:col-span-2 space-y-6">
+                    {/* Status Card */}
+                    <AutoPilotStatus
+                        user={user}
+                        config={config}
+                        isEnabled={isEnabled}
+                        toggleSystem={toggleSystem}
+                        language={language}
+                        automatedPosts={automatedPosts}
+                    />
+
                     <AutoPilotConfig
                         language={language}
                         frequency={frequency}
                         setFrequency={setFrequency}
                         tone={tone}
                         setTone={setTone}
-                        postCount={postCount}
-                        setPostCount={setPostCount}
                         audience={audience}
                         setAudience={setAudience}
                         topics={topics}
@@ -287,15 +311,23 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPos
                 </div>
 
                 {/* Activity Log Column */}
-                <div className="lg:col-span-1">
-                    <AutoPilotActivityLog
-                        language={language}
-                        isEnabled={isEnabled}
-                        automatedPosts={automatedPosts}
-                        onForceRun={handleForceRun}
-                        isGenerating={isGenerating}
-                        onViewPost={handleViewPost}
-                    />
+                <div className="lg:col-span-1 flex flex-col space-y-6 h-full">
+                    {/* Description Bubble */}
+                    <div className="bg-indigo-50/50 text-indigo-900/80 px-6 py-4 rounded-2xl text-sm font-medium border border-indigo-100 shadow-sm backdrop-blur-sm text-center">
+                        {t.description}
+                    </div>
+
+                    <div className="flex-1 min-h-0">
+                        <AutoPilotActivityLog
+                            language={language}
+                            isEnabled={isEnabled}
+                            automatedPosts={automatedPosts}
+                            onForceRun={handleForceRun}
+                            isGenerating={isGenerating}
+                            onViewPost={handleViewPost}
+                            onDeletePost={handleDeletePost}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

@@ -8,7 +8,7 @@ import { translations } from '../../../translations';
 import Tooltip from '../../ui/Tooltip';
 
 import { toast } from 'sonner';
-import { GenerationParamsSchema } from '../../../supabase/functions/_shared/schemas';
+import { GenerationParamsSchema } from '../../../schemas';
 
 interface GeneratorFormProps {
     params: GenerationParams;
