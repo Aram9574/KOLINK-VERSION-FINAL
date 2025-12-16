@@ -43,6 +43,7 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
             lastPostDate: data.last_post_date ? new Date(data.last_post_date).getTime() : undefined,
             unlockedAchievements: data.unlocked_achievements || [],
             autoPilot: data.auto_pilot || { enabled: false, topics: [], frequency: 'daily' },
+            isPremium: data.plan_tier === 'pro' || data.plan_tier === 'viral',
         } as unknown as UserProfile;
     } catch (err) {
         console.error("Exception in fetchUserProfile:", err);
