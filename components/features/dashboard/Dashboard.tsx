@@ -40,7 +40,16 @@ const DashboardContent: React.FC = () => {
     const t = translations[language].productTour;
 
     // UI State
-    const [activeTab, setActiveTab] = useState<'create' | 'history' | 'settings' | 'ideas' | 'autopilot'>('create');
+    // Persist active tab selection
+    const [activeTab, setActiveTabRaw] = useState<'create' | 'history' | 'settings' | 'ideas' | 'autopilot'>(() => {
+        const saved = localStorage.getItem('kolink_active_tab');
+        return (saved as any) || 'create';
+    });
+
+    const setActiveTab = (tab: 'create' | 'history' | 'settings' | 'ideas' | 'autopilot') => {
+        setActiveTabRaw(tab);
+        localStorage.setItem('kolink_active_tab', tab);
+    };
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [showCreditDeduction, setShowCreditDeduction] = useState(false);
