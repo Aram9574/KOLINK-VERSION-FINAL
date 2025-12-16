@@ -17,13 +17,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ language, user, mockContent, 
     return (
         <section className="pt-28 pb-16 lg:pt-32 lg:pb-24 px-6 relative">
             <div className="max-w-5xl mx-auto text-center relative z-10">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-wider mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-default">
-                    <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                    </span>
-                    {t.hero.badge}
-                </div>
+
 
                 <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold text-slate-900 mb-8 tracking-tight leading-[0.95] animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
                     {t.hero.titleLine1} <br />
