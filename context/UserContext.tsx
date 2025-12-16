@@ -1,54 +1,65 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { UserProfile, AppLanguage } from '../types';
 import { EMPTY_USER, MARKETING_DOMAIN } from '../constants';
 import { supabase } from '../services/supabaseClient';
+import { fetchUserProfile, syncUserProfile } from '../services/userRepository';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useUserProfile } from './UserProfileContext';
 import { Session, User } from '@supabase/supabase-js';
 
-// Auth Context Interface
-interface AuthContextType {
+// Unified User Context Interface
+interface UserContextType {
+    user: UserProfile;
+    authUser: User | null;
     session: Session | null;
-    user: User | null;
     loading: boolean;
     logout: () => Promise<void>;
+    setUser: (data: Partial<UserProfile> | ((prev: UserProfile) => Partial<UserProfile>)) => void; // Legacy support
+    updateProfile: (data: Partial<UserProfile>) => void;
+    refreshUser: () => Promise<void>;
+    setLanguage: (lang: AppLanguage) => void;
+    language: AppLanguage;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    // Auth State
     const [session, setSession] = useState<Session | null>(null);
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [authUser, setAuthUser] = useState<User | null>(null);
+    const [authLoading, setAuthLoading] = useState(true);
+
+    // Profile State
+    const [profile, setProfile] = useState<UserProfile>({ ...EMPTY_USER });
+    const [profileLoading, setProfileLoading] = useState(true);
+
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Domain Logic (Keep for redirect safety)
+    // Domain Logic
     const hostname = window.location.hostname;
     const isMarketingDomain = hostname.includes(MARKETING_DOMAIN);
 
+    // --- 1. Auth Logic ---
     useEffect(() => {
-        // 1. Initial Session Check
         const initializeAuth = async () => {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 setSession(session);
-                setUser(session?.user ?? null);
-                setLoading(false);
+                setAuthUser(session?.user ?? null);
+                setAuthLoading(false);
             } catch (error) {
                 console.error("Error initializing auth:", error);
-                setLoading(false);
+                setAuthLoading(false);
             }
         };
 
         initializeAuth();
 
-        // 2. Listen for Auth Changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             console.log("Auth state change:", event);
             setSession(session);
-            setUser(session?.user ?? null);
-            setLoading(false);
+            setAuthUser(session?.user ?? null);
+            setAuthLoading(false);
 
             if (event === 'SIGNED_IN') {
                 if (!isMarketingDomain && (location.pathname === '/login' || location.pathname === '/')) {
@@ -56,80 +67,125 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 }
             } else if (event === 'SIGNED_OUT') {
                 navigate('/login');
+                setProfile({ ...EMPTY_USER });
             }
         });
 
         return () => subscription.unsubscribe();
     }, [navigate, isMarketingDomain]);
 
+    // --- 2. Profile Logic ---
+    const fetchProfileData = useCallback(async (userId: string) => {
+        try {
+            console.log("UserProvider: Fetching profile for", userId);
+            setProfileLoading(true);
+            let data = await fetchUserProfile(userId);
+
+            if (!data) {
+                // Wait for creation if new user
+                await new Promise<void>((resolve) => {
+                    const channel = supabase
+                        .channel(`public:profiles:id=eq.\${userId}`)
+                        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles', filter: `id=eq.\${userId}` },
+                            async (payload) => {
+                                data = payload.new as UserProfile;
+                                supabase.removeChannel(channel);
+                                resolve();
+                            })
+                        .subscribe();
+
+                    setTimeout(() => {
+                        supabase.removeChannel(channel);
+                        resolve();
+                    }, 5000);
+                });
+                if (!data) data = await fetchUserProfile(userId);
+            }
+
+            if (data) {
+                setProfile(prev => ({ ...prev, ...data }));
+                if (authUser) syncUserProfile(authUser).catch(console.error);
+            }
+        } catch (err) {
+            console.error("UserProvider: Error fetching profile:", err);
+        } finally {
+            setProfileLoading(false);
+        }
+    }, [authUser]);
+
+    useEffect(() => {
+        if (authLoading) return;
+
+        if (authUser?.id && !authUser.id.startsWith('mock-')) {
+            fetchProfileData(authUser.id);
+        } else {
+            setProfile({ ...EMPTY_USER });
+            setProfileLoading(false);
+        }
+    }, [authUser?.id, authLoading, fetchProfileData]);
+
+    // --- 3. Actions ---
     const logout = async () => {
         await supabase.auth.signOut();
         setSession(null);
-        setUser(null);
+        setAuthUser(null);
         navigate('/login');
     };
 
-    return (
-        <AuthContext.Provider value={{ session, user, loading, logout }}>
-            {children}
-        </AuthContext.Provider>
-    );
-};
+    const updateProfile = (data: Partial<UserProfile>) => {
+        setProfile(prev => ({ ...prev, ...data }));
+    };
 
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
-};
+    const setUser = (data: Partial<UserProfile> | ((prev: UserProfile) => Partial<UserProfile>)) => {
+        if (typeof data === 'function') {
+            setProfile(prev => ({ ...prev, ...data(prev) }));
+        } else {
+            updateProfile(data);
+        }
+    };
 
-// Facade Hook for Backward Compatibility
-// Combines Auth and Profile data to match the old useUser interface
-export const useUser = () => {
-    const { user: authUser, logout, loading: authLoading } = useAuth();
-    // We need to handle the case where UserProfileProvider might not be ready or present
-    // But since we wrap App with both, it should be fine.
-    // However, useUserProfile throws if not in provider.
-    // We'll assume it is used correctly.
+    const refreshUser = async () => {
+        if (authUser?.id) await fetchProfileData(authUser.id);
+    };
 
-    // We need to access UserProfileContext safely.
-    // Since we can't conditionally call hooks, we assume this is called inside UserProfileProvider.
-    const { profile, isLoading: profileLoading, refreshProfile, updateProfile, setLanguage } = useUserProfile();
+    const setLanguage = (lang: AppLanguage) => {
+        setProfile(prev => ({ ...prev, language: lang }));
+    };
 
+    // Construct the merged user object for backward compatibility
+    // but preferred to use specific fields if possible.
+    // The previous 'useUser' hook returned the merged object as 'user'.
     const mergedUser: UserProfile = {
         ...profile,
         id: authUser?.id || profile.id,
         email: authUser?.email || profile.email,
     };
 
-    return {
-        user: mergedUser,
-        setUser: (data: Partial<UserProfile> | ((prev: UserProfile) => Partial<UserProfile>)) => {
-            // Handle both full update or partial. 
-            // Ideally consumers should use updateProfile.
-            // This is a best-effort shim.
-            if (typeof data === 'function') {
-                // We can't easily support functional updates that depend on previous state 
-                // across two contexts without more complex logic.
-                // For now, warn or try to support basic object merge.
-                console.warn("Functional setUser update not fully supported in facade.");
-            } else {
-                updateProfile(data as Partial<UserProfile>);
-            }
-        },
-        language: profile.language,
-        setLanguage,
-        loading: authLoading || profileLoading,
-        setLoading: () => { }, // No-op, managed internally
-        logout,
-        refreshUser: refreshProfile // Alias for compatibility
-    };
+    return (
+        <UserContext.Provider value={{
+            user: mergedUser,
+            authUser,
+            session,
+            loading: authLoading || profileLoading,
+            logout,
+            setUser,
+            updateProfile,
+            refreshUser,
+            setLanguage,
+            language: profile.language
+        }}>
+            {children}
+        </UserContext.Provider>
+    );
 };
 
-// Export UserContext for legacy imports if any (though useUser is preferred)
-export const UserContext = AuthContext;
-// Note: This exports AuthContext as UserContext, which might break consumers expecting UserContextType.
-// But since most use `useUser`, it should be fine. 
-// If consumers use `useContext(UserContext)`, they will get AuthContextType, which is different.
-// We should check if anyone uses `useContext(UserContext)` directly.
+export const useUser = () => {
+    const context = useContext(UserContext);
+    if (context === undefined) {
+        throw new Error('useUser must be used within a UserProvider');
+    }
+    return context;
+};
+
+// Deprecated export (kept if needed for import compatibility, but changed to UserProvider)
+export { UserProvider as AuthProvider };
