@@ -22,14 +22,38 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({ language, isLoa
     return (
         <div className="space-y-3 mb-8">
 
-            <button
-                onClick={() => onSocialLogin('linkedin_oidc')}
-                disabled={isLoading}
-                className="w-full flex items-center justify-center gap-3 bg-[#0A66C2] hover:bg-[#004182] text-white font-medium py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70"
-            >
-                <Linkedin className="w-5 h-5 fill-current" />
-                {language === 'es' ? 'Continuar con LinkedIn' : 'Continue with LinkedIn'}
-            </button>
+            <div className="relative group">
+                <div className="absolute -top-5 -right-4 z-20 pointer-events-none select-none">
+                    <div className="relative flex items-center justify-center transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                        {/* Glow effect */}
+                        <div className="absolute inset-0 bg-blue-500 rounded-lg blur-md opacity-25 animate-pulse"></div>
+
+                        {/* Main Badge */}
+                        <div className="relative bg-slate-900 border border-indigo-500/30 text-white px-3 py-1.5 rounded-lg shadow-xl shadow-indigo-500/20 flex items-center gap-2">
+                            {/* Animated border gradient */}
+                            <div className="absolute inset-0 rounded-lg overflow-hidden">
+                                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+                            </div>
+
+                            <span className="text-sm shadow-sm">🚀</span>
+                            <span className="text-[10px] font-bold bg-gradient-to-r from-indigo-200 to-white bg-clip-text text-transparent uppercase tracking-wider">
+                                {language === 'es' ? 'RECOMENDADO' : 'RECOMMENDED'}
+                            </span>
+                        </div>
+
+                        {/* Speech bubble tail */}
+                        <div className="absolute -bottom-1 left-4 w-2 h-2 bg-slate-900 border-b border-r border-indigo-500/30 rotate-45"></div>
+                    </div>
+                </div>
+                <button
+                    onClick={() => onSocialLogin('linkedin_oidc')}
+                    disabled={isLoading}
+                    className="w-full flex items-center justify-center gap-3 bg-[#0A66C2] hover:bg-[#004182] text-white font-medium py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70"
+                >
+                    <Linkedin className="w-5 h-5 fill-current" />
+                    {language === 'es' ? 'Continuar con LinkedIn' : 'Continue with LinkedIn'}
+                </button>
+            </div>
         </div>
     );
 };

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Mail, Lock, LogIn, UserPlus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Mail, Lock, LogIn, UserPlus, Eye, EyeOff } from 'lucide-react';
 import { AppLanguage } from '../../../types';
 
 interface EmailAuthFormProps {
@@ -27,6 +27,7 @@ const EmailAuthForm: React.FC<EmailAuthFormProps> = ({
     onForgotPassword,
     onSubmit
 }) => {
+    const [showPassword, setShowPassword] = useState(false);
     return (
         <>
             <form onSubmit={onSubmit} className="space-y-5">
@@ -63,13 +64,24 @@ const EmailAuthForm: React.FC<EmailAuthFormProps> = ({
                     <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all"
+                            className="w-full pl-10 pr-12 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all"
                             placeholder="••••••••"
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+                        >
+                            {showPassword ? (
+                                <EyeOff className="w-5 h-5" />
+                            ) : (
+                                <Eye className="w-5 h-5" />
+                            )}
+                        </button>
                     </div>
                 </div>
 
