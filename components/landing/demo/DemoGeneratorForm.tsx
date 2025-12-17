@@ -59,7 +59,7 @@ const DemoGeneratorForm: React.FC<DemoGeneratorFormProps> = ({
         outputLanguage: language === "es" ? "es" : "en",
     });
 
-    const [isStrategyOpen, setIsStrategyOpen] = React.useState(false);
+    const [isStrategyOpen, setIsStrategyOpen] = React.useState(true);
     const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
     const [credits, setCredits] = React.useState(20);
 
