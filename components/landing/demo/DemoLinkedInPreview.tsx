@@ -76,7 +76,7 @@ It's about writing better.
 
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState(content);
-    const [showAudit, setShowAudit] = useState(true);
+    const [showAudit, setShowAudit] = useState(false);
 
     // Mock viral stats
     const viralScore = 92;
