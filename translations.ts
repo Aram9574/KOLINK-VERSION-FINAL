@@ -1,6 +1,4 @@
-
-
-import { ViralTone, ViralFramework, EmojiDensity, PostLength } from './types';
+import { EmojiDensity, PostLength, ViralFramework, ViralTone } from "./types";
 
 export const translations = {
   en: {
@@ -11,16 +9,17 @@ export const translations = {
       pricing: "Pricing",
       faq: "FAQ",
       login: "Log In",
-      getStarted: "Get Started"
+      getStarted: "Get Started",
     },
     hero: {
       badge: "#1 AI Tool for LinkedIn Growth",
       titleLine1: "Stop staring at a",
       titleLine2: "blank page.",
-      subtitle: "Kolink is the AI studio that architects viral LinkedIn posts using proven psychological frameworks. From idea to \"Post\" in 30 seconds.",
+      subtitle:
+        'Kolink is the AI studio that architects viral LinkedIn posts using proven psychological frameworks. From idea to "Post" in 30 seconds.',
       ctaPrimary: "Start Creating for Free",
       ctaSecondary: "Watch Demo",
-      generating: "Generating Viral Post..."
+      generating: "Generating Viral Post...",
     },
     socialProof: "Trusted by creators at top companies",
     workflow: {
@@ -35,23 +34,25 @@ export const translations = {
       step4Title: "Deploy Asset",
       step4Desc: "One-click formatting for mobile feeds.",
       step5Title: "Dominate Feed",
-      step5Desc: "Watch your engagement metrics explode."
+      step5Desc: "Watch your engagement metrics explode.",
     },
     howItWorks: {
       title: "From vague idea to viral hit",
-      subtitle: "Our 3-step process turns your random thoughts into structured content assets.",
+      subtitle:
+        "Our 3-step process turns your random thoughts into structured content assets.",
       step1Title: "Input Topic",
       step1Desc: "Dump your raw thoughts, a link, or just a keyword.",
       step2Title: "Select Framework",
       step2Desc: "Choose a viral structure like 'Contrarian' or 'Story'.",
       step3Title: "Go Viral",
-      step3Desc: "Get a perfectly formatted post ready to dominate the feed."
+      step3Desc: "Get a perfectly formatted post ready to dominate the feed.",
     },
     comparison: {
       title: "The Reality Check",
-      subtitle: "See why 10k+ creators switched from standard chatbots to Kolink.",
+      subtitle:
+        "See why 10k+ creators switched from standard chatbots to Kolink.",
       genericHeader: "Generic Chatbots",
-      genericSub: "The \"Wall of Text\" Generator",
+      genericSub: 'The "Wall of Text" Generator',
       kolinkHeader: "Kolink Studio",
       kolinkSub: "Viral Architecture Engine",
       visualText: "Visual Structure",
@@ -59,7 +60,7 @@ export const translations = {
       kolinkVisualLabel: "Viral Sneak Peek",
       vsBad: "Dense, boring, ignored.",
       vsGood: "Scannable, hooked, viral.",
-      hookBad: "Boring \"I'm excited to announce\" intros.",
+      hookBad: 'Boring "I\'m excited to announce" intros.',
       hookGood: "Psychological hooks that stop scrolling.",
       toneBad: "Robotic, academic, and dry.",
       toneGood: "Human, witty, and authentic.",
@@ -70,11 +71,12 @@ export const translations = {
       feature3Title: "Zero Learning Curve",
       visualList1: "Systematize output",
       visualList2: "Leverage psychology",
-      viralBadge: "Viral"
+      viralBadge: "Viral",
     },
     roi: {
       title: "Stop burning money on multiple tools",
-      subtitle: "Kolink replaces your entire LinkedIn growth stack for a fraction of the cost.",
+      subtitle:
+        "Kolink replaces your entire LinkedIn growth stack for a fraction of the cost.",
       item1Title: "Professional Ghostwriter",
       item1Desc: "Replaces: Hiring expensive freelancers (€0.50/word)",
       item1Price: "€2,000/mo",
@@ -91,25 +93,33 @@ export const translations = {
       totalPrice: "€2,648/mo",
       kolinkLabel: "All of this is included when you join Kolink.",
       kolinkPlan: "Kolink Creator Pro:",
-      kolinkPrice: "€19/mo"
+      kolinkPrice: "€19/mo",
     },
     testimonials: {
       title: "Creators are growing fast",
-      subtitle: "Join the movement of founders building massive personal brands.",
-      t1: "I doubled my impressions in week 1. The 'Contrarian' framework is a cheat code.",
-      t2: "Finally, an AI that understands LinkedIn formatting. No more massive paragraphs.",
-      t3: "Kolink saved me 10 hours of writing this week alone. Worth every penny."
+      subtitle:
+        "Join the movement of founders building massive personal brands.",
+      t1:
+        "I doubled my impressions in week 1. The 'Contrarian' framework is a cheat code.",
+      t2:
+        "Finally, an AI that understands LinkedIn formatting. No more massive paragraphs.",
+      t3:
+        "Kolink saved me 10 hours of writing this week alone. Worth every penny.",
     },
     features: {
       title: "Everything you need to go viral",
-      subtitle: "We don't just write text. We engineer engagement using data-backed structures.",
+      subtitle:
+        "We don't just write text. We engineer engagement using data-backed structures.",
       f1Title: "6 Viral Frameworks",
 
-      f1Desc: "Don't guess. Use structures like \"The Contrarian Take\" or \"The Vulnerable Story\" that are proven to stop the scroll.",
+      f1Desc:
+        'Don\'t guess. Use structures like "The Contrarian Take" or "The Vulnerable Story" that are proven to stop the scroll.',
       f2Title: "Brand Voice Cloning",
-      f2Desc: "Teach the AI your specific writing style. It learns your vocabulary, sentence length, and personality.",
+      f2Desc:
+        "Teach the AI your specific writing style. It learns your vocabulary, sentence length, and personality.",
       f3Title: "Engagement Predictor",
-      f3Desc: "Our proprietary scoring system grades your post before you publish, optimizing for maximum reach.",
+      f3Desc:
+        "Our proprietary scoring system grades your post before you publish, optimizing for maximum reach.",
       viralScore: "Viral Score",
       hooks: "Hooks",
       format: "Format",
@@ -117,7 +127,8 @@ export const translations = {
       zeroStructure: "Zero Structure",
       hardToPrompt: "Hard to Prompt",
       speedTitle: "Ideas to Viral Hits in 30s",
-      speedDesc: "Stop wasting hours. Our workflow takes you from a messy thought to a polished, viral-ready asset instantly.",
+      speedDesc:
+        "Stop wasting hours. Our workflow takes you from a messy thought to a polished, viral-ready asset instantly.",
       noWritersBlock: "No Writer's Block",
       mobileOptimized: "Mobile Optimized",
       readyToPost: "Ready to Post",
@@ -125,14 +136,14 @@ export const translations = {
         pas: { name: "Problem-Agitate-Solution", desc: "Conversion" },
         bab: { name: "Before-After-Bridge", desc: "Storytelling" },
         contrarian: { name: "The Contrarian Take", desc: "Engagement" },
-        listicle: { name: "The Listicle", desc: "Reach" }
+        listicle: { name: "The Listicle", desc: "Reach" },
       },
       brandVoice: {
         aiModel: "AI Model",
         you: "YOU",
         ai: "AI",
-        match: "100% Match"
-      }
+        match: "100% Match",
+      },
     },
     pricing: {
       title: "Simple, transparent pricing",
@@ -143,24 +154,29 @@ export const translations = {
       startFree: "Start for Free",
       getStarted: "Get Started",
       mostPopular: "Recommended",
-      footer: "Secure payment via Stripe. Cancel anytime."
+      footer: "Secure payment via Stripe. Cancel anytime.",
     },
     faq: {
       title: "Frequently Asked Questions",
       q1: "Does Kolink generate unique content?",
-      a1: "Absolutely. We use a combination of GPT-4 and Claude 3 Opus tailored with proprietary viral frameworks. No two posts are the same.",
+      a1:
+        "Absolutely. We use a combination of GPT-4 and Claude 3 Opus tailored with proprietary viral frameworks. No two posts are the same.",
       q2: "Can I cancel my subscription?",
-      a2: "Yes, you can cancel anytime from your dashboard. You will retain access until the end of your billing cycle.",
+      a2:
+        "Yes, you can cancel anytime from your dashboard. You will retain access until the end of your billing cycle.",
       q3: "What is the difference between the models?",
-      a3: "The Free plan uses a faster, lighter model. Pro and Viral plans use our 'Deep Think' models which are better at nuance.",
+      a3:
+        "The Free plan uses a faster, lighter model. Pro and Viral plans use our 'Deep Think' models which are better at nuance.",
       q4: "Do you offer team plans?",
-      a4: "Yes! The 'Viral God' plan supports up to 3 team members. For larger enterprise needs, contact our sales team."
+      a4:
+        "Yes! The 'Viral God' plan supports up to 3 team members. For larger enterprise needs, contact our sales team.",
     },
     cta: {
       title: "Ready to dominate your feed?",
-      subtitle: "Join 10,000+ creators using Kolink to build their personal brand. Start generating viral content in the next 2 minutes.",
+      subtitle:
+        "Join 10,000+ creators using Kolink to build their personal brand. Start generating viral content in the next 2 minutes.",
       button: "Get Started for Free",
-      disclaimer: "No credit card required • Cancel anytime"
+      disclaimer: "No credit card required • Cancel anytime",
     },
     bugReport: {
       buttonLabel: "Report Bug",
@@ -170,7 +186,7 @@ export const translations = {
       cancel: "Cancel",
       send: "Send Report",
       sending: "Sending...",
-      success: "Thanks! We're on it."
+      success: "Thanks! We're on it.",
     },
     onboarding: {
       step1: {
@@ -182,20 +198,26 @@ export const translations = {
         lastNamePlaceholder: "Doe",
         jobTitle: "Profession / Job Title",
         jobTitlePlaceholder: "e.g. Founder, Marketing Manager, Developer",
-        next: "Next Step"
+        next: "Next Step",
       },
       step2: {
         title: "What is your goal?",
         subtitle: "This helps our AI select the best viral frameworks.",
         intents: {
-          personal_brand: { label: "Personal Brand", desc: "Build authority and network" },
+          personal_brand: {
+            label: "Personal Brand",
+            desc: "Build authority and network",
+          },
           company: { label: "Company Page", desc: "Promote my startup" },
           agency: { label: "Client Work", desc: "Ghostwriting for others" },
           sales: { label: "Sales / Leads", desc: "Social selling" },
           job_hunt: { label: "Job Hunt", desc: "Get seen by recruiters" },
-          content_creator: { label: "Content Creator", desc: "Monetize audience" }
+          content_creator: {
+            label: "Content Creator",
+            desc: "Monetize audience",
+          },
         },
-        next: "Next Step"
+        next: "Next Step",
       },
       step3: {
         title: "One last thing...",
@@ -206,18 +228,18 @@ export const translations = {
           friend: "Friend / Colleague",
           youtube: "YouTube",
           google: "Search Engine",
-          other: "Other"
+          other: "Other",
         },
-        start: "Start Creating"
+        start: "Start Creating",
       },
-      footer: "We use this information to personalize your viral frameworks."
+      footer: "We use this information to personalize your viral frameworks.",
     },
     levelUp: {
       title: "Level Up!",
       subtitle: "You are now Level {{level}}",
       achievements: "Achievements Unlocked",
       xp: "XP",
-      awesome: "Awesome!"
+      awesome: "Awesome!",
     },
     productTour: {
       skip: "Skip Tour",
@@ -225,12 +247,24 @@ export const translations = {
       next: "Next",
       start: "Start",
       steps: {
-        create: { title: "Create", desc: "Start here to create new viral posts." },
+        create: {
+          title: "Create",
+          desc: "Start here to create new viral posts.",
+        },
         history: { title: "History", desc: "View and manage your past posts." },
-        ideas: { title: "Ideas", desc: "Get AI-powered inspiration tailored to you." },
-        autopilot: { title: "AutoPilot", desc: "Schedule and automate your content strategy." },
-        levelUp: { title: "Level Up", desc: "Earn XP and rewards by posting consistently." }
-      }
+        ideas: {
+          title: "Ideas",
+          desc: "Get AI-powered inspiration tailored to you.",
+        },
+        autopilot: {
+          title: "AutoPilot",
+          desc: "Schedule and automate your content strategy.",
+        },
+        levelUp: {
+          title: "Level Up",
+          desc: "Earn XP and rewards by posting consistently.",
+        },
+      },
     },
     // APP INTERFACE TRANSLATIONS
     app: {
@@ -245,7 +279,7 @@ export const translations = {
         upgradeNow: "Upgrade Now",
         unlockDesc: "Unlock unlimited generations and advanced viral modes.",
         creditsLeft: "credits left",
-        logout: "Log Out"
+        logout: "Log Out",
       },
       ideas: {
         title: "Viral Inspiration",
@@ -256,7 +290,8 @@ export const translations = {
         sources: "Sources & News:",
         configTitle: "Configuration",
         nicheLabel: "Industry / Topic",
-        nicheTooltip: "Specific niches (e.g. 'SaaS Marketing') yield better trends than broad ones (e.g. 'Business').",
+        nicheTooltip:
+          "Specific niches (e.g. 'SaaS Marketing') yield better trends than broad ones (e.g. 'Business').",
         nichePlaceholder: "e.g. SaaS Marketing, Remote Work...",
         styleLabel: "Idea Style",
         sourceLabel: "Data Source",
@@ -276,17 +311,18 @@ export const translations = {
           contrarian: "😈 Contrarian/Debate",
           educational: "📚 How-to/Educational",
           story: "📖 Personal Story",
-          predictions: "🔮 Future Predictions"
+          predictions: "🔮 Future Predictions",
         },
         sourcesOpts: {
           news: "Google Search (Live News)",
-          evergreen: "Evergreen (General Knowledge)"
-        }
+          evergreen: "Evergreen (General Knowledge)",
+        },
       },
       autopilot: {
         title: "AutoPilot",
         subtitle: "Put your LinkedIn growth on cruise control.",
-        description: "AutoPilot generates high-quality drafts automatically based on your topics. Click 'View Output' on any draft to open it in the Studio for editing and publishing.",
+        description:
+          "AutoPilot generates high-quality drafts automatically based on your topics. Click 'View Output' on any draft to open it in the Studio for editing and publishing.",
         statusCard: {
           active: "SYSTEM ACTIVE",
           inactive: "SYSTEM OFFLINE",
@@ -294,20 +330,23 @@ export const translations = {
           lastRun: "Last Generated",
           activateBtn: "Activate AutoPilot",
           deactivateBtn: "Deactivate",
-          forceRunBtn: "Run Now"
+          forceRunBtn: "Run Now",
         },
         config: {
           title: "Flight Parameters",
           frequencyLabel: "Frequency",
-          frequencyTooltip: "How often should AutoPilot generate a draft for you.",
+          frequencyTooltip:
+            "How often should AutoPilot generate a draft for you.",
           topicsLabel: "Content Topics",
-          topicsTooltip: "AutoPilot will randomly pick one of these topics for each run.",
+          topicsTooltip:
+            "AutoPilot will randomly pick one of these topics for each run.",
           topicsPlaceholder: "Type topic and press Enter...",
           audienceLabel: "Target Audience",
           audiencePlaceholder: "e.g. SaaS Founders, Marketing Directors...",
           postCountLabel: "Post Quantity per Run",
-          postCountTooltip: "Number of posts to generate each time AutoPilot runs (1 credit per post).",
-          save: "Update Configuration"
+          postCountTooltip:
+            "Number of posts to generate each time AutoPilot runs (1 credit per post).",
+          save: "Update Configuration",
         },
         activity: {
           title: "Flight Log",
@@ -322,25 +361,30 @@ export const translations = {
           autoPilotTone: "AutoPilot Tone",
           postUnit: "Post",
           postsUnit: "Posts",
-          creditCostNote: "* Each generated post consumes 1 credit. Total: {{count}} credits per run.",
-          noTopics: "No topics added yet. Add at least one."
+          creditCostNote:
+            "* Each generated post consumes 1 credit. Total: {{count}} credits per run.",
+          noTopics: "No topics added yet. Add at least one.",
         },
         frequencies: {
           daily: "Daily (24h)",
           weekly: "Weekly (7d)",
-          biweekly: "Bi-Weekly (14d)"
-        }
+          biweekly: "Bi-Weekly (14d)",
+        },
       },
       generator: {
         title: "Viral Engine",
         credits: "Credits",
         topicLabel: "Core Idea / Topic",
-        topicPlaceholder: "e.g. Why 'hustle culture' is actually destroying productivity in remote teams...",
+        topicPlaceholder:
+          "e.g. Why 'hustle culture' is actually destroying productivity in remote teams...",
         audienceLabel: "Target Audience",
-        audienceTooltip: "Specific niches perform 2x better. 'SaaS Founders' > 'Business People'.",
-        audiencePlaceholder: "e.g. SaaS Founders, Junior Devs, Marketing Managers",
+        audienceTooltip:
+          "Specific niches perform 2x better. 'SaaS Founders' > 'Business People'.",
+        audiencePlaceholder:
+          "e.g. SaaS Founders, Junior Devs, Marketing Managers",
         toneLabel: "Tone of Voice",
-        toneTooltip: "Sets the attitude. 'Professional' builds trust, 'Controversial' sparks debate.",
+        toneTooltip:
+          "Sets the attitude. 'Professional' builds trust, 'Controversial' sparks debate.",
         structureLabel: "Viral Structure",
         structureTooltipTitle: "Why Structure Matters",
         structureTooltip1: "Listicle: Max readability & saves.",
@@ -348,7 +392,8 @@ export const translations = {
         structureTooltip3: "Contrarian: Triggers debate & comments.",
         lengthLabel: "Post Length",
         emojiLabel: "Emoji Density",
-        emojiTooltip: "Visual anchors. 'High' for mobile engagement, 'Minimal' for corporate polish.",
+        emojiTooltip:
+          "Visual anchors. 'High' for mobile engagement, 'Minimal' for corporate polish.",
         ctaLabel: "Include Call to Action?",
         creativityLabel: "Creativity Level",
         creativityTooltip: "High = Risky/Edgy. Low = Safe/Professional.",
@@ -356,7 +401,7 @@ export const translations = {
         creativityHigh: "Viral & Edgy",
         generateBtn: "Generate with AI",
         generatingBtn: "Architecting Viral Post...",
-        noCreditsBtn: "0 Credits Remaining"
+        noCreditsBtn: "0 Credits Remaining",
       },
       preview: {
         edit: "Edit",
@@ -373,7 +418,7 @@ export const translations = {
         hook: "HOOK",
         readability: "READABILITY",
         value: "VALUE",
-        proTip: "PRO TIP"
+        proTip: "PRO TIP",
       },
       history: {
         title: "Recent Creations",
@@ -385,14 +430,15 @@ export const translations = {
         searchPlaceholder: "Search by topic or keyword...",
         filterAll: "All Tones",
         noResults: "No posts found matching your criteria.",
-        noResultsDesc: "Try adjusting your filters or generate a new post to get started.",
+        noResultsDesc:
+          "Try adjusting your filters or generate a new post to get started.",
         noScore: "No Score",
         statsViews: "Est. Views",
         statsLikes: "Est. Likes",
         actions: {
           reuse: "Reuse",
-          copied: "Copied!"
-        }
+          copied: "Copied!",
+        },
       },
       settings: {
         title: "Settings",
@@ -400,13 +446,18 @@ export const translations = {
         trophyRoom: "Trophy Room",
         generalPrefs: "General Preferences",
         languageLabel: "Language / Idioma",
-        languageTooltip: "Changes the interface language AND the output language of the AI.",
-        languageDesc: "Select your preferred interface and generation language.",
+        languageTooltip:
+          "Changes the interface language AND the output language of the AI.",
+        languageDesc:
+          "Select your preferred interface and generation language.",
         brandVoiceTitle: "Brand Voice & Persona",
-        brandVoiceTooltip: "This overrides the standard 'Tone' setting. Be descriptive about adjectives and sentence structure.",
+        brandVoiceTooltip:
+          "This overrides the standard 'Tone' setting. Be descriptive about adjectives and sentence structure.",
         premiumFeature: "Premium Feature",
-        brandVoiceDesc: "Describe how you want your AI to sound. This defines your unique style and overrides standard tone settings when applicable.",
-        brandVoicePlaceholder: "e.g. 'Witty, sarcastic, and uses pop-culture references.', 'Authoritative, data-driven, and uses short punchy sentences.', 'Empathetic, vulnerable, and storytelling-focused.'",
+        brandVoiceDesc:
+          "Describe how you want your AI to sound. This defines your unique style and overrides standard tone settings when applicable.",
+        brandVoicePlaceholder:
+          "e.g. 'Witty, sarcastic, and uses pop-culture references.', 'Authoritative, data-driven, and uses short punchy sentences.', 'Empathetic, vulnerable, and storytelling-focused.'",
         profileTitle: "Profile Information",
         uploadPhoto: "Upload New Photo",
         fullName: "Full Name",
@@ -420,7 +471,8 @@ export const translations = {
         twoFactor: "Two-Factor Authentication (2FA)",
         twoFactorDesc: "Secure your account with an extra layer of protection.",
         securityAlerts: "Alertas de Seguridad",
-        securityAlertsDesc: "Recibe notificaciones sobre inicios de sesión sospechosos.",
+        securityAlertsDesc:
+          "Recibe notificaciones sobre inicios de sesión sospechosos.",
         activeSessions: "Active Sessions",
         billingTitle: "Billing & Usage",
         currentUsage: "Current Usage",
@@ -430,7 +482,7 @@ export const translations = {
         invoiceHistory: "Invoice History",
         saveChanges: "Save Changes",
         saving: "Saving...",
-        saved: "Saved!"
+        saved: "Saved!",
       },
       cancellation: {
         title: "We're sorry to see you go",
@@ -440,42 +492,46 @@ export const translations = {
           usage: "Not using it enough",
           alternative: "Found a better alternative",
           features: "Missing features",
-          other: "Other"
+          other: "Other",
         },
         keepPlan: "Keep My Plan",
         continue: "Continue",
         offer30: {
           title: "Wait! Don't lose your progress",
-          subtitle: "We'd love to keep you as a creator. Here is a special offer just for you.",
+          subtitle:
+            "We'd love to keep you as a creator. Here is a special offer just for you.",
           badge: "LIMITED OFFER",
           discountText: "30% OFF FOR 6 MONTHS",
           claimBtn: "Claim 30% Discount",
           applying: "Applying...",
-          reject: "No thanks, I still want to cancel"
+          reject: "No thanks, I still want to cancel",
         },
         offer50: {
           title: "Last Chance Offer",
-          subtitle: "We really don't want you to leave. This is our best possible offer.",
+          subtitle:
+            "We really don't want you to leave. This is our best possible offer.",
           badge: "FINAL OFFER",
           discountText: "50% OFF FOR 1 YEAR",
           claimBtn: "Claim 50% Discount",
           applying: "Applying...",
-          reject: "No thanks, proceed to cancellation"
+          reject: "No thanks, proceed to cancellation",
         },
         confirm: {
           title: "Confirm Cancellation",
-          subtitle: "Your subscription will be canceled at the end of your current billing period. You will lose access to premium features and your credits will expire.",
+          subtitle:
+            "Your subscription will be canceled at the end of your current billing period. You will lose access to premium features and your credits will expire.",
           access: "Access until end of billing cycle",
           data: "Data preserved for 30 days",
           frozen: "Credits will be frozen",
           goBack: "Go Back",
           confirmBtn: "Confirm Cancellation",
-          canceling: "Canceling..."
-        }
+          canceling: "Canceling...",
+        },
       },
       upgrade: {
         title: "Choose Your Viral Plan",
-        subtitle: "Unlock advanced AI models, unlimited generations, and secret viral frameworks used by top creators.",
+        subtitle:
+          "Unlock advanced AI models, unlimited generations, and secret viral frameworks used by top creators.",
         monthly: "Monthly",
         yearly: "Yearly",
         save: "Save 20%",
@@ -484,44 +540,82 @@ export const translations = {
         included: "Included in your Plan",
         upgradeNow: "Upgrade Now",
         billedYearly: "Billed {{amount}} yearly",
-        securePayment: "Secure payment via Stripe. Cancel anytime. By upgrading, you agree to our Terms of Service. For custom enterprise plans, contact sales."
+        securePayment:
+          "Secure payment via Stripe. Cancel anytime. By upgrading, you agree to our Terms of Service. For custom enterprise plans, contact sales.",
       },
       constants: {
         tones: {
-          [ViralTone.PROFESSIONAL]: { label: '👔 Professional', desc: 'Clean, corporate, leadership-focused.' },
-          [ViralTone.CONTROVERSIAL]: { label: '🔥 Controversial', desc: 'Polarizing opinions that drive comments.' },
-          [ViralTone.EMPATHETIC]: { label: '❤️ Empathetic', desc: 'Vulnerable stories that build connection.' },
-          [ViralTone.EDUCATIONAL]: { label: '📚 Educational', desc: 'High value, actionable tips.' },
-          [ViralTone.HUMOROUS]: { label: '😂 Humorous', desc: 'Lighthearted, relatable, memes.' },
-          [ViralTone.STORYTELLING]: { label: '📖 Storytelling', desc: 'Deep dive narrative.' },
+          [ViralTone.PROFESSIONAL]: {
+            label: "👔 Professional",
+            desc: "Clean, corporate, leadership-focused.",
+          },
+          [ViralTone.CONTROVERSIAL]: {
+            label: "🔥 Controversial",
+            desc: "Polarizing opinions that drive comments.",
+          },
+          [ViralTone.EMPATHETIC]: {
+            label: "❤️ Empathetic",
+            desc: "Vulnerable stories that build connection.",
+          },
+          [ViralTone.EDUCATIONAL]: {
+            label: "📚 Educational",
+            desc: "High value, actionable tips.",
+          },
+          [ViralTone.HUMOROUS]: {
+            label: "😂 Humorous",
+            desc: "Lighthearted, relatable, memes.",
+          },
+          [ViralTone.STORYTELLING]: {
+            label: "📖 Storytelling",
+            desc: "Deep dive narrative.",
+          },
         },
         frameworks: {
-          [ViralFramework.PAS]: { label: 'Problem-Agitate-Solution', desc: 'Classic copywriting formula for conversion.' },
-          [ViralFramework.AIDA]: { label: 'AIDA', desc: 'Attention, Interest, Desire, Action.' },
-          [ViralFramework.BAB]: { label: 'Before-After-Bridge', desc: 'Show transformation.' },
-          [ViralFramework.LISTICLE]: { label: 'The Listicle', desc: 'Scannable bullet points (High CTR).' },
-          [ViralFramework.CONTRARIAN]: { label: 'Unpopular Opinion', desc: 'Challenge the status quo.' },
-          [ViralFramework.STORY]: { label: 'Micro-Story', desc: 'Personal anecdote with a lesson.' },
+          [ViralFramework.PAS]: {
+            label: "Problem-Agitate-Solution",
+            desc: "Classic copywriting formula for conversion.",
+          },
+          [ViralFramework.AIDA]: {
+            label: "AIDA",
+            desc: "Attention, Interest, Desire, Action.",
+          },
+          [ViralFramework.BAB]: {
+            label: "Before-After-Bridge",
+            desc: "Show transformation.",
+          },
+          [ViralFramework.LISTICLE]: {
+            label: "The Listicle",
+            desc: "Scannable bullet points (High CTR).",
+          },
+          [ViralFramework.CONTRARIAN]: {
+            label: "Unpopular Opinion",
+            desc: "Challenge the status quo.",
+          },
+          [ViralFramework.STORY]: {
+            label: "Micro-Story",
+            desc: "Personal anecdote with a lesson.",
+          },
         },
         lengths: {
-          [PostLength.SHORT]: { label: 'Short & Punchy' },
-          [PostLength.MEDIUM]: { label: 'Standard' },
-          [PostLength.LONG]: { label: 'Deep Dive' }
+          [PostLength.SHORT]: { label: "Short & Punchy" },
+          [PostLength.MEDIUM]: { label: "Standard" },
+          [PostLength.LONG]: { label: "Deep Dive" },
         },
         emojis: {
-          [EmojiDensity.MINIMAL]: { label: 'Minimal' },
-          [EmojiDensity.MODERATE]: { label: 'Balanced' },
-          [EmojiDensity.HIGH]: { label: 'High' }
-        }
-      }
+          [EmojiDensity.MINIMAL]: { label: "Minimal" },
+          [EmojiDensity.MODERATE]: { label: "Balanced" },
+          [EmojiDensity.HIGH]: { label: "High" },
+        },
+      },
     },
     footer: {
       privacy: "Privacy Policy",
       terms: "Terms of Service",
       contact: "Contact",
       rights: "© 2024 Kolink Inc. All rights reserved.",
-      description: "Architecting viral moments for the world's most ambitious creators."
-    }
+      description:
+        "Architecting viral moments for the world's most ambitious creators.",
+    },
   },
   es: {
     nav: {
@@ -531,23 +625,25 @@ export const translations = {
       pricing: "Precios",
       faq: "Preguntas",
       login: "Comenzar Gratis",
-      getStarted: "Empezar"
+      getStarted: "Empezar",
     },
     footer: {
       privacy: "Política de Privacidad",
       terms: "Términos de Servicio",
       contact: "Contacto",
       rights: "© 2024 Kolink Inc. Todos los derechos reservados.",
-      description: "Arquitectando momentos virales para los creadores más ambiciosos del mundo."
+      description:
+        "Arquitectando momentos virales para los creadores más ambiciosos del mundo.",
     },
     hero: {
       badge: "#1 Herramienta de IA para LinkedIn",
-      titleLine1: "Deja de mirar una",
-      titleLine2: "página en blanco.",
-      subtitle: "Kolink es el estudio de IA que arquitecta posts virales para LinkedIn usando marcos psicológicos probados. De idea a \"Publicar\" en 30 segundos.",
-      ctaPrimary: "Crear Gratis",
+      titleLine1: "Crea contenido de autoridad",
+      titleLine2: "en LinkedIn 10x más rápido.",
+      subtitle:
+        "Deja de perder horas frente a la pantalla. Kolink es el estudio de IA que utiliza estructuras virales probadas para convertir tus ideas en posts de alto impacto. Diseñado para profesionales que no tienen tiempo que perder.",
+      ctaPrimary: "Generar mi primer post ahora",
       ctaSecondary: "Ver Demo",
-      generating: "Generando Post Viral..."
+      generating: "Generando Post Viral...",
     },
     socialProof: "Con la confianza de creadores en",
     workflow: {
@@ -562,23 +658,26 @@ export const translations = {
       step4Title: "Desplegar Activo",
       step4Desc: "Copia en un clic al editor de LinkedIn.",
       step5Title: "Dominar el Feed",
-      step5Desc: "Mira cómo explotan las impresiones."
+      step5Desc: "Mira cómo explotan las impresiones.",
     },
     howItWorks: {
       title: "De idea vaga a éxito viral",
-      subtitle: "Nuestro proceso de 3 pasos convierte tus pensamientos aleatorios en activos de contenido.",
+      subtitle:
+        "Nuestro proceso de 3 pasos convierte tus pensamientos aleatorios en activos de contenido.",
       step1Title: "Ingresa el Tema",
       step1Desc: "Vuelca tus ideas crudas, un enlace o solo una palabra clave.",
       step2Title: "Elige la Estructura",
       step2Desc: "Selecciona un marco viral como 'Contreras' o 'Historia'.",
       step3Title: "Hazte Viral",
-      step3Desc: "Obtén un post perfectamente formateado listo para dominar el feed."
+      step3Desc:
+        "Obtén un post perfectamente formateado listo para dominar el feed.",
     },
     comparison: {
       title: "El Golpe de Realidad",
-      subtitle: "Mira por qué 10k+ creadores cambiaron los chatbots estándar por Kolink.",
+      subtitle:
+        "Mira por qué 10k+ creadores cambiaron los chatbots estándar por Kolink.",
       genericHeader: "Chatbots Genéricos",
-      genericSub: "Generador de \"Muros de Texto\"",
+      genericSub: 'Generador de "Muros de Texto"',
       kolinkHeader: "Kolink Studio",
       kolinkSub: "Motor de Arquitectura Viral",
       visualText: "Estructura Visual",
@@ -586,7 +685,7 @@ export const translations = {
       kolinkVisualLabel: "Sneak Peek Viral",
       vsBad: "Párrafos densos, ignorados.",
       vsGood: "Escaneable, gancho viral.",
-      hookBad: "Intros aburridas tipo \"Me complace anunciar\".",
+      hookBad: 'Intros aburridas tipo "Me complace anunciar".',
       hookGood: "Ganchos psicológicos que detienen el scroll.",
       toneBad: "Robótico, académico y seco.",
       toneGood: "Humano, ingenioso y auténtico.",
@@ -597,11 +696,12 @@ export const translations = {
       feature3Title: "Cero Curva de Aprendizaje",
       visualList1: "Sistematizar output",
       visualList2: "Apalancar psicología",
-      viralBadge: "Viral"
+      viralBadge: "Viral",
     },
     roi: {
       title: "Deja de quemar dinero en múltiples herramientas",
-      subtitle: "Kolink reemplaza todo tu stack de crecimiento en LinkedIn por una fracción del costo.",
+      subtitle:
+        "Kolink reemplaza todo tu stack de crecimiento en LinkedIn por una fracción del costo.",
       item1Title: "Ghostwriter Profesional",
       item1Desc: "Reemplaza: Contratar freelancers caros (€0.50/palabra)",
       item1Price: "€2,000/mes",
@@ -618,24 +718,32 @@ export const translations = {
       totalPrice: "€2,648/mes",
       kolinkLabel: "Todo esto incluido al unirte a Kolink.",
       kolinkPlan: "Plan Creador Pro:",
-      kolinkPrice: "€19/mes"
+      kolinkPrice: "€19/mes",
     },
     testimonials: {
       title: "Creadores creciendo rápido",
-      subtitle: "Únete al movimiento de fundadores construyendo marcas personales masivas.",
-      t1: "Dupliqué mis impresiones en la semana 1. La estructura 'Contreras' es un truco de magia.",
-      t2: "Por fin, una IA que entiende el formato de LinkedIn. Adiós a los párrafos gigantes.",
-      t3: "Kolink me ahorró 10 horas de escritura esta semana. Vale cada centavo."
+      subtitle:
+        "Únete al movimiento de fundadores construyendo marcas personales masivas.",
+      t1:
+        "Dupliqué mis impresiones en la semana 1. La estructura 'Contreras' es un truco de magia.",
+      t2:
+        "Por fin, una IA que entiende el formato de LinkedIn. Adiós a los párrafos gigantes.",
+      t3:
+        "Kolink me ahorró 10 horas de escritura esta semana. Vale cada centavo.",
     },
     features: {
       title: "Todo lo que necesitas para ser viral",
-      subtitle: "No solo escribimos texto. Diseñamos engagement usando estructuras respaldadas por datos.",
+      subtitle:
+        "No solo escribimos texto. Diseñamos engagement usando estructuras respaldadas por datos.",
       f1Title: "6 Marcos Virales",
-      f1Desc: "No adivines. Usa estructuras como \"La Opinión Contraria\" o \"Historia Vulnerable\" probadas para detener el scroll.",
+      f1Desc:
+        'No adivines. Usa estructuras como "La Opinión Contraria" o "Historia Vulnerable" probadas para detener el scroll.',
       f2Title: "Clonación de Voz de Marca",
-      f2Desc: "Enséñale a la IA tu estilo de escritura. Aprende tu vocabulario, longitud de oraciones y personalidad.",
+      f2Desc:
+        "Enséñale a la IA tu estilo de escritura. Aprende tu vocabulario, longitud de oraciones y personalidad.",
       f3Title: "Predictor de Engagement",
-      f3Desc: "Nuestro sistema de puntuación califica tu post antes de publicar, optimizando para el máximo alcance.",
+      f3Desc:
+        "Nuestro sistema de puntuación califica tu post antes de publicar, optimizando para el máximo alcance.",
       viralScore: "Puntaje Viral",
       hooks: "Ganchos",
       format: "Formato",
@@ -643,7 +751,8 @@ export const translations = {
       zeroStructure: "Cero Estructura",
       hardToPrompt: "Difícil de Promptear",
       speedTitle: "De Ideas a Viral en 30s",
-      speedDesc: "Deja de perder horas. Nuestro flujo te lleva de un pensamiento desordenado a un activo viral listo al instante.",
+      speedDesc:
+        "Deja de perder horas. Nuestro flujo te lleva de un pensamiento desordenado a un activo viral listo al instante.",
       noWritersBlock: "Sin Bloqueo Creativo",
       mobileOptimized: "Optimizado para Móvil",
       readyToPost: "Listo para Publicar",
@@ -651,14 +760,14 @@ export const translations = {
         pas: { name: "Problem-Agitate-Solution", desc: "Conversión" },
         bab: { name: "Before-After-Bridge", desc: "Storytelling" },
         contrarian: { name: "The Contrarian Take", desc: "Engagement" },
-        listicle: { name: "The Listicle", desc: "Alcance" }
+        listicle: { name: "The Listicle", desc: "Alcance" },
       },
       brandVoice: {
         aiModel: "Modelo IA",
         you: "TÚ",
         ai: "IA",
-        match: "100% Coincidencia"
-      }
+        match: "100% Coincidencia",
+      },
     },
     pricing: {
       title: "Precios simples y transparentes",
@@ -669,24 +778,29 @@ export const translations = {
       startFree: "Empezar Gratis",
       getStarted: "Comenzar",
       mostPopular: "Recomendado",
-      footer: "Pago seguro vía Stripe. Cancela cuando quieras."
+      footer: "Pago seguro vía Stripe. Cancela cuando quieras.",
     },
     faq: {
       title: "Preguntas Frecuentes",
       q1: "¿Kolink genera contenido único?",
-      a1: "Absolutamente. Usamos una combinación de modelos avanzados ajustados con marcos virales propietarios. No hay dos posts iguales.",
+      a1:
+        "Absolutamente. Usamos una combinación de modelos avanzados ajustados con marcos virales propietarios. No hay dos posts iguales.",
       q2: "¿Puedo cancelar mi suscripción?",
-      a2: "Sí, puedes cancelar en cualquier momento desde tu panel. Mantendrás acceso hasta el final de tu ciclo de facturación.",
+      a2:
+        "Sí, puedes cancelar en cualquier momento desde tu panel. Mantendrás acceso hasta el final de tu ciclo de facturación.",
       q3: "¿Cuál es la diferencia entre los modelos?",
-      a3: "El plan Gratis usa un modelo más ligero. Los planes Pro y Viral usan nuestros modelos 'Deep Think' mejores en matices y humor.",
+      a3:
+        "El plan Gratis usa un modelo más ligero. Los planes Pro y Viral usan nuestros modelos 'Deep Think' mejores en matices y humor.",
       q4: "¿Ofrecen planes para equipos?",
-      a4: "¡Sí! El plan 'Viral God' soporta hasta 3 miembros. Para necesidades empresariales, contacta a ventas."
+      a4:
+        "¡Sí! El plan 'Viral God' soporta hasta 3 miembros. Para necesidades empresariales, contacta a ventas.",
     },
     cta: {
       title: "¿Listo para dominar tu feed?",
-      subtitle: "Únete a 10,000+ creadores usando Kolink para construir su marca personal. Empieza a generar contenido viral en 2 minutos.",
+      subtitle:
+        "Únete a 10,000+ creadores usando Kolink para construir su marca personal. Empieza a generar contenido viral en 2 minutos.",
       button: "Empezar Gratis",
-      disclaimer: "No requiere tarjeta de crédito • Cancela cuando quieras"
+      disclaimer: "No requiere tarjeta de crédito • Cancela cuando quieras",
     },
     bugReport: {
       buttonLabel: "Reportar Error",
@@ -696,7 +810,7 @@ export const translations = {
       cancel: "Cancelar",
       send: "Enviar Reporte",
       sending: "Enviando...",
-      success: "¡Gracias! Lo revisaremos."
+      success: "¡Gracias! Lo revisaremos.",
     },
     onboarding: {
       step1: {
@@ -708,20 +822,36 @@ export const translations = {
         lastNamePlaceholder: "Pérez",
         jobTitle: "Profesión / Cargo",
         jobTitlePlaceholder: "ej. Fundador, Marketing Manager, Desarrollador",
-        next: "Siguiente Paso"
+        next: "Siguiente Paso",
       },
       step2: {
         title: "¿Cuál es tu objetivo?",
-        subtitle: "Esto ayuda a nuestra IA a seleccionar los mejores marcos virales.",
+        subtitle:
+          "Esto ayuda a nuestra IA a seleccionar los mejores marcos virales.",
         intents: {
-          personal_brand: { label: "Marca Personal", desc: "Construir autoridad y red" },
-          company: { label: "Página de Empresa", desc: "Promocionar mi startup" },
-          agency: { label: "Trabajo para Clientes", desc: "Ghostwriting para otros" },
+          personal_brand: {
+            label: "Marca Personal",
+            desc: "Construir autoridad y red",
+          },
+          company: {
+            label: "Página de Empresa",
+            desc: "Promocionar mi startup",
+          },
+          agency: {
+            label: "Trabajo para Clientes",
+            desc: "Ghostwriting para otros",
+          },
           sales: { label: "Ventas / Leads", desc: "Venta social" },
-          job_hunt: { label: "Búsqueda de Empleo", desc: "Ser visto por reclutadores" },
-          content_creator: { label: "Creador de Contenido", desc: "Monetizar audiencia" }
+          job_hunt: {
+            label: "Búsqueda de Empleo",
+            desc: "Ser visto por reclutadores",
+          },
+          content_creator: {
+            label: "Creador de Contenido",
+            desc: "Monetizar audiencia",
+          },
         },
-        next: "Siguiente Paso"
+        next: "Siguiente Paso",
       },
       step3: {
         title: "Una última cosa...",
@@ -732,18 +862,18 @@ export const translations = {
           friend: "Amigo / Colega",
           youtube: "YouTube",
           google: "Buscador",
-          other: "Otro"
+          other: "Otro",
         },
-        start: "Empezar a Crear"
+        start: "Empezar a Crear",
       },
-      footer: "Usamos esta información para personalizar tus marcos virales."
+      footer: "Usamos esta información para personalizar tus marcos virales.",
     },
     levelUp: {
       title: "¡Subiste de Nivel!",
       subtitle: "Ahora eres Nivel {{level}}",
       achievements: "Logros Desbloqueados",
       xp: "XP",
-      awesome: "¡Genial!"
+      awesome: "¡Genial!",
     },
     productTour: {
       skip: "Saltar Tour",
@@ -751,16 +881,26 @@ export const translations = {
       next: "Siguiente",
       start: "Empezar",
       steps: {
-        create: { title: "Crear", desc: "Empieza aquí para crear nuevos posts virales." },
+        create: {
+          title: "Crear",
+          desc: "Empieza aquí para crear nuevos posts virales.",
+        },
         history: { title: "Historial", desc: "Gestiona tus posts pasados." },
         ideas: { title: "Ideas", desc: "Inspiración con IA a tu medida." },
-        autopilot: { title: "AutoPilot", desc: "Automatiza tu estrategia de contenido." },
-        levelUp: { title: "Subir Nivel", desc: "Gana XP y recompensas por publicar." }
-      }
+        autopilot: {
+          title: "AutoPilot",
+          desc: "Automatiza tu estrategia de contenido.",
+        },
+        levelUp: {
+          title: "Subir Nivel",
+          desc: "Gana XP y recompensas por publicar.",
+        },
+      },
     },
     settings: {
       language: "Idioma",
-      languageDesc: "Selecciona tu idioma preferido para la interfaz y la generación de contenido."
+      languageDesc:
+        "Selecciona tu idioma preferido para la interfaz y la generación de contenido.",
     },
     // APP INTERFACE TRANSLATIONS (ES)
     app: {
@@ -773,9 +913,10 @@ export const translations = {
         library: "Biblioteca",
         goPremium: "Planes que crecen contigo",
         upgradeNow: "Mejorar Plan",
-        unlockDesc: "Desbloquea generaciones ilimitadas y modos virales avanzados.",
+        unlockDesc:
+          "Desbloquea generaciones ilimitadas y modos virales avanzados.",
         creditsLeft: "créditos",
-        logout: "Cerrar Sesión"
+        logout: "Cerrar Sesión",
       },
       ideas: {
         title: "Inspiración Viral",
@@ -786,13 +927,15 @@ export const translations = {
         sources: "Fuentes y Noticias:",
         configTitle: "Configuración",
         nicheLabel: "Sector / Tema",
-        nicheTooltip: "Temas específicos (ej. 'Marketing SaaS') generan mejores tendencias que generales (ej. 'Negocios').",
+        nicheTooltip:
+          "Temas específicos (ej. 'Marketing SaaS') generan mejores tendencias que generales (ej. 'Negocios').",
         nichePlaceholder: "ej. Marketing SaaS, Trabajo Remoto...",
         styleLabel: "Estilo de Idea",
         sourceLabel: "Fuente de Datos",
         countLabel: "Cantidad",
         contextLabel: "Base de Conocimiento / Contexto (Opcional)",
-        contextTooltip: "Sube archivos o enlaces para dar más contexto a la IA.",
+        contextTooltip:
+          "Sube archivos o enlaces para dar más contexto a la IA.",
         addLink: "Añadir Enlace",
         addImage: "Subir Imagen",
         addText: "Pegar Texto",
@@ -806,17 +949,18 @@ export const translations = {
           contrarian: "😈 Contreras / Debate",
           educational: "📚 Educativo / How-to",
           story: "📖 Historia Personal",
-          predictions: "🔮 Predicciones Futuras"
+          predictions: "🔮 Predicciones Futuras",
         },
         sourcesOpts: {
           news: "Google Search (Noticias en Vivo)",
-          evergreen: "Evergreen (Conocimiento General)"
-        }
+          evergreen: "Evergreen (Conocimiento General)",
+        },
       },
       autopilot: {
         title: "AutoPilot",
         subtitle: "Pon tu crecimiento en LinkedIn en piloto automático.",
-        description: "AutoPilot genera borradores automáticamente basados en tus temas. Haz clic en 'Ver Resultado' en cualquier borrador para abrirlo en el Estudio, editarlo y publicarlo.",
+        description:
+          "AutoPilot genera borradores automáticamente basados en tus temas. Haz clic en 'Ver Resultado' en cualquier borrador para abrirlo en el Estudio, editarlo y publicarlo.",
         statusCard: {
           active: "SISTEMA ACTIVO",
           inactive: "SISTEMA OFFLINE",
@@ -824,20 +968,24 @@ export const translations = {
           lastRun: "Última Generación",
           activateBtn: "Activar AutoPilot",
           deactivateBtn: "Desactivar",
-          forceRunBtn: "Ejecutar Ahora"
+          forceRunBtn: "Ejecutar Ahora",
         },
         config: {
           title: "Parámetros de Vuelo",
           frequencyLabel: "Frecuencia",
-          frequencyTooltip: "Con qué frecuencia debe AutoPilot generar un borrador para ti.",
+          frequencyTooltip:
+            "Con qué frecuencia debe AutoPilot generar un borrador para ti.",
           topicsLabel: "Temas de Contenido",
-          topicsTooltip: "AutoPilot elegirá aleatoriamente uno de estos temas para cada ejecución.",
+          topicsTooltip:
+            "AutoPilot elegirá aleatoriamente uno de estos temas para cada ejecución.",
           topicsPlaceholder: "Escribe tema y presiona Enter...",
           audienceLabel: "Audiencia Objetivo",
-          audiencePlaceholder: "ej. Fundadores SaaS, Directores de Marketing...",
+          audiencePlaceholder:
+            "ej. Fundadores SaaS, Directores de Marketing...",
           postCountLabel: "Cantidad de Posts por Ejecución",
-          postCountTooltip: "Número de posts a generar cada vez que se ejecute AutoPilot (1 crédito por post).",
-          save: "Actualizar Configuración"
+          postCountTooltip:
+            "Número de posts a generar cada vez que se ejecute AutoPilot (1 crédito por post).",
+          save: "Actualizar Configuración",
         },
         activity: {
           title: "Bitácora de Vuelo",
@@ -852,25 +1000,30 @@ export const translations = {
           autoPilotTone: "Tono de AutoPilot",
           postUnit: "Post",
           postsUnit: "Posts",
-          creditCostNote: "* Cada post generado consume 1 crédito. Total: {{count}} créditos por ejecución.",
-          noTopics: "No hay temas añadidos. Añade al menos uno."
+          creditCostNote:
+            "* Cada post generado consume 1 crédito. Total: {{count}} créditos por ejecución.",
+          noTopics: "No hay temas añadidos. Añade al menos uno.",
         },
         frequencies: {
           daily: "Diario (24h)",
           weekly: "Semanal (7d)",
-          biweekly: "Quincenal (14d)"
-        }
+          biweekly: "Quincenal (14d)",
+        },
       },
       generator: {
         title: "Motor Viral",
         credits: "Créditos",
         topicLabel: "Idea Central / Tema",
-        topicPlaceholder: "ej. Por qué la 'cultura del esfuerzo' está destruyendo la productividad...",
+        topicPlaceholder:
+          "ej. Por qué la 'cultura del esfuerzo' está destruyendo la productividad...",
         audienceLabel: "Audiencia Objetivo",
-        audienceTooltip: "Nichos específicos funcionan 2x mejor. 'Fundadores SaaS' > 'Gente de negocios'.",
-        audiencePlaceholder: "ej. Fundadores SaaS, Desarrolladores Junior, Gerentes de Marketing",
+        audienceTooltip:
+          "Nichos específicos funcionan 2x mejor. 'Fundadores SaaS' > 'Gente de negocios'.",
+        audiencePlaceholder:
+          "ej. Fundadores SaaS, Desarrolladores Junior, Gerentes de Marketing",
         toneLabel: "Tono de Voz",
-        toneTooltip: "Define la actitud. 'Profesional' genera confianza, 'Controvertido' debate.",
+        toneTooltip:
+          "Define la actitud. 'Profesional' genera confianza, 'Controvertido' debate.",
         structureLabel: "Estructura Viral",
         structureTooltipTitle: "¿Por qué importa la estructura?",
         structureTooltip1: "Listicle: Máxima legibilidad y guardados.",
@@ -878,15 +1031,17 @@ export const translations = {
         structureTooltip3: "Contreras: Provoca debate y comentarios.",
         lengthLabel: "Longitud del Post",
         emojiLabel: "Densidad de Emojis",
-        emojiTooltip: "Anclas visuales. 'Alto' para móvil, 'Mínimo' para pulido corporativo.",
+        emojiTooltip:
+          "Anclas visuales. 'Alto' para móvil, 'Mínimo' para pulido corporativo.",
         ctaLabel: "¿Incluir Llamada a la Acción?",
         creativityLabel: "Nivel de Creatividad",
-        creativityTooltip: "Alto = Arriesgado/Atrevido. Bajo = Seguro/Profesional.",
+        creativityTooltip:
+          "Alto = Arriesgado/Atrevido. Bajo = Seguro/Profesional.",
         creativityLow: "Seguro/Corporativo",
         creativityHigh: "Viral y Atrevido",
         generateBtn: "Generar con IA",
         generatingBtn: "Arquitectando Post Viral...",
-        noCreditsBtn: "0 Créditos Restantes"
+        noCreditsBtn: "0 Créditos Restantes",
       },
       preview: {
         edit: "Editar",
@@ -903,7 +1058,7 @@ export const translations = {
         hook: "GANCHO",
         readability: "LEGIBILIDAD",
         value: "VALOR",
-        proTip: "CONSEJO PRO"
+        proTip: "CONSEJO PRO",
       },
       history: {
         title: "Creaciones Recientes",
@@ -911,18 +1066,20 @@ export const translations = {
         copy: "Copiar",
         delete: "Eliminar",
         viewTitle: "Archivo de Contenido",
-        viewSubtitle: "Revisa, edita y republica tu contenido de mejor rendimiento.",
-        searchPlaceholder: "Buscar por tema o palabra clave...",
+        viewSubtitle:
+          "Revisa, edita y republica tu contenido de mejor rendimiento.",
+        searchPlaceholder: "Buscar por tema...",
         filterAll: "Todos los Tonos",
         noResults: "No se encontraron posts con esos criterios.",
-        noResultsDesc: "Intenta ajustar tus filtros o genera un nuevo post para comenzar.",
+        noResultsDesc:
+          "Intenta ajustar tus filtros o genera un nuevo post para comenzar.",
         noScore: "Sin Puntaje",
         statsViews: "Vistas Est.",
         statsLikes: "Likes Est.",
         actions: {
           reuse: "Reusar",
-          copied: "¡Copiado!"
-        }
+          copied: "¡Copiado!",
+        },
       },
       settings: {
         title: "Ajustes",
@@ -930,27 +1087,35 @@ export const translations = {
         trophyRoom: "Sala de Trofeos",
         generalPrefs: "Preferencias Generales",
         languageLabel: "Idioma / Language",
-        languageTooltip: "Cambia el idioma de la interfaz Y el idioma de salida de la IA.",
-        languageDesc: "Selecciona tu idioma preferido para la interfaz y la generación.",
+        languageTooltip:
+          "Cambia el idioma de la interfaz Y el idioma de salida de la IA.",
+        languageDesc:
+          "Selecciona tu idioma preferido para la interfaz y la generación.",
         brandVoiceTitle: "Voz de Marca y Persona",
-        brandVoiceTooltip: "Esto anula la configuración estándar de 'Tono'. Sé descriptivo con adjetivos.",
+        brandVoiceTooltip:
+          "Esto anula la configuración estándar de 'Tono'. Sé descriptivo con adjetivos.",
         premiumFeature: "Función Premium",
-        brandVoiceDesc: "Describe cómo quieres que suene tu IA. Esto define tu estilo único y anula los tonos estándar.",
-        brandVoicePlaceholder: "ej. 'Ingenioso, sarcástico y usa referencias pop.', 'Autoritario, basado en datos y usa frases cortas.', 'Empático, vulnerable y enfocado en historias.'",
+        brandVoiceDesc:
+          "Describe cómo quieres que suene tu IA. Esto define tu estilo único y anula los tonos estándar.",
+        brandVoicePlaceholder:
+          "ej. 'Ingenioso, sarcástico y usa referencias pop.', 'Autoritario, basado en datos y usa frases cortas.', 'Empático, vulnerable y enfocado en historias.'",
         profileTitle: "Información del Perfil",
         uploadPhoto: "Subir Nueva Foto",
         fullName: "Nombre Completo",
         jobTitle: "Cargo",
         companyLabel: "Nombre de Empresa",
-        companyTooltip: "Ayuda a la IA a adaptar el contenido a tu organización.",
+        companyTooltip:
+          "Ayuda a la IA a adaptar el contenido a tu organización.",
         industryLabel: "Industria",
-        industryTooltip: "Proporciona contexto para jerga específica de la industria.",
+        industryTooltip:
+          "Proporciona contexto para jerga específica de la industria.",
         headline: "Titular de LinkedIn",
         securityTitle: "Seguridad y Privacidad",
         twoFactor: "Autenticación de Dos Factores (2FA)",
         twoFactorDesc: "Protege tu cuenta con una capa extra de seguridad.",
         securityAlerts: "Alertas de Seguridad",
-        securityAlertsDesc: "Recibe notificaciones sobre inicios de sesión sospechosos.",
+        securityAlertsDesc:
+          "Recibe notificaciones sobre inicios de sesión sospechosos.",
         activeSessions: "Sesiones Activas",
         billingTitle: "Facturación y Uso",
         currentUsage: "Uso Actual",
@@ -960,52 +1125,57 @@ export const translations = {
         invoiceHistory: "Historial de Facturas",
         saveChanges: "Guardar Cambios",
         saving: "Guardando...",
-        saved: "¡Guardado!"
+        saved: "¡Guardado!",
       },
       cancellation: {
         title: "Lamentamos que te vayas",
-        subtitle: "Por favor cuéntanos por qué te vas para que podamos mejorar.",
+        subtitle:
+          "Por favor cuéntanos por qué te vas para que podamos mejorar.",
         reasons: {
           expensive: "Muy caro",
           usage: "No lo uso suficiente",
           alternative: "Encontré otra alternativa",
           features: "Faltan funciones",
-          other: "Otro"
+          other: "Otro",
         },
         keepPlan: "Mantener mi Plan",
         continue: "Continuar",
         offer30: {
           title: "¡Espera! No pierdas tu progreso",
-          subtitle: "Nos encantaría mantenerte como creador. Aquí tienes una oferta especial solo para ti.",
+          subtitle:
+            "Nos encantaría mantenerte como creador. Aquí tienes una oferta especial solo para ti.",
           badge: "OFERTA LIMITADA",
           discountText: "30% DTO POR 6 MESES",
           claimBtn: "Reclamar 30% de Descuento",
           applying: "Aplicando...",
-          reject: "No gracias, aún quiero cancelar"
+          reject: "No gracias, aún quiero cancelar",
         },
         offer50: {
           title: "Oferta de Última Oportunidad",
-          subtitle: "Realmente no queremos que te vayas. Esta es nuestra mejor oferta posible.",
+          subtitle:
+            "Realmente no queremos que te vayas. Esta es nuestra mejor oferta posible.",
           badge: "OFERTA FINAL",
           discountText: "50% DTO POR 1 AÑO",
           claimBtn: "Reclamar 50% de Descuento",
           applying: "Aplicando...",
-          reject: "No gracias, proceder a la cancelación"
+          reject: "No gracias, proceder a la cancelación",
         },
         confirm: {
           title: "Confirmar Cancelación",
-          subtitle: "Tu suscripción se cancelará al final de tu período de facturación actual. Perderás acceso a las funciones premium y tus créditos expirarán.",
+          subtitle:
+            "Tu suscripción se cancelará al final de tu período de facturación actual. Perderás acceso a las funciones premium y tus créditos expirarán.",
           access: "Acceso hasta el final del ciclo",
           data: "Datos preservados por 30 días",
           frozen: "Los créditos se congelarán",
           goBack: "Volver",
           confirmBtn: "Confirmar Cancelación",
-          canceling: "Cancelando..."
-        }
+          canceling: "Cancelando...",
+        },
       },
       upgrade: {
         title: "Elige tu Plan Viral",
-        subtitle: "Desbloquea modelos de IA avanzados, generaciones ilimitadas y los marcos virales secretos usados por los mejores creadores.",
+        subtitle:
+          "Desbloquea modelos de IA avanzados, generaciones ilimitadas y los marcos virales secretos usados por los mejores creadores.",
         monthly: "Mensual",
         yearly: "Anual",
         save: "Ahorra 20%",
@@ -1014,37 +1184,73 @@ export const translations = {
         included: "Incluido en tu Plan",
         upgradeNow: "Mejorar Ahora",
         billedYearly: "Facturado {{amount}} anualmente",
-        securePayment: "Pago seguro vía Stripe. Cancela cuando quieras. Al mejorar, aceptas nuestros Términos de Servicio. Para planes empresariales personalizados, contacta a ventas."
+        securePayment:
+          "Pago seguro vía Stripe. Cancela cuando quieras. Al mejorar, aceptas nuestros Términos de Servicio. Para planes empresariales personalizados, contacta a ventas.",
       },
       constants: {
         tones: {
-          [ViralTone.PROFESSIONAL]: { label: '👔 Profesional', desc: 'Limpio, corporativo, enfocado en liderazgo.' },
-          [ViralTone.CONTROVERSIAL]: { label: '🔥 Controvertido', desc: 'Opiniones polarizantes que generan comentarios.' },
-          [ViralTone.EMPATHETIC]: { label: '❤️ Empático', desc: 'Vulnerable stories that build connection.' },
-          [ViralTone.EDUCATIONAL]: { label: '📚 Educativo', desc: 'Alto valor, consejos accionables.' },
-          [ViralTone.HUMOROUS]: { label: '😂 Humorístico', desc: 'Alegre, identificable, memes.' },
-          [ViralTone.STORYTELLING]: { label: '📖 Storytelling', desc: 'Deep dive narrative.' },
+          [ViralTone.PROFESSIONAL]: {
+            label: "👔 Profesional",
+            desc: "Limpio, corporativo, enfocado en liderazgo.",
+          },
+          [ViralTone.CONTROVERSIAL]: {
+            label: "🔥 Controvertido",
+            desc: "Opiniones polarizantes que generan comentarios.",
+          },
+          [ViralTone.EMPATHETIC]: {
+            label: "❤️ Empático",
+            desc: "Vulnerable stories that build connection.",
+          },
+          [ViralTone.EDUCATIONAL]: {
+            label: "📚 Educativo",
+            desc: "Alto valor, consejos accionables.",
+          },
+          [ViralTone.HUMOROUS]: {
+            label: "😂 Humorístico",
+            desc: "Alegre, identificable, memes.",
+          },
+          [ViralTone.STORYTELLING]: {
+            label: "📖 Storytelling",
+            desc: "Deep dive narrative.",
+          },
         },
         frameworks: {
-          [ViralFramework.PAS]: { label: 'Problema-Agitación-Solución', desc: 'Fórmula clásica de copywriting.' },
-          [ViralFramework.AIDA]: { label: 'AIDA', desc: 'Atención, Interés, Deseo, Acción.' },
-          [ViralFramework.BAB]: { label: 'Antes-Después-Puente', desc: 'Muestra la transformación.' },
-          [ViralFramework.LISTICLE]: { label: 'La Lista (Listicle)', desc: 'Puntos escaneables (Alto CTR).' },
-          [ViralFramework.CONTRARIAN]: { label: 'Opinión Impopular', desc: 'Desafía el status quo.' },
-          [ViralFramework.STORY]: { label: 'Micro-Historia', desc: 'Anécdota personal con lección.' },
+          [ViralFramework.PAS]: {
+            label: "Problema-Agitación-Solución",
+            desc: "Fórmula clásica de copywriting.",
+          },
+          [ViralFramework.AIDA]: {
+            label: "AIDA",
+            desc: "Atención, Interés, Deseo, Acción.",
+          },
+          [ViralFramework.BAB]: {
+            label: "Antes-Después-Puente",
+            desc: "Muestra la transformación.",
+          },
+          [ViralFramework.LISTICLE]: {
+            label: "La Lista (Listicle)",
+            desc: "Puntos escaneables (Alto CTR).",
+          },
+          [ViralFramework.CONTRARIAN]: {
+            label: "Opinión Impopular",
+            desc: "Desafía el status quo.",
+          },
+          [ViralFramework.STORY]: {
+            label: "Micro-Historia",
+            desc: "Anécdota personal con lección.",
+          },
         },
         lengths: {
-          [PostLength.SHORT]: { label: 'Corto e Impactante' },
-          [PostLength.MEDIUM]: { label: 'Estándar' },
-          [PostLength.LONG]: { label: 'Profundo' }
+          [PostLength.SHORT]: { label: "Corto e Impactante" },
+          [PostLength.MEDIUM]: { label: "Estándar" },
+          [PostLength.LONG]: { label: "Profundo" },
         },
         emojis: {
-          [EmojiDensity.MINIMAL]: { label: 'Mínimo' },
-          [EmojiDensity.MODERATE]: { label: 'Balanceado' },
-          [EmojiDensity.HIGH]: { label: 'Alto' }
-
-        }
-      }
-    }
-  }
+          [EmojiDensity.MINIMAL]: { label: "Mínimo" },
+          [EmojiDensity.MODERATE]: { label: "Balanceado" },
+          [EmojiDensity.HIGH]: { label: "Alto" },
+        },
+      },
+    },
+  },
 };

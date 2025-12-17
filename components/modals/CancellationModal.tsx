@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { AppLanguage } from '../../types';
-import { supabase } from '../../services/supabaseClient';
-import ReasonStep from './cancellation/ReasonStepV2';
-import OfferStep from './cancellation/OfferStep';
-import ConfirmStep from './cancellation/ConfirmStep';
-import BaseModal from './BaseModal';
+import React, { useState } from "react";
+import { AppLanguage } from "../../types";
+import { supabase } from "../../services/supabaseClient";
+import ReasonStep from "./cancellation/ReasonStepV2";
+import OfferStep from "./cancellation/OfferStep";
+import ConfirmStep from "./cancellation/ConfirmStep";
+import BaseModal from "./BaseModal";
 
 interface CancellationModalProps {
     isOpen: boolean;
@@ -23,53 +23,57 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
     language,
     subscriptionId,
     onCancelSuccess,
-    planPrice
+    planPrice,
 }) => {
-    const [step, setStep] = useState<'reason' | 'offer' | 'confirm'>('reason');
-    const [reason, setReason] = useState('');
+    const [step, setStep] = useState<"reason" | "offer" | "confirm">("reason");
+    const [reason, setReason] = useState("");
     const [loading, setLoading] = useState(false);
-    const [discountType, setDiscountType] = useState<'30' | '50'>('30');
+    const [discountType, setDiscountType] = useState<"30" | "50">("30");
 
     // Reset step when modal opens
     React.useEffect(() => {
         if (isOpen) {
-            setStep('reason');
-            setReason('');
+            setStep("reason");
+            setReason("");
         }
     }, [isOpen]);
 
     const handleApplyCoupon = async () => {
-        if (!subscriptionId) return;
         setLoading(true);
         try {
-            const couponId = discountType === '30' ? 'SAVE30' : 'SAVE50';
-            const { error } = await supabase.functions.invoke('manage-subscription', {
-                body: { action: 'apply_coupon', subscriptionId, couponId }
-            });
+            const couponId = discountType === "30" ? "SAVE30" : "SAVE50";
+            const { error } = await supabase.functions.invoke(
+                "manage-subscription",
+                {
+                    body: { action: "apply_coupon", subscriptionId, couponId },
+                },
+            );
 
             if (error) throw error;
             onClose();
         } catch (err) {
-            console.error('Error applying coupon:', err);
+            console.error("Error applying coupon:", err);
         } finally {
             setLoading(false);
         }
     };
 
     const handleCancelSubscription = async () => {
-        if (!subscriptionId) return;
         setLoading(true);
         try {
-            const { error } = await supabase.functions.invoke('manage-subscription', {
-                body: { action: 'cancel', subscriptionId, reason }
-            });
+            const { error } = await supabase.functions.invoke(
+                "manage-subscription",
+                {
+                    body: { action: "cancel", subscriptionId, reason },
+                },
+            );
 
             if (error) throw error;
             if (error) throw error;
             if (onCancelSuccess) onCancelSuccess();
             onClose();
         } catch (err) {
-            console.error('Error cancelling subscription:', err);
+            console.error("Error cancelling subscription:", err);
         } finally {
             setLoading(false);
         }
@@ -77,40 +81,43 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
 
     const renderStep = () => {
         switch (step) {
-            case 'reason':
+            case "reason":
                 return (
                     <ReasonStep
                         reason={reason}
                         setReason={setReason}
                         onNext={() => {
                             // Determine discount based on reason severity or random logic
-                            if (reason === 'too_expensive' || reason === 'not_using_enough') {
-                                setDiscountType('50');
+                            if (
+                                reason === "too_expensive" ||
+                                reason === "not_using_enough"
+                            ) {
+                                setDiscountType("50");
                             } else {
-                                setDiscountType('30');
+                                setDiscountType("30");
                             }
-                            setStep('offer');
+                            setStep("offer");
                         }}
                         language={language}
                         onClose={onClose}
                     />
                 );
-            case 'offer':
+            case "offer":
                 return (
                     <OfferStep
                         discountType={discountType}
                         onApplyCoupon={handleApplyCoupon}
-                        onReject={() => setStep('confirm')}
+                        onReject={() => setStep("confirm")}
                         isLoading={loading}
                         language={language}
                         planPrice={planPrice}
                     />
                 );
-            case 'confirm':
+            case "confirm":
                 return (
                     <ConfirmStep
                         onConfirm={handleCancelSubscription}
-                        onClose={() => setStep('offer')}
+                        onClose={() => setStep("offer")}
                         isLoading={loading}
                         language={language}
                     />
