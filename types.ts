@@ -174,3 +174,37 @@ export interface BrandVoice {
   isActive?: boolean;
   created_at?: string;
 }
+
+export interface AuditResult {
+  perfil_resumen: {
+    nombre: string;
+    sector: string;
+    score_actual: number; // Overall Score
+  };
+  pilares: {
+    pilar_1_fundamento: {
+      score: number; // 0-100
+      analisis_titular: string; // Formula check
+      propuesta_titular_a: string;
+      propuesta_titular_b: string;
+      foto_banner_check: string; // "Professional", "Needs Improvement"
+      url_check: string;
+    };
+    pilar_2_narrativa: {
+      score: number; // 0-100
+      gancho_analisis: string; // First 2 lines check
+      redaccion_gancho_sugerida: string;
+      experiencia_analisis: string; // Metrics check
+      experiencia_mejoras: Array<{
+        empresa: string;
+        propuesta_metrica: string;
+      }>;
+    };
+    pilar_3_visibilidad: {
+      score: number; // 0-100
+      estrategia_contenido: string; // Carousel, etc.
+      estrategia_networking: string; // 15 words rule, etc.
+    };
+  };
+  quick_wins: string[];
+}

@@ -18,6 +18,7 @@ import WelcomeModal from '../../modals/WelcomeModal';
 import TourGuide from './ProductTour';
 import LevelUpModal from '../../modals/LevelUpModal';
 import { updateUserProfile } from '../../../services/userRepository';
+import ProfileAuditor from '../auditor/ProfileAuditor';
 
 import { toast } from 'sonner';
 import { Post, UserProfile } from '../../../types';
@@ -57,13 +58,13 @@ const DashboardContent: React.FC = () => {
 
     // UI State
     // Persist active tab selection
-    const [activeTab, setActiveTabRaw] = useState<'create' | 'history' | 'settings' | 'autopilot'>(() => {
+    const [activeTab, setActiveTabRaw] = useState<'create' | 'history' | 'settings' | 'autopilot' | 'auditor' | 'ideas'>(() => {
         const saved = localStorage.getItem('kolink_active_tab');
-        if (saved === 'ideas') return 'create';
+        if (saved === 'ideas') return 'create'; // Legacy
         return (saved as any) || 'create';
     });
 
-    const setActiveTab = (tab: 'create' | 'history' | 'settings' | 'autopilot') => {
+    const setActiveTab = (tab: 'create' | 'history' | 'settings' | 'autopilot' | 'auditor' | 'ideas') => {
         setActiveTabRaw(tab);
         localStorage.setItem('kolink_active_tab', tab);
     };
@@ -285,6 +286,12 @@ const DashboardContent: React.FC = () => {
                                 onUpgrade={() => setShowUpgradeModal(true)}
                                 onSave={handleUpdateUser}
                             />
+                        </div>
+                    )}
+
+                    {activeTab === 'auditor' && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <ProfileAuditor />
                         </div>
                     )}
                 </div>

@@ -12,7 +12,7 @@ interface UsePostGenerationProps {
     currentPost: Post | null;
     setCurrentPost: React.Dispatch<React.SetStateAction<Post | null>>;
     activeTab: string;
-    setActiveTab: React.Dispatch<React.SetStateAction<'create' | 'history' | 'settings' | 'autopilot'>>;
+    setActiveTab: React.Dispatch<React.SetStateAction<'create' | 'history' | 'settings' | 'autopilot' | 'auditor' | 'ideas'>>;
     handleUpdateUser: (updates: Partial<UserProfile>) => Promise<void>;
     setShowUpgradeModal: (show: boolean) => void;
     setShowCreditDeduction: (show: boolean) => void;

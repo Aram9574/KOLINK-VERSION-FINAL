@@ -11,7 +11,7 @@ interface UseGenerationLogicProps {
     posts: Post[];
     setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
     setCurrentPost: React.Dispatch<React.SetStateAction<Post | null>>;
-    setActiveTab: React.Dispatch<React.SetStateAction<'create' | 'history' | 'settings' | 'autopilot'>>;
+    setActiveTab: React.Dispatch<React.SetStateAction<'create' | 'history' | 'settings' | 'autopilot' | 'auditor' | 'ideas'>>;
     handleUpdateUser: (updates: Partial<UserProfile>) => Promise<void>;
     setShowUpgradeModal: (show: boolean) => void;
     setShowCreditDeduction: (show: boolean) => void;

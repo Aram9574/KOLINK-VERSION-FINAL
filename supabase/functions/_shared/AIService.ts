@@ -97,32 +97,46 @@ export class AIService {
             .replace('{{lang_instruction}}', langInstruction)
             .replace('{{hashtag_instruction}}', hashtagInstruction);
 
-        const response = await this.ai.models.generateContent({
-            model: this.model,
-            contents: prompt,
-            config: {
-                systemInstruction: SYSTEM_INSTRUCTION,
-                temperature: 0.7 + (params.creativityLevel / 200),
-                responseMimeType: "application/json",
-                // outputSchema is preferred over responseSchema in newer SDKs but responseSchema works for now
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        post_content: { type: Type.STRING, description: "The actual LinkedIn post text." },
-                        overall_viral_score: { type: Type.INTEGER, description: "A holistic score from 0-100 predicting viral potential." },
-                        hook_score: { type: Type.INTEGER, description: "Score 0-100 for the opening line." },
-                        readability_score: { type: Type.INTEGER, description: "Score 0-100 for formatting and ease of reading." },
-                        value_score: { type: Type.INTEGER, description: "Score 0-100 for the insight quality." },
-                        feedback: { type: Type.STRING, description: "One specific, actionable tip to improve the post further." }
-                    },
-                    required: ["post_content", "overall_viral_score", "hook_score", "readability_score", "value_score", "feedback"]
+        return this.retryWithBackoff(async () => {
+             const response = await this.ai.models.generateContent({
+                model: this.model,
+                contents: prompt,
+                config: {
+                    systemInstruction: SYSTEM_INSTRUCTION,
+                    temperature: 0.7 + (params.creativityLevel / 200),
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: Type.OBJECT,
+                        properties: {
+                            post_content: { type: Type.STRING, description: "The actual LinkedIn post text." },
+                            overall_viral_score: { type: Type.INTEGER, description: "A holistic score from 0-100 predicting viral potential." },
+                            hook_score: { type: Type.INTEGER, description: "Score 0-100 for the opening line." },
+                            readability_score: { type: Type.INTEGER, description: "Score 0-100 for formatting and ease of reading." },
+                            value_score: { type: Type.INTEGER, description: "Score 0-100 for the insight quality." },
+                            feedback: { type: Type.STRING, description: "One specific, actionable tip to improve the post further." }
+                        },
+                        required: ["post_content", "overall_viral_score", "hook_score", "readability_score", "value_score", "feedback"]
+                    }
                 }
-            }
+            });
+
+            const text = response.text;
+            if (!text) throw new Error("No content generated");
+
+            return JSON.parse(text);
         });
+    }
 
-        const text = response.text;
-        if (!text) throw new Error("No content generated");
-
-        return JSON.parse(text);
+    private async retryWithBackoff<T>(operation: () => Promise<T>, retries = 3, delay = 2000): Promise<T> {
+        try {
+            return await operation();
+        } catch (error: any) {
+            if (retries > 0 && (error.status === 503 || error.message?.includes('overloaded'))) {
+                console.log(`Model overloaded. Retrying in ${delay}ms... (${retries} retries left)`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return this.retryWithBackoff(operation, retries - 1, delay * 2);
+            }
+            throw error;
+        }
     }
 }

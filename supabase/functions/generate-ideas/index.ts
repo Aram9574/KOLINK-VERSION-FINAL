@@ -82,7 +82,20 @@ serve(async (req: Request) => {
             });
         }
 
-        const result = await model.generateContent(prompt);
+        const retryWithBackoff = async <T>(operation: () => Promise<T>, retries = 3, delay = 2000): Promise<T> => {
+            try {
+                return await operation();
+            } catch (error: any) {
+                if (retries > 0 && (error.status === 503 || error.message?.includes('overloaded'))) {
+                    console.log(`Model overloaded. Retrying in ${delay}ms... (${retries} retries left)`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return retryWithBackoff(operation, retries - 1, delay * 2);
+                }
+                throw error;
+            }
+        };
+
+        const result = await retryWithBackoff(async () => await model.generateContent(prompt));
         const responseText = result.response.text();
 
         // Parse the list

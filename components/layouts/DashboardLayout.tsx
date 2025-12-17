@@ -9,8 +9,8 @@ import { Post } from '../../types';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
-    activeTab: 'create' | 'history' | 'settings' | 'ideas' | 'autopilot';
-    setActiveTab: (tab: 'create' | 'history' | 'settings' | 'ideas' | 'autopilot') => void;
+    activeTab: 'create' | 'history' | 'settings' | 'ideas' | 'autopilot' | 'auditor';
+    setActiveTab: (tab: 'create' | 'history' | 'settings' | 'ideas' | 'autopilot' | 'auditor') => void;
     onUpgrade: () => void;
     showCreditDeduction: boolean;
     onDeletePost: (id: string, e: React.MouseEvent) => void;
