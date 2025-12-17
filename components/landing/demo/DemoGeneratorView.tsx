@@ -39,7 +39,7 @@ const DemoGeneratorView: React.FC<DemoGeneratorViewProps> = ({ language }) => {
     return (
         <div className="relative bg-slate-900/5 rounded-3xl p-2 ring-1 ring-slate-900/10 shadow-2xl transform hover:scale-[1.01] transition-transform duration-500 ease-out backdrop-blur-sm group">
             {/* App Window Frame */}
-            <div className="bg-slate-50 rounded-2xl overflow-hidden min-h-[650px] md:min-h-[800px] relative flex border border-slate-200 shadow-inner">
+            <div className="bg-slate-50 rounded-2xl overflow-hidden min-h-[600px] md:min-h-[720px] relative flex border border-slate-200 shadow-inner">
                 {/* Demo Sidebar (Hidden on mobile same as real app) */}
                 <div className="hidden md:flex flex-shrink-0">
                     <DemoSidebar
@@ -62,7 +62,7 @@ const DemoGeneratorView: React.FC<DemoGeneratorViewProps> = ({ language }) => {
 
                     {/* Preview Column */}
                     <div className="hidden lg:flex flex-1 max-w-md pt-0 md:pt-8 flex-col h-full overflow-hidden">
-                        <div className="overflow-y-auto no-scrollbar pb-10">
+                        <div className="overflow-y-auto no-scrollbar pb-4">
                             <DemoLinkedInPreview
                                 language={language}
                                 isLoading={isGenerating}
