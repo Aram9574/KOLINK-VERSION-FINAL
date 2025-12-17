@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { translations } from "../../translations";
 import { AppLanguage, UserProfile } from "../../types";
@@ -123,6 +124,7 @@ const LandingPage: React.FC = () => {
         const handleScroll = () => {
             const sections = [
                 "hero",
+                "demo",
                 "features",
                 "how-it-works",
                 "pricing",
