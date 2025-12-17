@@ -530,7 +530,7 @@ export const translations = {
       testimonials: "Resultados",
       pricing: "Precios",
       faq: "Preguntas",
-      login: "Entrar",
+      login: "Comenzar Gratis",
       getStarted: "Empezar"
     },
     footer: {

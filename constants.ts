@@ -54,28 +54,28 @@ export const EMOJI_OPTIONS = [
 
 export const ALGORITHM_TIPS_CONTENT = {
   es: [
-    { title: "La Hora Dorada", desc: "Los primeros 60 minutos definen el alcance. Responde a cada comentario inmediatamente para activar la viralidad." },
-    { title: "Dwell Time", desc: "El algoritmo mide cuánto tiempo pasan leyendo. Usa listas y espacios en blanco para detener el scroll." },
-    { title: "La Regla del Enlace", desc: "Nunca pongas enlaces externos en el post. El algoritmo penaliza salidas. Ponlo en el primer comentario o bio." },
-    { title: "Comentarios > Likes", desc: "Un comentario vale por 5 likes. Termina tu post con una pregunta abierta para incitar el debate." },
-    { title: "El Gancho Visual", desc: "LinkedIn es móvil. Si tu primer párrafo tiene más de 2 líneas, la gente no hará clic en 'Ver más'." },
-    { title: "Humaniza tu Marca", desc: "Las fotos personales (selfies, equipo) tienen 3x más alcance que los gráficos corporativos o stock photos." },
-    { title: "PDFs y Carruseles", desc: "Actualmente es el formato con mayor alcance orgánico. Aportan valor denso y retienen al usuario." },
-    { title: "La Constancia Paga", desc: "Publicar a la misma hora diariamente entrena a tu audiencia y al algoritmo. La racha importa." },
-    { title: "Evita Editar", desc: "No edites tu post en los primeros 10 minutos de publicación, puede reiniciar el puntaje de distribución." },
-    { title: "Hashtags Precisos", desc: "No hagas spam. Usa solo 3 hashtags: uno amplio, uno de nicho y uno de marca personal." }
+    { title: "La 'Hora Dorada'", desc: "Los primeros 60 minutos definen tu viralidad. El algoritmo evalúa la velocidad de interacción. Responde comentarios de inmediato." },
+    { title: "Comentarios > Likes", desc: "Un comentario detallado (>15 palabras) vale 3x más que un like. Fomenta debates, no solo aplausos." },
+    { title: "Dwell Time (Tiempo en Pantalla)", desc: "LinkedIn mide si el usuario para el scroll. Usa ganchos visuales y espacios en blanco para retener la atención >10seg." },
+    { title: "El Gancho es el Rey", desc: "Tienes 210 caracteres antes del 'Ver más'. Si no provocas curiosidad o emoción ahí, nadie leerá el resto." },
+    { title: "Carruseles = Viralidad", desc: "El formato #1 en alcance. Entre 5 y 10 diapositivas, con diseño limpio, genera retención masiva." },
+    { title: "Abre Conversaciones (CTC)", desc: "No termines con 'Dale like'. Termina con una pregunta abierta que fuerce una respuesta matizada, no un sí/no." },
+    { title: "Sin Enlaces Externos", desc: "El algoritmo odia que saques a la gente de la app. Pon tu link en el primer comentario o en tu perfil." },
+    { title: "Constancia Estratégica", desc: "Publicar 2-5 veces por semana (Mar-Jue) entrena a tu audiencia. La consistencia vence a la intensidad." },
+    { title: "Comentar es Crecer", desc: "Comentar inteligentemente en posts de líderes te expone a sus audiencias. Es la forma más rápida de crecer sin publicar." },
+    { title: "Narrativa de Transformación", desc: "Las historias de 'Antes vs Después' conectan mejor que los consejos teóricos. Muestra vulnerabilidad y resultados." }
   ],
   en: [
-    { title: "The Golden Hour", desc: "The first 60 minutes define reach. Reply to every comment immediately to trigger virality." },
-    { title: "Dwell Time", desc: "The algorithm tracks reading time. Use lists and white space to stop the scroll." },
-    { title: "No External Links", desc: "Never put links in the post body. LinkedIn penalizes exits. Put it in comments or bio." },
-    { title: "Comments > Likes", desc: "One comment is worth 5 likes. End your post with an open question to spark debate." },
-    { title: "The Visual Hook", desc: "LinkedIn is mobile. If your first paragraph is >2 lines, people won't click 'See more'." },
-    { title: "Humanize It", desc: "Personal photos (selfies, team) get 3x more reach than corporate graphics or stock photos." },
-    { title: "PDF Carousels", desc: "Currently the highest reach format. They provide dense value and retain users." },
-    { title: "Consistency Pays", desc: "Posting at the same time daily trains your audience and the algorithm. Streaks matter." },
-    { title: "Avoid Editing", desc: "Don't edit your post in the first 10 minutes, it can reset the distribution score." },
-    { title: "Precise Hashtags", desc: "Don't spam. Use exactly 3 hashtags: one broad, one niche, and one personal brand." }
+    { title: "The 'Golden Hour'", desc: "The first 60 minutes define virality. The algorithm evaluates interaction speed. Reply to comments immediately." },
+    { title: "Comments > Likes", desc: "A detailed comment (>15 words) is worth 3x more than a like. Spark debates, not just applause." },
+    { title: "Dwell Time", desc: "LinkedIn tracks scroll stops. Use visual hooks and white space to retain attention for >10 seconds." },
+    { title: "The Hook is King", desc: "You have 210 chars before 'See more'. If you don't spark curiosity or emotion there, no one reads the rest." },
+    { title: "Carousels = Virality", desc: "The #1 format for reach. 5-10 slides with clean design generate massive retention." },
+    { title: "Call to Conversation (CTC)", desc: "Don't end with 'Like this'. End with an open question that forces a nuanced reply, not a yes/no." },
+    { title: "No External Links", desc: "The algorithm hates exits. Put your link in the first comment or your profile/bio." },
+    { title: "Strategic Consistency", desc: "Posting 2-5x weekly (Tue-Thu) trains your audience. Consistency beats intensity." },
+    { title: "Commenting is Growth", desc: "Smart comments on leader's posts expose you to their audience. Fastest way to grow without posting." },
+    { title: "Transformation Narrative", desc: "'Before vs After' stories connect better than theoretical advice. Show vulnerability and real results." }
   ]
 };
 

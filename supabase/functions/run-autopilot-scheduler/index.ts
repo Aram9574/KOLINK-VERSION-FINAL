@@ -9,7 +9,7 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
     }
@@ -92,7 +92,7 @@ serve(async (req) => {
 
                 results.push({ userId: profile.id, status: 'success', postId: savedPost.id });
 
-            } catch (err) {
+            } catch (err: any) {
                 console.error(`Error processing user ${profile.id}:`, err);
                 results.push({ userId: profile.id, status: 'error', error: err.message });
             }
@@ -106,7 +106,7 @@ serve(async (req) => {
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
 
-    } catch (error) {
+    } catch (error: any) {
         return new Response(
             JSON.stringify({ error: error.message }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

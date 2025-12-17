@@ -7,10 +7,9 @@ import { useAutoPilot } from '../../../hooks/useAutoPilot';
 import { useUserSync } from '../../../hooks/useUserSync';
 
 import DashboardLayout from '../../layouts/DashboardLayout';
-import PostCreator from '../generation/PostGenerator';
 import HistoryView from '../history/HistoryView';
 import SettingsView from '../settings/SettingsView';
-import IdeaGenerator from '../generation/IdeaGenerator';
+
 import AutoPilotView from '../autopilot/AutoPilotView';
 import OnboardingFlow from '../onboarding/OnboardingFlow';
 import UpgradeModal from '../../modals/UpgradeModal';
@@ -22,6 +21,10 @@ import { updateUserProfile } from '../../../services/userRepository';
 import { toast } from 'sonner';
 import { Post, UserProfile } from '../../../types';
 import { translations } from '../../../translations';
+import { Suspense } from 'react';
+
+// Lazy load PostGenerator to reduce initial Dashboard bundle size
+const PostCreator = React.lazy(() => import('../generation/PostGenerator'));
 
 const DashboardContent: React.FC = () => {
     const { user, refreshUser, setUser, language, setLanguage } = useUser();
@@ -39,14 +42,27 @@ const DashboardContent: React.FC = () => {
 
     const t = translations[language].productTour;
 
+    // Prefetch PostGenerator for smoother experience
+    useEffect(() => {
+        const prefetchPostGenerator = async () => {
+             try {
+                 await import('../generation/PostGenerator');
+             } catch (e) {
+                 console.error("Error prefetching PostGenerator", e);
+             }
+        };
+        prefetchPostGenerator();
+    }, []);
+
     // UI State
     // Persist active tab selection
-    const [activeTab, setActiveTabRaw] = useState<'create' | 'history' | 'settings' | 'ideas' | 'autopilot'>(() => {
+    const [activeTab, setActiveTabRaw] = useState<'create' | 'history' | 'settings' | 'autopilot'>(() => {
         const saved = localStorage.getItem('kolink_active_tab');
+        if (saved === 'ideas') return 'create';
         return (saved as any) || 'create';
     });
 
-    const setActiveTab = (tab: 'create' | 'history' | 'settings' | 'ideas' | 'autopilot') => {
+    const setActiveTab = (tab: 'create' | 'history' | 'settings' | 'autopilot') => {
         setActiveTabRaw(tab);
         localStorage.setItem('kolink_active_tab', tab);
     };
@@ -142,7 +158,7 @@ const DashboardContent: React.FC = () => {
     const TOUR_STEPS = [
         { targetId: 'nav-create', title: t.steps.create.title, description: t.steps.create.desc },
         { targetId: 'nav-history', title: t.steps.history.title, description: t.steps.history.desc },
-        { targetId: 'nav-ideas', title: t.steps.ideas.title, description: t.steps.ideas.desc },
+
         { targetId: 'nav-autopilot', title: t.steps.autopilot.title, description: t.steps.autopilot.desc },
         { targetId: 'gamification-widget', title: t.steps.levelUp.title, description: t.steps.levelUp.desc },
     ];
@@ -163,15 +179,21 @@ const DashboardContent: React.FC = () => {
                 <div className={`${activeTab === 'history' ? 'h-full ml-1' : 'max-w-7xl mx-auto p-4 lg:p-8 pb-24'}`}>
                     {activeTab === 'create' && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <PostCreator
-                                onGenerate={(params) => generatePost(params)}
-                                isGenerating={isGenerating}
-                                credits={user.credits}
-                                language={user.language || 'en'}
-                                showCreditDeduction={showCreditDeduction}
-                                initialParams={currentPost?.params}
-                                initialTopic={currentPost?.params?.topic}
-                            />
+                             <Suspense fallback={
+                                 <div className="flex justify-center items-center h-64">
+                                     <div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-500 border-t-transparent"></div>
+                                 </div>
+                             }>
+                                <PostCreator
+                                    onGenerate={(params) => generatePost(params)}
+                                    isGenerating={isGenerating}
+                                    credits={user.credits}
+                                    language={user.language || 'en'}
+                                    showCreditDeduction={showCreditDeduction}
+                                    initialParams={currentPost?.params}
+                                    initialTopic={currentPost?.params?.topic}
+                                />
+                             </Suspense>
                         </div>
                     )}
 
@@ -200,37 +222,7 @@ const DashboardContent: React.FC = () => {
                         </div>
                     )}
 
-                    {activeTab === 'ideas' && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <IdeaGenerator
-                                user={user}
-                                language={language}
-                                onSelectIdea={(idea) => {
-                                    const topicText = typeof idea === 'string' ? idea : (idea as any).topic;
-                                    setCurrentPost({
-                                        id: 'draft-' + Date.now(),
-                                        content: '',
-                                        params: {
-                                            topic: topicText,
-                                            audience: 'General Professional',
-                                            tone: 'Professional' as any,
-                                            framework: 'PAS' as any, // Default framework
-                                            length: 'Medium' as any,
-                                            creativityLevel: 50,
-                                            emojiDensity: 'Moderate' as any,
-                                            hashtagCount: 3,
-                                            includeCTA: true
-                                        },
-                                        createdAt: Date.now(),
-                                        likes: 0,
-                                        views: 0
-                                    });
-                                    setActiveTab('create');
-                                }}
-                                onUpgrade={() => setShowUpgradeModal(true)}
-                            />
-                        </div>
-                    )}
+
 
                     {activeTab === 'autopilot' && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">

@@ -20,8 +20,8 @@ import { getAvatarUrl } from '../../../utils';
 interface SidebarProps {
     posts: Post[];
     currentPost: Post | null;
-    activeTab: 'create' | 'history' | 'settings' | 'ideas' | 'autopilot';
-    setActiveTab: (tab: 'create' | 'history' | 'settings' | 'ideas' | 'autopilot') => void;
+    activeTab: 'create' | 'history' | 'settings' | 'autopilot';
+    setActiveTab: (tab: 'create' | 'history' | 'settings' | 'autopilot') => void;
     onSelectPost: (post: Post) => void;
     onDeletePost: (id: string, e: React.MouseEvent) => void;
     onUpgrade: () => void;
@@ -70,17 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <LayoutGrid className="w-5 h-5" />
                     {t.studio}
                 </button>
-                <button
-                    onClick={() => setActiveTab('ideas')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
-                ${activeTab === 'ideas'
-                            ? 'bg-amber-50 text-amber-700 shadow-sm ring-1 ring-amber-200'
-                            : 'text-slate-600 hover:bg-slate-50'}`}
-                >
-                    <Lightbulb className="w-5 h-5" />
-                    {t.ideas}
-                    {!user.isPremium && <Crown className="w-4 h-4 text-amber-500 fill-amber-500/20 ml-auto flex-shrink-0" />}
-                </button>
+
                 <button
                     onClick={() => setActiveTab('autopilot')}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200

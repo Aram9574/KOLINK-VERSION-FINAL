@@ -54,9 +54,22 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
     const [isStrategyOpen, setIsStrategyOpen] = React.useState(false);
     const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
 
+    // Rate Limiting Logic/Visuals
+    const [cooldown, setCooldown] = React.useState(0);
+
+    React.useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (cooldown > 0) {
+            interval = setInterval(() => {
+                setCooldown((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [cooldown]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (isCancelled) return;
+        if (isCancelled || cooldown > 0) return;
 
         const result = GenerationParamsSchema.safeParse(params);
         if (!result.success) {
@@ -66,6 +79,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
         }
 
         onGenerate();
+        setCooldown(15); // Set 15s visual cooldown (safe margin over 10s backend)
     };
 
     const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -447,9 +461,9 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                 <button
                     type="button"
                     onClick={handleSubmit}
-                    disabled={isGenerating || isCancelled}
+                    disabled={isGenerating || isCancelled || cooldown > 0}
                     className={`w-full py-4 px-4 rounded-xl text-white font-bold shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-brand-500/40 mt-4
-            ${isGenerating || isCancelled
+            ${isGenerating || isCancelled || cooldown > 0
                             ? 'bg-slate-400 cursor-not-allowed shadow-none hover:translate-y-0 hover:shadow-none'
                             : credits <= 0
                                 ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600'
@@ -463,6 +477,16 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                         </>
                     ) : isCancelled ? (
                         <span>Subscription Cancelled - Credits Frozen</span>
+                    ) : cooldown > 0 ? (
+                        <>
+                            <div className="w-5 h-5 rounded-full border-2 border-white/50 border-t-white animate-spin"></div>
+                            <span>
+                                {language === 'es' 
+                                    ? `Espera ${cooldown}s` 
+                                    : `Wait ${cooldown}s`
+                                }
+                            </span>
+                        </>
                     ) : credits <= 0 ? (
                         <>
                             <Zap className="w-5 h-5 fill-current" />

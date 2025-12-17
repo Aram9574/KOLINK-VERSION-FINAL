@@ -16,7 +16,7 @@ const CancellationModal = lazy(() => import('./components/modals/CancellationMod
 // Or wait, I haven't moved it yet. I will leave it as is or move it now?
 // I will move it now to avoid breaking.
 const AutoPilotView = lazy(() => import('./components/features/autopilot/AutoPilotView'));
-const IdeaGenerator = lazy(() => import('./components/features/generation/IdeaGenerator'));
+
 const PrivacyPolicy = lazy(() => import('./components/landing/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./components/landing/TermsOfService'));
 

@@ -19,6 +19,7 @@ export interface GenerationParams {
     creativityLevel: number;
     hashtagCount: number;
     includeCTA: boolean;
+    outputLanguage?: 'en' | 'es';
 }
 
 export interface UserProfileContext {
@@ -67,7 +68,10 @@ export class AIService {
             ? templates.voice_custom.replace('{{brand_voice}}', profile.brand_voice)
             : templates.voice_default.replace('{{tone}}', params.tone);
 
-        const langInstruction = profile.language === 'es'
+        // Priority: Param > Profile > Default (es)
+        const targetLang = params.outputLanguage || profile.language || 'es';
+        
+        const langInstruction = targetLang === 'es'
             ? templates.lang_es
             : templates.lang_en;
 

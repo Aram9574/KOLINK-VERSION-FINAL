@@ -6,6 +6,24 @@ import ErrorBoundary from './components/ui/ErrorBoundary';
 import { UserProvider } from './context/UserContext';
 import App from './App';
 import './index.css';
+import * as Sentry from "@sentry/react";
+import { PostHogProvider } from 'posthog-js/react';
+import { initAnalytics } from './services/analytics';
+
+const posthogClient = initAnalytics();
+
+if (import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration(),
+    ],
+    tracesSampleRate: 1.0,
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
+  });
+}
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -16,13 +34,16 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <ErrorBoundary>
-      <HelmetProvider>
+      <PostHogProvider client={posthogClient}>
+        <HelmetProvider>
         <BrowserRouter>
           <UserProvider>
             <App />
           </UserProvider>
         </BrowserRouter>
       </HelmetProvider>
+
+      </PostHogProvider>
     </ErrorBoundary>
   </React.StrictMode>
 );

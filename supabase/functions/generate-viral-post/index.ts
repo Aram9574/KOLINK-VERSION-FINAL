@@ -2,8 +2,9 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { z } from 'https://esm.sh/zod@3.22.4';
 import { CreditService } from './services/CreditService.ts';
-import { AIService, GenerationParams } from './services/AIService.ts'; // Note: AIService defines interface too, we might want to unify this later
+import { AIService, GenerationParams } from './services/AIService.ts';
 import { PostRepository } from './services/PostRepository.ts';
+import { GamificationService } from './services/GamificationService.ts';
 import { sanitizeInput } from './utils/validation.ts';
 import { GenerationParamsSchema } from '../_shared/schemas.ts';
 
@@ -12,7 +13,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -35,16 +36,18 @@ serve(async (req) => {
     try {
       const parsed = GenerationParamsSchema.parse(params);
       safeParams = {
-        topic: sanitizeInput(parsed.topic), // Keep sanitize for extra safety against XSS if displayed raw
+        topic: sanitizeInput(parsed.topic),
         audience: sanitizeInput(parsed.audience),
         tone: parsed.tone,
         framework: parsed.framework,
         emojiDensity: parsed.emojiDensity,
         length: parsed.length,
         creativityLevel: parsed.creativityLevel,
-        includeCTA: parsed.includeCTA
+        hashtagCount: parsed.hashtagCount,
+        includeCTA: parsed.includeCTA,
+        outputLanguage: parsed.outputLanguage
       } as GenerationParams;
-    } catch (zodError) {
+    } catch (zodError: any) {
       if (zodError instanceof z.ZodError) {
         return new Response(
           JSON.stringify({
@@ -66,8 +69,8 @@ serve(async (req) => {
     // Initialize Services
     const creditService = new CreditService(supabaseAdmin, supabaseClient);
     const aiService = new AIService(Deno.env.get('GEMINI_API_KEY') ?? '');
-    // USE ADMIN CLIENT for persistence to ensure we bypass RLS for insertion
     const postRepository = new PostRepository(supabaseAdmin);
+    const gamificationService = new GamificationService(supabaseAdmin);
 
     // 2. Check Credits, Rate Limit & Fetch Context
     console.log("Fetching profile for User ID:", user.id);
@@ -85,14 +88,6 @@ serve(async (req) => {
 
     const isPremium = ['pro', 'viral'].includes(profile.plan_tier);
     if (!isPremium && profile.credits <= 0) throw new Error('Insufficient credits')
-
-    // RATE LIMITING PROTECTION
-    // Check if last post was created very recently (e.g. 10 seconds)
-    // This relies on 'last_post_date' being updated when a post is created (which happens in gamification/state update usually)
-    // Ideally we check the latest post in 'posts' table, but checking profile timestamp is cheaper if available.
-    // For now, let's query the latest post timestamp directly to be sure, or just rely on a simple timestamp if we had it.
-    // Let's implement a simple check against 'posts' table for the user since 'profile.last_post_date' might be gamification logic.
-    // Actually, let's just use the Admin client to quickly check the last created_at for this user.
 
     const { data: lastPost } = await supabaseAdmin
       .from('posts')
@@ -112,8 +107,6 @@ serve(async (req) => {
     }
 
     // 3. Prepare Params
-    // The params are now validated by Zod above, and `safeParams` is ready.
-
     const userContext = {
       brand_voice: sanitizeInput(profile.brand_voice || ""),
       company_name: sanitizeInput(profile.company_name || ""),
@@ -129,7 +122,41 @@ serve(async (req) => {
     // 5. Save Post
     const insertedPost = await postRepository.savePost(user.id, generatedContent, params);
 
-    // 6. Deduct Credit (Only if not premium)
+    // 6. Validated Gamification Update
+    // Get total post count
+    const { count: postCount } = await supabaseAdmin
+      .from('posts')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+
+    const gamificationResults = await gamificationService.processGamification(
+      profile, // Use the profile we fetched earlier
+      safeParams,
+      (postCount || 0) // Should include the one we just inserted? postRepository.savePost inserts it. 
+                       // Note: supabase count might or might not see it immediately if read-after-write consistency is laggy, 
+                       // but usually it's fine in same transaction or generic usage.
+                       // Just to be safe, if we just inserted, the count should be +1 if the query didn't catch it, 
+                       // but since we await savePost, it should be there.
+    );
+
+    // Apply updates to DB
+    // Merge achievements
+    const currentAchievements = profile.unlocked_achievements || [];
+    const newAchievements = gamificationResults.newAchievements;
+    const allAchievements = Array.from(new Set([...currentAchievements, ...newAchievements]));
+
+    await supabaseAdmin
+      .from('profiles')
+      .update({
+        xp: gamificationResults.newXP,
+        level: gamificationResults.newLevel,
+        current_streak: gamificationResults.newStreak,
+        last_post_date: insertedPost?.created_at || new Date().toISOString(),
+        unlocked_achievements: allAchievements
+      })
+      .eq('id', user.id);
+
+    // 7. Deduct Credit (Only if not premium) - Do this last to ensure user gets value first
     if (!isPremium) {
       await creditService.deductCredit(user.id);
     }
@@ -144,12 +171,20 @@ serve(async (req) => {
           readabilityScore: generatedContent.readability_score,
           valueScore: generatedContent.value_score,
           feedback: generatedContent.feedback
+        },
+        gamification: {
+           newXP: gamificationResults.newXP,
+           newLevel: gamificationResults.newLevel,
+           newStreak: gamificationResults.newStreak,
+           newAchievements: gamificationResults.newAchievements,
+           leveledUp: gamificationResults.leveledUp
         }
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Endpoint Error:", error);
     return new Response(
       JSON.stringify({
         error: error.message,

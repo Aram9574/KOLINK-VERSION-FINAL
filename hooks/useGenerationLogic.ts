@@ -11,7 +11,7 @@ interface UseGenerationLogicProps {
     posts: Post[];
     setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
     setCurrentPost: React.Dispatch<React.SetStateAction<Post | null>>;
-    setActiveTab: React.Dispatch<React.SetStateAction<'create' | 'history' | 'settings' | 'ideas' | 'autopilot'>>;
+    setActiveTab: React.Dispatch<React.SetStateAction<'create' | 'history' | 'settings' | 'autopilot'>>;
     handleUpdateUser: (updates: Partial<UserProfile>) => Promise<void>;
     setShowUpgradeModal: (show: boolean) => void;
     setShowCreditDeduction: (show: boolean) => void;
@@ -181,10 +181,17 @@ export const useGenerationLogic = ({
         } catch (error: any) {
             console.error("Failed to generate", error);
             if (!isAutoPilot) {
-                if (error.message === "Insufficient credits") {
+                const msg = error.message || "";
+                
+                if (msg.includes("Insufficient credits")) {
                     setShowUpgradeModal(true);
+                } else if (msg.includes("Rate limit exceeded")) {
+                    toast.warning("Por favor espera unos segundos antes de generar otro post.");
                 } else {
-                    toast.error("Error al generar contenido. Por favor revisa tu conexión.");
+                    // Generic error - distinguish between network and server if possible
+                    toast.error("Error al generar contenido. Inténtalo de nuevo o contacta soporte.", {
+                        description: msg.length < 50 ? msg : "Error de conexión o del servidor"
+                    });
                 }
             }
         } finally {

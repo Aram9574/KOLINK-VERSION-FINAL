@@ -5,7 +5,7 @@ import { GenerationParams, AppLanguage, UserProfile, CustomSource } from "../typ
 import { supabase } from './supabaseClient';
 
 export interface GeneratedPostResult {
-  id?: string; // Optional because legacy posts might not have it immediately available if not saved
+  id?: string;
   content: string;
   viralScore: number;
   viralAnalysis: {
@@ -13,6 +13,13 @@ export interface GeneratedPostResult {
     readabilityScore: number;
     valueScore: number;
     feedback: string;
+  };
+  gamification?: {
+    newXP: number;
+    newLevel: number;
+    newStreak: number;
+    newAchievements: string[];
+    leveledUp: boolean;
   }
 }
 
@@ -35,7 +42,8 @@ export const generateViralPost = async (params: GenerationParams, user: UserProf
     id: data.id,
     content: data.postContent,
     viralScore: data.viralScore,
-    viralAnalysis: data.viralAnalysis
+    viralAnalysis: data.viralAnalysis,
+    gamification: data.gamification
   };
 };
 

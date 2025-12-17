@@ -7,7 +7,7 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+serve(async (req: Request) => {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders });
     }
@@ -88,8 +88,8 @@ serve(async (req) => {
         // Parse the list
         const ideas = responseText
             .split(/\d+\.\s+/)
-            .map(i => i.trim())
-            .filter(i => i.length > 5)
+            .map((i: string) => i.trim())
+            .filter((i: string) => i.length > 5)
             .slice(0, count);
 
         return new Response(
@@ -97,7 +97,7 @@ serve(async (req) => {
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Generate Ideas Error:", error);
         const errorMessage = error instanceof Error ? error.message : String(error);
         const errorStack = error instanceof Error ? error.stack : undefined;

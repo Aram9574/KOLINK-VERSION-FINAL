@@ -46,13 +46,20 @@ export const executePostGeneration = async (
     const newCreditCount = Math.max(0, user.credits - 1);
 
     // 5. Process Gamification
-    // We need the updated list of posts for accurate gamification (e.g. "10th post" achievement)
-    const updatedPosts = [newPost, ...allPosts];
-    const gamificationResult = processGamification(
-        { ...user, credits: newCreditCount }, // Pass updated credits state
-        newPost,
-        updatedPosts
-    );
+    // PRIORITY: Use server-validated gamification result
+    let gamificationResult;
+
+    if (result.gamification) {
+        gamificationResult = result.gamification;
+    } else {
+        // FALLBACK: Local calculation (legacy support or offline dev)
+        const updatedPosts = [newPost, ...allPosts];
+        gamificationResult = processGamification(
+            { ...user, credits: newCreditCount }, // Pass updated credits state
+            newPost,
+            updatedPosts
+        );
+    }
 
     // 6. Construct Updated User State
     const updatedUser: UserProfile = {
@@ -62,7 +69,8 @@ export const executePostGeneration = async (
         level: gamificationResult.newLevel,
         currentStreak: gamificationResult.newStreak,
         lastPostDate: Date.now(),
-        unlockedAchievements: [...user.unlockedAchievements, ...gamificationResult.newAchievements]
+        // Merge unique achievements
+        unlockedAchievements: Array.from(new Set([...user.unlockedAchievements, ...gamificationResult.newAchievements]))
     };
 
     return {

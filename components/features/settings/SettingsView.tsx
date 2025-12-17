@@ -104,7 +104,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onUpgrade, onSave }) 
                 onSave={onSave}
             />
 
-            <div className="flex justify-end pt-4">
+            <div className="sticky bottom-6 z-40 flex justify-end pt-4 pb-2 mt-8 pointer-events-none">
+                <div className="pointer-events-auto">
                 <button
                     onClick={handleSave}
                     disabled={isSavingProfile}
@@ -121,6 +122,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onUpgrade, onSave }) 
                     )}
                     {isSavingProfile ? t.saving : showSaved ? t.saved : t.saveChanges}
                 </button>
+                </div>
             </div>
         </div >
     );

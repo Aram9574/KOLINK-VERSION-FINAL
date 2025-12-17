@@ -1,38 +1,38 @@
 
 
 export enum ViralTone {
-  PROFESSIONAL = 'Professional & Authoritative',
-  CONTROVERSIAL = 'Controversial & Bold',
-  EMPATHETIC = 'Empathetic & Vulnerable',
-  EDUCATIONAL = 'Educational & Insightful',
-  HUMOROUS = 'Witty & Humorous',
-  STORYTELLING = 'Narrative & Personal',
-  INSPIRATIONAL = 'Inspirational & Uplifting',
-  PROMOTIONAL = 'Sales & Promotional'
+  PROFESSIONAL = 'Professional',
+  CONTROVERSIAL = 'Controversial',
+  EMPATHETIC = 'Empathetic',
+  EDUCATIONAL = 'Educational',
+  HUMOROUS = 'Humorous',
+  STORYTELLING = 'Storytelling',
+  INSPIRATIONAL = 'Inspirational',
+  PROMOTIONAL = 'Promotional'
 }
 
 export enum ViralFramework {
-  STANDARD = 'Standard / General',
-  LISTICLE = 'Listicle / Bullet Points',
-  STORY = 'Hero\'s Journey (Micro-Story)',
-  CASE_STUDY = 'Case Study / Proof',
-  CONTRARIAN = 'Contrarian Take (The "Unpopular Opinion")',
-  VS_COMPARISON = 'Comparison (This vs That)',
-  PAS = 'Problem - Agitate - Solution', // Keeping for backward compat if needed, but UI will use STANDARD
-  AIDA = 'Attention - Interest - Desire - Action',
-  BAB = 'Before - After - Bridge'
+  STANDARD = 'STANDARD',
+  LISTICLE = 'LISTICLE',
+  STORY = 'STORY',
+  CASE_STUDY = 'CASE_STUDY',
+  CONTRARIAN = 'CONTRARIAN',
+  VS_COMPARISON = 'VS_COMPARISON',
+  PAS = 'PAS',
+  AIDA = 'AIDA',
+  BAB = 'BAB'
 }
 
 export enum EmojiDensity {
-  MINIMAL = 'Minimal (Professional)',
-  MODERATE = 'Moderate (Engaging)',
-  HIGH = 'High (Visual/Playful)'
+  MINIMAL = 'MINIMAL',
+  MODERATE = 'MODERATE',
+  HIGH = 'HIGH'
 }
 
 export enum PostLength {
-  SHORT = 'Short',
-  MEDIUM = 'Medium',
-  LONG = 'Long'
+  SHORT = 'SHORT',
+  MEDIUM = 'MEDIUM',
+  LONG = 'LONG'
 }
 
 export type ViralHook = 'auto' | 'question' | 'statistic' | 'negative' | 'story' | 'assertion';

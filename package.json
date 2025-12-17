@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
+    "@sentry/react": "^10.31.0",
     "@stripe/stripe-js": "^8.5.2",
     "@supabase/supabase-js": "^2.39.7",
     "@types/react-window": "^1.8.8",
@@ -18,6 +19,7 @@
     "dotenv": "^17.2.3",
     "lucide-react": "^0.554.0",
     "openai": "4.28.0",
+    "posthog-js": "^1.307.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-helmet-async": "^2.0.5",
