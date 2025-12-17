@@ -21,6 +21,44 @@ interface InsightWidgetProps {
 const InsightWidget: React.FC<InsightWidgetProps> = ({ language }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+    
+    // Drag functionality
+    const [buttonTop, setButtonTop] = useState(150); // Initial position
+    const isDragging = React.useRef(false);
+    const dragStartY = React.useRef(0);
+    const initialButtonTop = React.useRef(0);
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isDragging.current) return;
+            
+            const deltaY = e.clientY - dragStartY.current;
+            const newTop = Math.max(80, Math.min(window.innerHeight - 80, initialButtonTop.current + deltaY));
+            setButtonTop(newTop);
+        };
+
+        const handleMouseUp = () => {
+            isDragging.current = false;
+            document.body.style.userSelect = '';
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, []);
+
+    const handleMouseDown = (e: React.MouseEvent) => {
+        // Prevent opening/closing when starting drag
+        e.stopPropagation(); 
+        isDragging.current = true;
+        dragStartY.current = e.clientY;
+        initialButtonTop.current = buttonTop;
+        document.body.style.userSelect = 'none'; // Prevent text selection while dragging
+    };
 
     const TIP_ICONS = [
         <Clock className="w-5 h-5" />,
@@ -136,12 +174,19 @@ const InsightWidget: React.FC<InsightWidgetProps> = ({ language }) => {
                         <div className="h-8"></div> {/* Bottom spacer */}
                     </div>
                     
-                    {/* Toggle Handle */}
+                    {/* Toggle Handle - Draggable */}
                     {!isOpen && (
-                         <div className="absolute top-24 -left-12">
+                         <div 
+                            className="absolute -left-12 transition-all duration-75 ease-out"
+                            style={{ top: `${buttonTop}px` }}
+                         >
                              <button
-                                onClick={() => setIsOpen(true)}
-                                className="w-12 h-12 bg-white rounded-l-xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.1)] border-y border-l border-slate-100 flex items-center justify-center hover:bg-slate-50 text-brand-600 hover:text-brand-700 hover:w-14 transition-all duration-200 group relative"
+                                onMouseDown={handleMouseDown}
+                                onClick={(e) => {
+                                    // If we were dragging, don't toggle
+                                    if (!isDragging.current) setIsOpen(true);
+                                }}
+                                className="w-12 h-12 bg-white rounded-l-xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.1)] border-y border-l border-slate-100 flex items-center justify-center hover:bg-slate-50 text-brand-600 hover:text-brand-700 hover:w-14 transition-all duration-200 group relative cursor-ns-resize active:cursor-grabbing"
                              >
                                 <div className="absolute right-0 top-0 bottom-0 w-1 bg-white"></div>
                                 <Lightbulb className="w-6 h-6 fill-brand-100" />

@@ -98,20 +98,22 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                     {t.title}
                 </h2>
 
-                <div className="relative">
-                    <div className={`text-xs font-bold px-3 py-1.5 rounded-full border flex items-center gap-1.5 transition-all duration-300
-              ${credits > 0 ? 'bg-brand-50 text-brand-700 border-brand-200' : 'bg-red-50 text-red-600 border-red-200'}
-              ${showCreditDeduction ? 'bg-red-50 border-red-200 text-red-600 scale-105 shadow-sm ring-2 ring-red-100' : ''}
-            `}>
-                        <Sparkles className="w-3 h-3" />
-                        {credits} {t.credits}
-                    </div>
-                    {showCreditDeduction && (
-                        <div className="absolute top-full right-0 mt-1 text-xs font-bold text-red-500 animate-bounce whitespace-nowrap flex items-center gap-0.5">
-                            -1 credit
+                {!user?.isPremium && (
+                    <div className="relative">
+                        <div className={`text-xs font-bold px-3 py-1.5 rounded-full border flex items-center gap-1.5 transition-all duration-300
+                  ${credits > 0 ? 'bg-brand-50 text-brand-700 border-brand-200' : 'bg-red-50 text-red-600 border-red-200'}
+                  ${showCreditDeduction ? 'bg-red-50 border-red-200 text-red-600 scale-105 shadow-sm ring-2 ring-red-100' : ''}
+                `}>
+                            <Sparkles className="w-3 h-3" />
+                            {credits} {t.credits}
                         </div>
-                    )}
-                </div>
+                        {showCreditDeduction && (
+                            <div className="absolute top-full right-0 mt-1 text-xs font-bold text-red-500 animate-bounce whitespace-nowrap flex items-center gap-0.5">
+                                -1 credit
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             <div className="space-y-6">
@@ -121,7 +123,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                         {t.topicLabel}
                     </label>
                     <textarea
-                        className="w-full p-4 bg-slate-50/50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all text-slate-900 placeholder-slate-400 resize-none h-28 text-sm font-medium"
+                        className="w-full p-4 bg-white border border-slate-300 rounded-2xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all text-slate-900 placeholder-slate-400 resize-none h-28 text-sm font-medium shadow-sm hover:border-brand-300"
                         placeholder={t.topicPlaceholder}
                         value={params.topic}
                         onChange={(e) => onUpdateParams({ topic: e.target.value })}
@@ -161,7 +163,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                 </label>
                                 <div className="relative group">
                                     <select
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
                                         value={params.framework}
                                         onChange={(e) => {
                                             const selected = FRAMEWORKS.find(f => f.value === e.target.value);
@@ -196,7 +198,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                 </label>
                                 <div className="relative group">
                                     <select
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
                                         value={params.hookStyle || 'auto'}
                                         onChange={(e) => {
                                             const selected = HOOK_STYLES.find(h => h.value === e.target.value);
@@ -239,7 +241,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     }}
                                 >
                                     <select
-                                        className={`w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 ${isFreeUser ? 'opacity-60 cursor-not-allowed bg-slate-100' : ''}`}
+                                        className={`w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm ${isFreeUser ? 'opacity-60 cursor-not-allowed bg-slate-50' : ''}`}
                                         value={params.brandVoiceId || ''}
                                         onChange={(e) => {
                                             const val = e.target.value;
@@ -270,7 +272,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                 </label>
                                 <div className="relative group">
                                     <select
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
                                         value={params.tone}
                                         onChange={(e) => {
                                             const selected = TONES.find(t => t.value === e.target.value);
@@ -305,7 +307,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                 </label>
                                 <div className="relative group">
                                     <select
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
                                         value={params.outputLanguage || 'es'}
                                         onChange={(e) => onUpdateParams({ outputLanguage: e.target.value as 'es' | 'en' })}
                                     >
@@ -351,7 +353,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     </div>
                                     <input
                                         type="text"
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium transition-all text-slate-900"
+                                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-300 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium transition-all text-slate-900 shadow-sm hover:border-brand-300"
                                         placeholder={t.audiencePlaceholder}
                                         value={params.audience}
                                         onChange={(e) => onUpdateParams({ audience: e.target.value })}
@@ -368,7 +370,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     </label>
                                     <div className="relative group">
                                         <select
-                                            className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                            className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
                                             value={params.length}
                                             onChange={(e) => onUpdateParams({ length: e.target.value as PostLength })}
                                         >
@@ -410,7 +412,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     </label>
                                     <div className="relative group">
                                         <select
-                                            className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                            className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
                                             value={params.emojiDensity}
                                             onChange={(e) => onUpdateParams({ emojiDensity: e.target.value as EmojiDensity })}
                                         >
@@ -436,7 +438,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     </label>
                                     <div className="relative group">
                                         <select
-                                            className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300"
+                                            className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
                                             value={params.hashtagCount || 3}
                                             onChange={(e) => onUpdateParams({ hashtagCount: parseInt(e.target.value) })}
                                         >

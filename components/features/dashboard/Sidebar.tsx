@@ -151,19 +151,21 @@ const Sidebar: React.FC<SidebarProps> = ({
                             <p className="text-sm font-bold text-slate-900 truncate">{user.name}</p>
                             {user.isPremium && <Crown className="w-3 h-3 text-amber-500 fill-current" />}
                         </div>
-                        <div className="relative inline-block">
-                            <p
-                                id="tour-credits"
-                                className={`text-xs transition-all duration-300 ${showCreditDeduction ? 'text-red-600 font-bold scale-105' : 'text-slate-500'}`}
-                            >
-                                {user.credits} {t.creditsLeft}
-                            </p>
-                            {showCreditDeduction && (
-                                <div className="absolute -top-4 left-0 text-xs font-bold text-red-600 animate-bounce whitespace-nowrap">
-                                    -1
-                                </div>
-                            )}
-                        </div>
+                        {!user.isPremium && (
+                            <div className="relative inline-block">
+                                <p
+                                    id="tour-credits"
+                                    className={`text-xs transition-all duration-300 ${showCreditDeduction ? 'text-red-600 font-bold scale-105' : 'text-slate-500'}`}
+                                >
+                                    {user.credits} {t.creditsLeft}
+                                </p>
+                                {showCreditDeduction && (
+                                    <div className="absolute -top-4 left-0 text-xs font-bold text-red-600 animate-bounce whitespace-nowrap">
+                                        -1
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <div className="flex gap-1">
                         <button

@@ -90,7 +90,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
                                     setName(e.target.value);
                                     onSave({ name: e.target.value });
                                 }}
-                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                className="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm hover:border-indigo-400"
                             />
                         </div>
                         <div className="space-y-2">
@@ -102,7 +102,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
                                     setHeadline(e.target.value);
                                     onSave({ headline: e.target.value });
                                 }}
-                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                className="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm hover:border-indigo-400"
                             />
                         </div>
                     </div>
@@ -123,7 +123,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
                                     onSave({ companyName: e.target.value });
                                 }}
                                 placeholder="e.g. Kolink Inc."
-                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                className="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm hover:border-indigo-400"
                             />
                         </div>
                         <div className="space-y-2">
@@ -140,7 +140,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
                                     onSave({ industry: e.target.value });
                                 }}
                                 placeholder="e.g. SaaS, Fintech, Marketing"
-                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                className="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm hover:border-indigo-400"
                             />
                         </div>
                     </div>

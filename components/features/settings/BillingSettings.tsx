@@ -48,14 +48,27 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpg
                     <div>
                         <p className="text-xs font-bold uppercase text-slate-400 tracking-wider mb-1">{t.currentUsage}</p>
                         <div className="flex items-baseline gap-2 mb-3">
-                            <span className="text-3xl font-display font-bold text-slate-900">{isUnlimited ? '∞' : user.credits}</span>
-                            <span className="text-sm font-medium text-slate-400">/ {isUnlimited ? '∞' : effectiveMax} credits</span>
+                            <span className="text-3xl font-display font-bold text-slate-900">
+                                {user.isPremium ? (language === 'es' ? 'Ilimitados' : 'Unlimited') : user.credits}
+                            </span>
+                            {!user.isPremium && (
+                                <span className="text-sm font-medium text-slate-400">/ {effectiveMax} credits</span>
+                            )}
                         </div>
-                        <div className="w-full bg-slate-200 rounded-full h-2 mb-2">
-                            <div className="bg-gradient-to-r from-brand-500 to-indigo-500 h-2 rounded-full transition-all duration-500 ease-out" style={{ width: `${progressPercent}%` }}></div>
+                        <div className="w-full bg-slate-200 rounded-full h-2 mb-2 overflow-hidden">
+                            <div
+                                className={`h-2 rounded-full transition-all duration-500 ease-out ${user.isPremium
+                                        ? 'bg-gradient-to-r from-amber-400 to-amber-600 w-full animate-pulse'
+                                        : 'bg-gradient-to-r from-brand-500 to-indigo-500'
+                                    }`}
+                                style={{ width: user.isPremium ? '100%' : `${progressPercent}%` }}
+                            ></div>
                         </div>
                         <p className="text-xs text-slate-500">
-                            {isUnlimited ? 'You are unstoppable.' : `Resets on ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}`}
+                            {user.isPremium
+                                ? (language === 'es' ? 'Tienes el poder absoluto. Crea sin límites.' : 'You have absolute power. Create without limits.')
+                                : `Resets on ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}`
+                            }
                         </p>
                     </div>
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useUser } from './context/UserContext';
+import { useSessionTimeout } from './hooks/useSessionTimeout';
 import ProtectedRoute from './components/features/auth/ProtectedRoute';
 
 // Lazy load components for better performance
@@ -22,6 +23,10 @@ const TermsOfService = lazy(() => import('./components/landing/TermsOfService'))
 
 const App: React.FC = () => {
     const { user, language, loading } = useUser();
+    
+    // Initialize session timeout monitoring
+    useSessionTimeout();
+
     const [isTimeout, setIsTimeout] = useState(false);
 
     // Safety timeout for loading state

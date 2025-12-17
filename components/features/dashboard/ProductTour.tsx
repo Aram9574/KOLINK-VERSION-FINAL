@@ -12,6 +12,7 @@ export interface TourStep {
 interface ProductTourProps {
   steps: TourStep[];
   onComplete: () => void;
+  onStepChange?: (stepIndex: number) => void;
   labels: {
     skip: string;
     back: string;
@@ -20,7 +21,7 @@ interface ProductTourProps {
   };
 }
 
-const ProductTour: React.FC<ProductTourProps> = ({ steps, onComplete, labels }) => {
+const ProductTour: React.FC<ProductTourProps> = ({ steps, onComplete, onStepChange, labels }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [position, setPosition] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [isExiting, setIsExiting] = useState(false);
@@ -60,7 +61,9 @@ const ProductTour: React.FC<ProductTourProps> = ({ steps, onComplete, labels }) 
 
   const handleNext = () => {
     if (currentStepIndex < steps.length - 1) {
-      setCurrentStepIndex(prev => prev + 1);
+      const nextOne = currentStepIndex + 1;
+      setCurrentStepIndex(nextOne);
+      onStepChange?.(nextOne);
     } else {
       handleComplete();
     }
@@ -68,7 +71,9 @@ const ProductTour: React.FC<ProductTourProps> = ({ steps, onComplete, labels }) 
 
   const handleBack = () => {
     if (currentStepIndex > 0) {
-      setCurrentStepIndex(prev => prev - 1);
+      const prevOne = currentStepIndex - 1;
+      setCurrentStepIndex(prevOne);
+      onStepChange?.(prevOne);
     }
   };
 

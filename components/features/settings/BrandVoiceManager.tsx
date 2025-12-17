@@ -100,7 +100,7 @@ const BrandVoiceManager: React.FC<BrandVoiceManagerProps> = ({ userId, language 
     const isFormOpen = isCreating || editingVoice;
 
     return (
-        <div className="space-y-6">
+        <div id="brand-voice-manager" className="space-y-6">
             <div className="flex justify-between items-center">
                 <h3 className="text-lg font-bold text-slate-900">
                     {language === 'es' ? 'Gestor de Voces de Marca' : 'Brand Voice Manager'}
@@ -150,7 +150,7 @@ const BrandVoiceManager: React.FC<BrandVoiceManagerProps> = ({ userId, language 
                                     value={formName}
                                     onChange={(e) => setFormName(e.target.value)}
                                     placeholder="e.g. Professional, Casual, LinkedIn Guru..."
-                                    className="w-full rounded-lg border-slate-300 focus:ring-brand-500 focus:border-brand-500"
+                                    className="w-full rounded-lg bg-white border-slate-300 focus:ring-brand-500 focus:border-brand-500 shadow-sm"
                                 />
                             </div>
 
@@ -162,7 +162,7 @@ const BrandVoiceManager: React.FC<BrandVoiceManagerProps> = ({ userId, language 
                                     value={formDescription}
                                     onChange={(e) => setFormDescription(e.target.value)}
                                     placeholder="Describe how this voice sounds. Be specific about sentence structure, vocabulary, and emotion."
-                                    className="w-full h-32 rounded-lg border-slate-300 focus:ring-brand-500 focus:border-brand-500 text-sm"
+                                    className="w-full h-32 rounded-lg bg-white border-slate-300 focus:ring-brand-500 focus:border-brand-500 text-sm shadow-sm"
                                 />
                                 <p className="text-xs text-slate-500 mt-1">
                                     {language === 'es'

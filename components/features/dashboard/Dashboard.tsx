@@ -14,6 +14,7 @@ import AutoPilotView from '../autopilot/AutoPilotView';
 import OnboardingFlow from '../onboarding/OnboardingFlow';
 import UpgradeModal from '../../modals/UpgradeModal';
 import CancellationModal from '../../modals/CancellationModal';
+import WelcomeModal from '../../modals/WelcomeModal';
 import TourGuide from './ProductTour';
 import LevelUpModal from '../../modals/LevelUpModal';
 import { updateUserProfile } from '../../../services/userRepository';
@@ -70,6 +71,7 @@ const DashboardContent: React.FC = () => {
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [showCreditDeduction, setShowCreditDeduction] = useState(false);
     const [isOnboarding, setIsOnboarding] = useState(false);
+    const [showWelcome, setShowWelcome] = useState(false);
     const [isTourActive, setIsTourActive] = useState(false);
     const [levelUpData, setLevelUpData] = useState<any>(null);
 
@@ -121,10 +123,14 @@ const DashboardContent: React.FC = () => {
 
     useEffect(() => {
         const hasSeenTour = localStorage.getItem(`kolink_tour_seen_${user.id}`);
+        // If onboarded but hasn't seen tour, show Welcome Modal first
         if (!hasSeenTour && !isOnboarding && user.hasOnboarded) {
-            setIsTourActive(true);
+             // Only show if not already showing tour
+             if (!isTourActive) {
+                 setShowWelcome(true);
+             }
         }
-    }, [user.id, isOnboarding, user.hasOnboarded]);
+    }, [user.id, isOnboarding, user.hasOnboarded, isTourActive]);
 
     // Handlers
     const handleDeletePost = (id: string, e: React.MouseEvent) => {
@@ -142,11 +148,22 @@ const DashboardContent: React.FC = () => {
         // 2. Close Onboarding
         setIsOnboarding(false);
 
-        // 3. Refresh to ensure consistency (optional, but good)
+        // 3. Refresh to verify state
         await refreshUser();
 
-        // 4. Start Product Tour
+        // 4. Trigger Welcome Modal
+        setShowWelcome(true);
+    };
+
+    const handleStartTour = () => {
+        setShowWelcome(false);
         setIsTourActive(true);
+        setActiveTab('create'); // Ensure we start at first step
+    };
+
+    const handleSkipTour = () => {
+        setShowWelcome(false);
+        localStorage.setItem(`kolink_tour_seen_${user.id}`, 'true');
     };
 
     const handleTourComplete = () => {
@@ -155,13 +172,36 @@ const DashboardContent: React.FC = () => {
     };
 
     // Tour Steps
+    // Tour Steps with Tab Navigation
     const TOUR_STEPS = [
-        { targetId: 'nav-create', title: t.steps.create.title, description: t.steps.create.desc },
-        { targetId: 'nav-history', title: t.steps.history.title, description: t.steps.history.desc },
-
-        { targetId: 'nav-autopilot', title: t.steps.autopilot.title, description: t.steps.autopilot.desc },
-        { targetId: 'gamification-widget', title: t.steps.levelUp.title, description: t.steps.levelUp.desc },
+        { 
+            targetId: 'viral-engine-view', 
+            title: language === 'es' ? 'Motor Viral' : 'Viral Engine', 
+            description: language === 'es' ? 'Genera tu primer post aquí con nuestra IA entrenada.' : 'Generate your first post here with our trained AI.',
+            tab: 'create' as const
+        },
+        { 
+            targetId: 'brand-voice-manager', 
+            title: language === 'es' ? 'Voz de Marca' : 'Brand Voice', 
+            description: language === 'es' ? 'Entrena a la IA para que suene exactamente como tú.' : 'Train the AI to sound exactly like you.',
+            tab: 'settings' as const
+        },
+        { 
+            targetId: 'autopilot-view', 
+            title: 'AutoPilot', 
+            description: language === 'es' ? 'Programa y automatiza tu contenido en piloto automático.' : 'Schedule and automate your content on autopilot.',
+            tab: 'autopilot' as const
+        },
     ];
+
+    const handleTourStepChange = (index: number) => {
+        if (index >= 0 && index < TOUR_STEPS.length) {
+            const step = TOUR_STEPS[index];
+            if (step.tab && step.tab !== activeTab) {
+                setActiveTab(step.tab);
+            }
+        }
+    };
 
     if (isOnboarding) {
         return <OnboardingFlow user={user} onComplete={handleOnboardingComplete} />;
@@ -178,7 +218,7 @@ const DashboardContent: React.FC = () => {
             <div className={`h-full ${activeTab === 'history' ? 'overflow-hidden' : 'overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent'}`}>
                 <div className={`${activeTab === 'history' ? 'h-full ml-1' : 'max-w-7xl mx-auto p-4 lg:p-8 pb-24'}`}>
                     {activeTab === 'create' && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div id="viral-engine-view" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                              <Suspense fallback={
                                  <div className="flex justify-center items-center h-64">
                                      <div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-500 border-t-transparent"></div>
@@ -270,10 +310,19 @@ const DashboardContent: React.FC = () => {
                 />
             )}
 
+            {showWelcome && (
+                <WelcomeModal
+                    user={user}
+                    onStartTour={handleStartTour}
+                    onSkip={handleSkipTour}
+                />
+            )}
+
             {isTourActive && (
                 <TourGuide
                     steps={TOUR_STEPS}
                     onComplete={handleTourComplete}
+                    onStepChange={handleTourStepChange}
                     labels={t}
                 />
             )}

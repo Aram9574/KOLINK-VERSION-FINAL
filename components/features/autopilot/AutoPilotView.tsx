@@ -276,7 +276,7 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = ({ user, language, onViewPos
     }
 
     return (
-        <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
+        <div id="autopilot-view" className="max-w-6xl mx-auto px-4 md:px-8 py-8">
 
 
 
