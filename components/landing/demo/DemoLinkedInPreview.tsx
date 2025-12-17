@@ -34,11 +34,6 @@ Mientras tanto, el top 1% usa frameworks.
 
 Aquí está el secreto: No necesitas más creatividad. Necesitas mejor arquitectura.
 
-El Framework PAS para viralidad:
-❌ Problema: El bloqueo mata el impulso.
-🔥 Agitación: La inconsistencia mata el alcance.
-✅ Solución: Usa estructuras probadas.
-
 Con Kolink, conviertes ideas vagas en posts de autoridad en segundos.
 
 No se trata de escribir más.
@@ -53,11 +48,6 @@ Most people lose 10 hours/week thinking about what to write.
 Meanwhile, the top 1% uses frameworks.
 
 Here's the secret: You don't need more creativity. You need better architecture.
-
-The PAS Framework for virality:
-❌ Problem: Writer's block kills momentum.
-🔥 Agitation: Inconsistency kills reach.
-✅ Solution: Use proven structures.
 
 With Kolink, you turn vague ideas into authority posts in seconds.
 
