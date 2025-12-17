@@ -60,8 +60,8 @@ const HeroSection: React.FC<HeroSectionProps> = (
             {/* Advanced Hero Visual - Realistic App Preview */}
             <div className="mt-20 md:mt-32 relative max-w-6xl mx-auto perspective-1000 group z-10 px-4 sm:px-6">
                 {/* Floating Feature Card - Left (Voice) */}
-                <div className="absolute -left-12 top-1/4 z-20 hidden xl:block animate-float-slow">
-                    <div className="bg-white/90 backdrop-blur-xl p-4 rounded-2xl shadow-2xl border border-white/50 flex items-center gap-4 max-w-[240px]">
+                <div className="absolute -left-12 top-1/4 z-20 hidden xl:block animate-float-slow will-change-transform">
+                    <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl border border-white/50 flex items-center gap-4 max-w-[240px]">
                         <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
                             <Fingerprint className="w-6 h-6" />
                         </div>
@@ -77,8 +77,8 @@ const HeroSection: React.FC<HeroSectionProps> = (
                 </div>
 
                 {/* Floating Feature Card - Right (Viral) */}
-                <div className="absolute -right-12 bottom-1/3 z-20 hidden xl:block animate-float-delayed">
-                    <div className="bg-white/90 backdrop-blur-xl p-4 rounded-2xl shadow-2xl border border-white/50 flex items-center gap-4 max-w-[240px]">
+                <div className="absolute -right-12 bottom-1/3 z-20 hidden xl:block animate-float-delayed will-change-transform">
+                    <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl border border-white/50 flex items-center gap-4 max-w-[240px]">
                         <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                             <TrendingUp className="w-6 h-6" />
                         </div>
@@ -94,7 +94,7 @@ const HeroSection: React.FC<HeroSectionProps> = (
                 </div>
 
                 {/* Glow effect */}
-                <div className="absolute -inset-4 bg-gradient-to-r from-brand-500 to-indigo-600 rounded-[2.5rem] opacity-20 blur-3xl group-hover:opacity-30 transition-opacity duration-700">
+                <div className="absolute -inset-4 bg-gradient-to-r from-brand-500 to-indigo-600 rounded-[2.5rem] opacity-20 blur-2xl group-hover:opacity-30 transition-opacity duration-700">
                 </div>
 
                 <DemoGeneratorView language={language} />
