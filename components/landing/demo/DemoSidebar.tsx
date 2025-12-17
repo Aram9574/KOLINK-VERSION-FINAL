@@ -148,32 +148,6 @@ const DemoSidebar: React.FC<DemoSidebarProps> = ({
                         </div>
                     )}
                 </button>
-                <button
-                    onClick={() => setActiveTab("settings")}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
-                ${
-                        activeTab === "settings"
-                            ? "bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200"
-                            : "text-slate-600 hover:bg-slate-50"
-                    }`}
-                >
-                    <SettingsIcon className="w-5 h-5" />
-                    <div className="flex-1 text-left">{t.settings}</div>
-                </button>
-
-                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all duration-200 group">
-                    <LogOut className="w-5 h-5" />
-                    {t.logout}
-                </button>
-
-                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all duration-200 group">
-                    <Gift className="w-5 h-5 text-violet-500 group-hover:scale-110 transition-transform" />
-                    <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent font-bold">
-                        {language === "es"
-                            ? "Gana 1 Mes Gratis"
-                            : "Get 1 Month Free"}
-                    </span>
-                </button>
             </div>
 
             <div className="p-4 border-t border-slate-100 bg-slate-50/30 backdrop-blur-sm flex-shrink-0">
