@@ -73,7 +73,7 @@ const DemoGeneratorView: React.FC<DemoGeneratorViewProps> = ({ language }) => {
             </div>
 
             {/* Floating Badge */}
-            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full border border-slate-200 shadow-lg text-xs font-bold text-slate-500 animate-bounce">
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full border border-slate-200 shadow-lg text-xs font-bold text-slate-500 animate-bounce z-10">
                 {language === "es"
                     ? "Probar Demo Interactiva"
                     : "Try Interactive Demo"} 👇

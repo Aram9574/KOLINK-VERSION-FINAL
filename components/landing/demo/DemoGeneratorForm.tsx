@@ -162,9 +162,6 @@ const DemoGeneratorForm: React.FC<DemoGeneratorFormProps> = ({
                             <div className="space-y-1.5">
                                 <label className="text-sm font-semibold text-slate-700 ml-1">
                                     {language === "es" ? "Formato" : "Format"}
-                                    <Tooltip>
-                                        {currentFrameworkDesc || ""}
-                                    </Tooltip>
                                 </label>
                                 <div className="relative group">
                                     <select
