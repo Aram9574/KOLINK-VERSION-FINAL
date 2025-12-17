@@ -156,6 +156,43 @@ export const translations = {
       getStarted: "Get Started",
       mostPopular: "Recommended",
       footer: "Secure payment via Stripe. Cancel anytime.",
+      plans: {
+        free: {
+          name: "Starter Plan",
+          description: "To test the power of AI",
+          features: [
+            "10 Free Credits",
+            "Basic Idea Generator",
+            "3 Tones",
+            "Community Access",
+            "No Credit Card",
+          ],
+        },
+        pro: {
+          name: "Creator Pro",
+          description: "Automate your personal brand",
+          features: [
+            "Everything in Starter",
+            "UNLIMITED AI Credits",
+            "UNLIMITED Ideas",
+            "AutoPilot (Scheduling)",
+            "Brand Voice Analysis",
+            "Priority Support",
+          ],
+        },
+        viral: {
+          name: "Viral God",
+          description: "Scale without limits",
+          features: [
+            "Everything in Pro",
+            "Multi-Account",
+            "Monthly Audit",
+            "Hook A/B Testing",
+            "Buffer Integration",
+            "24/7 VIP Support",
+          ],
+        },
+      },
     },
     faq: {
       title: "Frequently Asked Questions",
@@ -241,6 +278,28 @@ export const translations = {
       achievements: "Achievements Unlocked",
       xp: "XP",
       awesome: "Awesome!",
+      achievementList: {
+        first_step: {
+          title: "The First Step",
+          description: "Generate your first post.",
+        },
+        streak_3: {
+          title: "Consistency is Key",
+          description: "Reach a 3-day streak.",
+        },
+        streak_7: {
+          title: "LinkedIn Top Voice",
+          description: "Reach a 7-day streak.",
+        },
+        pro_writer: {
+          title: "Prolific Writer",
+          description: "Generate 10 posts total.",
+        },
+        clickbait_master: {
+          title: "Clickbait Master",
+          description: "Use the 'Controversial' tone.",
+        },
+      },
     },
     productTour: {
       skip: "Skip Tour",
@@ -403,7 +462,10 @@ export const translations = {
         generateBtn: "Generate with AI",
         generatingBtn: "Architecting Viral Post...",
         noCreditsBtn: "0 Credits Remaining",
+        strategyTitle: "Content Strategy",
+        detailsTitle: "Details & Settings",
       },
+
       preview: {
         edit: "Edit",
         save: "Save",
@@ -423,6 +485,16 @@ export const translations = {
       },
       history: {
         title: "Recent Creations",
+        navAll: "All Posts",
+        navPublished: "Published",
+        navScheduled: "Scheduled",
+        navDrafts: "Drafts",
+        libraryTitle: "Library",
+        favorites: "Favorites",
+        filtersTitle: "Filters",
+        toneLabel: "Tone",
+        frameworkLabel: "Framework",
+        filterAllFrameworks: "All Frameworks",
         empty: "No history yet.",
         copy: "Copy",
         delete: "Delete",
@@ -514,7 +586,6 @@ export const translations = {
           badge: "FINAL OFFER",
           discountText: "50% OFF FOR 1 YEAR",
           claimBtn: "Claim 50% Discount",
-          applying: "Applying...",
           reject: "No thanks, proceed to cancellation",
         },
         confirm: {
@@ -606,6 +677,14 @@ export const translations = {
           [EmojiDensity.MINIMAL]: { label: "Minimal" },
           [EmojiDensity.MODERATE]: { label: "Balanced" },
           [EmojiDensity.HIGH]: { label: "High" },
+        },
+        hooks: {
+          random: { label: "🎲 Random (Surprise Me)" },
+          question: { label: "Rhetorical Question" },
+          statistic: { label: "Shocking Fact/Stat" },
+          negative: { label: "Negative/Warning" },
+          story: { label: "Story Start ('Yesterday...')" },
+          assertion: { label: "Direct Assertion" },
         },
       },
     },
@@ -781,6 +860,43 @@ export const translations = {
       getStarted: "Comenzar",
       mostPopular: "Recomendado",
       footer: "Pago seguro vía Stripe. Cancela cuando quieras.",
+      plans: {
+        free: {
+          name: "Plan Inicial",
+          description: "Para probar el poder de la IA",
+          features: [
+            "10 Créditos de Prueba",
+            "Generador de Ideas Básico",
+            "3 Tonos Predefinidos",
+            "Acceso a Comunidad",
+            "Sin Tarjeta de Crédito",
+          ],
+        },
+        pro: {
+          name: "Creador Pro",
+          description: "Automatiza tu marca personal",
+          features: [
+            "Todo lo del Plan Inicial, más:",
+            "Créditos IA ILIMITADOS",
+            "Generador de Ideas ILIMITADO",
+            "Autopilot (Programación)",
+            "Análisis de Voz de Marca",
+            "Soporte Prioritario",
+          ],
+        },
+        viral: {
+          name: "Dios Viral",
+          description: "Para escalar sin límites",
+          features: [
+            "Todo lo del Creador Pro, más:",
+            "Multi-Cuenta (Agencias)",
+            "Auditoría de Perfil Mensual",
+            "A/B Testing de Ganchos",
+            "Integración Buffer/Hootsuite",
+            "Soporte VIP Dedicado 24/7",
+          ],
+        },
+      },
     },
     faq: {
       title: "Preguntas Frecuentes",
@@ -876,6 +992,28 @@ export const translations = {
       achievements: "Logros Desbloqueados",
       xp: "XP",
       awesome: "¡Genial!",
+      achievementList: {
+        first_step: {
+          title: "El Primer Paso",
+          description: "Genera tu primer post.",
+        },
+        streak_3: {
+          title: "La Constancia es Clave",
+          description: "Alcanza una racha de 3 días.",
+        },
+        streak_7: {
+          title: "Top Voice LinkedIn",
+          description: "Alcanza una racha de 7 días.",
+        },
+        pro_writer: {
+          title: "Escritor Prolífico",
+          description: "Genera 10 posts en total.",
+        },
+        clickbait_master: {
+          title: "Maestro del Clickbait",
+          description: "Usa el tono 'Controvertido'.",
+        },
+      },
     },
     productTour: {
       skip: "Saltar Tour",
@@ -1044,7 +1182,10 @@ export const translations = {
         generateBtn: "Generar con IA",
         generatingBtn: "Arquitectando Post Viral...",
         noCreditsBtn: "0 Créditos Restantes",
+        strategyTitle: "Estrategia de Contenido",
+        detailsTitle: "Detalles & Ajustes",
       },
+
       preview: {
         edit: "Editar",
         save: "Guardar",
@@ -1064,6 +1205,16 @@ export const translations = {
       },
       history: {
         title: "Creaciones Recientes",
+        navAll: "Todo",
+        navPublished: "Publicados",
+        navScheduled: "Programados",
+        navDrafts: "Borradores",
+        libraryTitle: "Biblioteca",
+        favorites: "Favoritos",
+        filtersTitle: "Filtros",
+        toneLabel: "Tono",
+        frameworkLabel: "Estructura",
+        filterAllFrameworks: "Todas Estructuras",
         empty: "Sin historial aún.",
         copy: "Copiar",
         delete: "Eliminar",
@@ -1251,6 +1402,14 @@ export const translations = {
           [EmojiDensity.MINIMAL]: { label: "Mínimo" },
           [EmojiDensity.MODERATE]: { label: "Balanceado" },
           [EmojiDensity.HIGH]: { label: "Alto" },
+        },
+        hooks: {
+          random: { label: "🎲 Aleatorio (Sorpréndeme)" },
+          question: { label: "Pregunta Retórica" },
+          statistic: { label: "Dato/Estadística Impactante" },
+          negative: { label: "Negativo/Advertencia" },
+          story: { label: "Inicio de Historia ('Ayer me pasó...')" },
+          assertion: { label: "Afirmación Directa" },
         },
       },
     },

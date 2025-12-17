@@ -1,8 +1,8 @@
-import React from 'react';
-import { Search, Filter, Zap } from 'lucide-react';
-import { AppLanguage } from '../../../types';
-import { translations } from '../../../translations';
-import { TONES, FRAMEWORKS } from '../../../constants';
+import React from "react";
+import { Filter, Search, Zap } from "lucide-react";
+import { AppLanguage } from "../../../types";
+import { translations } from "../../../translations";
+import { FRAMEWORKS, TONES } from "../../../constants";
 
 interface HistoryFilterProps {
     searchTerm: string;
@@ -21,7 +21,7 @@ const HistoryFilter: React.FC<HistoryFilterProps> = ({
     setSelectedTone,
     selectedFramework,
     setSelectedFramework,
-    language
+    language,
 }) => {
     const t = translations[language].app.history;
     const tConstants = translations[language].app.constants;
@@ -50,7 +50,7 @@ const HistoryFilter: React.FC<HistoryFilterProps> = ({
                     className="w-full sm:w-48 pl-10 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium shadow-sm appearance-none cursor-pointer hover:border-brand-300 transition-all"
                 >
                     <option value="all">{t.filterAll}</option>
-                    {TONES.map(tone => (
+                    {TONES.map((tone) => (
                         <option key={tone.value} value={tone.value}>
                             {tConstants.tones[tone.value]?.label || tone.label}
                         </option>
@@ -68,8 +68,8 @@ const HistoryFilter: React.FC<HistoryFilterProps> = ({
                     onChange={(e) => setSelectedFramework(e.target.value)}
                     className="w-full sm:w-48 pl-10 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium shadow-sm appearance-none cursor-pointer hover:border-brand-300 transition-all"
                 >
-                    <option value="all">{language === 'es' ? 'Todas Estructuras' : 'All Frameworks'}</option>
-                    {FRAMEWORKS.map(fw => (
+                    <option value="all">{t.filterAllFrameworks}</option>
+                    {FRAMEWORKS.map((fw) => (
                         <option key={fw.value} value={fw.value}>
                             {tConstants.frameworks[fw.value]?.label || fw.label}
                         </option>

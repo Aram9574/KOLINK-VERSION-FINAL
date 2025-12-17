@@ -45,22 +45,22 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
     const navItems = [
         {
             id: "all",
-            label: language === "es" ? "Todo" : "All Posts",
+            label: t.navAll,
             icon: FolderOpen,
         },
         {
             id: "published",
-            label: language === "es" ? "Publicados" : "Published",
+            label: t.navPublished,
             icon: FileText,
         },
         {
             id: "scheduled",
-            label: language === "es" ? "Programados" : "Scheduled",
+            label: t.navScheduled,
             icon: Clock,
         },
         {
             id: "draft",
-            label: language === "es" ? "Borradores" : "Drafts",
+            label: t.navDrafts,
             icon: FileText,
         },
     ];
@@ -82,7 +82,7 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
             {/* Navigation / Status Filters */}
             <div className="space-y-1">
                 <h3 className="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                    {language === "es" ? "Biblioteca" : "Library"}
+                    {t.libraryTitle}
                 </h3>
                 {navItems.map((item) => (
                     <button
@@ -127,20 +127,20 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                                 : "text-slate-400"
                         }`}
                     />
-                    {language === "es" ? "Favoritos" : "Favorites"}
+                    {t.favorites}
                 </button>
             </div>
 
             {/* Filters */}
             <div className="space-y-4 pt-4 border-t border-slate-100">
                 <h3 className="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                    {language === "es" ? "Filtros" : "Filters"}
+                    {t.filtersTitle}
                 </h3>
 
                 <div className="space-y-3 px-1">
                     <div className="space-y-1.5">
                         <label className="text-xs font-medium text-slate-500 px-2">
-                            {language === "es" ? "Tono" : "Tone"}
+                            {t.toneLabel}
                         </label>
                         <select
                             value={selectedTone}
@@ -159,7 +159,7 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
 
                     <div className="space-y-1.5">
                         <label className="text-xs font-medium text-slate-500 px-2">
-                            {language === "es" ? "Estructura" : "Framework"}
+                            {t.frameworkLabel}
                         </label>
                         <select
                             value={selectedFramework}
@@ -168,7 +168,7 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                             className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition-colors"
                         >
                             <option value="all">
-                                {language === "es" ? "Todas" : "All"}
+                                {t.filterAllFrameworks}
                             </option>
                             {FRAMEWORKS.map((fw) => (
                                 <option key={fw.value} value={fw.value}>

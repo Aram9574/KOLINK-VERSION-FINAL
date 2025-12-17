@@ -134,9 +134,9 @@ const DemoGeneratorForm: React.FC<DemoGeneratorFormProps> = ({
                         className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider w-full hover:text-slate-600 transition-colors group cursor-pointer"
                     >
                         <AlignLeft className="w-4 h-4" />
-                        {language === "es"
+                        {t.strategyTitle || (language === "es"
                             ? "ESTRATEGIA DE CONTENIDO"
-                            : "CONTENT STRATEGY"}
+                            : "CONTENT STRATEGY")}
                         <div
                             className={`ml-auto transition-transform duration-200 ${
                                 isStrategyOpen ? "rotate-180" : ""
@@ -328,9 +328,9 @@ const DemoGeneratorForm: React.FC<DemoGeneratorFormProps> = ({
                         className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider w-full hover:text-slate-600 transition-colors group cursor-pointer"
                     >
                         <Sliders className="w-4 h-4" />
-                        {language === "es"
+                        {t.detailsTitle || (language === "es"
                             ? "DETALLES & AJUSTES"
-                            : "DETAILS & SETTINGS"}
+                            : "DETAILS & SETTINGS")}
                         <div
                             className={`ml-auto transition-transform duration-200 ${
                                 isDetailsOpen ? "rotate-180" : ""
