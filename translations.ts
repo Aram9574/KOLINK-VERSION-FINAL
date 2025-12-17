@@ -4,6 +4,7 @@ export const translations = {
   en: {
     nav: {
       howItWorks: "How it Works",
+      demo: "Demo",
       features: "Features",
       testimonials: "Results",
       pricing: "Pricing",
@@ -620,6 +621,7 @@ export const translations = {
   es: {
     nav: {
       howItWorks: "Cómo Funciona",
+      demo: "Demo",
       features: "Funciones",
       testimonials: "Resultados",
       pricing: "Precios",

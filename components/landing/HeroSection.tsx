@@ -58,7 +58,10 @@ const HeroSection: React.FC<HeroSectionProps> = (
             </div>
 
             {/* Advanced Hero Visual - Realistic App Preview */}
-            <div className="mt-20 md:mt-32 relative max-w-6xl mx-auto perspective-1000 group z-10 px-4 sm:px-6">
+            <div
+                id="demo"
+                className="mt-20 md:mt-32 relative max-w-6xl mx-auto perspective-1000 group z-10 px-4 sm:px-6"
+            >
                 {/* Floating Feature Card - Left (Voice) */}
                 <div className="absolute -left-12 top-1/4 z-20 hidden xl:block animate-float-slow will-change-transform">
                     <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl border border-white/50 flex items-center gap-4 max-w-[240px]">
