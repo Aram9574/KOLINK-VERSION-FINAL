@@ -14,6 +14,7 @@ interface DashboardLayoutProps {
     onUpgrade: () => void;
     showCreditDeduction: boolean;
     onDeletePost: (id: string, e: React.MouseEvent) => void;
+    onReferral?: () => void;
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({
@@ -22,7 +23,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     setActiveTab,
     onUpgrade,
     showCreditDeduction,
-    onDeletePost
+    onDeletePost,
+    onReferral
 }) => {
     const { user, language, setLanguage } = useUser();
     const { posts, currentPost, setCurrentPost } = usePosts();
@@ -40,7 +42,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         onDeletePost,
         onUpgrade,
         onSettingsClick: () => setActiveTab('settings'),
-        showCreditDeduction
+        showCreditDeduction,
+        onReferral
     };
 
     return (

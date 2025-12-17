@@ -60,10 +60,14 @@ const LoginPage: React.FC = () => {
                     password,
                     options: {
                         emailRedirectTo: `https://${APP_DOMAIN}/dashboard`,
+                        data: localStorage.getItem('kolink_referral_code') ? {
+                            referred_by: localStorage.getItem('kolink_referral_code')
+                        } : undefined
                     }
                 });
                 if (error) throw error;
                 toast.success("Cuenta creada. Por favor verifica tu correo.");
+                setIsLoading(false);
             }
         } catch (error: any) {
             toast.error(error.message || "Error de autenticación");

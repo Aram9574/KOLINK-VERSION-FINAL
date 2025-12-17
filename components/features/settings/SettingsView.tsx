@@ -89,6 +89,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onUpgrade, onSave }) 
                 language={language}
                 setLanguage={setLanguage}
                 onSave={handleProfileUpdate}
+                onUpgrade={onUpgrade}
             />
 
             <SecuritySettings

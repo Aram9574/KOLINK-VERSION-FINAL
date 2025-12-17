@@ -1,0 +1,65 @@
+{
+  "version": "5",
+  "redirects": {
+    "https://esm.sh/@supabase/supabase-js@2": "https://esm.sh/@supabase/supabase-js@2.88.0",
+    "https://esm.sh/iceberg-js@^0.8.1?target=denonext": "https://esm.sh/iceberg-js@0.8.1?target=denonext"
+  },
+  "remote": {
+    "https://esm.sh/@supabase/auth-js@2.88.0/denonext/auth-js.mjs": "78b4ee0af024d453a9d9719768348f68caebb670b4197b4deb6e2cd9002be7d8",
+    "https://esm.sh/@supabase/functions-js@2.88.0/denonext/functions-js.mjs": "01bbf2d2393c6e73b822584ce6da3709652fa69f60abf84575e21c8ab36dcf8c",
+    "https://esm.sh/@supabase/postgrest-js@2.88.0/denonext/postgrest-js.mjs": "fe8314d8892efc93be789a0934af1bb31fb9ee59a96fc8aa89911739978dac2d",
+    "https://esm.sh/@supabase/realtime-js@2.88.0/denonext/realtime-js.mjs": "33a96b471bd11011d60d69abbb536abc8ba765c957f601162a5a6d2940666544",
+    "https://esm.sh/@supabase/storage-js@2.88.0/denonext/storage-js.mjs": "ee330ec1a97d013141cb723979631853bf73dd670b442f4939a0cb9a78f8811c",
+    "https://esm.sh/@supabase/supabase-js@2.88.0": "970ab311466eae157789aad084936f7441312963198b2a7e0b7926ad32f96b9d",
+    "https://esm.sh/@supabase/supabase-js@2.88.0/denonext/supabase-js.mjs": "bbdb0bc06058152f086f867a81510b38095d54e2785d7a570c954e135a52f967",
+    "https://esm.sh/iceberg-js@0.8.1/denonext/iceberg-js.mjs": "d839d81a2e3966500ca2cdd0c1cb458e9608bacfc91f7bb67a69b2e878dcdb4f",
+    "https://esm.sh/iceberg-js@0.8.1?target=denonext": "58c849d7fe2bf4eca4a84eb501e83c161a7d8c34ca1bec15a962b3bec3062633",
+    "https://esm.sh/tslib@2.8.1/denonext/tslib.mjs": "c38da5dd6da6281964435002ce204cd586634fe3bdfb24a0ee116f48cf3292e9"
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@capacitor/android@8",
+        "npm:@capacitor/cli@^7.4.4",
+        "npm:@capacitor/core@8",
+        "npm:@capacitor/ios@8",
+        "npm:@google/genai@^1.30.0",
+        "npm:@sentry/react@^10.31.0",
+        "npm:@stripe/stripe-js@^8.5.2",
+        "npm:@supabase/supabase-js@^2.39.7",
+        "npm:@tailwindcss/postcss@^4.1.17",
+        "npm:@testing-library/dom@^10.4.1",
+        "npm:@testing-library/jest-dom@^6.9.1",
+        "npm:@testing-library/react@^16.3.0",
+        "npm:@testing-library/user-event@^14.6.1",
+        "npm:@types/canvas-confetti@^1.9.0",
+        "npm:@types/html2pdf.js@0.10",
+        "npm:@types/node@^22.14.0",
+        "npm:@types/react-window@^1.8.8",
+        "npm:@vitejs/plugin-react@5",
+        "npm:autoprefixer@^10.4.22",
+        "npm:canvas-confetti@^1.9.4",
+        "npm:date-fns@^4.1.0",
+        "npm:dotenv@^17.2.3",
+        "npm:html2pdf.js@~0.12.1",
+        "npm:jsdom@^27.2.0",
+        "npm:lucide-react@0.554",
+        "npm:openai@4.28.0",
+        "npm:postcss@^8.5.6",
+        "npm:posthog-js@^1.307.0",
+        "npm:react-dom@^19.2.0",
+        "npm:react-helmet-async@^2.0.5",
+        "npm:react-router-dom@^7.9.6",
+        "npm:react-virtualized-auto-sizer@^1.0.26",
+        "npm:react-window@^2.2.3",
+        "npm:react@^19.2.0",
+        "npm:sonner@^2.0.7",
+        "npm:tailwindcss@^4.1.17",
+        "npm:typescript@~5.8.2",
+        "npm:vite@^6.2.0",
+        "npm:vitest@^4.0.15",
+        "npm:zod@^4.1.13"
+      ]
+    }
+  }
+}

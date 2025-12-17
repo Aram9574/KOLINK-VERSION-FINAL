@@ -4,6 +4,7 @@ import { translations } from '../../../translations';
 import { User, Building2, Briefcase } from 'lucide-react';
 import Tooltip from '../../ui/Tooltip';
 import BrandVoiceManager from './BrandVoiceManager';
+import LockedBrandVoiceState from './LockedBrandVoiceState';
 import { getAvatarUrl } from '../../../utils';
 
 interface ProfileSettingsProps {
@@ -11,9 +12,10 @@ interface ProfileSettingsProps {
     language: AppLanguage;
     setLanguage: (lang: AppLanguage) => void;
     onSave: (updates: Partial<UserProfile>) => void;
+    onUpgrade: () => void;
 }
 
-const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLanguage, onSave }) => {
+const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLanguage, onSave, onUpgrade }) => {
     const [name, setName] = useState(user.name || '');
     const [headline, setHeadline] = useState(user.headline || '');
     const [companyName, setCompanyName] = useState(user.companyName || '');
@@ -59,7 +61,11 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
 
             {/* Brand Voice Manager */}
             <div className="bg-white border boundary-slate-200 rounded-2xl p-6 shadow-sm ring-1 ring-slate-900/5">
-                <BrandVoiceManager userId={user.id} language={language} />
+                {user.planTier === 'free' ? (
+                     <LockedBrandVoiceState onUpgrade={onUpgrade} />
+                ) : (
+                    <BrandVoiceManager userId={user.id} language={language} />
+                )}
             </div>
 
             {/* Profile Section */}

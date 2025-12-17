@@ -141,6 +141,7 @@ export interface UserProfile {
   // Security Settings
   twoFactorEnabled?: boolean;
   securityNotifications?: boolean;
+  referredBy?: string; // ID of the referring user
   // Gamification Stats
   xp: number;
   level: number;

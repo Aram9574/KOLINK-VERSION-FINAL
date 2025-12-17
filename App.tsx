@@ -40,6 +40,17 @@ const App: React.FC = () => {
         return () => clearTimeout(timer);
     }, [loading]);
 
+    // Capture referral code from URL
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const refCode = params.get('ref');
+        if (refCode) {
+            localStorage.setItem('kolink_referral_code', refCode);
+            // Optional: Remove query param to clean URL
+            // window.history.replaceState({}, '', window.location.pathname);
+        }
+    }, []);
+
     if (loading && !isTimeout) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">

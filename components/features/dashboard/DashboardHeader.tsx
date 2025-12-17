@@ -5,6 +5,8 @@ import { ALGORITHM_TIPS_CONTENT } from '../../../constants';
 import FeedbackModal from '../../modals/FeedbackModal';
 import { getAvatarUrl } from '../../../utils';
 
+import NotificationBell from '../notifications/NotificationBell';
+
 interface DashboardHeaderProps {
     user: UserProfile;
     language: AppLanguage;
@@ -37,6 +39,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ user, language, setLa
 
                 <div className="flex items-center gap-6">
                     <div className="flex items-center gap-3">
+                        <NotificationBell userId={user.id} language={language} />
+                        
                         <button
                             onClick={() => setIsFeedbackOpen(true)}
                             className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-100 hover:border-violet-200 text-violet-700 rounded-full text-xs font-bold transition-all hover:shadow-sm hover:from-violet-100 hover:to-indigo-100 mr-2 group"

@@ -1,12 +1,17 @@
 {
-    "compilerOptions": {
-        "allowJs": true,
-        "lib": [
-            "deno.window"
-        ],
-        "strict": true
-    },
-    "imports": {
-        "zod": "https://esm.sh/zod@3.22.4"
-    }
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": [
+      "deno.window"
+    ],
+    "strict": true
+  },
+  "imports": {
+    "zod": "https://esm.sh/zod@3.22.4",
+    "std/http/server": "https://deno.land/std@0.168.0/http/server.ts",
+    "stripe": "npm:stripe@^14.0.0",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2",
+    "@google/genai": "npm:@google/genai@^0.2.0",
+    "@google/generative-ai": "npm:@google/generative-ai@^0.12.0"
+  }
 }

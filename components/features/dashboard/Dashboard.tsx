@@ -19,6 +19,11 @@ import TourGuide from './ProductTour';
 import LevelUpModal from '../../modals/LevelUpModal';
 import { updateUserProfile } from '../../../services/userRepository';
 import ProfileAuditor from '../auditor/ProfileAuditor';
+import LockedAuditorState from '../auditor/LockedAuditorState';
+import LockedAutoPilotState from '../autopilot/LockedAutoPilotState';
+import LockedHistoryState from '../history/LockedHistoryState';
+import ReferralModal from '../../modals/ReferralModal';
+import { Gift } from 'lucide-react';
 
 import { toast } from 'sonner';
 import { Post, UserProfile } from '../../../types';
@@ -74,6 +79,7 @@ const DashboardContent: React.FC = () => {
     const [isOnboarding, setIsOnboarding] = useState(false);
     const [showWelcome, setShowWelcome] = useState(false);
     const [isTourActive, setIsTourActive] = useState(false);
+    const [showReferralModal, setShowReferralModal] = useState(false);
     const [levelUpData, setLevelUpData] = useState<any>(null);
 
     // Helper for hooks
@@ -213,6 +219,7 @@ const DashboardContent: React.FC = () => {
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             onUpgrade={() => setShowUpgradeModal(true)}
+            onReferral={() => setShowReferralModal(true)}
             showCreditDeduction={showCreditDeduction}
             onDeletePost={handleDeletePost}
         >
@@ -240,26 +247,30 @@ const DashboardContent: React.FC = () => {
 
                     {activeTab === 'history' && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full">
-                            <HistoryView
-                                onSelect={(post) => {
-                                    setCurrentPost(post);
-                                    setActiveTab('create');
-                                }}
-                                onReuse={(params) => {
-                                    setCurrentPost({
-                                        id: 'draft-' + Date.now(),
-                                        content: '', // Start clear for new generation
-                                        params: params,
-                                        createdAt: Date.now(),
-                                        likes: 0,
-                                        views: 0
-                                    });
-                                    setActiveTab('create');
-                                }}
-                                onDelete={handleDeletePost}
-                                language={language}
-                                onUpgrade={() => setShowUpgradeModal(true)}
-                            />
+                            {user.planTier === 'free' ? (
+                                <LockedHistoryState onUpgrade={() => setShowUpgradeModal(true)} />
+                            ) : (
+                                <HistoryView
+                                    onSelect={(post) => {
+                                        setCurrentPost(post);
+                                        setActiveTab('create');
+                                    }}
+                                    onReuse={(params) => {
+                                        setCurrentPost({
+                                            id: 'draft-' + Date.now(),
+                                            content: '', // Start clear for new generation
+                                            params: params,
+                                            createdAt: Date.now(),
+                                            likes: 0,
+                                            views: 0
+                                        });
+                                        setActiveTab('create');
+                                    }}
+                                    onDelete={handleDeletePost}
+                                    language={language}
+                                    onUpgrade={() => setShowUpgradeModal(true)}
+                                />
+                            )}
                         </div>
                     )}
 
@@ -267,15 +278,19 @@ const DashboardContent: React.FC = () => {
 
                     {activeTab === 'autopilot' && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <AutoPilotView
-                                user={user}
-                                language={language}
-                                onViewPost={(post) => {
-                                    setCurrentPost(post);
-                                    setActiveTab('create');
-                                }}
-                                onUpgrade={() => setShowUpgradeModal(true)}
-                            />
+                             {user.planTier === 'free' ? (
+                                <LockedAutoPilotState onUpgrade={() => setShowUpgradeModal(true)} />
+                            ) : (
+                                <AutoPilotView
+                                    user={user}
+                                    language={language}
+                                    onViewPost={(post) => {
+                                        setCurrentPost(post);
+                                        setActiveTab('create');
+                                    }}
+                                    onUpgrade={() => setShowUpgradeModal(true)}
+                                />
+                            )}
                         </div>
                     )}
 
@@ -291,7 +306,11 @@ const DashboardContent: React.FC = () => {
 
                     {activeTab === 'auditor' && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <ProfileAuditor />
+                            {user.planTier === 'free' ? (
+                                <LockedAuditorState onUpgrade={() => setShowUpgradeModal(true)} />
+                            ) : (
+                                <ProfileAuditor />
+                            )}
                         </div>
                     )}
                 </div>
@@ -341,6 +360,11 @@ const DashboardContent: React.FC = () => {
                     language={language}
                 />
             )}
+            
+            <ReferralModal 
+                isOpen={showReferralModal}
+                onClose={() => setShowReferralModal(false)}
+            />
         </DashboardLayout>
     );
 };

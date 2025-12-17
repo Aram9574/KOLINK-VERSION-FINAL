@@ -1,6 +1,9 @@
+/// <reference lib="deno.ns" />
+// @ts-ignore
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import Stripe from 'npm:stripe@^14.0.0'
+// @ts-ignore
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import Stripe from 'https://esm.sh/stripe@14.25.0?target=deno'
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') as string, {
     apiVersion: '2023-10-16',
@@ -12,7 +15,7 @@ const supabaseClient = createClient(
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 )
 
-serve(async (req) => {
+serve(async (req: Request) => {
     const signature = req.headers.get('Stripe-Signature')
 
     if (!signature) {
@@ -30,7 +33,7 @@ serve(async (req) => {
         console.log(`Received event: ${event.type}`);
 
         if (event.type === 'invoice.payment_succeeded' || event.type === 'checkout.session.completed') {
-            const dataObject = event.data.object;
+            const dataObject = event.data.object as any; // Cast to any to access properties safely without full Stripe type
             const customerId = dataObject.customer as string;
             // For checkout session, use amount_total. For invoice, use amount_paid.
             const amountPaid = dataObject.amount_paid ?? dataObject.amount_total ?? 0;
@@ -40,7 +43,7 @@ serve(async (req) => {
             // Find user by stripe_customer_id
             const { data: profile, error: profileError } = await supabaseClient
                 .from('profiles')
-                .select('id, credits, email')
+                .select('id, credits, email, referred_by')
                 .eq('stripe_customer_id', customerId)
                 .single()
 
@@ -59,12 +62,7 @@ serve(async (req) => {
                     if (profileByEmail) {
                         console.log(`Found user by email. Updating customer ID...`);
                         await supabaseClient.from('profiles').update({ stripe_customer_id: customerId }).eq('id', profileByEmail.id);
-                        // Continue with this profile logic (re-fetch or just use found profile)
-                        // For simplicity in this patch, we'll use the found profile and proceed
-                        // But we need to be careful about variable scope if we were strictly typed, but here 'profile' is const.
-                        // Let's just recursively call or copy logic? No, let's just proceed if we found it.
-                        // Actually, let's just use the profileByEmail as the target.
-
+                        
                         await processCreditUpdate(supabaseClient, profileByEmail, amountPaid, dataObject?.lines?.data?.[0]?.period?.end ?? Math.floor(Date.now() / 1000) + 2592000); // Default 30 days if no period
                         return new Response(JSON.stringify({ received: true }), { headers: { 'Content-Type': 'application/json' } });
                     } else {
@@ -105,7 +103,7 @@ serve(async (req) => {
     }
 })
 
-async function processCreditUpdate(supabaseClient, profile, amountPaid, periodEndTimestamp) {
+async function processCreditUpdate(supabaseClient: SupabaseClient, profile: any, amountPaid: number, periodEndTimestamp: number) {
     console.log(`Found user: ${profile.id} (${profile.email}). Current credits: ${profile.credits}`);
 
     let creditsToAdd = 0
@@ -140,4 +138,63 @@ async function processCreditUpdate(supabaseClient, profile, amountPaid, periodEn
     }
 
     console.log(`Successfully updated profile. New balance: ${newCreditBalance}`);
+
+    // Referral Reward Logic
+    if (profile.referred_by) {
+        console.log(`User was referred by ${profile.referred_by}. Processing reward...`);
+        try {
+            // 1. Get Referrer details
+            const { data: referrer, error: referrerError } = await supabaseClient
+                .from('profiles')
+                .select('id, stripe_customer_id, email')
+                .eq('id', profile.referred_by)
+                .single();
+
+            if (referrerError || !referrer) {
+                console.error("Referrer not found:", referrerError);
+                return;
+            }
+
+            if (referrer.stripe_customer_id) {
+                // 2. Apply Credit Balance to Referrer in Stripe
+                // €19.00 = 1900 cents
+                await stripe.customers.createBalanceTransaction(
+                    referrer.stripe_customer_id,
+                    {
+                        amount: -1900, // Negative amount adds credit to the customer balance (owed to customer)
+                        currency: 'eur',
+                        description: `Referral Reward: ${profile.email} subscribed!`
+                    }
+                );
+                console.log(`Applied €19 credit to referrer ${referrer.id} (Stripe: ${referrer.stripe_customer_id})`);
+
+                // 3. Insert Notification into DB
+                const { error: notifError } = await supabaseClient
+                    .from('notifications')
+                    .insert({
+                        user_id: referrer.id,
+                        type: 'referral_reward',
+                        title: 'Referral Reward Unlocked! 🎁',
+                        message: `Your friend (${profile.email}) subscribed! You've received €19 credit (1 month free).`,
+                        read: false
+                    });
+                
+                if (notifError) {
+                    console.error("Error creating notification:", notifError);
+                } else {
+                    console.log("Notification created for referrer.");
+                }
+
+                // 4. Send Email (Placeholder)
+                // if (Deno.env.get('RESEND_API_KEY')) { ... }
+                console.log(`[Email Simulation] To: ${referrer.email}, Subject: You got a free month!`);
+
+            } else {
+                 console.warn(`Referrer ${referrer.id} has no stripe_customer_id.`);
+            }
+
+        } catch (err) {
+            console.error("Error processing referral reward:", err);
+        }
+    }
 }

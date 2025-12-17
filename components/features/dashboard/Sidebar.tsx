@@ -7,7 +7,8 @@ import {
     Crown,
     Sparkles,
     Lightbulb,
-    Bot
+    Bot,
+    Gift
 } from 'lucide-react';
 import { Post, UserProfile, AppLanguage } from '../../../types';
 import GamificationWidget from './GamificationWidget';
@@ -28,6 +29,7 @@ interface SidebarProps {
     onSettingsClick: () => void;
     className?: string;
     showCreditDeduction?: boolean;
+    onReferral?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -40,7 +42,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     onUpgrade,
     onSettingsClick,
     className = '',
-    showCreditDeduction = false
+    showCreditDeduction = false,
+    onReferral
 }) => {
     const { user, language, logout } = useUser();
     const t = translations[language].app.sidebar;
@@ -125,6 +128,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                 >
                     <LogOut className="w-5 h-5" />
                     {t.logout}
+                </button>
+
+                <button
+                    onClick={onReferral}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all duration-200 group"
+                >
+                    <Gift className="w-5 h-5 text-violet-500 group-hover:scale-110 transition-transform" />
+                    <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent font-bold">
+                        {language === 'es' ? 'Gana 1 Mes Gratis' : 'Get 1 Month Free'}
+                    </span>
                 </button>
 
 
