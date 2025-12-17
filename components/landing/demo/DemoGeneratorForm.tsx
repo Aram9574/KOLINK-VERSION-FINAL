@@ -165,13 +165,9 @@ const DemoGeneratorForm: React.FC<DemoGeneratorFormProps> = ({
                                 </label>
                                 <div className="relative group">
                                     <select
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
+                                        disabled
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-300 rounded-xl outline-none text-sm appearance-none cursor-default font-medium text-slate-500 shadow-sm"
                                         value={params.framework}
-                                        onChange={(e) =>
-                                            onUpdateParams({
-                                                framework: e.target
-                                                    .value as ViralFramework,
-                                            })}
                                     >
                                         {FRAMEWORKS.map((fOption) => (
                                             <option
@@ -185,20 +181,7 @@ const DemoGeneratorForm: React.FC<DemoGeneratorFormProps> = ({
                                         ))}
                                     </select>
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                        <svg
-                                            className="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M19 9l-7 7-7-7"
-                                            >
-                                            </path>
-                                        </svg>
+                                        <Lock className="w-4 h-4 text-slate-400" />
                                     </div>
                                 </div>
                             </div>
@@ -207,18 +190,14 @@ const DemoGeneratorForm: React.FC<DemoGeneratorFormProps> = ({
                             <div className="space-y-1.5">
                                 <label className="text-sm font-semibold text-slate-700 ml-1">
                                     {language === "es"
-                                        ? "Estilo de Gancho (Hook)"
+                                        ? "Estilo de Gancho"
                                         : "Hook Style"}
                                 </label>
                                 <div className="relative group">
                                     <select
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
+                                        disabled
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-300 rounded-xl outline-none text-sm appearance-none cursor-default font-medium text-slate-500 shadow-sm"
                                         value={params.hookStyle || "auto"}
-                                        onChange={(e) =>
-                                            onUpdateParams({
-                                                hookStyle: e.target
-                                                    .value as ViralHook,
-                                            })}
                                     >
                                         {HOOK_STYLES.map((hOption) => (
                                             <option
@@ -230,20 +209,7 @@ const DemoGeneratorForm: React.FC<DemoGeneratorFormProps> = ({
                                         ))}
                                     </select>
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                        <svg
-                                            className="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M19 9l-7 7-7-7"
-                                            >
-                                            </path>
-                                        </svg>
+                                        <Lock className="w-4 h-4 text-slate-400" />
                                     </div>
                                 </div>
                             </div>
@@ -259,7 +225,7 @@ const DemoGeneratorForm: React.FC<DemoGeneratorFormProps> = ({
                                 <div className="relative group">
                                     <select
                                         disabled
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-300 rounded-xl text-sm appearance-none cursor-not-allowed font-medium text-slate-400 shadow-sm"
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-300 rounded-xl text-sm appearance-none cursor-default font-medium text-slate-500 shadow-sm"
                                     >
                                         <option>
                                             {language === "es"
@@ -280,13 +246,9 @@ const DemoGeneratorForm: React.FC<DemoGeneratorFormProps> = ({
                                 </label>
                                 <div className="relative group">
                                     <select
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
+                                        disabled
+                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-slate-50 border border-slate-300 rounded-xl outline-none text-sm appearance-none cursor-default font-medium text-slate-500 shadow-sm"
                                         value={params.tone}
-                                        onChange={(e) =>
-                                            onUpdateParams({
-                                                tone: e.target
-                                                    .value as ViralTone,
-                                            })}
                                     >
                                         {TONES.map((tOption) => (
                                             <option
@@ -299,20 +261,7 @@ const DemoGeneratorForm: React.FC<DemoGeneratorFormProps> = ({
                                         ))}
                                     </select>
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                        <svg
-                                            className="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M19 9l-7 7-7-7"
-                                            >
-                                            </path>
-                                        </svg>
+                                        <Lock className="w-4 h-4 text-slate-400" />
                                     </div>
                                 </div>
                             </div>
