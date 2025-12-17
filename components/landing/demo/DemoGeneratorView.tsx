@@ -39,7 +39,7 @@ const DemoGeneratorView: React.FC<DemoGeneratorViewProps> = ({ language }) => {
     return (
         <div className="relative bg-slate-900/5 rounded-3xl p-2 ring-1 ring-slate-900/10 shadow-2xl transform hover:scale-[1.01] transition-transform duration-500 ease-out backdrop-blur-sm group">
             {/* App Window Frame */}
-            <div className="bg-slate-50 rounded-2xl overflow-hidden aspect-[16/10] md:aspect-[16/9] relative flex border border-slate-200 shadow-inner">
+            <div className="bg-slate-50 rounded-2xl overflow-hidden min-h-[650px] md:min-h-[800px] relative flex border border-slate-200 shadow-inner">
                 {/* Demo Sidebar (Hidden on mobile same as real app) */}
                 <div className="hidden md:flex flex-shrink-0">
                     <DemoSidebar
