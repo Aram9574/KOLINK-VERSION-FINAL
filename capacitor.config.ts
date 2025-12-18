@@ -1,9 +1,9 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'com.kolink.app',
-  appName: 'Kolink',
-  webDir: 'dist'
+  appId: "com.aramzakzuk.kolink",
+  appName: "Kolink",
+  webDir: "dist-mobile",
 };
 
 export default config;

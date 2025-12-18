@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Google tag (gtag.js) -->
+        <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=G-YJR861QCW8"
+        ></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
+
+            gtag("config", "G-YJR861QCW8");
+        </script>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+        />
+        <title>Kolink App</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+            rel="stylesheet"
+        >
+        <script async defer src="https://apis.google.com/js/api.js"></script>
+        <script
+            async
+            defer
+            src="https://accounts.google.com/gsi/client"
+        ></script>
+        <style>
+            /* Mobile specific Global Overrides */
+            body {
+                -webkit-tap-highlight-color: transparent;
+                overscroll-behavior-y: none; /* Prevent rubber banding */
+                user-select: none; /* App-like feel */
+            }
+            input, textarea {
+                user-select: text; /* Allow typing */
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="module" src="/mobile.tsx"></script>
+    </body>
+</html>

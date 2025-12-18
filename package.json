@@ -6,12 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "test": "vitest run",
-    "mobile": "npx cap sync"
+    "build:mobile": "vite build -c vite.mobile.config.ts && mv dist-mobile/mobile.html dist-mobile/index.html",
+    "mobile": "npm run build:mobile && npx cap sync"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.0.0",
     "@capacitor/cli": "^7.4.4",
     "@capacitor/core": "^8.0.0",
     "@capacitor/ios": "^8.0.0",

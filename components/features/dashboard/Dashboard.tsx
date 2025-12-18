@@ -1,37 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { useUser } from '../../../context/UserContext';
-import { PostProvider, usePosts } from '../../../context/PostContext';
-import { useSubscription } from '../../../hooks/useSubscription';
-import { usePostGeneration } from '../../../hooks/usePostGeneration';
-import { useAutoPilot } from '../../../hooks/useAutoPilot';
-import { useUserSync } from '../../../hooks/useUserSync';
+import React, { useEffect, useState } from "react";
+import { Capacitor } from "@capacitor/core";
+import { useUser } from "../../../context/UserContext";
+import { PostProvider, usePosts } from "../../../context/PostContext";
+import { useSubscription } from "../../../hooks/useSubscription";
+import { usePostGeneration } from "../../../hooks/usePostGeneration";
+import { useAutoPilot } from "../../../hooks/useAutoPilot";
+import { useUserSync } from "../../../hooks/useUserSync";
 
-import DashboardLayout from '../../layouts/DashboardLayout';
-import HistoryView from '../history/HistoryView';
-import SettingsView from '../settings/SettingsView';
+import DashboardLayout from "../../layouts/DashboardLayout";
+import HistoryView from "../history/HistoryView";
+import SettingsView from "../settings/SettingsView";
 
-import AutoPilotView from '../autopilot/AutoPilotView';
-import OnboardingFlow from '../onboarding/OnboardingFlow';
-import UpgradeModal from '../../modals/UpgradeModal';
-import CancellationModal from '../../modals/CancellationModal';
-import WelcomeModal from '../../modals/WelcomeModal';
-import TourGuide from './ProductTour';
-import LevelUpModal from '../../modals/LevelUpModal';
-import { updateUserProfile } from '../../../services/userRepository';
-import ProfileAuditor from '../auditor/ProfileAuditor';
-import LockedAuditorState from '../auditor/LockedAuditorState';
-import LockedAutoPilotState from '../autopilot/LockedAutoPilotState';
-import LockedHistoryState from '../history/LockedHistoryState';
-import ReferralModal from '../../modals/ReferralModal';
-import { Gift } from 'lucide-react';
+import AutoPilotView from "../autopilot/AutoPilotView";
+import OnboardingFlow from "../onboarding/OnboardingFlow";
+import UpgradeModal from "../../modals/UpgradeModal";
+import CancellationModal from "../../modals/CancellationModal";
+import WelcomeModal from "../../modals/WelcomeModal";
+import TourGuide from "./ProductTour";
+import LevelUpModal from "../../modals/LevelUpModal";
+import { updateUserProfile } from "../../../services/userRepository";
+import ProfileAuditor from "../auditor/ProfileAuditor";
+import LockedAuditorState from "../auditor/LockedAuditorState";
+import LockedAutoPilotState from "../autopilot/LockedAutoPilotState";
+import LockedHistoryState from "../history/LockedHistoryState";
+import ReferralModal from "../../modals/ReferralModal";
+import { Gift } from "lucide-react";
 
-import { toast } from 'sonner';
-import { Post, UserProfile } from '../../../types';
-import { translations } from '../../../translations';
-import { Suspense } from 'react';
+import { toast } from "sonner";
+import { Post, UserProfile } from "../../../types";
+import { translations } from "../../../translations";
+import { Suspense } from "react";
 
 // Lazy load PostGenerator to reduce initial Dashboard bundle size
-const PostCreator = React.lazy(() => import('../generation/PostGenerator'));
+const PostCreator = React.lazy(() => import("../generation/PostGenerator"));
 
 const DashboardContent: React.FC = () => {
     const { user, refreshUser, setUser, language, setLanguage } = useUser();
@@ -44,7 +45,7 @@ const DashboardContent: React.FC = () => {
         setIsGenerating,
         addPost,
         removePost,
-        updatePost
+        updatePost,
     } = usePosts();
 
     const t = translations[language].productTour;
@@ -52,26 +53,36 @@ const DashboardContent: React.FC = () => {
     // Prefetch PostGenerator for smoother experience
     useEffect(() => {
         const prefetchPostGenerator = async () => {
-             try {
-                 await import('../generation/PostGenerator');
-             } catch (e) {
-                 console.error("Error prefetching PostGenerator", e);
-             }
+            try {
+                await import("../generation/PostGenerator");
+            } catch (e) {
+                console.error("Error prefetching PostGenerator", e);
+            }
         };
         prefetchPostGenerator();
     }, []);
 
     // UI State
     // Persist active tab selection
-    const [activeTab, setActiveTabRaw] = useState<'create' | 'history' | 'settings' | 'autopilot' | 'auditor' | 'ideas'>(() => {
-        const saved = localStorage.getItem('kolink_active_tab');
-        if (saved === 'ideas') return 'create'; // Legacy
-        return (saved as any) || 'create';
+    const [activeTab, setActiveTabRaw] = useState<
+        "create" | "history" | "settings" | "autopilot" | "auditor" | "ideas"
+    >(() => {
+        const saved = localStorage.getItem("kolink_active_tab");
+        if (saved === "ideas") return "create"; // Legacy
+        return (saved as any) || "create";
     });
 
-    const setActiveTab = (tab: 'create' | 'history' | 'settings' | 'autopilot' | 'auditor' | 'ideas') => {
+    const setActiveTab = (
+        tab:
+            | "create"
+            | "history"
+            | "settings"
+            | "autopilot"
+            | "auditor"
+            | "ideas",
+    ) => {
         setActiveTabRaw(tab);
-        localStorage.setItem('kolink_active_tab', tab);
+        localStorage.setItem("kolink_active_tab", tab);
     };
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [showCancelModal, setShowCancelModal] = useState(false);
@@ -85,7 +96,7 @@ const DashboardContent: React.FC = () => {
     // Helper for hooks
     const handleUpdateUser = async (updates: Partial<UserProfile>) => {
         // 1. Optimistic Update
-        setUser(prev => ({ ...prev, ...updates }));
+        setUser((prev) => ({ ...prev, ...updates }));
 
         // 2. Persist to Database
         if (user.id) {
@@ -118,7 +129,7 @@ const DashboardContent: React.FC = () => {
         setShowCreditDeduction,
         setLevelUpData,
         isGenerating,
-        setIsGenerating
+        setIsGenerating,
     });
 
     // Effects
@@ -132,23 +143,25 @@ const DashboardContent: React.FC = () => {
         const hasSeenTour = localStorage.getItem(`kolink_tour_seen_${user.id}`);
         // If onboarded but hasn't seen tour, show Welcome Modal first
         if (!hasSeenTour && !isOnboarding && user.hasOnboarded) {
-             // Only show if not already showing tour
-             if (!isTourActive) {
-                 setShowWelcome(true);
-             }
+            // Only show if not already showing tour
+            if (!isTourActive) {
+                setShowWelcome(true);
+            }
         }
     }, [user.id, isOnboarding, user.hasOnboarded, isTourActive]);
 
     // Handlers
     const handleDeletePost = (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (window.confirm('Are you sure you want to delete this post?')) {
+        if (window.confirm("Are you sure you want to delete this post?")) {
             removePost(id);
-            toast.success('Post deleted');
+            toast.success("Post deleted");
         }
     };
 
-    const handleOnboardingComplete = async (updatedData: Partial<UserProfile>) => {
+    const handleOnboardingComplete = async (
+        updatedData: Partial<UserProfile>,
+    ) => {
         // 1. Update DB and Local State
         await handleUpdateUser(updatedData);
 
@@ -165,39 +178,45 @@ const DashboardContent: React.FC = () => {
     const handleStartTour = () => {
         setShowWelcome(false);
         setIsTourActive(true);
-        setActiveTab('create'); // Ensure we start at first step
+        setActiveTab("create"); // Ensure we start at first step
     };
 
     const handleSkipTour = () => {
         setShowWelcome(false);
-        localStorage.setItem(`kolink_tour_seen_${user.id}`, 'true');
+        localStorage.setItem(`kolink_tour_seen_${user.id}`, "true");
     };
 
     const handleTourComplete = () => {
         setIsTourActive(false);
-        localStorage.setItem(`kolink_tour_seen_${user.id}`, 'true');
+        localStorage.setItem(`kolink_tour_seen_${user.id}`, "true");
     };
 
     // Tour Steps
     // Tour Steps with Tab Navigation
     const TOUR_STEPS = [
-        { 
-            targetId: 'viral-engine-view', 
-            title: language === 'es' ? 'Motor Viral' : 'Viral Engine', 
-            description: language === 'es' ? 'Genera tu primer post aquí con nuestra IA entrenada.' : 'Generate your first post here with our trained AI.',
-            tab: 'create' as const
+        {
+            targetId: "viral-engine-view",
+            title: language === "es" ? "Motor Viral" : "Viral Engine",
+            description: language === "es"
+                ? "Genera tu primer post aquí con nuestra IA entrenada."
+                : "Generate your first post here with our trained AI.",
+            tab: "create" as const,
         },
-        { 
-            targetId: 'brand-voice-manager', 
-            title: language === 'es' ? 'Voz de Marca' : 'Brand Voice', 
-            description: language === 'es' ? 'Entrena a la IA para que suene exactamente como tú.' : 'Train the AI to sound exactly like you.',
-            tab: 'settings' as const
+        {
+            targetId: "brand-voice-manager",
+            title: language === "es" ? "Voz de Marca" : "Brand Voice",
+            description: language === "es"
+                ? "Entrena a la IA para que suene exactamente como tú."
+                : "Train the AI to sound exactly like you.",
+            tab: "settings" as const,
         },
-        { 
-            targetId: 'autopilot-view', 
-            title: 'AutoPilot', 
-            description: language === 'es' ? 'Programa y automatiza tu contenido en piloto automático.' : 'Schedule and automate your content on autopilot.',
-            tab: 'autopilot' as const
+        {
+            targetId: "autopilot-view",
+            title: "AutoPilot",
+            description: language === "es"
+                ? "Programa y automatiza tu contenido en piloto automático."
+                : "Schedule and automate your content on autopilot.",
+            tab: "autopilot" as const,
         },
     ];
 
@@ -211,7 +230,9 @@ const DashboardContent: React.FC = () => {
     };
 
     if (isOnboarding) {
-        return <OnboardingFlow user={user} onComplete={handleOnboardingComplete} />;
+        return (
+            <OnboardingFlow user={user} onComplete={handleOnboardingComplete} />
+        );
     }
 
     return (
@@ -223,78 +244,107 @@ const DashboardContent: React.FC = () => {
             showCreditDeduction={showCreditDeduction}
             onDeletePost={handleDeletePost}
         >
-            <div className={`h-full ${activeTab === 'history' ? 'overflow-hidden' : 'overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent'}`}>
-                <div className={`${activeTab === 'history' ? 'h-full ml-1' : 'max-w-7xl mx-auto p-4 lg:p-8 pb-24'}`}>
-                    {activeTab === 'create' && (
-                        <div id="viral-engine-view" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                             <Suspense fallback={
-                                 <div className="flex justify-center items-center h-64">
-                                     <div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-500 border-t-transparent"></div>
-                                 </div>
-                             }>
+            <div
+                className={`h-full ${
+                    activeTab === "history"
+                        ? "overflow-hidden"
+                        : "overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent"
+                }`}
+            >
+                <div
+                    className={`${
+                        activeTab === "history"
+                            ? "h-full ml-1"
+                            : "max-w-7xl mx-auto p-4 lg:p-8 pb-24"
+                    }`}
+                >
+                    {activeTab === "create" && (
+                        <div
+                            id="viral-engine-view"
+                            className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+                        >
+                            <Suspense
+                                fallback={
+                                    <div className="flex justify-center items-center h-64">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-500 border-t-transparent">
+                                        </div>
+                                    </div>
+                                }
+                            >
                                 <PostCreator
-                                    onGenerate={(params) => generatePost(params)}
+                                    onGenerate={(params) =>
+                                        generatePost(params)}
                                     isGenerating={isGenerating}
                                     credits={user.credits}
-                                    language={user.language || 'en'}
+                                    language={user.language || "en"}
                                     showCreditDeduction={showCreditDeduction}
                                     initialParams={currentPost?.params}
                                     initialTopic={currentPost?.params?.topic}
                                 />
-                             </Suspense>
+                            </Suspense>
                         </div>
                     )}
 
-                    {activeTab === 'history' && (
+                    {activeTab === "history" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full">
-                            {user.planTier === 'free' ? (
-                                <LockedHistoryState onUpgrade={() => setShowUpgradeModal(true)} />
-                            ) : (
-                                <HistoryView
-                                    onSelect={(post) => {
-                                        setCurrentPost(post);
-                                        setActiveTab('create');
-                                    }}
-                                    onReuse={(params) => {
-                                        setCurrentPost({
-                                            id: 'draft-' + Date.now(),
-                                            content: '', // Start clear for new generation
-                                            params: params,
-                                            createdAt: Date.now(),
-                                            likes: 0,
-                                            views: 0
-                                        });
-                                        setActiveTab('create');
-                                    }}
-                                    onDelete={handleDeletePost}
-                                    language={language}
-                                    onUpgrade={() => setShowUpgradeModal(true)}
-                                />
-                            )}
+                            {user.planTier === "free"
+                                ? (
+                                    <LockedHistoryState
+                                        onUpgrade={() =>
+                                            setShowUpgradeModal(true)}
+                                    />
+                                )
+                                : (
+                                    <HistoryView
+                                        onSelect={(post) => {
+                                            setCurrentPost(post);
+                                            setActiveTab("create");
+                                        }}
+                                        onReuse={(params) => {
+                                            setCurrentPost({
+                                                id: "draft-" + Date.now(),
+                                                content: "", // Start clear for new generation
+                                                params: params,
+                                                createdAt: Date.now(),
+                                                likes: 0,
+                                                views: 0,
+                                            });
+                                            setActiveTab("create");
+                                        }}
+                                        onDelete={handleDeletePost}
+                                        language={language}
+                                        onUpgrade={() =>
+                                            setShowUpgradeModal(true)}
+                                    />
+                                )}
                         </div>
                     )}
 
-
-
-                    {activeTab === 'autopilot' && (
+                    {activeTab === "autopilot" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                             {user.planTier === 'free' ? (
-                                <LockedAutoPilotState onUpgrade={() => setShowUpgradeModal(true)} />
-                            ) : (
-                                <AutoPilotView
-                                    user={user}
-                                    language={language}
-                                    onViewPost={(post) => {
-                                        setCurrentPost(post);
-                                        setActiveTab('create');
-                                    }}
-                                    onUpgrade={() => setShowUpgradeModal(true)}
-                                />
-                            )}
+                            {user.planTier === "free"
+                                ? (
+                                    <LockedAutoPilotState
+                                        onUpgrade={() =>
+                                            setShowUpgradeModal(true)}
+                                    />
+                                )
+                                : (
+                                    <AutoPilotView
+                                        user={user}
+                                        language={language}
+                                        onViewPost={(post) => {
+                                            setCurrentPost(post);
+                                            setActiveTab("create");
+                                        }}
+                                        onUpgrade={() =>
+                                            setShowUpgradeModal(true)}
+                                    />
+                                )}
                         </div>
                     )}
 
-                    {activeTab === 'settings' && (
+                    {activeTab === "settings" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <SettingsView
                                 user={user}
@@ -304,13 +354,16 @@ const DashboardContent: React.FC = () => {
                         </div>
                     )}
 
-                    {activeTab === 'auditor' && (
+                    {activeTab === "auditor" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            {user.planTier === 'free' ? (
-                                <LockedAuditorState onUpgrade={() => setShowUpgradeModal(true)} />
-                            ) : (
-                                <ProfileAuditor />
-                            )}
+                            {user.planTier === "free"
+                                ? (
+                                    <LockedAuditorState
+                                        onUpgrade={() =>
+                                            setShowUpgradeModal(true)}
+                                    />
+                                )
+                                : <ProfileAuditor />}
                         </div>
                     )}
                 </div>
@@ -330,9 +383,9 @@ const DashboardContent: React.FC = () => {
                 <CancellationModal
                     isOpen={showCancelModal}
                     onClose={() => setShowCancelModal(false)}
-                    userEmail={user.email || ''}
+                    userEmail={user.email || ""}
                     planPrice={19}
-                    language={user.language || 'en'}
+                    language={user.language || "en"}
                 />
             )}
 
@@ -360,8 +413,8 @@ const DashboardContent: React.FC = () => {
                     language={language}
                 />
             )}
-            
-            <ReferralModal 
+
+            <ReferralModal
                 isOpen={showReferralModal}
                 onClose={() => setShowReferralModal(false)}
             />
