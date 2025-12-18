@@ -6,6 +6,7 @@ import { useSubscription } from "../../../hooks/useSubscription";
 import { usePostGeneration } from "../../../hooks/usePostGeneration";
 import { useAutoPilot } from "../../../hooks/useAutoPilot";
 import { useUserSync } from "../../../hooks/useUserSync";
+import { useLocation } from "react-router-dom";
 
 import DashboardLayout from "../../layouts/DashboardLayout";
 import HistoryView from "../history/HistoryView";
@@ -149,6 +150,23 @@ const DashboardContent: React.FC = () => {
             }
         }
     }, [user.id, isOnboarding, user.hasOnboarded, isTourActive]);
+
+    // Handle Stripe Success Redirect
+    useEffect(() => {
+        const queryParams = new URLSearchParams(window.location.search);
+        if (queryParams.has("session_id")) {
+            console.log("Stripe session detected, refreshing user...");
+            refreshUser().then(() => {
+                toast.success(
+                    language === "es"
+                        ? "¡Suscripción actualizada!"
+                        : "Subscription updated!",
+                );
+                // Clean up URL to prevent multiple refreshes on re-render
+                window.history.replaceState({}, "", window.location.pathname);
+            });
+        }
+    }, [refreshUser, language]);
 
     // Handlers
     const handleDeletePost = (id: string, e: React.MouseEvent) => {
