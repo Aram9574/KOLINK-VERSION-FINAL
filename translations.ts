@@ -6,6 +6,7 @@ export const translations = {
       howItWorks: "How it Works",
       demo: "Demo",
       features: "Features",
+      tools: "Tools",
       testimonials: "Results",
       pricing: "Pricing",
       faq: "FAQ",
@@ -111,6 +112,30 @@ export const translations = {
       title: "Everything you need to go viral",
       subtitle:
         "We don't just write text. We engineer engagement using data-backed structures.",
+      tools: {
+        title: "Platform Tools",
+        subtitle: "A complete suite of tools to dominate LinkedIn.",
+        studio: {
+          title: "Viral Studio",
+          desc:
+            "Your creative command center. Generate viral posts, edit with AI, and perfect your content before publishing.",
+        },
+        autopilot: {
+          title: "AutoPilot",
+          desc:
+            "Growth on autopilot. Schedule your strategy and let AI generate and publish content for you while you sleep.",
+        },
+        audit: {
+          title: "Profile Audit",
+          desc:
+            "Analyze your LinkedIn profile. Discover what you're doing wrong and get personalized recommendations to optimize your conversion.",
+        },
+        brandVoice: {
+          title: "Brand Voice",
+          desc:
+            "Clone your unique style. Train the AI to write exactly like you, maintaining your authenticity in every post.",
+        },
+      },
       f1Title: "6 Viral Frameworks",
 
       f1Desc:
@@ -702,6 +727,7 @@ export const translations = {
       howItWorks: "Cómo Funciona",
       demo: "Demo",
       features: "Funciones",
+      tools: "Herramientas",
       testimonials: "Resultados",
       pricing: "Precios",
       faq: "Preguntas",
@@ -816,6 +842,30 @@ export const translations = {
       title: "Todo lo que necesitas para ser viral",
       subtitle:
         "No solo escribimos texto. Diseñamos engagement usando estructuras respaldadas por datos.",
+      tools: {
+        title: "Herramientas de la Plataforma",
+        subtitle: "Una suite completa para dominar LinkedIn.",
+        studio: {
+          title: "Studio Viral",
+          desc:
+            "Tu centro de comando creativo. Genera posts virales, edita con IA y perfecciona tu contenido antes de publicar.",
+        },
+        autopilot: {
+          title: "AutoPilot",
+          desc:
+            "Crecimiento en piloto automático. Programa tu estrategia y deja que la IA genere y publique contenido por ti mientras duermes.",
+        },
+        audit: {
+          title: "Auditoría de Perfil",
+          desc:
+            "Analiza tu perfil de LinkedIn. Descubre puntos débiles y recibe recomendaciones para convertir visitas en seguidores.",
+        },
+        brandVoice: {
+          title: "Voz de Marca",
+          desc:
+            "Clona tu estilo único. Entrena a la IA para que escriba exactamente como tú, manteniendo tu autenticidad en cada post.",
+        },
+      },
       f1Title: "6 Marcos Virales",
       f1Desc:
         'No adivines. Usa estructuras como "La Opinión Contraria" o "Historia Vulnerable" probadas para detener el scroll.',

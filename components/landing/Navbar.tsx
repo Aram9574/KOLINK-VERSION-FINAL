@@ -59,11 +59,11 @@ const Navbar: React.FC<NavbarProps> = (
                         {t.nav.demo}
                     </a>
                     <a
-                        href="#features"
-                        onClick={(e) => scrollToSection(e, "features")}
-                        className={getNavLinkClass("features")}
+                        href="#tools"
+                        onClick={(e) => scrollToSection(e, "tools")}
+                        className={getNavLinkClass("tools")}
                     >
-                        {t.nav.features}
+                        {t.nav.tools}
                     </a>
                     <a
                         href="#howitworks"

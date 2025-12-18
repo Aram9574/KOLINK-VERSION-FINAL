@@ -1,5 +1,6 @@
 import React from "react";
 import { AppLanguage } from "../../../types";
+import { useNavigate } from "react-router-dom";
 import DemoSidebar from "./DemoSidebar";
 import DemoGeneratorForm from "./DemoGeneratorForm";
 import DemoLinkedInPreview from "./DemoLinkedInPreview";
@@ -11,29 +12,10 @@ interface DemoGeneratorViewProps {
 
 const DemoGeneratorView: React.FC<DemoGeneratorViewProps> = ({ language }) => {
     const [activeTab, setActiveTab] = React.useState("create");
-    const [isGenerating, setIsGenerating] = React.useState(false);
+    const navigate = useNavigate();
 
     const onGenerate = () => {
-        setIsGenerating(true);
-        // Simulate generation delay
-        setTimeout(() => {
-            setIsGenerating(false);
-            toast.message(
-                language === "es" ? "¡Esto es una demo!" : "This is a demo!",
-                {
-                    description: language === "es"
-                        ? "Regístrate para generar posts reales con IA."
-                        : "Sign up to generate real posts with AI.",
-                    action: {
-                        label: language === "es"
-                            ? "Empezar Gratis"
-                            : "Start Free",
-                        onClick: () =>
-                            window.scrollTo({ top: 0, behavior: "smooth" }),
-                    },
-                },
-            );
-        }, 2000);
+        navigate("/login");
     };
 
     return (
@@ -56,7 +38,7 @@ const DemoGeneratorView: React.FC<DemoGeneratorViewProps> = ({ language }) => {
                         <DemoGeneratorForm
                             language={language}
                             onGenerate={onGenerate}
-                            isGenerating={isGenerating}
+                            isGenerating={false}
                         />
                     </div>
 
@@ -65,7 +47,7 @@ const DemoGeneratorView: React.FC<DemoGeneratorViewProps> = ({ language }) => {
                         <div className="overflow-y-auto no-scrollbar pb-4">
                             <DemoLinkedInPreview
                                 language={language}
-                                isLoading={isGenerating}
+                                isLoading={false}
                             />
                         </div>
                     </div>

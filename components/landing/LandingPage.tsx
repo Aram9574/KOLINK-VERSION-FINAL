@@ -5,8 +5,8 @@ import { translations } from "../../translations";
 import { AppLanguage, UserProfile } from "../../types";
 import Navbar from "./Navbar";
 import HeroSection from "./HeroSection";
+import ToolsSection from "./ToolsSection";
 import HowItWorksSection from "./HowItWorksSection";
-import FeaturesSection from "./FeaturesSection";
 import ComparisonSection from "./ComparisonSection";
 import RoiSection from "./RoiSection";
 import PricingSection from "./PricingSection";
@@ -125,7 +125,7 @@ const LandingPage: React.FC = () => {
             const sections = [
                 "hero",
                 "demo",
-                "features",
+                "tools",
                 "how-it-works",
                 "pricing",
                 "faq",
@@ -177,17 +177,14 @@ const LandingPage: React.FC = () => {
                     scrollToSection={scrollToSection}
                 />
 
+                <ToolsSection language={language} />
+
+                <HowItWorksSection language={language} />
+
                 <ComparisonSection
                     language={language}
                     mockContent={mockContent}
                 />
-
-                <FeaturesSection
-                    language={language}
-                    mockContent={mockContent}
-                />
-
-                <HowItWorksSection language={language} />
 
                 <RoiSection language={language} />
 

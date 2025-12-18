@@ -19,6 +19,15 @@
   --color-linkedin-brand: #0a66c2;
 }
 
+/* Safe Area Utilities */
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
