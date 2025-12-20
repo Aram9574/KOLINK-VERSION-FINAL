@@ -17,12 +17,19 @@ import {
 import { supabase } from "../../../services/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { translations } from "../../../translations";
-// - [x] AutoPilot UX: Resize Status Bar (Move to Grid)
-// - [ ] AutoPilot UX: Move Description to Right Column
 import AutoPilotStatus from "./AutoPilotStatus";
 import AutoPilotConfig from "./AutoPilotConfig";
 import AutoPilotActivityLog from "./AutoPilotActivityLog";
 import { toast } from "sonner";
+import {
+    Bot,
+    ChevronRight,
+    Cpu,
+    Crown,
+    ShieldCheck,
+    Sparkles,
+    Zap,
+} from "lucide-react";
 
 interface AutoPilotViewProps {
     user: UserProfile;
@@ -45,7 +52,7 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
     const [audience, setAudience] = useState("");
     const [topics, setTopics] = useState<string[]>([]);
 
-    // Mock Data for Demo
+    // Config Object for Status
     const [config, setConfig] = useState<AutoPilotConfigType>({
         frequency: "daily",
         tone: ViralTone.PROFESSIONAL,
@@ -63,8 +70,10 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
 
     // Load saved config and posts on mount
     useEffect(() => {
-        fetchConfig();
-        fetchAutoPilotPosts();
+        if (user.id) {
+            fetchConfig();
+            fetchAutoPilotPosts();
+        }
     }, [user.id]);
 
     const fetchConfig = async () => {
@@ -75,16 +84,18 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
             .single();
 
         if (data) {
+            const nextRunVal = data.next_run
+                ? new Date(data.next_run).getTime()
+                : Date.now() + 86400000;
+
             setConfig({
                 enabled: data.is_enabled,
                 frequency: data.frequency,
                 tone: data.tone as ViralTone,
                 topics: data.topics || [],
-                nextRun: data.next_run
-                    ? new Date(data.next_run).getTime()
-                    : Date.now() + 86400000,
+                nextRun: nextRunVal,
                 targetAudience: data.target_audience || "",
-                postCount: 1, // Enforce 1
+                postCount: 1,
             });
             setFrequency(data.frequency);
             setTone(data.tone as ViralTone);
@@ -101,7 +112,7 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
             .select("*")
             .eq("user_id", user.id)
             .order("created_at", { ascending: false })
-            .limit(20);
+            .limit(30);
 
         if (data) {
             const mappedPosts: Post[] = data.map((p: any) => ({
@@ -113,7 +124,7 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
                 views: 0,
                 isAutoPilot: true,
                 viralScore: p.viral_score,
-                viralAnalysis: p.params?.viralAnalysis, // Assuming it is stored in params or we fetch it?
+                viralAnalysis: p.params?.viralAnalysis,
             }));
             setAutomatedPosts(mappedPosts);
         }
@@ -123,6 +134,19 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
         const newState = !isEnabled;
         setIsEnabled(newState);
         await saveConfig({ ...config, enabled: newState }, newState);
+
+        if (newState) {
+            toast.success(
+                language === "es" ? "AutoPilot Activado" : "AutoPilot Active",
+                { icon: <Zap className="w-4 h-4 text-green-500" /> },
+            );
+        } else {
+            toast.info(
+                language === "es"
+                    ? "AutoPilot en Standby"
+                    : "AutoPilot Standby",
+            );
+        }
     };
 
     const saveConfig = async (newConfig: any, enabledState?: boolean) => {
@@ -145,13 +169,18 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
 
             if (error) throw error;
 
-            setConfig({
-                ...config,
+            setConfig((prev) => ({
+                ...prev,
                 ...newConfig,
                 enabled: enabledState !== undefined ? enabledState : isEnabled,
-            });
+            }));
         } catch (e) {
             console.error("Error saving config:", e);
+            toast.error(
+                language === "es"
+                    ? "Error al guardar configuración"
+                    : "Error saving configuration",
+            );
         } finally {
             setIsSaving(false);
         }
@@ -164,11 +193,16 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
             topics,
             targetAudience: audience,
         });
+        toast.success(
+            language === "es"
+                ? "Configuración guardada"
+                : "Configuration saved",
+        );
     };
 
     const handleForceRun = async () => {
         if (topics.length === 0) {
-            alert(
+            toast.error(
                 language === "es"
                     ? "Agrega al menos un tema primero."
                     : "Add at least one topic first.",
@@ -177,11 +211,15 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
         }
 
         setIsGenerating(true);
+        const toastId = toast.loading(
+            language === "es"
+                ? "AutoPilot: Generando contenido estratégico..."
+                : "AutoPilot: Generating strategic content...",
+        );
+
         try {
-            // 1. Pick a random topic
             const topic = topics[Math.floor(Math.random() * topics.length)];
 
-            // 2. Generate Idea
             const ideas = await generatePostIdeas(user, language, {
                 niche: topic,
                 style: "trending",
@@ -190,7 +228,6 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
             });
 
             if (ideas && ideas.ideas.length > 0) {
-                // 3. Generate Post
                 const generationParams: GenerationParams = {
                     topic: ideas.ideas[0],
                     audience: audience || "General Professional Audience",
@@ -208,14 +245,16 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
                     user,
                 );
 
-                // 4. Save to DB
                 const { data: insertedPost, error } = await supabase
                     .from("autopilot_posts")
                     .insert({
                         user_id: user.id,
                         content: postResult.content,
                         topic: topic,
-                        params: generationParams,
+                        params: {
+                            ...generationParams,
+                            viralAnalysis: postResult.viralAnalysis,
+                        },
                         viral_score: postResult.viralScore,
                         status: "generated",
                     })
@@ -224,7 +263,6 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
 
                 if (error) throw error;
 
-                // 5. Add to local state
                 const newPost: Post = {
                     id: insertedPost.id,
                     content: postResult.content,
@@ -238,25 +276,27 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
                 };
 
                 setAutomatedPosts((prev) => [newPost, ...prev]);
+                toast.success(
+                    language === "es"
+                        ? "Post generado con éxito"
+                        : "Post generated successfully",
+                    { id: toastId },
+                );
             }
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
-            alert(
+            toast.error(
                 language === "es"
                     ? "Error al generar post. Revisa tus créditos."
                     : "Error generating post. Check credits.",
+                { id: toastId },
             );
         } finally {
             setIsGenerating(false);
         }
     };
 
-    // Handle "View/Edit" action - Redirect to Studio
     const handleViewPost = (post: Post) => {
-        // We can pass state via navigate to pre-fill the Studio
-        navigate("/studio", {
-            state: { initialContent: post.content, fromAutoPilot: true },
-        });
         if (onViewPost) onViewPost(post);
     };
 
@@ -302,109 +342,214 @@ const AutoPilotView: React.FC<AutoPilotViewProps> = (
 
     if (!user.isPremium) {
         return (
-            <div className="w-full h-full flex flex-col items-center justify-center p-8">
-                <div className="bg-white rounded-3xl p-12 text-center max-w-lg shadow-xl border border-slate-100">
-                    <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <div className="w-12 h-12 text-amber-500">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="48"
-                                height="48"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <path d="M12 8V4H8" />
-                                <rect
-                                    width="16"
-                                    height="12"
-                                    x="4"
-                                    y="8"
-                                    rx="2"
-                                />
-                                <path d="M2 14h2" />
-                                <path d="M20 14h2" />
-                                <path d="M15 13v2" />
-                                <path d="M9 13v2" />
-                            </svg>
+            <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-6 overflow-hidden bg-slate-50">
+                {/* Background Decoration */}
+                <div className="absolute top-1/4 -left-20 w-80 h-80 bg-amber-400/10 rounded-full blur-[100px] animate-pulse">
+                </div>
+                <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-orange-400/10 rounded-full blur-[100px] animate-pulse transition-all">
+                </div>
+
+                <div className="relative z-10 w-full max-w-4xl">
+                    <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] border border-white/40 shadow-2xl p-8 md:p-12 overflow-hidden group">
+                        {/* Decorative Badge */}
+                        <div className="flex justify-center mb-8">
+                            <div className="px-4 py-2 bg-amber-50 rounded-full border border-amber-100/50 flex items-center gap-2">
+                                <Crown className="w-4 h-4 text-amber-500 fill-amber-500/20" />
+                                <span className="text-xs font-bold text-amber-600 uppercase tracking-widest">
+                                    Premium Experience
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-12 items-center">
+                            <div className="text-center md:text-left">
+                                <h2 className="text-4xl md:text-5xl font-display font-bold text-slate-900 mb-6 leading-tight">
+                                    Tu Contenido en <br />
+                                    <span className="bg-gradient-to-r from-amber-500 to-orange-600 bg-clip-text text-transparent">
+                                        Piloto Automático
+                                    </span>
+                                </h2>
+                                <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+                                    {language === "es"
+                                        ? "Deja que la IA analice tendencias, redacte posts virales y los programe por ti. Mantén tu presencia activa 24/7 sin mover un dedo."
+                                        : "Let AI analyze trends, write viral posts, and schedule them for you. Keep your presence active 24/7 without lifting a finger."}
+                                </p>
+
+                                <button
+                                    onClick={onUpgrade}
+                                    className="group relative w-full md:w-auto px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-slate-900/20 transition-all hover:-translate-y-1 flex items-center justify-center gap-3"
+                                >
+                                    <span>
+                                        {language === "es"
+                                            ? "Desbloquear AutoPilot"
+                                            : "Unlock AutoPilot"}
+                                    </span>
+                                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                {[
+                                    {
+                                        icon: <Zap />,
+                                        title: "IA Estratégica",
+                                        desc:
+                                            "Contenido optimizado para visibilidad",
+                                    },
+                                    {
+                                        icon: <ShieldCheck />,
+                                        title: "Control Total",
+                                        desc: "Define temas, tono y frecuencia",
+                                    },
+                                    {
+                                        icon: <Cpu />,
+                                        title: "Mantenimiento Zero",
+                                        desc:
+                                            "Publicaciones constantes y automáticas",
+                                    },
+                                ].map((item, i) => (
+                                    <div
+                                        key={i}
+                                        className="flex gap-4 p-5 bg-white/50 rounded-2xl border border-white/40 shadow-sm transition-transform hover:scale-[1.02]"
+                                    >
+                                        <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                                            {item.icon}
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-slate-900">
+                                                {item.title}
+                                            </h4>
+                                            <p className="text-sm text-slate-500">
+                                                {item.desc}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                    <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                        {language === "es"
-                            ? "AutoPilot Premium"
-                            : "Premium AutoPilot"}
-                    </h2>
-                    <p className="text-slate-600 mb-8 leading-relaxed">
-                        {language === "es"
-                            ? "Automatiza tu creación de contenido con IA. Define tus temas, frecuencia y tono, y deja que nuestra IA trabaje por ti."
-                            : "Automate your content creation with AI. Define your topics, frequency, and tone, and let our AI work for you."}
-                    </p>
-                    <button
-                        onClick={onUpgrade}
-                        className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all transform hover:-translate-y-1"
-                    >
-                        {language === "es"
-                            ? "Desbloquear AutoPilot"
-                            : "Unlock AutoPilot"}
-                    </button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div
-            id="autopilot-view"
-            className="max-w-6xl mx-auto px-4 md:px-8 py-8"
-        >
-            <div className="grid lg:grid-cols-3 gap-8">
-                {/* Configuration Column */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Status Card */}
-                    <AutoPilotStatus
-                        user={user}
-                        config={config}
-                        isEnabled={isEnabled}
-                        toggleSystem={toggleSystem}
-                        language={language}
-                        automatedPosts={automatedPosts}
-                    />
+        <div className="relative min-h-screen bg-slate-50/50 pb-20">
+            {/* Background Decoration */}
+            <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-sky-50 to-transparent -z-10">
+            </div>
+            <div className="absolute top-40 -left-20 w-80 h-80 bg-sky-200/20 rounded-full blur-[100px] -z-10">
+            </div>
+            <div className="absolute top-60 -right-20 w-80 h-80 bg-indigo-200/20 rounded-full blur-[100px] -z-10">
+            </div>
 
-                    <AutoPilotConfig
-                        language={language}
-                        frequency={frequency}
-                        setFrequency={setFrequency}
-                        tone={tone}
-                        setTone={setTone}
-                        audience={audience}
-                        setAudience={setAudience}
-                        topics={topics}
-                        setTopics={setTopics}
-                        onSave={handleSaveSettings}
-                        isSaving={isSaving}
-                    />
-                </div>
-
-                {/* Activity Log Column */}
-                <div className="lg:col-span-1 flex flex-col space-y-6 h-full">
-                    {/* Description Bubble */}
-                    <div className="bg-indigo-50/50 text-indigo-900/80 px-6 py-4 rounded-2xl text-sm font-medium border border-indigo-100 shadow-sm backdrop-blur-sm text-center">
-                        {t.description}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-12">
+                {/* Professional Header */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 px-3 py-1 bg-sky-100 text-sky-700 rounded-full w-fit text-[10px] font-bold uppercase tracking-wider border border-sky-200/50">
+                            <Bot className="w-3 h-3" />
+                            AI Operations Center
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-display font-bold text-slate-900 tracking-tight">
+                            AutoPilot{" "}
+                            <span className="text-sky-600 text-2xl md:text-3xl font-mono align-top ml-1 opacity-50">
+                                v2.0
+                            </span>
+                        </h1>
+                        <p className="text-slate-500 max-w-xl leading-relaxed">
+                            {language === "es"
+                                ? "Configura tu estrategia autónoma y deja que la IA genere contenido viral basado en tu marca y audiencia."
+                                : "Configure your autonomous strategy and let AI generate viral content based on your brand and audience."}
+                        </p>
                     </div>
 
-                    <div className="flex-1 min-h-0">
-                        <AutoPilotActivityLog
-                            language={language}
+                    <div className="hidden lg:flex items-center gap-4 bg-white/70 backdrop-blur-md px-6 py-4 rounded-2xl border border-white shadow-sm ring-1 ring-slate-200/5">
+                        <div className="text-right">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">
+                                System Health
+                            </p>
+                            <div className="flex items-center gap-2 justify-end">
+                                <span className="text-sm font-bold text-slate-700 font-mono">
+                                    OPTIMAL
+                                </span>
+                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse">
+                                </div>
+                            </div>
+                        </div>
+                        <div className="w-px h-8 bg-slate-200"></div>
+                        <div className="text-right">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">
+                                Generations
+                            </p>
+                            <p className="text-sm font-bold text-slate-700 font-mono">
+                                {automatedPosts.length}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid lg:grid-cols-12 gap-8 items-start">
+                    {/* Configuration Column */}
+                    <div className="lg:col-span-8 space-y-8">
+                        {/* Status Card */}
+                        <AutoPilotStatus
+                            user={user}
+                            config={config}
                             isEnabled={isEnabled}
+                            toggleSystem={toggleSystem}
+                            language={language}
                             automatedPosts={automatedPosts}
-                            onForceRun={handleForceRun}
-                            isGenerating={isGenerating}
-                            onViewPost={handleViewPost}
-                            onDeletePost={handleDeletePost}
                         />
+
+                        {/* Configuration Form */}
+                        <div id="autopilot-setup">
+                            <AutoPilotConfig
+                                language={language}
+                                frequency={frequency}
+                                setFrequency={setFrequency}
+                                tone={tone}
+                                setTone={setTone}
+                                audience={audience}
+                                setAudience={setAudience}
+                                topics={topics}
+                                setTopics={setTopics}
+                                onSave={handleSaveSettings}
+                                isSaving={isSaving}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Activity Log Sidebar */}
+                    <div className="lg:col-span-4 sticky top-8 space-y-6">
+                        {/* Insight Bubble */}
+                        <div className="relative overflow-hidden bg-white rounded-3xl p-6 text-slate-900 border border-slate-200 shadow-sm group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl -translate-y-12 translate-x-12 group-hover:bg-sky-500/20 transition-colors">
+                            </div>
+                            <div className="relative z-10 space-y-4">
+                                <div className="flex items-center gap-2 text-sky-600">
+                                    <Sparkles className="w-5 h-5" />
+                                    <span className="text-xs font-bold uppercase tracking-widest">
+                                        Kolink AI Insight
+                                    </span>
+                                </div>
+                                <p className="text-sm text-slate-600 leading-relaxed italic">
+                                    "{t.description}"
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="h-[600px]">
+                            <AutoPilotActivityLog
+                                language={language}
+                                isEnabled={isEnabled}
+                                automatedPosts={automatedPosts}
+                                onForceRun={handleForceRun}
+                                isGenerating={isGenerating}
+                                onViewPost={handleViewPost}
+                                onDeletePost={handleDeletePost}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

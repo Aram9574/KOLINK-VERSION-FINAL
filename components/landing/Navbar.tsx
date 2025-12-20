@@ -38,14 +38,14 @@ const Navbar: React.FC<NavbarProps> = (
                     onClick={() =>
                         window.scrollTo({ top: 0, behavior: "smooth" })}
                 >
-                    <div className="relative w-9 h-9 transition-transform duration-300 group-hover:scale-110">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-brand-600 to-indigo-500 rounded-xl rotate-6 opacity-50 blur-[2px]">
-                        </div>
-                        <div className="relative w-full h-full bg-gradient-to-tr from-brand-600 to-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
-                            K
-                        </div>
+                    <div className="relative w-10 h-10 transition-transform duration-300 group-hover:scale-110">
+                        <img
+                            src="/brand-logo.jpg"
+                            alt="Kolink Logo"
+                            className="w-full h-full object-contain rounded-xl shadow-lg shadow-brand-500/20"
+                        />
                     </div>
-                    <span className="font-display font-bold text-xl text-slate-900 tracking-tight ml-2">
+                    <span className="font-display font-bold text-xl text-slate-900 tracking-tight ml-1">
                         Kolink
                     </span>
                 </div>

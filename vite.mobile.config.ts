@@ -13,6 +13,21 @@ export default defineConfig(({ mode }) => {
                 input: {
                     main: path.resolve(__dirname, "mobile.html"), // FORCE mobile.html as entry
                 },
+                output: {
+                    manualChunks: {
+                        "vendor-react": [
+                            "react",
+                            "react-dom",
+                            "react-router-dom",
+                        ],
+                        "vendor-supabase": ["@supabase/supabase-js"],
+                        "vendor-icons": ["lucide-react"],
+                        "vendor-utils": [
+                            "sonner",
+                            "date-fns",
+                        ],
+                    },
+                },
             },
         },
         // Server config doesn't matter much for build, but kept for consistency

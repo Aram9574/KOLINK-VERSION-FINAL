@@ -7,6 +7,7 @@ import {
     Settings,
     Sparkles,
 } from "lucide-react";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { useUser } from "../../context/UserContext";
 import { translations } from "../../translations";
 import { Post } from "../../types";
@@ -18,6 +19,7 @@ interface MobileBottomNavProps {
         | "settings"
         | "autopilot"
         | "auditor"
+        | "carousel"
         | "ideas";
     setActiveTab: (
         tab:
@@ -26,6 +28,7 @@ interface MobileBottomNavProps {
             | "settings"
             | "autopilot"
             | "auditor"
+            | "carousel"
             | "ideas",
     ) => void;
 }
@@ -61,6 +64,12 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             isPremium: true,
         },
         {
+            id: "carousel" as const,
+            icon: Crown,
+            label: language === "es" ? "Carrusel" : "Carousel",
+            isPremium: true,
+        },
+        {
             id: "settings" as const,
             icon: Settings,
             label: t.settings,
@@ -76,31 +85,40 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     return (
                         <button
                             key={item.id}
-                            onClick={() => setActiveTab(item.id)}
-                            className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-16 mb-2 ${
+                            onClick={async () => {
+                                if (!isActive) {
+                                    await Haptics.impact({
+                                        style: ImpactStyle.Light,
+                                    });
+                                }
+                                setActiveTab(item.id);
+                            }}
+                            className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-16 mb-2 active:scale-90 ${
                                 isActive
                                     ? "text-brand-600"
                                     : "text-slate-400 hover:text-slate-600"
                             }`}
                         >
                             <div
-                                className={`relative p-1 rounded-lg transition-all ${
-                                    isActive ? "bg-brand-50" : ""
+                                className={`relative p-1.5 rounded-xl transition-all duration-300 ${
+                                    isActive
+                                        ? "bg-brand-50 scale-110 shadow-sm"
+                                        : "scale-100"
                                 }`}
                             >
                                 <Icon
-                                    className={`w-6 h-6 ${
+                                    className={`w-6 h-6 transition-transform duration-300 ${
                                         isActive ? "stroke-[2.5px]" : "stroke-2"
                                     }`}
                                 />
                                 {item.isPremium && !user.isPremium && (
-                                    <Crown className="absolute -top-1 -right-1 w-3 h-3 text-amber-500 fill-amber-500" />
+                                    <Crown className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                                 )}
                             </div>
                             <span
-                                className={`text-[10px] font-medium leading-none ${
+                                className={`text-[10px] font-bold leading-none transition-all duration-300 ${
                                     isActive
-                                        ? "text-brand-600"
+                                        ? "text-brand-600 translate-y-0.5"
                                         : "text-slate-500"
                                 }`}
                             >

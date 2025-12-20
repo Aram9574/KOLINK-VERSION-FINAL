@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "npm:@google/generative-ai@^0.12.0";
 import {
   getEmojiInstructions,
   getFrameworkInstructions,
@@ -18,6 +18,7 @@ export interface GenerationParams {
   creativityLevel: number;
   hashtagCount: number;
   includeCTA: boolean;
+  outputLanguage?: string;
 }
 
 export interface UserProfileContext {
@@ -29,62 +30,40 @@ export interface UserProfileContext {
   language?: string;
 }
 
-/**
- * Service to handle interaction with Google Gemini via Generative AI.
- * Responsible for constructing prompts and parsing AI responses into structured JSON.
- */
 export class AIService {
   private genAI: GoogleGenerativeAI;
-  // Use a standard model if gemini-3 is not valid, but keeping user intent.
-  // Standard is gemini-1.5-pro or gemini-2.0-flash-exp.
-  // User used gemini-3-pro-preview which seems specific. I will keep it.
-  private model = "gemini-1.5-pro"; // Fallback to stable if unsure, but let's stick to what works for schemas.
+  private model = "gemini-3-flash-preview";
 
-  /**
-   * @param apiKey - The Google Gemini API Key.
-   */
-  constructor(apiKey: string) {
-    this.genAI = new GoogleGenerativeAI(apiKey);
+  constructor(geminiApiKey: string) {
+    this.genAI = new GoogleGenerativeAI(geminiApiKey);
   }
 
   /**
-   * Generates a viral LinkedIn post based on user parameters and profile context.
-   *
-   * @param params - The user-defined generation parameters (topic, tone, framework, etc.).
-   * @param profile - The user's profile context (brand voice, industry, etc.) to personalize the output.
-   * @returns Promise<any> - The structured JSON response containing the post content and analysis.
-   * @throws {Error} if content generation fails or returns empty.
+   * Generates a viral LinkedIn post.
    */
-  generatePost(params: GenerationParams, profile: UserProfileContext) {
+  async generatePost(params: GenerationParams, profile: UserProfileContext) {
     const frameworkRules = getFrameworkInstructions(params.framework);
     const emojiRules = getEmojiInstructions(params.emojiDensity);
     const lengthRules = getLengthInstructions(params.length);
     const viralExample =
       VIRAL_EXAMPLES[params.framework as keyof typeof VIRAL_EXAMPLES] || "";
-
     const templates = getTemplates();
-    const ctaInstruction = templates.cta_yes;
 
     const voiceInstruction =
       (profile.brand_voice && profile.brand_voice.length > 0)
         ? templates.voice_custom.replace("{{brand_voice}}", profile.brand_voice)
         : templates.voice_default.replace("{{tone}}", params.tone);
 
-    const langInstruction = profile.language === "es"
+    const langInstruction = (params.outputLanguage || profile.language) === "es"
       ? templates.lang_es
       : templates.lang_en;
-
-    const hashtagInstruction =
-      `Use strictly ${params.hashtagCount} hashtags at the end of the post. They must be SEO optimized and relevant to the topic.`;
 
     const authorPersona = templates.author_persona
       .replace("{{headline}}", profile.headline || "")
       .replace("{{industry}}", profile.industry || "")
       .replace(
         "{{experience_level}}",
-        (profile.xp || 0) > 1000
-          ? "Expert/Thought Leader"
-          : "Rising Professional",
+        (profile.xp || 0) > 1000 ? "Expert" : "Professional",
       )
       .replace("{{company_name}}", profile.company_name || "");
 
@@ -95,15 +74,12 @@ export class AIService {
       .replace("{{creativity_level}}", params.creativityLevel.toString())
       .replace("{{emoji_density}}", params.emojiDensity)
       .replace("{{length}}", params.length)
-      .replace("{{cta_instruction}}", "YES (Auto-generated)")
       .replace("{{author_persona}}", authorPersona)
       .replace("{{viral_example}}", viralExample)
       .replace("{{framework_rules}}", frameworkRules)
       .replace("{{length_rules}}", lengthRules)
       .replace("{{emoji_rules}}", emojiRules)
-      .replace("{{cta_instruction_detail}}", ctaInstruction)
-      .replace("{{lang_instruction}}", langInstruction)
-      .replace("{{hashtag_instruction}}", hashtagInstruction);
+      .replace("{{lang_instruction}}", langInstruction);
 
     return this.retryWithBackoff(async () => {
       const model = this.genAI.getGenerativeModel({
@@ -119,51 +95,87 @@ export class AIService {
           responseSchema: {
             type: "OBJECT",
             properties: {
-              post_content: {
-                type: "STRING",
-                description: "The actual LinkedIn post text.",
-              },
-              overall_viral_score: {
-                type: "INTEGER",
-                description:
-                  "A holistic score from 0-100 predicting viral potential.",
-              },
-              hook_score: {
-                type: "INTEGER",
-                description: "Score 0-100 for the opening line.",
-              },
-              readability_score: {
-                type: "INTEGER",
-                description: "Score 0-100 for formatting and ease of reading.",
-              },
-              value_score: {
-                type: "INTEGER",
-                description: "Score 0-100 for the insight quality.",
-              },
-              feedback: {
-                type: "STRING",
-                description:
-                  "One specific, actionable tip to improve the post further.",
-              },
+              post_content: { type: "STRING" },
+              overall_viral_score: { type: "INTEGER" },
+              hook_score: { type: "INTEGER" },
+              readability_score: { type: "INTEGER" },
+              value_score: { type: "INTEGER" },
+              feedback: { type: "STRING" },
             },
-            required: [
-              "post_content",
-              "overall_viral_score",
-              "hook_score",
-              "readability_score",
-              "value_score",
-              "feedback",
-            ],
-            // deno-lint-ignore no-explicit-any
+            required: ["post_content", "overall_viral_score", "feedback"],
           } as any,
         },
       });
 
-      const text = response.response.text();
-      if (!text) throw new Error("No content generated");
-
-      return JSON.parse(text);
+      return JSON.parse(response.response.text());
     });
+  }
+
+  /**
+   * Generates a LinkedIn Carousel JSON using CoT and RAG style fragments.
+   */
+  async generateCarousel(
+    sourceText: string,
+    styleFragments: string[],
+    profile: UserProfileContext,
+  ) {
+    const styleContext = styleFragments.length > 0
+      ? `Tone and style examples from the user:\n${
+        styleFragments.join("\n---\n")
+      }`
+      : "Tone: Professional and engaging.";
+
+    const prompt = `
+      Act as a Senior Content Strategist. Create a LinkedIn Carousel (native PDF format logic) based on the following content.
+      
+      SOURCE CONTENT:
+      ${sourceText}
+      
+      USER STYLE CONTEXT:
+      ${styleContext}
+      
+      INSTRUCTIONS:
+      1. Use Chain of Thought: First analyze the 5-10 key points.
+      2. Design a hook (Slide 1), narrative body, and final CTA.
+      3. Apply "Voice Cloning": Mimic the emoji usage, sentence length, and tone of the style examples.
+      4. Ensure visibility: Short sentences, high impact.
+      5. Output MUST be strictly JSON.
+      
+      JSON STRUCTURE:
+      {
+        "carousel_config": { "slides_count": 10, "tone": "Expert", "analysis": "CoT reasoning here" },
+        "slides": [
+          { "number": 1, "title": "Headline", "content": "Subtext" }
+        ]
+      }
+    `;
+
+    return this.retryWithBackoff(async () => {
+      const model = this.genAI.getGenerativeModel({ model: this.model }); // Use global model
+      const response = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.4,
+          responseMimeType: "application/json",
+        },
+      });
+      return JSON.parse(response.response.text());
+    });
+  }
+
+  /**
+   * Generates embeddings using OpenAI's text-embedding-3-small.
+   */
+  /**
+   * Generates embeddings using Gemini's text-embedding-004.
+   */
+  async createEmbedding(text: string): Promise<number[]> {
+    const model = this.genAI.getGenerativeModel({
+      model: "text-embedding-004",
+    });
+    const result = await model.embedContent(text);
+    const embedding = result.embedding;
+    return embedding.values;
   }
 
   private async retryWithBackoff<T>(
@@ -173,16 +185,12 @@ export class AIService {
   ): Promise<T> {
     try {
       return await operation();
-    } catch (error: unknown) {
-      const err = error as { status?: number; message?: string };
+    } catch (error: any) {
       if (
         retries > 0 &&
-        (err.status === 503 || err.message?.includes("overloaded"))
+        (error.status === 503 || error.message?.includes("overloaded"))
       ) {
-        console.log(
-          `Model overloaded. Retrying in ${delay}ms... (${retries} retries left)`,
-        );
-        await new Promise((resolve) => setTimeout(resolve, delay));
+        await new Promise((r) => setTimeout(r, delay));
         return this.retryWithBackoff(operation, retries - 1, delay * 2);
       }
       throw error;

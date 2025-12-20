@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useUser } from "../../../context/UserContext";
-import { usePosts } from "../../../context/PostContext";
+import { PostProvider, usePosts } from "../../../context/PostContext";
 import { useSubscription } from "../../../hooks/useSubscription";
 import { usePostGeneration } from "../../../hooks/usePostGeneration";
 import { useUserSync } from "../../../hooks/useUserSync";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
+import { Loader2 } from "lucide-react";
 
 import DashboardLayout from "../../layouts/DashboardLayout";
 import HistoryView from "../history/HistoryView";
@@ -30,8 +32,9 @@ import { Suspense } from "react";
 // Lazy load PostGenerator
 const PostCreator = React.lazy(() => import("../generation/PostGenerator"));
 
-const MobileDashboard: React.FC = () => {
-    const { user, refreshUser, setUser, language, setLanguage } = useUser();
+const MobileDashboardContent: React.FC = () => {
+    const { user, refreshUser, setUser, language, setLanguage, logout } =
+        useUser();
     const {
         posts,
         setPosts,
@@ -89,6 +92,61 @@ const MobileDashboard: React.FC = () => {
     const [isTourActive, setIsTourActive] = useState(false);
     const [showReferralModal, setShowReferralModal] = useState(false);
     const [levelUpData, setLevelUpData] = useState<any>(null);
+
+    // Pull to Refresh State
+    const [pullDistance, setPullDistance] = useState(0);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [startY, setStartY] = useState(0);
+
+    const REFRESH_THRESHOLD = 80;
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        if (activeTab === "history") return; // History has its own scrolling sometimes
+        const scrollContainer = e.currentTarget;
+        if (scrollContainer.scrollTop === 0) {
+            setStartY(e.touches[0].pageY);
+        } else {
+            setStartY(-1);
+        }
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (startY === -1 || isRefreshing) return;
+        const currentY = e.touches[0].pageY;
+        const distance = currentY - startY;
+        if (distance > 0) {
+            setPullDistance(Math.min(distance * 0.5, REFRESH_THRESHOLD + 20));
+            if (distance * 0.5 >= REFRESH_THRESHOLD) {
+                // Potential vibration on threshold?
+                // We'll do it on release to avoid constant vibrations
+            }
+        }
+    };
+
+    const handleTouchEnd = async () => {
+        if (pullDistance >= REFRESH_THRESHOLD && !isRefreshing) {
+            setIsRefreshing(true);
+            setPullDistance(REFRESH_THRESHOLD);
+
+            await Haptics.impact({ style: ImpactStyle.Medium });
+
+            try {
+                await refreshUser();
+                // If history view had a manual refresh we'd call it here
+                toast.success(language === "es" ? "Actualizado" : "Refreshed");
+            } catch (error) {
+                console.error("Refresh failed", error);
+            } finally {
+                setTimeout(() => {
+                    setIsRefreshing(false);
+                    setPullDistance(0);
+                }, 1000);
+            }
+        } else {
+            setPullDistance(0);
+        }
+        setStartY(-1);
+    };
 
     // Helpers
     const handleUpdateUser = async (updates: Partial<UserProfile>) => {
@@ -208,50 +266,87 @@ const MobileDashboard: React.FC = () => {
             onDeletePost={handleDeletePost}
         >
             <div className="h-full flex flex-col bg-slate-50">
-                {/* Mobile Specific Header/Content Wrapper */}
-
                 <div
-                    className={`flex-1 ${
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    className={`flex-1 relative ${
                         activeTab === "history"
                             ? "overflow-hidden"
                             : "overflow-y-auto"
                     }`}
                 >
-                    {/* Mobile Padding & Layout Adjustments */}
-                    <div className="pb-24 pt-safe safe-area-inset-bottom">
-                        {
-                            /*
-                            MOBILE SPECIFIC UI DIFFERENCES WILL GO HERE
-                            For now, mirroring structure but ready for deviation
-                        */
-                        }
+                    {/* Pull to Refresh Indicator */}
+                    <div
+                        className="absolute left-0 right-0 flex items-center justify-center pointer-events-none z-50 overflow-hidden transition-all duration-200"
+                        style={{
+                            height: `${pullDistance}px`,
+                            opacity: pullDistance / REFRESH_THRESHOLD,
+                        }}
+                    >
+                        <div
+                            className={`transition-transform duration-200 ${
+                                isRefreshing ? "animate-spin" : ""
+                            }`}
+                        >
+                            <Loader2
+                                className="text-brand-600"
+                                style={{
+                                    transform: `rotate(${pullDistance * 2}deg)`,
+                                }}
+                            />
+                        </div>
+                    </div>
 
+                    <div
+                        className="pb-24 pt-safe pr-safe pl-safe safe-area-inset-bottom h-full"
+                        style={{
+                            transform: `translateY(${pullDistance}px)`,
+                            transition: isRefreshing
+                                ? "transform 0.2s"
+                                : "none",
+                        }}
+                    >
                         {activeTab === "create" && (
-                            <div className="px-4 py-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <Suspense
-                                    fallback={
-                                        <div className="h-64 flex items-center justify-center">
-                                            Loading...
-                                        </div>
-                                    }
-                                >
-                                    <PostCreator
-                                        onGenerate={(params) =>
-                                            generatePost(params)}
-                                        isGenerating={isGenerating}
-                                        credits={user.credits}
-                                        language={user.language || "en"}
-                                        showCreditDeduction={showCreditDeduction}
-                                        initialParams={currentPost?.params}
-                                        initialTopic={currentPost?.params
-                                            ?.topic}
-                                    />
-                                </Suspense>
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="px-6 pt-6 pb-2">
+                                    <h1 className="text-3xl font-display font-bold text-slate-900 leading-tight">
+                                        {language === "es"
+                                            ? "Estudio"
+                                            : "Studio"}
+                                    </h1>
+                                    <p className="text-slate-500 text-sm mt-1">
+                                        {language === "es"
+                                            ? "Crea contenido viral con IA."
+                                            : "Create viral content with AI."}
+                                    </p>
+                                </div>
+                                <div className="px-4 py-4">
+                                    <Suspense
+                                        fallback={
+                                            <div className="h-64 flex items-center justify-center">
+                                                Loading...
+                                            </div>
+                                        }
+                                    >
+                                        <PostCreator
+                                            onGenerate={(params) =>
+                                                generatePost(params)}
+                                            isGenerating={isGenerating}
+                                            credits={user.credits}
+                                            language={user.language || "en"}
+                                            showCreditDeduction={showCreditDeduction}
+                                            initialParams={currentPost?.params}
+                                            initialTopic={currentPost?.params
+                                                ?.topic}
+                                        />
+                                    </Suspense>
+                                </div>
                             </div>
                         )}
 
                         {activeTab === "history" && (
-                            <div className="h-full">
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 {user.planTier === "free"
                                     ? (
                                         <LockedHistoryState
@@ -261,34 +356,134 @@ const MobileDashboard: React.FC = () => {
                                     )
                                     : (
                                         <div className="p-2">
-                                            <HistoryView
-                                                onSelect={(post) => {
-                                                    setCurrentPost(post);
-                                                    setActiveTab("create");
-                                                }}
-                                                onReuse={(params) => {
-                                                    // reuse logic...
-                                                    setActiveTab("create");
-                                                }}
-                                                onDelete={handleDeletePost}
-                                                language={language}
-                                                onUpgrade={() =>
-                                                    setShowUpgradeModal(true)}
-                                            />
+                                            <div className="px-4 pt-4 pb-2">
+                                                <h1 className="text-3xl font-display font-bold text-slate-900 leading-tight">
+                                                    {language === "es"
+                                                        ? "Historial"
+                                                        : "History"}
+                                                </h1>
+                                                <p className="text-slate-500 text-sm mt-1">
+                                                    {language === "es"
+                                                        ? "Tus creaciones pasadas."
+                                                        : "Your past creations."}
+                                                </p>
+                                            </div>
+                                            <div className="p-2">
+                                                <HistoryView
+                                                    onSelect={(post) => {
+                                                        setCurrentPost(post);
+                                                        setActiveTab("create");
+                                                    }}
+                                                    onReuse={(params) => {
+                                                        setCurrentPost({
+                                                            id: "draft-" +
+                                                                Date.now(),
+                                                            content: "",
+                                                            params: params,
+                                                            createdAt: Date
+                                                                .now(),
+                                                            likes: 0,
+                                                            views: 0,
+                                                        });
+                                                        setActiveTab("create");
+                                                    }}
+                                                    onDelete={handleDeletePost}
+                                                    language={language}
+                                                    onUpgrade={() =>
+                                                        setShowUpgradeModal(
+                                                            true,
+                                                        )}
+                                                />
+                                            </div>
                                         </div>
                                     )}
                             </div>
                         )}
 
-                        {/* Other tabs... */}
+                        {activeTab === "autopilot" && (
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="px-6 pt-6 pb-2">
+                                    <h1 className="text-3xl font-display font-bold text-slate-900 leading-tight">
+                                        {language === "es"
+                                            ? "AutoPilot"
+                                            : "AutoPilot"}
+                                    </h1>
+                                    <p className="text-slate-500 text-sm mt-1">
+                                        {language === "es"
+                                            ? "Automatización inteligente."
+                                            : "Smart automation."}
+                                    </p>
+                                </div>
+                                {user.planTier === "free"
+                                    ? (
+                                        <LockedAutoPilotState
+                                            onUpgrade={() =>
+                                                setShowUpgradeModal(true)}
+                                        />
+                                    )
+                                    : (
+                                        <AutoPilotView
+                                            user={user}
+                                            language={language}
+                                            onViewPost={(post) => {
+                                                setCurrentPost(post);
+                                                setActiveTab("create");
+                                            }}
+                                            onUpgrade={() =>
+                                                setShowUpgradeModal(true)}
+                                        />
+                                    )}
+                            </div>
+                        )}
+
                         {activeTab === "settings" && (
-                            <div className="p-4">
-                                <SettingsView
-                                    user={user}
-                                    onUpgrade={() => setShowUpgradeModal(true)}
-                                    // wrapper for mobile saving feedback if needed
-                                    onSave={handleUpdateUser}
-                                />
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="px-6 pt-6 pb-2">
+                                    <h1 className="text-3xl font-display font-bold text-slate-900 leading-tight">
+                                        {language === "es"
+                                            ? "Ajustes"
+                                            : "Settings"}
+                                    </h1>
+                                    <p className="text-slate-500 text-sm mt-1">
+                                        {language === "es"
+                                            ? "Gestiona tu cuenta."
+                                            : "Manage your account."}
+                                    </p>
+                                </div>
+                                <div className="px-4 py-4">
+                                    <SettingsView
+                                        user={user}
+                                        onUpgrade={() =>
+                                            setShowUpgradeModal(true)}
+                                        onSave={handleUpdateUser}
+                                        onLogout={logout}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === "auditor" && (
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="px-6 pt-6 pb-2">
+                                    <h1 className="text-3xl font-display font-bold text-slate-900 leading-tight">
+                                        {language === "es"
+                                            ? "Auditor"
+                                            : "Auditor"}
+                                    </h1>
+                                    <p className="text-slate-500 text-sm mt-1">
+                                        {language === "es"
+                                            ? "Analiza tu perfil de LinkedIn."
+                                            : "Analyze your LinkedIn profile."}
+                                    </p>
+                                </div>
+                                {user.planTier === "free"
+                                    ? (
+                                        <LockedAuditorState
+                                            onUpgrade={() =>
+                                                setShowUpgradeModal(true)}
+                                        />
+                                    )
+                                    : <ProfileAuditor />}
                             </div>
                         )}
                     </div>
@@ -310,6 +505,14 @@ const MobileDashboard: React.FC = () => {
 
             {/* ... Other modals */}
         </DashboardLayout>
+    );
+};
+
+const MobileDashboard: React.FC = () => {
+    return (
+        <PostProvider>
+            <MobileDashboardContent />
+        </PostProvider>
     );
 };
 

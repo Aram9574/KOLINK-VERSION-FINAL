@@ -1,55 +1,60 @@
-
-
 export enum ViralTone {
-  PROFESSIONAL = 'Professional',
-  CONTROVERSIAL = 'Controversial',
-  EMPATHETIC = 'Empathetic',
-  EDUCATIONAL = 'Educational',
-  HUMOROUS = 'Humorous',
-  STORYTELLING = 'Storytelling',
-  INSPIRATIONAL = 'Inspirational',
-  PROMOTIONAL = 'Promotional'
+  PROFESSIONAL = "Professional",
+  CONTROVERSIAL = "Controversial",
+  EMPATHETIC = "Empathetic",
+  EDUCATIONAL = "Educational",
+  HUMOROUS = "Humorous",
+  STORYTELLING = "Storytelling",
+  INSPIRATIONAL = "Inspirational",
+  PROMOTIONAL = "Promotional",
 }
 
 export enum ViralFramework {
-  STANDARD = 'STANDARD',
-  LISTICLE = 'LISTICLE',
-  STORY = 'STORY',
-  CASE_STUDY = 'CASE_STUDY',
-  CONTRARIAN = 'CONTRARIAN',
-  VS_COMPARISON = 'VS_COMPARISON',
-  PAS = 'PAS',
-  AIDA = 'AIDA',
-  BAB = 'BAB'
+  STANDARD = "STANDARD",
+  LISTICLE = "LISTICLE",
+  STORY = "STORY",
+  CASE_STUDY = "CASE_STUDY",
+  CONTRARIAN = "CONTRARIAN",
+  VS_COMPARISON = "VS_COMPARISON",
+  PAS = "PAS",
+  AIDA = "AIDA",
+  BAB = "BAB",
 }
 
 export enum EmojiDensity {
-  MINIMAL = 'MINIMAL',
-  MODERATE = 'MODERATE',
-  HIGH = 'HIGH'
+  MINIMAL = "MINIMAL",
+  MODERATE = "MODERATE",
+  HIGH = "HIGH",
 }
 
 export enum PostLength {
-  SHORT = 'SHORT',
-  MEDIUM = 'MEDIUM',
-  LONG = 'LONG'
+  SHORT = "SHORT",
+  MEDIUM = "MEDIUM",
+  LONG = "LONG",
 }
 
-export type ViralHook = 'auto' | 'question' | 'statistic' | 'negative' | 'story' | 'assertion';
+export type ViralHook =
+  | "auto"
+  | "question"
+  | "statistic"
+  | "negative"
+  | "story"
+  | "assertion";
 
 export interface GenerationParams {
   topic: string;
   audience: string;
-  tone: ViralTone | 'random';
-  framework: ViralFramework | 'random';
-  length: PostLength | 'random';
+  tone: ViralTone | "random";
+  framework: ViralFramework | "random";
+  length: PostLength | "random";
   creativityLevel: number; // 0 to 100
-  emojiDensity: EmojiDensity | 'random';
+  emojiDensity: EmojiDensity | "random";
   hashtagCount: number; // 0 to 5 (SEO Optimized)
   includeCTA: boolean;
-  hookStyle?: ViralHook | 'random';
+  hookStyle?: ViralHook | "random";
   brandVoiceId?: string;
-  outputLanguage?: 'en' | 'es';
+  outputLanguage?: "en" | "es";
+  generateCarousel?: boolean; // Intent to generate carousel after post
 }
 
 export interface ViralAnalysis {
@@ -71,7 +76,7 @@ export interface Post {
   viralAnalysis?: ViralAnalysis;
   tags?: string[];
   isFavorite?: boolean;
-  status?: 'draft' | 'scheduled' | 'published';
+  status?: "draft" | "scheduled" | "published";
   scheduledDate?: number;
 }
 
@@ -83,7 +88,7 @@ export interface Achievement {
   xpReward: number;
 }
 
-export type PlanTier = 'free' | 'pro' | 'viral';
+export type PlanTier = "free" | "pro" | "viral";
 
 export interface SubscriptionPlan {
   id: PlanTier;
@@ -100,15 +105,15 @@ export interface Invoice {
   id: string;
   date: string;
   amount: string;
-  status: 'Paid' | 'Pending' | 'Failed';
+  status: "Paid" | "Pending" | "Failed";
   planName: string;
 }
 
-export type AppLanguage = 'en' | 'es';
+export type AppLanguage = "en" | "es";
 
 export interface AutoPilotConfig {
   enabled: boolean;
-  frequency: 'daily' | 'weekly' | 'biweekly' | 'custom';
+  frequency: "daily" | "weekly" | "biweekly" | "custom";
   days?: number[]; // 0=Sun, 1=Mon, etc. (Used for 'custom' frequency)
   time?: string; // HH:mm format (24h)
   nextRun: number; // Timestamp
@@ -154,7 +159,7 @@ export interface UserProfile {
 
 export interface CustomSource {
   id: string;
-  type: 'link' | 'image' | 'text' | 'drive';
+  type: "link" | "image" | "text" | "drive";
   content: string; // URL, Base64 Image, Text content, or File ID
   name?: string; // Filename or Link title
   mimeType?: string; // Useful for drive files
@@ -164,7 +169,7 @@ export interface TourStep {
   targetId: string;
   title: string;
   description: string;
-  position?: 'top' | 'right' | 'bottom' | 'left';
+  position?: "top" | "right" | "bottom" | "left";
 }
 
 export interface BrandVoice {

@@ -1,21 +1,21 @@
-import { GoogleGenAI, Type } from 'https://esm.sh/@google/genai'
+import { GoogleGenAI, Type } from "@google/genai";
 
 export interface AnalysisParams {
-    contentSamples: string[];
-    language: string;
+  contentSamples: string[];
+  language: string;
 }
 
 export class AnalysisService {
-    private ai: GoogleGenAI;
-    private model = 'gemini-1.5-flash';
+  private ai: GoogleGenAI;
+  private model = "gemini-3-flash-preview";
 
-    constructor(apiKey: string) {
-        this.ai = new GoogleGenAI({ apiKey });
-    }
+  constructor(apiKey: string) {
+    this.ai = new GoogleGenAI({ apiKey });
+  }
 
-    async analyzeVoice(params: AnalysisParams) {
-        const samples = params.contentSamples.join("\n---\n");
-        const prompt = `
+  async analyzeVoice(params: AnalysisParams) {
+    const samples = params.contentSamples.join("\n---\n");
+    const prompt = `
         You are an expert Ghostwriter and Brand Strategist.
         Analyze the following text samples from a LinkedIn creator. 
         Extract their unique "Brand Voice" so that an AI can ghostwrite exactly like them.
@@ -33,28 +33,41 @@ export class AnalysisService {
         ${samples}
         `;
 
-        const response = await this.ai.models.generateContent({
-            model: this.model,
-            contents: prompt,
-            config: {
-                systemInstruction: "You are a brand voice analyst. Extract precise style instructions.",
-                temperature: 0.5,
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        name: { type: Type.STRING, description: "A creative name for this style (e.g. 'The Empathetic Leader')" },
-                        description: { type: Type.STRING, description: "A detailed prompt instruction that describes this voice perfectly to an LLM." },
-                        keywords: { type: Type.ARRAY, items: { type: Type.STRING }, description: "3-5 adjectives describing the tone." }
-                    },
-                    required: ["name", "description", "keywords"]
-                }
-            }
-        });
+    const response = await this.ai.models.generateContent({
+      model: this.model,
+      contents: prompt,
+      config: {
+        systemInstruction:
+          "You are a brand voice analyst. Extract precise style instructions.",
+        temperature: 0.5,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            name: {
+              type: Type.STRING,
+              description:
+                "A creative name for this style (e.g. 'The Empathetic Leader')",
+            },
+            description: {
+              type: Type.STRING,
+              description:
+                "A detailed prompt instruction that describes this voice perfectly to an LLM.",
+            },
+            keywords: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: "3-5 adjectives describing the tone.",
+            },
+          },
+          required: ["name", "description", "keywords"],
+        },
+      },
+    });
 
-        const text = response.text;
-        if (!text) throw new Error("No analysis generated");
+    const text = response.text;
+    if (!text) throw new Error("No analysis generated");
 
-        return JSON.parse(text);
-    }
+    return JSON.parse(text);
+  }
 }

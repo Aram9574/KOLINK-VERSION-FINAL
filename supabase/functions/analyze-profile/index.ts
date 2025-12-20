@@ -1,205 +1,106 @@
 import { serve } from "std/http/server";
-import { corsHeaders } from "../_shared/cors.ts";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Buffer } from "node:buffer";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
 
 serve(async (req) => {
-  // Handle CORS preflight requests
+  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const formData = await req.formData();
-    const file = formData.get("file");
+    const { pdfText } = await req.json();
 
-    if (!file) {
-      throw new Error("No file uploaded");
+    if (!pdfText) {
+      throw new Error("Missing PDF text");
     }
 
-    if (!(file instanceof File)) {
-      throw new Error("Uploaded content is not a file");
-    }
+    const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY")!);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    console.log(
-      `Received file: ${file.name}, size: ${file.size}, type: ${file.type}`,
-    );
+    const prompt = `
+      Eres un experto en Personal Branding y LinkedIn Coach con más de 10 años de experiencia ayudando a CEOs y emprendedores a escalar su presencia digital.
+      Tu tarea es realizar una AUDITORÍA MAESTRA de este perfil de LinkedIn basándote en el texto extraído del PDF.
 
-    // Read file as ArrayBuffer and convert to Base64 for Gemini
-    const arrayBuffer = await file.arrayBuffer();
-    const base64Data = Buffer.from(arrayBuffer).toString("base64");
+      [REGLAS CRÍTICAS]
+      1. SÉ CRÍTICO pero CONSTRUCTIVO. El usuario quiere mejorar, no que le digan que todo está bien.
+      2. USA MÉTRICAS Y FÓRMULAS: Evalúa si usan fórmulas en el titular o métricas en la experiencia.
+      3. RESPONDE SIEMPRE EN ESPAÑOL.
+      4. RESPONDE ESTRICTAMENTE EN FORMATO JSON. No incluyas texto fuera del JSON.
+      5. ELIMINA CARACTERES ESPECIALES: El JSON final debe ser limpio y fácil de parsear.
 
-    const apiKey = Deno.env.get("GEMINI_API_KEY");
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY not configured in Supabase secrets");
-    }
-
-    const systemPrompt =
-      `### SYSTEM PROMPT: KOLINK PDF PROFILE AUDITOR - EXPERT MODE
-
-**Role:** Eres el consultor de marca personal y estratega de LinkedIn definitivo de Kolink. Tu metodología se basa en los "3 Pilares de Ingeniería de la Atención": Fundamento (LSO), Narrativa de Conversión y Motor de Visibilidad.
-
-**Objetivo:** Analizar el PDF del perfil de LinkedIn y proporcionar una auditoría crítica, estratégica y orientada a la conversión.
-
-**BASE DE CONOCIMIENTO (Reglas Estrictas):**
-
-**PILAR I: EL FUNDAMENTO (SEO/LSO & Primera Impresión)**
-1. **LSO (LinkedIn Search Optimization):** Densidad de palabras clave en Titular, About y Experiencia.
-2. **Titular (Headline):** NUNCA debe ser solo el cargo.
-   - **Fórmula Obligatoria:** [Rol] | [Especialización/Keyword] | [Ayudo a X a lograr Y / Valor Único].
-   - Debe contener métricas si es posible ("10 años exp", "100+ proyectos").
-3. **Foto y Banner:** Evalúa si se mencionan o se ven profesionales (60% rostro, fondo neutro). El banner debe reforzar la propuesta de valor.
-4. **URL:** (Si visible) Debe ser personalizada.
-
-**PILAR II: NARRATIVA DE CONVERSIÓN (Credibilidad)**
-1. **Extracto (About):**
-   - **El Gancho:** Las primeras 2 líneas (265 caracteres) son vitales. Deben incitar a "ver más".
-   - **Formato:** Párrafos cortos (2-3 líneas), mucho espacio en blanco (whitespace), viñetas. NO bloques de texto corporativo.
-   - **Contenido:** Storytelling, no CV. Misión, logros, personalidad.
-   - **CTA:** Debe terminar con una llamada a acción clara (ej. "Escríbeme", "Visita mi web") y datos de contacto.
-   - **Longitud:** Ideal 880-1120 caracteres. 
-2. **Experiencia:**
-   - FOCO EN RESULTADOS. Reemplazar "responsabilidades" por "logros cuantificables".
-   - Uso de verbos de acción fuertes.
-   - Ejemplo: "Aumenté ventas 30%" vs "Encargado de ventas".
-
-**PILAR III: VISIBILIDAD (Para Estrategia)**
-- Aunque el PDF es estático, la estrategia debe recomendar actividad: Carruseles (alto engagement), comentar (regla de 15+ palabras), y networking estratégico.
-
----
-
-**Output Estructurado (JSON):**
-
-{
-  "perfil_resumen": { 
-    "nombre": "Nombre del usuario", 
-    "sector": "Sector detectado", 
-    "score_actual": 0-100 (Promedio de los 3 scores de pilares)
-  },
-  "pilares": {
-    "pilar_1_fundamento": {
-      "score": 0-100,
-      "analisis_titular": "Crítica basada en fórmula Rol|Esp|Valor. ¿Usa keywords?",
-      "propuesta_titular_a": "Opción 1: Rol | Especialidad | Valor",
-      "propuesta_titular_b": "Opción 2: Más creativa/autoridad",
-      "foto_banner_check": "Opinión sobre foto (60% rostro) y banner (propuesta valor).",
-      "url_check": "Si visible, ¿es personalizada?"
-    },
-    "pilar_2_narrativa": {
-      "score": 0-100,
-      "gancho_analisis": "Análisis de las primeras 2 líneas del About.",
-      "redaccion_gancho_sugerida": "Propuesta de las primeras 3 líneas para incitar el clic.",
-      "experiencia_analisis": "Crítica general sobre uso de métricas vs responsabilidades.",
-      "experiencia_mejoras": [
-        { "empresa": "Nombre", "propuesta_metrica": "Ejemplo de cómo reescribir un punto con métricas." }
-      ]
-    },
-    "pilar_3_visibilidad": {
-      "score": 0-100,
-      "estrategia_contenido": "Recomendación específica de formatos (Carruseles, etc) para su sector.",
-      "estrategia_networking": "Tácticas de comentarios y conexión 1:1."
-    }
-  },
-  "quick_wins": ["Acción 1", "Acción 2", "Acción 3"]
-}
-
-**Tono:** 
-- Eres el mentor experto, no un asistente pasivo.
-- Directo, a veces duro ("tough love"), pero constructivo.
-- Usa terminología experta: "LSO", "Densidad semántica", "Dwell Time", "Conversión".
-- Tu objetivo es que el usuario sea "Headhunted".
-`;
-
-    // Initialize SDK
-    const genAI = new GoogleGenerativeAI(apiKey);
-    // Use gemini-1.5-flash for speed/vision or pro
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-pro",
-      systemInstruction: systemPrompt,
-    });
-
-    const retryWithBackoff = async <T>(
-      operation: () => Promise<T>,
-      retries = 3,
-      delay = 2000,
-    ): Promise<T> => {
-      try {
-        return await operation();
-      } catch (error: unknown) {
-        const err = error as { status?: number; message?: string };
-        if (
-          retries > 0 &&
-          (err.status === 503 || err.message?.includes("overloaded"))
-        ) {
-          console.log(
-            `Model overloaded. Retrying in ${delay}ms... (${retries} retries left)`,
-          );
-          await new Promise((resolve) => setTimeout(resolve, delay));
-          return retryWithBackoff(operation, retries - 1, delay * 2);
-        }
-        throw error;
-      }
-    };
-
-    // Using gemini-3-pro-preview as requested by user -> defaulting to 1.5 pro for stability
-    const response = await retryWithBackoff(async () =>
-      await model.generateContent({
-        contents: [
-          {
-            role: "user",
-            parts: [
-              {
-                inlineData: {
-                  mimeType: "application/pdf",
-                  data: base64Data,
-                },
-              },
-              {
-                text:
-                  "Analiza este perfil de LinkedIn aplicando rigurosamente los 3 Pilares de Ingeniería de la Atención.",
-              },
-            ],
-          },
-        ],
-        generationConfig: {
-          responseMimeType: "application/json",
+      [ESTRUCTURA DEL JSON REQUERIDA]
+      {
+        "perfil_resumen": {
+          "nombre": "string",
+          "sector": "string",
+          "score_actual": "number (0-100)"
         },
-      })
-    );
+        "pilares": {
+          "pilar_1_fundamento": {
+            "score": "number",
+            "analisis_titular": "Resumen crítico del titular actual",
+            "propuesta_titular_a": "Opción SEO (Rol | Valor | Palabra Clave)",
+            "propuesta_titular_b": "Opción Autoridad (Ayudo a X a conseguir Y mediante Z)",
+            "foto_banner_check": "Feedback sobre lo que se deduce de su imagen actual",
+            "url_check": "Feedback sobre su URL de LinkedIn"
+          },
+          "pilar_2_narrativa": {
+            "score": "number",
+            "gancho_analisis": "Cómo son las primeras 2 líneas de su 'Acerca de'",
+            "redaccion_gancho_sugerida": "Reescritura de alto impacto (máximo 3 líneas)",
+            "experiencia_analisis": "Análisis de si usa logros cuantificables",
+            "experiencia_mejoras": [
+              {
+                "empresa": "string",
+                "propuesta_metrica": "Sugerencia de logro cuantificable para esta posición"
+              }
+            ]
+          },
+          "pilar_3_visibilidad": {
+            "score": "number",
+            "estrategia_contenido": "3 tipos de posts que debería estar publicando",
+            "estrategia_networking": "Consejo sobre cómo interactuar con otros líderes"
+          }
+        },
+        "quick_wins": ["Victoria 1", "Victoria 2", "Victoria 3"]
+      }
 
-    const text = response.response.text();
-    if (!text) throw new Error("No analysis generated from Gemini.");
+      [TEXTO DEL PDF]
+      ${pdfText}
+    `;
 
-    let analysis;
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let text = response.text();
+
+    // Limpiar posibles bloques de código Markdown
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+
+    // Validar JSON
     try {
-      const cleanJson = text.replace(/```json/g, "").replace(/```/g, "").trim();
-      analysis = JSON.parse(cleanJson);
+      JSON.parse(text);
     } catch (e) {
-      console.error("Error parsing Gemini JSON:", e, text);
-      // Fallback or re-throw
-      throw new Error("Failed to parse Gemini response as JSON.");
+      console.error("Invalid JSON generated by AI:", text);
+      throw new Error("La IA generó una respuesta inválida. Reintenta.");
     }
 
-    return new Response(
-      JSON.stringify(analysis),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
+    return new Response(text, {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
       },
-    );
-  } catch (error: unknown) {
-    console.error("Error processing request:", error);
-    const err = error as Error;
-    // Return 200 with error field so client can read the message explicitly
-    return new Response(
-      JSON.stringify({
-        error: err.message || "Unknown error occurred",
-        stack: err.stack,
-      }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      },
-    );
+    });
+  } catch (error: any) {
+    console.error("Error in analyze-profile:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

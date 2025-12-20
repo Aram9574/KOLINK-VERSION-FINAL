@@ -34,6 +34,7 @@ import { Suspense } from "react";
 
 // Lazy load PostGenerator to reduce initial Dashboard bundle size
 const PostCreator = React.lazy(() => import("../generation/PostGenerator"));
+const CarouselStudio = React.lazy(() => import("../generation/CarouselStudio"));
 
 const DashboardContent: React.FC = () => {
     const { user, refreshUser, setUser, language, setLanguage } = useUser();
@@ -66,7 +67,13 @@ const DashboardContent: React.FC = () => {
     // UI State
     // Persist active tab selection
     const [activeTab, setActiveTabRaw] = useState<
-        "create" | "history" | "settings" | "autopilot" | "auditor" | "ideas"
+        | "create"
+        | "history"
+        | "settings"
+        | "autopilot"
+        | "auditor"
+        | "ideas"
+        | "carousel"
     >(() => {
         const saved = localStorage.getItem("kolink_active_tab");
         if (saved === "ideas") return "create"; // Legacy
@@ -80,7 +87,8 @@ const DashboardContent: React.FC = () => {
             | "settings"
             | "autopilot"
             | "auditor"
-            | "ideas",
+            | "ideas"
+            | "carousel",
     ) => {
         setActiveTabRaw(tab);
         localStorage.setItem("kolink_active_tab", tab);
@@ -93,6 +101,9 @@ const DashboardContent: React.FC = () => {
     const [isTourActive, setIsTourActive] = useState(false);
     const [showReferralModal, setShowReferralModal] = useState(false);
     const [levelUpData, setLevelUpData] = useState<any>(null);
+    const [carouselDraftContent, setCarouselDraftContent] = useState<string>(
+        "",
+    );
 
     // Helper for hooks
     const handleUpdateUser = async (updates: Partial<UserProfile>) => {
@@ -298,6 +309,10 @@ const DashboardContent: React.FC = () => {
                                     showCreditDeduction={showCreditDeduction}
                                     initialParams={currentPost?.params}
                                     initialTopic={currentPost?.params?.topic}
+                                    onGoToCarousel={(content) => {
+                                        setCarouselDraftContent(content);
+                                        setActiveTab("carousel");
+                                    }}
                                 />
                             </Suspense>
                         </div>
@@ -382,6 +397,23 @@ const DashboardContent: React.FC = () => {
                                     />
                                 )
                                 : <ProfileAuditor />}
+                        </div>
+                    )}
+
+                    {activeTab === "carousel" && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <Suspense
+                                fallback={
+                                    <div className="flex justify-center items-center h-64">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-500 border-t-transparent">
+                                        </div>
+                                    </div>
+                                }
+                            >
+                                <CarouselStudio
+                                    initialContent={carouselDraftContent}
+                                />
+                            </Suspense>
                         </div>
                     )}
                 </div>

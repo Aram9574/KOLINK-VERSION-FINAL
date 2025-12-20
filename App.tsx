@@ -17,6 +17,9 @@ const LoginPage = lazy(() => import("./components/features/auth/LoginPage"));
 const Dashboard = lazy(() =>
     import("./components/features/dashboard/Dashboard")
 );
+const CarouselStudio = lazy(() =>
+    import("./components/features/generation/CarouselStudio")
+);
 const OnboardingFlow = lazy(() =>
     import("./components/features/onboarding/OnboardingFlow")
 );

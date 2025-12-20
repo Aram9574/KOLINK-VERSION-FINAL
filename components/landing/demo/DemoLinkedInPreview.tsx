@@ -4,6 +4,7 @@ import {
     Check,
     ChevronDown,
     ChevronUp,
+    Clock,
     Globe,
     MessageCircle,
     MoreHorizontal,
@@ -226,54 +227,84 @@ It's about writing better.
 
             {/* PREVIEW CARD */}
             <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden transition-all duration-500 ease-in-out relative group">
-                {/* Control Toolbar */}
-                <div className="bg-slate-50 border-b border-slate-200 px-4 py-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                {/* Control Toolbar - Matching Reference Design */}
+                <div className="bg-slate-50/30 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
                         <div className="flex space-x-1.5">
-                            <div className="w-2.5 h-2.5 rounded-full bg-red-400">
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F57]">
                             </div>
-                            <div className="w-2.5 h-2.5 rounded-full bg-amber-400">
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#FEBC2E]">
                             </div>
-                            <div className="w-2.5 h-2.5 rounded-full bg-green-400">
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#28C840]">
                             </div>
                         </div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-2">
-                            Preview
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-2">
+                            PREVIEW
                         </span>
                     </div>
 
-                    {isEditing
-                        ? (
-                            <div className="flex items-center gap-2 animate-in fade-in duration-200">
-                                <button
-                                    onClick={handleCancel}
-                                    className="px-3 py-1 rounded-md text-xs font-bold text-slate-500 hover:bg-slate-200 transition-colors"
-                                >
-                                    {t.cancel}
-                                </button>
-                                <button
-                                    onClick={handleSave}
-                                    className="px-3 py-1 rounded-md bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 transition-colors shadow-sm flex items-center gap-1"
-                                >
-                                    <Check className="w-3 h-3" />
-                                    {t.save}
-                                </button>
-                            </div>
-                        )
-                        : (
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => {
-                                        setEditContent(content);
-                                        setIsEditing(true);
-                                    }}
-                                    className="px-3 py-1.5 rounded-md bg-white border border-slate-200 text-brand-600 text-xs font-bold hover:border-brand-300 hover:bg-brand-50 transition-all shadow-sm flex items-center gap-1.5"
-                                >
-                                    <PenSquare className="w-3.5 h-3.5" />
-                                    {t.edit}
-                                </button>
-                            </div>
-                        )}
+                    <div className="flex items-center gap-2">
+                        {isEditing
+                            ? (
+                                <div className="flex items-center gap-2 animate-in zoom-in-95 duration-200">
+                                    <button
+                                        onClick={handleCancel}
+                                        className="px-4 h-10 rounded-lg text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 active:scale-95 transition-all shadow-sm"
+                                    >
+                                        {t.cancel}
+                                    </button>
+                                    <button
+                                        onClick={handleSave}
+                                        className="px-4 h-10 rounded-lg bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2"
+                                    >
+                                        <Check className="w-4 h-4" />
+                                        {t.save}
+                                    </button>
+                                </div>
+                            )
+                            : (
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => {
+                                            setEditContent(content);
+                                            setIsEditing(true);
+                                        }}
+                                        className="px-4 h-11 rounded-xl bg-white border border-slate-200 text-blue-600 text-[11px] font-bold hover:border-blue-300 hover:bg-blue-50/30 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-2"
+                                    >
+                                        <PenSquare className="w-4 h-4" />
+                                        {t.edit}
+                                    </button>
+                                    <button
+                                        onClick={() =>
+                                            toast.info(
+                                                language === "es"
+                                                    ? "Función disponible en la versión completa"
+                                                    : "Full version feature",
+                                            )}
+                                        className="px-4 h-11 rounded-xl bg-white border border-slate-200 text-slate-700 text-[11px] font-bold hover:border-slate-300 hover:bg-slate-50 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-2"
+                                    >
+                                        <Clock className="w-4 h-4 text-slate-500" />
+                                        {language === "es"
+                                            ? "Programar"
+                                            : "Schedule"}
+                                    </button>
+                                    <button
+                                        onClick={() =>
+                                            toast.info(
+                                                language === "es"
+                                                    ? "Función disponible en la versión completa"
+                                                    : "Full version feature",
+                                            )}
+                                        className="px-6 h-11 rounded-xl bg-[#0077b5] text-white text-[11px] font-bold hover:bg-[#006097] active:scale-95 transition-all shadow-md flex items-center justify-center gap-2"
+                                    >
+                                        <Send className="w-4 h-4" />
+                                        {language === "es"
+                                            ? "Publicar"
+                                            : "Publish"}
+                                    </button>
+                                </div>
+                            )}
+                    </div>
                 </div>
 
                 {/* Post Header */}

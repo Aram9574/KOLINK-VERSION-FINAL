@@ -1,5 +1,17 @@
 import React from "react";
-import { Eye, Loader2, Play, Terminal, Trash2, Zap } from "lucide-react";
+import {
+    BarChart3,
+    Calendar,
+    ChevronRight,
+    Clock,
+    Eye,
+    LayoutGrid,
+    Loader2,
+    Play,
+    Terminal,
+    Trash2,
+    Zap,
+} from "lucide-react";
 import { AppLanguage, Post } from "../../../types";
 import { translations } from "../../../translations";
 
@@ -25,106 +37,172 @@ const AutoPilotActivityLog: React.FC<AutoPilotActivityLogProps> = ({
     const t = translations[language].app.autopilot;
 
     return (
-        <div className="bg-white text-slate-600 rounded-3xl p-6 border border-slate-200 flex flex-col shadow-sm h-full">
-            <div className="flex items-center justify-between mb-6 shrink-0">
-                <h3 className="text-lg font-bold flex items-center gap-2 text-slate-900">
-                    <Terminal className="w-5 h-5 text-sky-600" />
-                    {t.activity.title}
-                </h3>
-                {isEnabled && (
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]">
-                    </div>
-                )}
-            </div>
-
-            <div className="flex-1 space-y-4 overflow-y-auto min-h-0 pr-2 custom-scrollbar font-mono text-xs">
-                {/* Manual Force Run Control in Log */}
-                {isEnabled && (
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 mb-6">
-                        <div className="flex justify-between items-center mb-3">
-                            <span className="text-slate-500 font-bold uppercase tracking-wider">
-                                {t.activity.manualOverride}
-                            </span>
-                            <Zap className="w-4 h-4 text-amber-500" />
-                        </div>
-                        <button
-                            onClick={onForceRun}
-                            disabled={isGenerating}
-                            className="w-full py-2.5 bg-white border border-slate-200 text-sky-700 font-bold rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-sky-50 hover:border-sky-200"
-                        >
-                            {isGenerating
-                                ? <Loader2 className="w-3 h-3 animate-spin" />
-                                : <Play className="w-3 h-3 fill-current" />}
-                            {t.statusCard.forceRunBtn}
-                        </button>
-                    </div>
-                )}
-
-                {automatedPosts.length === 0
-                    ? (
-                        <div className="text-slate-400 text-center py-10 italic border-2 border-dashed border-slate-200 rounded-xl">
-                            <div className="mb-2 text-slate-300">_</div>
-                            {t.activity.empty}
-                        </div>
-                    )
-                    : (
-                        automatedPosts.map((post) => (
-                            <div
-                                key={post.id}
-                                className="group bg-slate-50 rounded-lg p-3 border border-slate-100 hover:border-slate-300 transition-colors"
-                            >
-                                <div className="flex justify-between items-start mb-2 opacity-60">
-                                    <span className="text-sky-600 font-bold">
-                                        [{new Date(post.createdAt)
-                                            .toLocaleTimeString([], {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            })}]
+        <div className="bg-white text-slate-600 rounded-[2.5rem] p-6 border border-slate-200 flex flex-col shadow-sm h-full relative overflow-hidden group/console">
+            <div className="relative z-20 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-6 shrink-0 border-b border-slate-100 pb-4">
+                    <div className="space-y-1">
+                        <h3 className="text-sm font-bold flex items-center gap-2 text-slate-900 uppercase tracking-[0.2em]">
+                            <Terminal className="w-4 h-4 text-sky-600" />
+                            {t.activity.title}
+                        </h3>
+                        {isEnabled && (
+                            <div className="flex items-center gap-2 text-[10px] text-green-600 font-mono font-bold">
+                                <span className="relative flex h-1.5 w-1.5">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75">
                                     </span>
-                                    <span className="text-[10px] text-slate-400">
-                                        {new Date(post.createdAt)
-                                            .toLocaleDateString()}
+                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500">
                                     </span>
-                                </div>
-                                <div className="flex items-start gap-2 mb-3">
-                                    <span className="text-green-600 mt-0.5 font-bold">
-                                        ➜
-                                    </span>
-                                    <p className="text-slate-600 line-clamp-2 leading-relaxed">
-                                        {t.activity.generatedFor}{" "}
-                                        <span className="text-slate-900 font-bold">
-                                            "{post.params.topic}"
-                                        </span>
-                                    </p>
-                                </div>
-
-                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                        onClick={() =>
-                                            onViewPost && onViewPost(post)}
-                                        className="flex-1 py-1.5 rounded bg-white border border-slate-200 hover:border-sky-200 text-xs font-bold text-slate-500 hover:text-sky-600 transition-all flex items-center justify-center gap-1.5 shadow-sm"
-                                    >
-                                        <Eye className="w-3 h-3" />
-                                        {t.activity.viewOutput}
-                                    </button>
-                                    <button
-                                        onClick={() =>
-                                            onDeletePost &&
-                                            onDeletePost(post.id)}
-                                        className="px-2 py-1.5 rounded bg-white border border-slate-200 hover:border-red-200 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center shadow-sm"
-                                        title={language === "es"
-                                            ? "Eliminar"
-                                            : "Delete"}
-                                    >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
-                                </div>
+                                </span>
+                                LIVE_MONITORING: [READY]
                             </div>
-                        ))
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex-1 space-y-4 overflow-y-auto min-h-0 pr-2 custom-scrollbar font-mono text-[11px]">
+                    {/* Log Header Info */}
+                    <div className="mb-6 p-3 bg-slate-50 rounded-xl border border-slate-100 text-[10px] text-slate-500 space-y-1">
+                        <p className="flex justify-between">
+                            <span>CPU_PRIORITY:</span>{" "}
+                            <span className="text-sky-600 font-bold">
+                                MAX_HIGH
+                            </span>
+                        </p>
+                        <p className="flex justify-between">
+                            <span>QUEUE_STATUS:</span>{" "}
+                            <span className="text-slate-600">
+                                {automatedPosts.length > 0
+                                    ? "WAITING_SCHEDULE"
+                                    : "IDLE"}
+                            </span>
+                        </p>
+                    </div>
+
+                    {/* Manual Override Section */}
+                    {isEnabled && (
+                        <div className="p-4 bg-sky-50 rounded-2xl border border-sky-100 mb-6 group/override">
+                            <div className="flex justify-between items-center mb-3">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-sky-600">
+                                    {t.activity.manualOverride}
+                                </span>
+                                <Zap className="w-3.5 h-3.5 text-amber-500 group-hover:scale-110 transition-transform" />
+                            </div>
+                            <button
+                                onClick={onForceRun}
+                                disabled={isGenerating}
+                                className="w-full h-10 bg-sky-600 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-sky-700 shadow-sm active:scale-95 translate-z-0"
+                            >
+                                {isGenerating
+                                    ? (
+                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                    )
+                                    : <Play className="w-3 h-3 fill-current" />}
+                                <span className="text-xs">
+                                    {t.statusCard.forceRunBtn}
+                                </span>
+                            </button>
+                        </div>
                     )}
-                {isEnabled && (
-                    <div className="text-slate-400 animate-pulse">_</div>
-                )}
+
+                    {automatedPosts.length === 0
+                        ? (
+                            <div className="text-slate-400 text-center py-16 italic border border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+                                <div className="mb-4 text-slate-200 flex justify-center">
+                                    <Zap className="w-8 h-8 opacity-20" />
+                                </div>
+                                <p className="text-[10px] uppercase tracking-widest px-8">
+                                    {t.activity.empty}
+                                </p>
+                                <p className="text-[9px] mt-2 opacity-30">
+                                    // Awaiting initial generation signal
+                                </p>
+                            </div>
+                        )
+                        : (
+                            <div className="space-y-3">
+                                {automatedPosts.map((post) => (
+                                    <div
+                                        key={post.id}
+                                        className="group/item bg-slate-50/50 rounded-2xl p-4 border border-slate-100 hover:border-sky-100 transition-all hover:bg-white"
+                                    >
+                                        <div className="flex justify-between items-center mb-3">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 rounded-lg bg-sky-100 flex items-center justify-center border border-sky-200">
+                                                    <Calendar className="w-3 h-3 text-sky-600" />
+                                                </div>
+                                                <span className="text-sky-600 font-bold">
+                                                    {new Date(post.createdAt)
+                                                        .toLocaleTimeString(
+                                                            [],
+                                                            {
+                                                                hour: "2-digit",
+                                                                minute:
+                                                                    "2-digit",
+                                                            },
+                                                        )}
+                                                </span>
+                                            </div>
+                                            <span className="text-[9px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded uppercase tracking-wider">
+                                                {new Date(post.createdAt)
+                                                    .toLocaleDateString(
+                                                        undefined,
+                                                        {
+                                                            month: "short",
+                                                            day: "numeric",
+                                                        },
+                                                    )}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-start gap-3 mb-4">
+                                            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)]">
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-slate-400 text-[10px] uppercase tracking-wide">
+                                                    Output Generated:
+                                                </p>
+                                                <p className="text-slate-600 line-clamp-2 leading-relaxed italic text-[11px]">
+                                                    "{post.params.topic}"
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => onViewPost &&
+                                                    onViewPost(post)}
+                                                className="flex-1 h-9 rounded-xl bg-white border border-slate-200 hover:border-sky-200 text-[10px] font-bold text-slate-600 hover:text-sky-600 transition-all flex items-center justify-center gap-2 group/btn shadow-sm"
+                                            >
+                                                <Eye className="w-3.5 h-3.5 text-slate-400 group-hover/btn:text-sky-600 transition-colors" />
+                                                {t.activity.viewOutput}
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    onDeletePost &&
+                                                    onDeletePost(post.id)}
+                                                className="w-9 h-9 rounded-xl bg-white border border-slate-200 hover:bg-red-50 hover:border-red-200 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center shadow-sm"
+                                                title={language === "es"
+                                                    ? "Eliminar"
+                                                    : "Delete"}
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                    {isEnabled && (
+                        <div className="pt-4 flex items-center gap-2 text-sky-600/50">
+                            <span className="w-1.5 h-1.5 bg-sky-600/50 rounded-full animate-pulse">
+                            </span>
+                            <span className="animate-pulse">
+                                Awaiting next operational cycle...
+                            </span>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

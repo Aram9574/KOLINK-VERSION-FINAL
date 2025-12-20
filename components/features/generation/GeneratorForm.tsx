@@ -36,6 +36,7 @@ import Tooltip from "../../ui/Tooltip";
 
 import { toast } from "sonner";
 import { GenerationParamsSchema } from "../../../schemas";
+import { CustomSelect } from "../../ui/CustomSelect";
 
 interface GeneratorFormProps {
     params: GenerationParams;
@@ -229,63 +230,22 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                         {currentFrameworkDesc || ""}
                                     </Tooltip>
                                 </label>
-                                <div className="relative group">
-                                    <select
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
-                                        value={params.framework}
-                                        onChange={(e) => {
-                                            const selected = FRAMEWORKS.find(
-                                                (f) =>
-                                                    f.value === e.target.value
-                                            );
-                                            if (
-                                                selected &&
-                                                checkPremiumAccess(selected)
-                                            ) {
-                                                onUpdateParams({
-                                                    framework: e.target
-                                                        .value as ViralFramework,
-                                                });
-                                            }
-                                        }}
-                                    >
-                                        {FRAMEWORKS.map((fOption) => (
-                                            <option
-                                                key={fOption.value}
-                                                value={fOption.value}
-                                                disabled={isFreeUser &&
-                                                    fOption.isPremium}
-                                                className={isFreeUser &&
-                                                        fOption.isPremium
-                                                    ? "text-slate-400"
-                                                    : ""}
-                                            >
-                                                {isFreeUser && fOption.isPremium
-                                                    ? "🔒 "
-                                                    : ""}
-                                                {tConstants
-                                                    .frameworks[fOption.value]
-                                                    ?.label || fOption.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                        <svg
-                                            className="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M19 9l-7 7-7-7"
-                                            >
-                                            </path>
-                                        </svg>
-                                    </div>
-                                </div>
+                                <CustomSelect
+                                    options={FRAMEWORKS.map((f) => ({
+                                        value: f.value,
+                                        label: tConstants.frameworks[f.value]
+                                            ?.label || f.label,
+                                        isPremium: f.isPremium,
+                                    }))}
+                                    value={params.framework}
+                                    onChange={(val) =>
+                                        onUpdateParams({
+                                            framework: val as ViralFramework,
+                                        })}
+                                    isFreeUser={isFreeUser}
+                                    onPremiumClick={() =>
+                                        checkPremiumAccess({ isPremium: true })}
+                                />
                             </div>
 
                             {/* Estilo de Gancho */}
@@ -299,61 +259,21 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                             "Choose how your post starts."}
                                     </Tooltip>
                                 </label>
-                                <div className="relative group">
-                                    <select
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
-                                        value={params.hookStyle || "auto"}
-                                        onChange={(e) => {
-                                            const selected = HOOK_STYLES.find(
-                                                (h) =>
-                                                    h.value === e.target.value
-                                            );
-                                            if (
-                                                selected &&
-                                                checkPremiumAccess(selected)
-                                            ) {
-                                                onUpdateParams({
-                                                    hookStyle: e.target
-                                                        .value as ViralHook,
-                                                });
-                                            }
-                                        }}
-                                    >
-                                        {HOOK_STYLES.map((hOption) => (
-                                            <option
-                                                key={hOption.value}
-                                                value={hOption.value}
-                                                disabled={isFreeUser &&
-                                                    hOption.isPremium}
-                                                className={isFreeUser &&
-                                                        hOption.isPremium
-                                                    ? "text-slate-400"
-                                                    : ""}
-                                            >
-                                                {isFreeUser && hOption.isPremium
-                                                    ? "🔒 "
-                                                    : ""}
-                                                {hOption.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                        <svg
-                                            className="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M19 9l-7 7-7-7"
-                                            >
-                                            </path>
-                                        </svg>
-                                    </div>
-                                </div>
+                                <CustomSelect
+                                    options={HOOK_STYLES.map((h) => ({
+                                        value: h.value,
+                                        label: h.label,
+                                        isPremium: h.isPremium,
+                                    }))}
+                                    value={params.hookStyle || "auto"}
+                                    onChange={(val) =>
+                                        onUpdateParams({
+                                            hookStyle: val as ViralHook,
+                                        })}
+                                    isFreeUser={isFreeUser}
+                                    onPremiumClick={() =>
+                                        checkPremiumAccess({ isPremium: true })}
+                                />
                             </div>
 
                             {/* Brand Voice Selector */}
@@ -371,59 +291,38 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                             : "Select a custom voice or use a preset tone."}
                                     </Tooltip>
                                 </label>
-                                <div
-                                    className="relative group"
-                                    onClickCapture={() => {
-                                        if (isFreeUser) {
-                                            toast.error(
-                                                language === "es"
-                                                    ? "Las voces de marca son solo para usuarios Premium 🔒"
-                                                    : "Brand voices are for Premium users only 🔒",
-                                            );
-                                        }
-                                    }}
-                                >
-                                    <select
-                                        className={`w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm ${
-                                            isFreeUser
-                                                ? "opacity-60 cursor-not-allowed bg-slate-50"
-                                                : ""
-                                        }`}
-                                        value={params.brandVoiceId || ""}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            onUpdateParams({
-                                                brandVoiceId: val === ""
-                                                    ? undefined
-                                                    : val,
-                                            });
-                                        }}
-                                        disabled={isFreeUser}
-                                    >
-                                        <option value="">
-                                            {language === "es"
+                                <CustomSelect
+                                    options={[
+                                        {
+                                            value: "",
+                                            label: language === "es"
                                                 ? "Usar Tono (Abajo)"
-                                                : "Use Tone (Below)"}
-                                        </option>
-                                        {voices.map((voice) => (
-                                            <option
-                                                key={voice.id}
-                                                value={voice.id}
-                                            >
-                                                {voice.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                        {isFreeUser
-                                            ? (
-                                                <Lock className="w-4 h-4 text-slate-400" />
-                                            )
-                                            : (
-                                                <Wand2 className="w-4 h-4 opacity-50" />
-                                            )}
-                                    </div>
-                                </div>
+                                                : "Use Tone (Below)",
+                                        },
+                                        ...voices.map((v) => ({
+                                            value: v.id,
+                                            label: v.name,
+                                        })),
+                                    ]}
+                                    value={params.brandVoiceId || ""}
+                                    onChange={(val) =>
+                                        onUpdateParams({
+                                            brandVoiceId: val === ""
+                                                ? undefined
+                                                : val as string,
+                                        })}
+                                    disabled={isFreeUser}
+                                    isFreeUser={isFreeUser}
+                                    icon={isFreeUser
+                                        ? <Lock size={16} />
+                                        : <Wand2 size={16} />}
+                                    onPremiumClick={() =>
+                                        toast.error(
+                                            language === "es"
+                                                ? "Las voces de marca son solo para usuarios Premium 🔒"
+                                                : "Brand voices are for Premium users only 🔒",
+                                        )}
+                                />
                             </div>
 
                             {/* Tono (Disable if Brand Voice is selected) */}
@@ -438,98 +337,102 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     {t.toneLabel}
                                     <Tooltip>{t.toneTooltip}</Tooltip>
                                 </label>
-                                <div className="relative group">
-                                    <select
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
-                                        value={params.tone}
-                                        onChange={(e) => {
-                                            const selected = TONES.find((t) =>
-                                                t.value === e.target.value
-                                            );
-                                            if (
-                                                selected &&
-                                                checkPremiumAccess(selected)
-                                            ) {
-                                                onUpdateParams({
-                                                    tone: e.target
-                                                        .value as ViralTone,
-                                                });
-                                            }
-                                        }}
-                                        disabled={!!params.brandVoiceId}
-                                    >
-                                        {TONES.map((tOption) => (
-                                            <option
-                                                key={tOption.value}
-                                                value={tOption.value}
-                                                disabled={isFreeUser &&
-                                                    tOption.isPremium}
-                                                className={isFreeUser &&
-                                                        tOption.isPremium
-                                                    ? "text-slate-400"
-                                                    : ""}
-                                            >
-                                                {isFreeUser && tOption.isPremium
-                                                    ? "🔒 "
-                                                    : ""}
-                                                {tConstants.tones[tOption.value]
-                                                    ?.label || tOption.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                        <svg
-                                            className="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M19 9l-7 7-7-7"
-                                            >
-                                            </path>
-                                        </svg>
-                                    </div>
-                                </div>
+                                <CustomSelect
+                                    options={TONES.map((tOption) => ({
+                                        value: tOption.value,
+                                        label: tConstants.tones[tOption.value]
+                                            ?.label || tOption.label,
+                                        isPremium: tOption.isPremium,
+                                    }))}
+                                    value={params.tone}
+                                    onChange={(val) =>
+                                        onUpdateParams({
+                                            tone: val as ViralTone,
+                                        })}
+                                    disabled={!!params.brandVoiceId}
+                                    isFreeUser={isFreeUser}
+                                    onPremiumClick={() =>
+                                        checkPremiumAccess({ isPremium: true })}
+                                />
                             </div>
 
-                            {/* Idioma */}
-                            <div className="space-y-1.5">
-                                <label className="text-sm font-semibold text-slate-700 ml-1">
-                                    {language === "es" ? "Idioma" : "Language"}
-                                </label>
-                                <div className="relative group">
-                                    <select
-                                        className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
+                            <div className="space-y-1.5 col-span-1 md:col-span-2 grid grid-cols-2 gap-4">
+                                {/* Idioma */}
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-semibold text-slate-700 ml-1">
+                                        {language === "es"
+                                            ? "Idioma"
+                                            : "Language"}
+                                    </label>
+                                    <CustomSelect
+                                        options={[
+                                            { value: "es", label: "Español" },
+                                            { value: "en", label: "Inglés" },
+                                        ]}
                                         value={params.outputLanguage || "es"}
-                                        onChange={(e) =>
+                                        onChange={(val) =>
                                             onUpdateParams({
-                                                outputLanguage: e.target
-                                                    .value as "es" | "en",
+                                                outputLanguage: val as
+                                                    | "es"
+                                                    | "en",
                                             })}
+                                    />
+                                </div>
+
+                                {/* Generate Carousel Toggle */}
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-semibold text-slate-700 ml-1 flex items-center gap-1.5">
+                                        {language === "es"
+                                            ? "Generar Carrusel"
+                                            : "Generate Carousel"}
+                                        <div className="px-1.5 py-0.5 text-[10px] font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full">
+                                            BETA
+                                        </div>
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            onUpdateParams({
+                                                generateCarousel: !params
+                                                    .generateCarousel,
+                                            })}
+                                        className={`w-full h-[42px] px-3 rounded-xl border flex items-center justify-between transition-all duration-200 group ${
+                                            params.generateCarousel
+                                                ? "bg-blue-50 border-blue-200"
+                                                : "bg-white border-slate-200 hover:border-blue-300"
+                                        }`}
                                     >
-                                        <option value="es">Español</option>
-                                        <option value="en">Inglés</option>
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                        <svg
-                                            className="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
+                                        <span
+                                            className={`text-sm font-medium ${
+                                                params.generateCarousel
+                                                    ? "text-blue-700"
+                                                    : "text-slate-600"
+                                            }`}
                                         >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M19 9l-7 7-7-7"
-                                            >
-                                            </path>
-                                        </svg>
-                                    </div>
+                                            {params.generateCarousel
+                                                ? (language === "es"
+                                                    ? "Sí, crear carrusel"
+                                                    : "Yes, create carousel")
+                                                : (language === "es"
+                                                    ? "Solo texto"
+                                                    : "Text only")}
+                                        </span>
+                                        <div
+                                            className={`w-10 h-6 rounded-full p-1 transition-colors duration-200 ${
+                                                params.generateCarousel
+                                                    ? "bg-blue-500"
+                                                    : "bg-slate-200"
+                                            }`}
+                                        >
+                                            <div
+                                                className={`w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                                                    params.generateCarousel
+                                                        ? "translate-x-4"
+                                                        : "translate-x-0"
+                                                }`}
+                                            />
+                                        </div>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -598,44 +501,21 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     <label className="text-sm font-semibold text-slate-700 ml-1">
                                         {t.lengthLabel}
                                     </label>
-                                    <div className="relative group">
-                                        <select
-                                            className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
-                                            value={params.length}
-                                            onChange={(e) =>
-                                                onUpdateParams({
-                                                    length: e.target
-                                                        .value as PostLength,
-                                                })}
-                                        >
-                                            {LENGTH_OPTIONS.map((option) => (
-                                                <option
-                                                    key={option.value}
-                                                    value={option.value}
-                                                >
-                                                    {tConstants
-                                                        .lengths[option.value]
-                                                        ?.label || option.label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                            <svg
-                                                className="w-4 h-4"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth="2"
-                                                    d="M19 9l-7 7-7-7"
-                                                >
-                                                </path>
-                                            </svg>
-                                        </div>
-                                    </div>
+                                    <CustomSelect
+                                        options={LENGTH_OPTIONS.map(
+                                            (option) => ({
+                                                value: option.value,
+                                                label: tConstants
+                                                    .lengths[option.value]
+                                                    ?.label || option.label,
+                                            }),
+                                        )}
+                                        value={params.length}
+                                        onChange={(val) =>
+                                            onUpdateParams({
+                                                length: val as PostLength,
+                                            })}
+                                    />
                                 </div>
 
                                 {/* Creativity Slider */}
@@ -669,44 +549,33 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     <label className="text-sm font-semibold text-slate-700 ml-1">
                                         {t.emojiLabel}
                                     </label>
-                                    <div className="relative group">
-                                        <select
-                                            className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
-                                            value={params.emojiDensity}
-                                            onChange={(e) =>
-                                                onUpdateParams({
-                                                    emojiDensity: e.target
-                                                        .value as EmojiDensity,
-                                                })}
-                                        >
-                                            {EMOJI_OPTIONS.map((opt) => (
-                                                <option
-                                                    key={opt.value}
-                                                    value={opt.value}
-                                                >
-                                                    {language === "es" &&
-                                                            opt.value ===
-                                                                EmojiDensity
-                                                                    .MINIMAL
-                                                        ? "Mínimo (Profesional)"
-                                                        : language === "es" &&
-                                                                opt.value ===
-                                                                    EmojiDensity
-                                                                        .MODERATE
-                                                        ? "Moderado (Atractivo)"
-                                                        : language === "es" &&
-                                                                opt.value ===
-                                                                    EmojiDensity
-                                                                        .HIGH
-                                                        ? "Alto (Visual/Divertido)"
-                                                        : opt.label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                            <Smile className="w-4 h-4" />
-                                        </div>
-                                    </div>
+                                    <CustomSelect
+                                        options={EMOJI_OPTIONS.map((opt) => ({
+                                            value: opt.value,
+                                            label: language === "es" &&
+                                                    opt.value ===
+                                                        EmojiDensity.MINIMAL
+                                                ? "Mínimo (Profesional)"
+                                                : language === "es" &&
+                                                        opt.value ===
+                                                            EmojiDensity
+                                                                .MODERATE
+                                                ? "Moderado (Atractivo)"
+                                                : language === "es" &&
+                                                        opt.value ===
+                                                            EmojiDensity
+                                                                .HIGH
+                                                ? "Alto (Visual/Divertido)"
+                                                : opt.label,
+                                        }))}
+                                        value={params.emojiDensity}
+                                        onChange={(val) =>
+                                            onUpdateParams({
+                                                emojiDensity:
+                                                    val as EmojiDensity,
+                                            })}
+                                        icon={<Smile size={16} />}
+                                    />
                                 </div>
 
                                 {/* Hashtags Count Dropdown */}
@@ -714,53 +583,32 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                     <label className="text-sm font-semibold text-slate-700 ml-1">
                                         # Hashtags (SEO)
                                     </label>
-                                    <div className="relative group">
-                                        <select
-                                            className="w-full pl-3 pr-8 py-2.5 h-[46px] bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm appearance-none cursor-pointer font-medium text-slate-900 transition-all hover:border-brand-300 shadow-sm"
-                                            value={params.hashtagCount || 3}
-                                            onChange={(e) =>
-                                                onUpdateParams({
-                                                    hashtagCount: parseInt(
-                                                        e.target.value,
-                                                    ),
-                                                })}
-                                        >
-                                            <option value="0">
-                                                0 (Ninguno)
-                                            </option>
-                                            <option value="1">
-                                                1 (Marca Persona)
-                                            </option>
-                                            <option value="2">
-                                                2 (Balanceado)
-                                            </option>
-                                            <option value="3">
-                                                3 (Recomendado)
-                                            </option>
-                                            <option value="4">
-                                                4 (Alto Alcance)
-                                            </option>
-                                            <option value="5">
-                                                5 (Máximo)
-                                            </option>
-                                        </select>
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                            <svg
-                                                className="w-4 h-4"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth="2"
-                                                    d="M19 9l-7 7-7-7"
-                                                >
-                                                </path>
-                                            </svg>
-                                        </div>
-                                    </div>
+                                    <CustomSelect
+                                        options={[
+                                            { value: 0, label: "0 (Ninguno)" },
+                                            {
+                                                value: 1,
+                                                label: "1 (Marca Persona)",
+                                            },
+                                            {
+                                                value: 2,
+                                                label: "2 (Balanceado)",
+                                            },
+                                            {
+                                                value: 3,
+                                                label: "3 (Recomendado)",
+                                            },
+                                            {
+                                                value: 4,
+                                                label: "4 (Alto Alcance)",
+                                            },
+                                            { value: 5, label: "5 (Máximo)" },
+                                        ]}
+                                        value={params.hashtagCount || 3}
+                                        onChange={(val) => onUpdateParams({
+                                            hashtagCount: parseInt(val),
+                                        })}
+                                    />
                                 </div>
                             </div>
                         </div>

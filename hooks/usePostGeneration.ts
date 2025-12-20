@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { UserProfile, Post, GenerationParams } from '../types';
-import { useGenerationLogic } from './useGenerationLogic';
-import { useLinkedInPublishing } from './useLinkedInPublishing';
-import { usePostHistory } from './usePostHistory';
+import React, { useEffect, useState } from "react";
+import { GenerationParams, Post, UserProfile } from "../types";
+import { useGenerationLogic } from "./useGenerationLogic";
+import { useLinkedInPublishing } from "./useLinkedInPublishing";
+import { usePostHistory } from "./usePostHistory";
 
 interface UsePostGenerationProps {
     user: UserProfile;
@@ -12,7 +12,17 @@ interface UsePostGenerationProps {
     currentPost: Post | null;
     setCurrentPost: React.Dispatch<React.SetStateAction<Post | null>>;
     activeTab: string;
-    setActiveTab: React.Dispatch<React.SetStateAction<'create' | 'history' | 'settings' | 'autopilot' | 'auditor' | 'ideas'>>;
+    setActiveTab: React.Dispatch<
+        React.SetStateAction<
+            | "create"
+            | "history"
+            | "settings"
+            | "autopilot"
+            | "auditor"
+            | "ideas"
+            | "carousel"
+        >
+    >;
     handleUpdateUser: (updates: Partial<UserProfile>) => Promise<void>;
     setShowUpgradeModal: (show: boolean) => void;
     setShowCreditDeduction: (show: boolean) => void;
@@ -35,19 +45,25 @@ export const usePostGeneration = ({
     setShowCreditDeduction,
     setLevelUpData,
     isGenerating,
-    setIsGenerating
+    setIsGenerating,
 }: UsePostGenerationProps) => {
-    const [prefilledTopic, setPrefilledTopic] = useState<string>('');
+    const [prefilledTopic, setPrefilledTopic] = useState<string>("");
 
-    const { savePostToHistory, handleDeletePost, handleUpdatePostContent } = usePostHistory({
-        user,
-        posts,
-        setPosts,
-        currentPost,
-        setCurrentPost
-    });
+    const { savePostToHistory, handleDeletePost, handleUpdatePostContent } =
+        usePostHistory({
+            user,
+            posts,
+            setPosts,
+            currentPost,
+            setCurrentPost,
+        });
 
-    const { prefilledParams, setPrefilledParams, handleGenerate, justGeneratedPostId } = useGenerationLogic({
+    const {
+        prefilledParams,
+        setPrefilledParams,
+        handleGenerate,
+        justGeneratedPostId,
+    } = useGenerationLogic({
         user,
         setUser,
         posts,
@@ -60,17 +76,23 @@ export const usePostGeneration = ({
         setLevelUpData,
         isGenerating,
         setIsGenerating,
-        savePostToHistory
+        savePostToHistory,
     });
 
-    const { isPublishing, handlePublish: publishToLinkedIn } = useLinkedInPublishing();
+    const { isPublishing, handlePublish: publishToLinkedIn } =
+        useLinkedInPublishing();
 
     // Enforce display of newly generated post
     useEffect(() => {
         if (justGeneratedPostId.current && posts.length > 0) {
-            const targetPost = posts.find(p => p.id === justGeneratedPostId.current);
+            const targetPost = posts.find((p) =>
+                p.id === justGeneratedPostId.current
+            );
             if (targetPost && currentPost?.id !== targetPost.id) {
-                console.log("Enforcing display of generated post:", targetPost.id);
+                console.log(
+                    "Enforcing display of generated post:",
+                    targetPost.id,
+                );
                 setCurrentPost(targetPost);
                 justGeneratedPostId.current = null;
             }
@@ -82,13 +104,13 @@ export const usePostGeneration = ({
     const handleUseIdea = (idea: string) => {
         setPrefilledTopic(idea);
         setPrefilledParams(null);
-        setActiveTab('create');
+        setActiveTab("create");
     };
 
     const handleReusePost = (params: GenerationParams) => {
         setPrefilledParams(params);
-        setPrefilledTopic('');
-        setActiveTab('create');
+        setPrefilledTopic("");
+        setActiveTab("create");
     };
 
     return {
@@ -102,6 +124,6 @@ export const usePostGeneration = ({
         handleUpdatePostContent,
         handlePublish,
         handleUseIdea,
-        handleReusePost
+        handleReusePost,
     };
 };

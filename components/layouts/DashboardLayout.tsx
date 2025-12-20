@@ -4,7 +4,6 @@ import { useUser } from "../../context/UserContext";
 import { usePosts } from "../../context/PostContext";
 import Sidebar from "../features/dashboard/Sidebar";
 import DashboardHeader from "../features/dashboard/DashboardHeader";
-import InsightWidget from "../features/dashboard/InsightWidget";
 import MobileBottomNav from "./MobileBottomNav";
 import { Post } from "../../types";
 
@@ -14,17 +13,19 @@ interface DashboardLayoutProps {
         | "create"
         | "history"
         | "settings"
-        | "ideas"
         | "autopilot"
-        | "auditor";
+        | "auditor"
+        | "carousel"
+        | "ideas";
     setActiveTab: (
         tab:
             | "create"
             | "history"
             | "settings"
-            | "ideas"
             | "autopilot"
-            | "auditor",
+            | "auditor"
+            | "carousel"
+            | "ideas",
     ) => void;
     onUpgrade: () => void;
     showCreditDeduction: boolean;
@@ -61,18 +62,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     };
 
     return (
-        <div className="flex flex-col lg:block bg-slate-50 font-sans relative selection:bg-brand-200 selection:text-brand-900 h-screen overflow-hidden">
-            {/* Mobile Header - Removed in favor of Bottom Nav integration within views, or kept minimal if needed */}
-            {/* Keeping minimal header for Logo if desired, or removing entirely to gain space */}
-            <div className="lg:hidden bg-white border-b border-slate-200 p-3 flex items-center justify-center z-20 relative shadow-sm sticky top-0">
-                <div className="flex items-center gap-2 font-display font-bold text-lg text-slate-900">
-                    <div className="w-7 h-7 bg-gradient-to-tr from-brand-600 to-indigo-500 rounded-lg flex items-center justify-center text-white text-xs shadow-md">
-                        K
-                    </div>
-                    Kolink
-                </div>
-            </div>
-
+        <div className="flex flex-col lg:block bg-slate-50 font-sans relative selection:bg-brand-200 selection:text-brand-900 h-dvh overflow-hidden pr-safe pl-safe">
             <div className="flex h-full lg:h-screen overflow-hidden">
                 {/* Sidebar */}
                 <div className="hidden lg:block w-72 bg-white border-r border-slate-200 z-50 shadow-none relative">
@@ -82,7 +72,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 </div>
 
                 {/* Main Content Area */}
-                <main className="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-50/50">
+                <main className="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-50">
                     <div className="hidden lg:block">
                         <DashboardHeader
                             user={user}
@@ -95,11 +85,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                     {/* Content Body */}
                     <div className="flex-1 overflow-hidden relative">
                         {children}
-                    </div>
-
-                    {/* Floating Insight Widget */}
-                    <div className="mb-20 lg:mb-0">
-                        <InsightWidget language={language} />
                     </div>
                 </main>
 

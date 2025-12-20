@@ -14,6 +14,8 @@ import LibrarySidebar from "./LibrarySidebar";
 import HistoryCard from "./HistoryCard";
 import CalendarView from "./CalendarView";
 import { updatePost as updatePostInDb } from "../../../services/postRepository";
+import { Share } from "@capacitor/share";
+import Skeleton from "../../ui/Skeleton";
 import { toast } from "sonner";
 
 interface HistoryViewProps {
@@ -122,6 +124,19 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                 console.error("Failed to toggle favorite:", error);
                 updatePost({ ...post, isFavorite: !isFavorite });
             }
+        }
+    };
+
+    const handleShare = async (post: Post) => {
+        try {
+            await Share.share({
+                title: "Post de KOLINK",
+                text: post.content,
+                url: "https://kolink.ai",
+                dialogTitle: "Compartir post",
+            });
+        } catch (error) {
+            console.error("Error sharing:", error);
         }
     };
 
@@ -293,20 +308,27 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                                                         onReuse={onReuse}
                                                         onDelete={onDelete}
                                                         onToggleFavorite={handleToggleFavorite}
+                                                        onShare={handleShare}
                                                     />
                                                 ))}
+                                                {isLoadingMore && (
+                                                    <>
+                                                        <Skeleton className="h-[400px]" />
+                                                        <Skeleton className="h-[400px]" />
+                                                        <Skeleton className="h-[400px]" />
+                                                    </>
+                                                )}
                                             </div>
 
                                             {/* Load More Trigger */}
-                                            {hasMore && (
+                                            {hasMore && !isLoadingMore && (
                                                 <div className="mt-8 flex justify-center">
                                                     <button
                                                         onClick={loadMorePosts}
-                                                        disabled={isLoadingMore}
-                                                        className="px-6 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium disabled:opacity-50"
+                                                        className="px-6 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium"
                                                     >
-                                                        {isLoadingMore
-                                                            ? "Loading..."
+                                                        {language === "es"
+                                                            ? "Cargar más"
                                                             : "Load More"}
                                                     </button>
                                                 </div>

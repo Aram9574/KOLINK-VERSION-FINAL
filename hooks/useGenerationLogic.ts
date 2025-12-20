@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { toast } from 'sonner';
-import { UserProfile, Post, GenerationParams } from '../types';
-import { executePostGeneration } from '../services/postWorkflow';
-import { supabase } from '../services/supabaseClient';
-import { fetchUserProfile } from '../services/userRepository';
+import React, { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { GenerationParams, Post, UserProfile } from "../types";
+import { executePostGeneration } from "../services/postWorkflow";
+import { supabase } from "../services/supabaseClient";
+import { fetchUserProfile } from "../services/userRepository";
 
 interface UseGenerationLogicProps {
     user: UserProfile;
@@ -11,7 +11,17 @@ interface UseGenerationLogicProps {
     posts: Post[];
     setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
     setCurrentPost: React.Dispatch<React.SetStateAction<Post | null>>;
-    setActiveTab: React.Dispatch<React.SetStateAction<'create' | 'history' | 'settings' | 'autopilot' | 'auditor' | 'ideas'>>;
+    setActiveTab: React.Dispatch<
+        React.SetStateAction<
+            | "create"
+            | "history"
+            | "settings"
+            | "autopilot"
+            | "auditor"
+            | "ideas"
+            | "carousel"
+        >
+    >;
     handleUpdateUser: (updates: Partial<UserProfile>) => Promise<void>;
     setShowUpgradeModal: (show: boolean) => void;
     setShowCreditDeduction: (show: boolean) => void;
@@ -24,7 +34,7 @@ interface UseGenerationLogicProps {
 /**
  * Custom hook to manage the core post generation workflow.
  * Handles user interaction, recovery from interruptions, state updates, and gamification events.
- * 
+ *
  * @param props - Dependencies injected from the main Application/Dashboard component.
  * @returns Object containing handlers and state for the generation process.
  */
@@ -41,9 +51,11 @@ export const useGenerationLogic = ({
     setLevelUpData,
     isGenerating,
     setIsGenerating,
-    savePostToHistory
+    savePostToHistory,
 }: UseGenerationLogicProps) => {
-    const [prefilledParams, setPrefilledParams] = useState<GenerationParams | null>(null);
+    const [prefilledParams, setPrefilledParams] = useState<
+        GenerationParams | null
+    >(null);
     const justGeneratedPostId = useRef<string | null>(null);
     const hasCheckedRecovery = useRef(false);
 
@@ -53,46 +65,54 @@ export const useGenerationLogic = ({
 
         const checkRecovery = async () => {
             hasCheckedRecovery.current = true;
-            const genTimestamp = localStorage.getItem('kolink_is_generating');
+            const genTimestamp = localStorage.getItem("kolink_is_generating");
             if (genTimestamp) {
                 const startTime = parseInt(genTimestamp);
                 if (Date.now() - startTime < 5 * 60 * 1000) {
-                    console.log("Attempting to recover interrupted generation...");
+                    console.log(
+                        "Attempting to recover interrupted generation...",
+                    );
                     setIsGenerating(true);
-                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
 
                     try {
                         const { data: latestPosts } = await supabase
-                            .from('posts')
-                            .select('*')
-                            .eq('user_id', user.id)
-                            .order('created_at', { ascending: false })
+                            .from("posts")
+                            .select("*")
+                            .eq("user_id", user.id)
+                            .order("created_at", { ascending: false })
                             .limit(1);
 
                         if (latestPosts && latestPosts.length > 0) {
                             const recoveredPost = latestPosts[0];
-                            const postTime = new Date(recoveredPost.created_at).getTime();
+                            const postTime = new Date(recoveredPost.created_at)
+                                .getTime();
 
                             if (postTime > startTime) {
-                                toast.success("¡Post recuperado! Se generó mientras no estabas.");
+                                toast.success(
+                                    "¡Post recuperado! Se generó mientras no estabas.",
+                                );
                                 const mappedPost: Post = {
                                     id: recoveredPost.id,
                                     content: recoveredPost.content,
-                                    params: recoveredPost.generation_params || {},
+                                    params: recoveredPost.generation_params ||
+                                        {},
                                     createdAt: postTime,
                                     likes: 0,
                                     views: 0,
                                     isAutoPilot: false,
                                     viralScore: recoveredPost.viral_score,
-                                    viralAnalysis: recoveredPost.viral_analysis
+                                    viralAnalysis: recoveredPost.viral_analysis,
                                 };
 
                                 setCurrentPost(mappedPost);
-                                setPosts(prev => {
-                                    if (prev.some(p => p.id === mappedPost.id)) return prev;
+                                setPosts((prev) => {
+                                    if (
+                                        prev.some((p) => p.id === mappedPost.id)
+                                    ) return prev;
                                     return [mappedPost, ...prev];
                                 });
-                                localStorage.removeItem('kolink_is_generating');
+                                localStorage.removeItem("kolink_is_generating");
                             }
                         }
                     } catch (e) {
@@ -100,11 +120,11 @@ export const useGenerationLogic = ({
                     } finally {
                         setIsGenerating(false);
                         if (Date.now() - startTime > 60000) {
-                            localStorage.removeItem('kolink_is_generating');
+                            localStorage.removeItem("kolink_is_generating");
                         }
                     }
                 } else {
-                    localStorage.removeItem('kolink_is_generating');
+                    localStorage.removeItem("kolink_is_generating");
                 }
             }
         };
@@ -114,22 +134,32 @@ export const useGenerationLogic = ({
     /**
      * Triggers the post generation process.
      * Validates credits, calls the backend workflow, updates user state (XP/Level), and handles errors.
-     * 
+     *
      * @param params - Generation parameters.
      * @param isAutoPilot - Whether this is triggered automatically (suppresses UI modals).
      */
-    const handleGenerate = async (params: GenerationParams, isAutoPilot = false) => {
+    const handleGenerate = async (
+        params: GenerationParams,
+        isAutoPilot = false,
+    ) => {
         if (user.credits <= 0 || user.cancelAtPeriodEnd) {
-            if (!isAutoPilot && !user.cancelAtPeriodEnd) setShowUpgradeModal(true);
+            if (!isAutoPilot && !user.cancelAtPeriodEnd) {
+                setShowUpgradeModal(true);
+            }
             return;
         }
 
         setIsGenerating(true);
-        localStorage.setItem('kolink_is_generating', Date.now().toString());
+        localStorage.setItem("kolink_is_generating", Date.now().toString());
         if (!isAutoPilot) setShowCreditDeduction(false);
 
         try {
-            const result = await executePostGeneration(user, params, posts, isAutoPilot);
+            const result = await executePostGeneration(
+                user,
+                params,
+                posts,
+                isAutoPilot,
+            );
             const { post: newPost, updatedUser, gamificationResult } = result;
 
             setUser(updatedUser);
@@ -139,11 +169,14 @@ export const useGenerationLogic = ({
                 setShowCreditDeduction(true);
                 setTimeout(() => setShowCreditDeduction(false), 2500);
 
-                if (gamificationResult.leveledUp || gamificationResult.newAchievements.length > 0) {
+                if (
+                    gamificationResult.leveledUp ||
+                    gamificationResult.newAchievements.length > 0
+                ) {
                     setLevelUpData({
                         leveledUp: gamificationResult.leveledUp,
                         newLevel: gamificationResult.newLevel,
-                        newAchievements: gamificationResult.newAchievements
+                        newAchievements: gamificationResult.newAchievements,
                     });
                 }
 
@@ -152,51 +185,60 @@ export const useGenerationLogic = ({
                     level: gamificationResult.newLevel,
                     currentStreak: gamificationResult.newStreak,
                     lastPostDate: Date.now(),
-                    unlockedAchievements: updatedUser.unlockedAchievements
+                    unlockedAchievements: updatedUser.unlockedAchievements,
                 });
 
                 const xpGained = gamificationResult.newXP - user.xp;
                 if (xpGained > 0) {
                     toast.success(`+${xpGained} XP`, {
                         description: "¡Sigue así para subir de nivel!",
-                        icon: "⭐"
+                        icon: "⭐",
                     });
                 }
 
-                fetchUserProfile(user.id).then(updatedProfile => {
+                fetchUserProfile(user.id).then((updatedProfile) => {
                     if (updatedProfile) {
-                        setUser(prev => ({ ...prev, ...updatedProfile }));
+                        setUser((prev) => ({ ...prev, ...updatedProfile }));
                     }
                 });
             }
 
             setPrefilledParams(null);
-            console.log("Finalizing generation, setting current post:", newPost.id);
+            console.log(
+                "Finalizing generation, setting current post:",
+                newPost.id,
+            );
             setCurrentPost(newPost);
-            localStorage.setItem('kolink_current_post_id', newPost.id);
+            localStorage.setItem("kolink_current_post_id", newPost.id);
             justGeneratedPostId.current = newPost.id;
-            setActiveTab('create');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
+            setActiveTab("create");
+            window.scrollTo({ top: 0, behavior: "smooth" });
         } catch (error: any) {
             console.error("Failed to generate", error);
             if (!isAutoPilot) {
                 const msg = error.message || "";
-                
+
                 if (msg.includes("Insufficient credits")) {
                     setShowUpgradeModal(true);
                 } else if (msg.includes("Rate limit exceeded")) {
-                    toast.warning("Por favor espera unos segundos antes de generar otro post.");
+                    toast.warning(
+                        "Por favor espera unos segundos antes de generar otro post.",
+                    );
                 } else {
                     // Generic error - distinguish between network and server if possible
-                    toast.error("Error al generar contenido. Inténtalo de nuevo o contacta soporte.", {
-                        description: msg.length < 50 ? msg : "Error de conexión o del servidor"
-                    });
+                    toast.error(
+                        "Error al generar contenido. Inténtalo de nuevo o contacta soporte.",
+                        {
+                            description: msg.length < 50
+                                ? msg
+                                : "Error de conexión o del servidor",
+                        },
+                    );
                 }
             }
         } finally {
             setIsGenerating(false);
-            localStorage.removeItem('kolink_is_generating');
+            localStorage.removeItem("kolink_is_generating");
         }
     };
 
@@ -204,6 +246,6 @@ export const useGenerationLogic = ({
         prefilledParams,
         setPrefilledParams,
         handleGenerate,
-        justGeneratedPostId
+        justGeneratedPostId,
     };
 };

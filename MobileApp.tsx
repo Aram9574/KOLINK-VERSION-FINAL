@@ -36,7 +36,7 @@ const MobileApp: React.FC = () => {
 
     const [isTimeout, setIsTimeout] = useState(false);
 
-    // Safety timeout for loading state
+    // Safety timeout for loading state - reduced for better perception
     useEffect(() => {
         const timer = setTimeout(() => {
             if (loading) {
@@ -45,7 +45,7 @@ const MobileApp: React.FC = () => {
                 );
                 setIsTimeout(true);
             }
-        }, 8000);
+        }, 5000); // Reduced to 5s
         return () => clearTimeout(timer);
     }, [loading]);
 
@@ -61,11 +61,26 @@ const MobileApp: React.FC = () => {
 
     if (loading && !isTimeout) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin">
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="flex flex-col items-center gap-8 animate-in fade-in duration-700">
+                    <div className="relative">
+                        <div className="w-20 h-20 bg-gradient-to-tr from-brand-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-brand-500/20 rotate-12">
+                            <span className="text-3xl font-display font-bold text-white -rotate-12">
+                                K
+                            </span>
+                        </div>
+                        <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-amber-400 rounded-full border-4 border-white animate-pulse">
+                        </div>
                     </div>
-                    {/* Simplified Loading for Mobile */}
+                    <div className="flex flex-col items-center gap-2">
+                        <h2 className="text-xl font-display font-bold text-slate-900 tracking-tight">
+                            KOLINK
+                        </h2>
+                        <div className="w-48 h-1 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-brand-600 rounded-full animate-loading-bar w-1/3">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );

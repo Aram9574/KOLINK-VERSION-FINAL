@@ -15,8 +15,12 @@ const Footer: React.FC<FooterProps> = ({ language }) => {
             <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8">
                 <div className="flex flex-col items-center md:items-start gap-4">
                     <div className="flex items-center gap-2 font-display font-bold text-xl text-slate-900">
-                        <div className="w-8 h-8 bg-gradient-to-tr from-brand-600 to-indigo-500 rounded-lg flex items-center justify-center text-white text-sm shadow-md">
-                            K
+                        <div className="w-9 h-9 transition-transform duration-300 hover:scale-105">
+                            <img
+                                src="/brand-logo.jpg"
+                                alt="Kolink Logo"
+                                className="w-full h-full object-contain rounded-lg shadow-md"
+                            />
                         </div>
                         Kolink
                     </div>

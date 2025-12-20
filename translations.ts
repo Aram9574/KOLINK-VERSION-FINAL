@@ -355,6 +355,7 @@ export const translations = {
     app: {
       sidebar: {
         studio: "Studio",
+        carousel: "Carousel Studio",
         ideas: "Idea Generator",
         autopilot: "AutoPilot",
         history: "History",
@@ -1096,6 +1097,7 @@ export const translations = {
     app: {
       sidebar: {
         studio: "Estudio",
+        carousel: "Carrusel Studio",
         ideas: "Generador de Ideas",
         autopilot: "AutoPilot",
         history: "Historial",

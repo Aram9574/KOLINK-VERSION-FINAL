@@ -18,8 +18,12 @@ const supabaseClient = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
 );
 
+console.log("Stripe Webhook Function Hit!");
+
 serve(async (req: Request) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
   const signature = req.headers.get("Stripe-Signature");
+  console.log(`Signature present: ${!!signature}`);
 
   if (!signature) {
     return new Response("No signature", { status: 400 });
@@ -39,16 +43,12 @@ serve(async (req: Request) => {
       event.type === "invoice.payment_succeeded" ||
       event.type === "checkout.session.completed"
     ) {
-      const dataObject = event.data.object as any; // Cast to any to access properties safely without full Stripe type
+      const dataObject = event.data.object as any;
       const customerId = dataObject.customer as string;
-      // For checkout session, use amount_total. For invoice, use amount_paid.
       const amountPaid = dataObject.amount_paid ?? dataObject.amount_total ?? 0;
 
-      console.log(
-        `Processing ${event.type} for customer: ${customerId}, Amount: ${amountPaid}`,
-      );
+      console.log(`Processing ${event.type} for customer: ${customerId}`);
 
-      // Find user by stripe_customer_id
       const { data: profile, error: profileError } = await supabaseClient
         .from("profiles")
         .select("id, credits, email, referred_by")
@@ -56,30 +56,20 @@ serve(async (req: Request) => {
         .single();
 
       if (profileError || !profile) {
-        console.error(
-          "User not found for Stripe Customer ID:",
-          customerId,
-          "Error:",
-          profileError,
-        );
-        // Fallback: Try to find by email if customer ID lookup fails
+        // Fallback email lookup logic...
         const email = dataObject.customer_email ??
           dataObject.customer_details?.email;
         if (email) {
-          console.log(`Attempting lookup by email: ${email}`);
-          const { data: profileByEmail, error: emailError } =
-            await supabaseClient
-              .from("profiles")
-              .select("id, credits, email")
-              .eq("email", email)
-              .single();
+          const { data: profileByEmail } = await supabaseClient
+            .from("profiles")
+            .select("id, credits, email")
+            .eq("email", email)
+            .single();
 
           if (profileByEmail) {
-            console.log(`Found user by email. Updating customer ID...`);
             await supabaseClient.from("profiles").update({
               stripe_customer_id: customerId,
             }).eq("id", profileByEmail.id);
-
             const priceId = dataObject.lines?.data?.[0]?.price?.id;
             await processCreditUpdate(
               supabaseClient,
@@ -88,41 +78,81 @@ serve(async (req: Request) => {
               dataObject?.lines?.data?.[0]?.period?.end ??
                 Math.floor(Date.now() / 1000) + 2592000,
               priceId,
-            ); // Default 30 days if no period
+            );
             return new Response(JSON.stringify({ received: true }), {
               headers: { "Content-Type": "application/json" },
             });
-          } else {
-            console.error("User not found by email either.");
-            return new Response("User not found", { status: 404 });
           }
-        } else {
-          return new Response("User not found", { status: 404 });
         }
+        return new Response("User not found", { status: 404 });
       }
 
-      if (profile) {
-        // Calculate period end
-        let periodEnd;
-        let priceId;
-        if (event.type === "invoice.payment_succeeded") {
-          periodEnd = dataObject.lines.data[0].period.end;
-          priceId = dataObject.lines.data[0].price?.id;
-        } else {
-          // For checkout session, we might not have subscription details handy without expansion.
-          // But usually it's a subscription. Let's default to now + 30 days if missing.
-          periodEnd = Math.floor(Date.now() / 1000) + 2592000;
-          priceId = dataObject.line_items?.data?.[0]?.price?.id;
-        }
+      const periodEnd = event.type === "invoice.payment_succeeded"
+        ? dataObject.lines.data[0].period.end
+        : (Math.floor(Date.now() / 1000) + 2592000);
+      const priceId = event.type === "invoice.payment_succeeded"
+        ? dataObject.lines.data[0].price?.id
+        : dataObject.line_items?.data?.[0]?.price?.id;
 
-        await processCreditUpdate(
-          supabaseClient,
-          profile,
-          amountPaid,
-          periodEnd,
-          priceId,
-        );
-      }
+      await processCreditUpdate(
+        supabaseClient,
+        profile,
+        amountPaid,
+        periodEnd,
+        priceId,
+      );
+    } else if (event.type === "customer.subscription.deleted") {
+      const subscription = event.data.object as any;
+      const customerId = subscription.customer;
+
+      console.log(`Subscription deleted for customer: ${customerId}`);
+
+      await supabaseClient
+        .from("profiles")
+        .update({
+          subscription_status: "canceled",
+          plan_tier: "free",
+          credits: 0, // Reset credits upon cancellation if desired, or leave them
+        })
+        .eq("stripe_customer_id", customerId);
+    } else if (event.type === "customer.subscription.updated") {
+      const subscription = event.data.object as any;
+      const customerId = subscription.customer;
+      const status = subscription.status;
+      const priceId = subscription.items.data[0].price.id;
+
+      console.log(
+        `Subscription updated for customer: ${customerId}, status: ${status}`,
+      );
+
+      // Update plan tier and status
+      const PRO_PRICE_ID = "price_1SZJKhE0zDGmS9ihOiYOzLa1";
+      const VIRAL_PRICE_ID = "price_1SZDgvE0zDGmS9ihnRXmmx4T";
+      let newPlan = "pro";
+      if (priceId === VIRAL_PRICE_ID) newPlan = "viral";
+
+      await supabaseClient
+        .from("profiles")
+        .update({
+          subscription_status: status === "active" ? "active" : "past_due",
+          plan_tier: newPlan,
+          subscription_end_date: new Date(
+            subscription.current_period_end * 1000,
+          ).toISOString(),
+        })
+        .eq("stripe_customer_id", customerId);
+    } else if (event.type === "invoice.payment_failed") {
+      const invoice = event.data.object as any;
+      const customerId = invoice.customer;
+
+      console.log(`Payment failed for customer: ${customerId}`);
+
+      await supabaseClient
+        .from("profiles")
+        .update({
+          subscription_status: "past_due",
+        })
+        .eq("stripe_customer_id", customerId);
     }
 
     return new Response(JSON.stringify({ received: true }), {
