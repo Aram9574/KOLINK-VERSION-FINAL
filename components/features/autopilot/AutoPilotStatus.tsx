@@ -77,8 +77,8 @@ const AutoPilotStatus: React.FC<AutoPilotStatusProps> = ({
                                 className={`w-9 h-9 border rounded-full shadow-lg transition-all duration-500 flex items-center justify-center
                                 ${
                                     isEnabled
-                                        ? "translate-x-12 bg-green-500 border-green-400 rotate-180"
-                                        : "translate-x-0 bg-white border-slate-200 rotate-0"
+                                        ? "translate-x-12 bg-green-500 border-green-400"
+                                        : "translate-x-0 bg-white border-slate-200"
                                 }
                             `}
                             >
@@ -96,7 +96,9 @@ const AutoPilotStatus: React.FC<AutoPilotStatusProps> = ({
                                 isEnabled ? "text-green-400" : "text-slate-400"
                             }`}
                         >
-                            {isEnabled ? "System Live" : "System Off"}
+                            {isEnabled
+                                ? t.statusCard.systemLive
+                                : t.statusCard.systemOff}
                         </span>
                     </div>
 
@@ -131,15 +133,15 @@ const AutoPilotStatus: React.FC<AutoPilotStatusProps> = ({
                             {isEnabled
                                 ? `OP_SIG: ${
                                     user.id?.slice(0, 8).toUpperCase() || "AUTH"
-                                } // CLOUD_SYNC_OK`
-                                : "SYS_STANDBY // WAITING_INPUT"}
+                                } // ${t.statusCard.cloudSyncOk}`
+                                : t.statusCard.systemStandby}
                         </p>
                     </div>
                 </div>
 
-                <div className="flex flex-wrap justify-center md:justify-end gap-x-12 gap-y-6">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2 mb-1 justify-center md:justify-start">
+                <div className="flex flex-col gap-6 md:items-end">
+                    <div className="space-y-1 text-center md:text-right">
+                        <div className="flex items-center gap-2 mb-1 justify-center md:justify-end">
                             <Timer className="w-3.5 h-3.5 opacity-40" />
                             <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">
                                 {t.statusCard.nextRun}
@@ -159,11 +161,8 @@ const AutoPilotStatus: React.FC<AutoPilotStatusProps> = ({
                         </p>
                     </div>
 
-                    <div className="hidden sm:block w-px h-12 bg-current opacity-10 self-center">
-                    </div>
-
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2 mb-1 justify-center md:justify-start">
+                    <div className="space-y-1 text-center md:text-right">
+                        <div className="flex items-center gap-2 mb-1 justify-center md:justify-end">
                             <HistoryIcon className="w-3.5 h-3.5 opacity-40" />
                             <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">
                                 {t.statusCard.lastRun}
@@ -187,8 +186,7 @@ const AutoPilotStatus: React.FC<AutoPilotStatusProps> = ({
                     <div className="flex items-center gap-3 text-[10px] font-mono text-sky-600/70">
                         <Zap className="w-3 h-3 animate-pulse" />
                         <span>
-                            NEURAL_ENGINE_PROCESSING: Optimizing for next
-                            deployment...
+                            {t.statusCard.neuralProcessing}
                         </span>
                     </div>
                 </div>

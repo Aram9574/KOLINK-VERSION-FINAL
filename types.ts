@@ -111,6 +111,16 @@ export interface Invoice {
 
 export type AppLanguage = "en" | "es";
 
+export type AppTab =
+  | "create"
+  | "history"
+  | "settings"
+  | "autopilot"
+  | "auditor"
+  | "ideas"
+  | "carousel"
+  | "chat";
+
 export interface AutoPilotConfig {
   enabled: boolean;
   frequency: "daily" | "weekly" | "biweekly" | "custom";

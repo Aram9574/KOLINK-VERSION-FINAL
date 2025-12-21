@@ -79,9 +79,7 @@ const AutoPilotConfig: React.FC<AutoPilotConfigProps> = ({
                         {t.config.title}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                        {isConfigOpen
-                            ? "Define your automated content strategy parameters."
-                            : "Click to expand settings."}
+                        {isConfigOpen ? t.config.description : t.config.expand}
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -89,7 +87,7 @@ const AutoPilotConfig: React.FC<AutoPilotConfigProps> = ({
                         <div className="flex items-center gap-2 px-3 py-1 bg-sky-50 rounded-full border border-sky-100">
                             <Loader2 className="w-3 h-3 text-sky-600 animate-spin" />
                             <span className="text-[10px] text-sky-600 font-bold uppercase tracking-wider">
-                                Syncing...
+                                {t.config.syncing}
                             </span>
                         </div>
                     )}
@@ -204,7 +202,7 @@ const AutoPilotConfig: React.FC<AutoPilotConfigProps> = ({
                             >
                                 <Plus className="w-5 h-5" />
                                 <span className="text-sm font-bold hidden md:block">
-                                    Add Theme
+                                    {t.config.addTheme}
                                 </span>
                             </button>
                         </div>

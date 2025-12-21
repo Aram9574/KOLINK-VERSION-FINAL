@@ -27,10 +27,11 @@ interface CarouselData {
 interface CarouselEditorProps {
     initialData: CarouselData;
     onSave?: (data: CarouselData) => void;
+    onReset?: () => void;
 }
 
 export const CarouselEditor: React.FC<CarouselEditorProps> = (
-    { initialData, onSave },
+    { initialData, onSave, onReset },
 ) => {
     const [data, setData] = useState<CarouselData>(initialData);
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -41,6 +42,12 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
     const [isHighRes, setIsHighRes] = useState(true);
     const [isExporting, setIsExporting] = useState(false);
 
+    const [aspectRatio, setAspectRatio] = useState<
+        "4/5" | "1/1" | "16/9" | "9/16"
+    >(
+        "4/5",
+    );
+
     useEffect(() => {
         fetchBrandSettings();
     }, []);
@@ -48,7 +55,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
     const fetchBrandSettings = async () => {
         const { data: profile } = await supabase.from("profiles").select(
             "brand_settings",
-        ).single();
+        ).maybeSingle();
         if (profile?.brand_settings) {
             setBrandSettings(profile.brand_settings);
         }
@@ -70,20 +77,52 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
 
     // Helper to render a slide with the current template
     const renderSlide = (slide: Slide, isPreview = false) => {
+        if (!slide) return null;
+
         const scale = isPreview ? 1 : 2.5; // Scale for export vs preview container size approximation
+
+        const aspectClasses = {
+            "4/5": "aspect-[4/5]",
+            "1/1": "aspect-square",
+            "16/9": "aspect-video",
+        };
+
+        const containerDimensions: Record<
+            string,
+            string | { width: string; height: string }
+        > = {
+            "4/5": isPreview
+                ? "w-full max-w-[540px]"
+                : { width: "1080px", height: "1350px" },
+            "1/1": isPreview
+                ? "w-full max-w-[540px]"
+                : { width: "1080px", height: "1080px" },
+            "16/9": isPreview
+                ? "w-full max-w-[540px]"
+                : { width: "1920px", height: "1080px" },
+            "9/16": isPreview
+                ? "w-full max-w-[420px]"
+                : { width: "1080px", height: "1920px" },
+        };
+
+        const currentDims = containerDimensions[aspectRatio];
+        const isObjectDims = typeof currentDims === "object";
 
         return (
             <div
-                className={`slide-canvas aspect-[4/5] flex flex-col transition-all duration-500 overflow-hidden relative ${template.styles.container} ${
+                className={`slide-canvas ${
+                    aspectClasses[aspectRatio]
+                } flex flex-col transition-all duration-500 overflow-hidden relative ${template.styles.container} ${
                     isPreview
-                        ? "w-full max-w-md rounded-xl shadow-2xl p-12"
-                        : "w-[1080px] h-[1350px] p-24"
+                        ? `${currentDims} rounded-xl shadow-2xl p-12`
+                        : `p-24`
                 }`}
                 style={{
-                    // Allow override if brand settings dictate, but for templates usually we strictly follow the theme
-                    // We can hybridize: use template Structure but Brand Colors if "Custom" mode.
-                    // For now, template styles rule, but we might inject brand logo.
-                    // Note: Some templates might ignore inline styles if using complex Tailwind classes.
+                    width: isObjectDims ? currentDims.width : undefined,
+                    height: isObjectDims ? currentDims.height : undefined,
+                    aspectRatio: isPreview
+                        ? aspectRatio.replace("/", " / ")
+                        : undefined,
                 }}
             >
                 {template.elements?.showDecorativeShapes && (
@@ -199,13 +238,30 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
         }
     };
 
+    const handleShareLinkedIn = () => {
+        // Since direct upload requires API, we encourage downloading PDF first
+        // But requested was "share directly", so we direct to feed
+        // In a real app with API v2, this would register a share.
+        // For now, open LinkedIn feed in new tab
+        const width = 600;
+        const height = 600;
+        const left = window.screen.width / 2 - width / 2;
+        const top = window.screen.height / 2 - height / 2;
+
+        window.open(
+            "https://www.linkedin.com/feed/?shareActive=true",
+            "LinkedInShare",
+            `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`,
+        );
+    };
+
     return (
-        <div className="carousel-editor-container bg-slate-50 min-h-[85vh] rounded-[2.5rem] overflow-hidden border border-slate-200/60 flex flex-col lg:flex-row shadow-[0_24px_48px_-12px_rgba(0,0,0,0.08)]">
+        <div className="carousel-editor-container bg-slate-50 min-h-[500px] rounded-[2rem] overflow-hidden border border-slate-200/60 flex flex-col lg:flex-row shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)]">
             {/* Main Preview Area */}
-            <div className="flex-1 p-8 lg:p-12 flex flex-col items-center justify-center relative bg-white">
-                <div className="w-full max-w-2xl flex flex-col items-center gap-10">
+            <div className="flex-1 p-4 lg:p-8 flex flex-col items-center justify-center relative bg-white">
+                <div className="w-full max-w-2xl flex flex-col items-center gap-6">
                     {/* Template Quick Switcher (at top of preview for easy access) */}
-                    <div className="w-full mb-4">
+                    <div className="w-full mb-2">
                         <TemplateSelector
                             selectedTemplateId={selectedTemplateId}
                             onSelect={setSelectedTemplateId}
@@ -215,19 +271,25 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                     <div className="relative group/preview transition-all duration-700 hover:scale-[1.01]">
                         <div className="absolute -inset-4 bg-blue-500/5 rounded-[2rem] blur-2xl opacity-0 group-hover/preview:opacity-100 transition-opacity duration-700" />
                         <div className="relative z-10 transition-shadow duration-500 hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] rounded-xl">
-                            {renderSlide(currentSlide, true)}
+                            {currentSlide
+                                ? renderSlide(currentSlide, true)
+                                : (
+                                    <div className="flex items-center justify-center p-20 text-slate-400 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                                        No slide selected
+                                    </div>
+                                )}
                         </div>
                     </div>
 
                     {/* Iconic Navigation */}
-                    <div className="flex items-center gap-8 bg-white px-8 py-4 rounded-2xl border border-slate-200 shadow-sm transition-all duration-300">
+                    <div className="flex items-center gap-6 bg-white px-6 py-2 rounded-xl border border-slate-200 shadow-sm transition-all duration-300">
                         <button
                             onClick={() =>
                                 setCurrentSlideIndex((prev) =>
                                     Math.max(0, prev - 1)
                                 )}
                             disabled={currentSlideIndex === 0}
-                            className="p-3 rounded-xl hover:bg-slate-100 disabled:opacity-20 transition-all group/btn"
+                            className="p-2 rounded-xl hover:bg-slate-100 disabled:opacity-20 transition-all group/btn"
                         >
                             <svg
                                 className="w-6 h-6 text-slate-600 group-hover/btn:-translate-x-0.5 transition-transform"
@@ -260,7 +322,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                 )}
                             disabled={currentSlideIndex ===
                                 data.slides.length - 1}
-                            className="p-3 rounded-xl hover:bg-slate-100 disabled:opacity-20 transition-all group/btn"
+                            className="p-2 rounded-xl hover:bg-slate-100 disabled:opacity-20 transition-all group/btn"
                         >
                             <svg
                                 className="w-6 h-6 text-slate-600 group-hover/btn:translate-x-0.5 transition-transform"
@@ -281,46 +343,83 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
             </div>
 
             {/* Editing Sidebar */}
-            <div className="w-full lg:w-[420px] bg-white border-l border-slate-200 flex flex-col p-8 lg:p-10 space-y-10 shadow-[-12px_0_24px_-12px_rgba(0,0,0,0.03)] relative z-20 overflow-y-auto">
+            <div className="w-full lg:w-[400px] bg-white border-l border-slate-200 flex flex-col p-6 lg:p-8 space-y-6 shadow-[-12px_0_24px_-12px_rgba(0,0,0,0.03)] relative z-20 overflow-y-auto">
                 <div>
-                    <h2 className="text-xl font-black text-slate-900 mb-2">
-                        Contenido de Slide
+                    <h2 className="text-lg font-black text-slate-900 mb-1">
+                        Configuración y Contenido
                     </h2>
-                    <p className="text-sm text-slate-500 font-medium">
-                        Refina el texto para maximizar el engagement viral.
+                    <p className="text-xs text-slate-500 font-medium">
+                        Optimiza el formato y contenido para LinkedIn.
                     </p>
                 </div>
 
-                <div className="space-y-8">
+                <div className="space-y-6">
+                    {/* Aspect Ratio Selector */}
                     <div className="space-y-3">
                         <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 ml-1">
-                            Título de Slide
+                            Proporciones (Aspect Ratio)
                         </label>
-                        <input
-                            type="text"
-                            value={currentSlide.title}
-                            onChange={(e) =>
-                                handleSlideChange("title", e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300"
-                        />
+                        <div className="grid grid-cols-3 gap-2">
+                            {(["4/5", "9/16", "1/1", "16/9"] as const).map((
+                                ratio,
+                            ) => (
+                                <button
+                                    key={ratio}
+                                    onClick={() => setAspectRatio(ratio)}
+                                    className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                                        aspectRatio === ratio
+                                            ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/30"
+                                            : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100"
+                                    }`}
+                                >
+                                    {ratio === "4/5" && "Portrait"}
+                                    {ratio === "9/16" && "Tall"}
+                                    {ratio === "1/1" && "Square"}
+                                    {ratio === "16/9" && "Landsc."}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
-                    <div className="space-y-3">
-                        <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 ml-1">
-                            Contenido Principal
-                        </label>
-                        <textarea
-                            rows={8}
-                            value={currentSlide.content}
-                            onChange={(e) =>
-                                handleSlideChange("content", e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200/80 rounded-2xl px-6 py-5 text-slate-900 font-medium focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all resize-none leading-relaxed"
-                        />
-                    </div>
+                    {currentSlide && (
+                        <>
+                            <div className="space-y-3">
+                                <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 ml-1">
+                                    Título de Slide
+                                </label>
+                                <input
+                                    type="text"
+                                    value={currentSlide.title}
+                                    onChange={(e) =>
+                                        handleSlideChange(
+                                            "title",
+                                            e.target.value,
+                                        )}
+                                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300"
+                                />
+                            </div>
+
+                            <div className="space-y-3">
+                                <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 ml-1">
+                                    Contenido Principal
+                                </label>
+                                <textarea
+                                    rows={5}
+                                    value={currentSlide.content}
+                                    onChange={(e) =>
+                                        handleSlideChange(
+                                            "content",
+                                            e.target.value,
+                                        )}
+                                    className="w-full bg-slate-50 border border-slate-200/80 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all resize-none leading-relaxed text-sm"
+                                />
+                            </div>
+                        </>
+                    )}
                 </div>
 
-                <div className="pt-8 border-t border-slate-100 space-y-8">
-                    <div className="flex items-center justify-between bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                <div className="pt-4 border-t border-slate-100 space-y-6">
+                    <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100">
                         <div className="flex flex-col">
                             <span className="text-sm font-black text-slate-900">
                                 Alta Resolución
@@ -343,14 +442,14 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                         <button
                             onClick={handleExportZIP}
                             disabled={isExporting}
-                            className="w-full bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-2xl py-4.5 font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3 disabled:opacity-50 border border-slate-200"
+                            className="col-span-1 bg-white hover:bg-slate-50 text-slate-700 rounded-xl py-3 font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 disabled:opacity-50 border border-slate-200 shadow-sm"
                         >
                             <svg
-                                className="w-5 h-5"
+                                className="w-4 h-4"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -362,9 +461,21 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                                 />
                             </svg>
-                            {isExporting
-                                ? "Procesando..."
-                                : "Descargar PNGs (ZIP)"}
+                            PNG (ZIP)
+                        </button>
+
+                        <button
+                            onClick={handleShareLinkedIn}
+                            className="col-span-1 bg-[#0077b5] hover:bg-[#006399] text-white rounded-xl py-3 font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm"
+                        >
+                            <svg
+                                className="w-4 h-4"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                            </svg>
+                            Compartir
                         </button>
 
                         <button
@@ -375,7 +486,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                 );
                                 onSave?.(data);
                             }}
-                            className="w-full bg-slate-900 text-white rounded-2xl py-5 font-black text-sm uppercase tracking-[0.15em] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                            className="col-span-2 bg-slate-900 text-white rounded-xl py-4 font-black text-xs uppercase tracking-[0.15em] transition-all active:scale-[0.98] flex items-center justify-center gap-3 hover:shadow-xl hover:shadow-blue-500/10"
                         >
                             <svg
                                 className="w-5 h-5"
@@ -392,6 +503,26 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                             </svg>
                             Exportar PDF Premium
                         </button>
+
+                        <button
+                            onClick={onReset}
+                            className="col-span-2 bg-white text-slate-500 hover:text-blue-600 rounded-xl py-3 font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 border border-slate-200 mt-2"
+                        >
+                            <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 4v16m8-8H4"
+                                />
+                            </svg>
+                            Crear otro carrusel
+                        </button>
                     </div>
                 </div>
             </div>
@@ -402,7 +533,9 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                 className="fixed left-[-9999px] top-[-9999px]"
             >
                 {data.slides.map((slide, idx) => (
-                    <div key={idx}>{renderSlide(slide, false)}</div>
+                    <React.Fragment key={idx}>
+                        {renderSlide(slide, false)}
+                    </React.Fragment>
                 ))}
             </div>
         </div>

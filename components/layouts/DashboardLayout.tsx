@@ -5,28 +5,12 @@ import { usePosts } from "../../context/PostContext";
 import Sidebar from "../features/dashboard/Sidebar";
 import DashboardHeader from "../features/dashboard/DashboardHeader";
 import MobileBottomNav from "./MobileBottomNav";
-import { Post } from "../../types";
+import { AppTab, Post } from "../../types";
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
-    activeTab:
-        | "create"
-        | "history"
-        | "settings"
-        | "autopilot"
-        | "auditor"
-        | "carousel"
-        | "ideas";
-    setActiveTab: (
-        tab:
-            | "create"
-            | "history"
-            | "settings"
-            | "autopilot"
-            | "auditor"
-            | "carousel"
-            | "ideas",
-    ) => void;
+    activeTab: AppTab;
+    setActiveTab: (tab: AppTab) => void;
     onUpgrade: () => void;
     showCreditDeduction: boolean;
     onDeletePost: (id: string, e: React.MouseEvent) => void;

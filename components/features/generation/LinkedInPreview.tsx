@@ -9,6 +9,7 @@ import {
     ChevronUp,
     Clock,
     Globe,
+    Linkedin,
     MessageCircle,
     MoreHorizontal,
     PenSquare,
@@ -527,25 +528,23 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
                     <button
                         onClick={handlePublish}
                         disabled={isPublishing}
-                        className="flex items-center justify-center gap-2 px-2 sm:px-4 py-3.5 rounded-lg bg-[#0077b5] text-white font-bold text-sm hover:bg-[#006097] flex-1 transition-all duration-200 active:scale-95 shadow-md disabled:opacity-70 disabled:cursor-wait"
+                        className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#0077b5] text-white font-black text-sm hover:bg-[#006097] transition-all duration-200 active:scale-95 shadow-md shadow-blue-500/20 disabled:opacity-70 disabled:cursor-wait"
                     >
                         {isPublishing
                             ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             )
-                            : 
-                            <Send className="w-5 h-5 stroke-[2] fill-white" />}
-                        <span className="hidden sm:inline">
+                            : (
+                                <div className="bg-white p-0.5 rounded-sm">
+                                    <Linkedin className="w-4 h-4 text-[#0077b5] fill-[#0077b5]" />
+                                </div>
+                            )}
+                        <span className="uppercase tracking-wider">
                             {isPublishing
                                 ? (language === "es"
                                     ? "Publicando..."
                                     : "Publishing...")
-                                : (language === "es" ? "Publicar" : "Publish")}
-                        </span>
-                        <span className="sm:hidden">
-                            {isPublishing
-                                ? "..."
-                                : (language === "es" ? "Publicar" : "Post")}
+                                : (language === "es" ? "COMPARTIR" : "SHARE")}
                         </span>
                     </button>
                 </div>

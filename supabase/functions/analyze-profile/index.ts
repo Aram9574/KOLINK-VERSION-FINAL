@@ -1,5 +1,6 @@
-import { serve } from "std/http/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { GoogleGenerativeAI } from "npm:@google/generative-ai@^0.22.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,14 +17,28 @@ serve(async (req) => {
   try {
     const { pdfText } = await req.json();
 
-    if (!pdfText) {
-      throw new Error("Missing PDF text");
-    }
+    // 0. Setup Supabase for Language Detection
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    );
+
+    // Get user from auth header
+    const authHeader = req.headers.get("Authorization")!;
+    const { data: { user } } = await supabaseAdmin.auth.getUser(
+      authHeader.replace("Bearer ", ""),
+    );
+    const { data: profile } = await supabaseAdmin.from("profiles").select(
+      "language",
+    ).eq("id", user?.id).single();
+    const language = profile?.language || "es";
+    const isSpanish = language === "es";
 
     const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY")!);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const prompt = `
+    const prompt = isSpanish
+      ? `
       Eres un experto en Personal Branding y LinkedIn Coach con más de 10 años de experiencia ayudando a CEOs y emprendedores a escalar su presencia digital.
       Tu tarea es realizar una AUDITORÍA MAESTRA de este perfil de LinkedIn basándote en el texto extraído del PDF.
 
@@ -36,42 +51,41 @@ serve(async (req) => {
 
       [ESTRUCTURA DEL JSON REQUERIDA]
       {
-        "perfil_resumen": {
-          "nombre": "string",
-          "sector": "string",
-          "score_actual": "number (0-100)"
-        },
+        "perfil_resumen": { "nombre": "string", "sector": "string", "score_actual": "number (0-100)" },
         "pilares": {
-          "pilar_1_fundamento": {
-            "score": "number",
-            "analisis_titular": "Resumen crítico del titular actual",
-            "propuesta_titular_a": "Opción SEO (Rol | Valor | Palabra Clave)",
-            "propuesta_titular_b": "Opción Autoridad (Ayudo a X a conseguir Y mediante Z)",
-            "foto_banner_check": "Feedback sobre lo que se deduce de su imagen actual",
-            "url_check": "Feedback sobre su URL de LinkedIn"
-          },
-          "pilar_2_narrativa": {
-            "score": "number",
-            "gancho_analisis": "Cómo son las primeras 2 líneas de su 'Acerca de'",
-            "redaccion_gancho_sugerida": "Reescritura de alto impacto (máximo 3 líneas)",
-            "experiencia_analisis": "Análisis de si usa logros cuantificables",
-            "experiencia_mejoras": [
-              {
-                "empresa": "string",
-                "propuesta_metrica": "Sugerencia de logro cuantificable para esta posición"
-              }
-            ]
-          },
-          "pilar_3_visibilidad": {
-            "score": "number",
-            "estrategia_contenido": "3 tipos de posts que debería estar publicando",
-            "estrategia_networking": "Consejo sobre cómo interactuar con otros líderes"
-          }
+          "pilar_1_fundamento": { "score": "number", "analisis_titular": "...", "propuesta_titular_a": "...", "propuesta_titular_b": "...", "foto_banner_check": "...", "url_check": "..." },
+          "pilar_2_narrativa": { "score": "number", "gancho_analisis": "...", "redaccion_gancho_sugerida": "...", "experiencia_analisis": "...", "experiencia_mejoras": [] },
+          "pilar_3_visibilidad": { "score": "number", "estrategia_contenido": "...", "estrategia_networking": "..." }
         },
         "quick_wins": ["Victoria 1", "Victoria 2", "Victoria 3"]
       }
 
       [TEXTO DEL PDF]
+      ${pdfText}
+    `
+      : `
+      You are a Personal Branding expert and LinkedIn Coach with over 10 years of experience helping CEOs and entrepreneurs scale their digital presence.
+      Your task is to conduct a MASTER AUDIT of this LinkedIn profile based on the text extracted from the PDF.
+
+      [CRITICAL RULES]
+      1. BE CRITICAL but CONSTRUCTIVE. The user wants to improve, not to be told everything is fine.
+      2. USE METRICS AND FORMULAS: Evaluate if they use formulas in the headline or metrics in the experience.
+      3. ALWAYS RESPOND IN ENGLISH.
+      4. RESPOND STRICTLY IN JSON FORMAT. Do not include text outside the JSON.
+      5. REMOVE SPECIAL CHARACTERS: The final JSON must be clean and easy to parse.
+
+      [REQUIRED JSON STRUCTURE]
+      {
+        "perfil_resumen": { "nombre": "string", "sector": "string", "score_actual": "number (0-100)" },
+        "pilares": {
+          "pilar_1_fundamento": { "score": "number", "analisis_titular": "...", "propuesta_titular_a": "...", "propuesta_titular_b": "...", "foto_banner_check": "...", "url_check": "..." },
+          "pilar_2_narrativa": { "score": "number", "gancho_analisis": "...", "redaccion_gancho_sugerida": "...", "experiencia_analisis": "...", "experiencia_mejoras": [] },
+          "pilar_3_visibility": { "score": "number", "estrategia_contenido": "...", "estrategia_networking": "..." }
+        },
+        "quick_wins": ["Goal 1", "Goal 2", "Goal 3"]
+      }
+
+      [PDF TEXT]
       ${pdfText}
     `;
 
@@ -85,7 +99,7 @@ serve(async (req) => {
     // Validar JSON
     try {
       JSON.parse(text);
-    } catch (e) {
+    } catch (_e) {
       console.error("Invalid JSON generated by AI:", text);
       throw new Error("La IA generó una respuesta inválida. Reintenta.");
     }
@@ -96,11 +110,15 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as Error;
     console.error("Error in analyze-profile:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: err.message || "Internal error" }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   }
 });

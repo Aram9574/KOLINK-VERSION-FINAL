@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import Stripe from "npm:stripe@^14.0.0";
+import { serve } from "std/http/server";
+import { createClient } from "@supabase/supabase-js";
+import Stripe from "stripe";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -59,7 +59,7 @@ serve(async (req) => {
     let body;
     try {
       body = await req.json();
-    } catch (e) {
+    } catch (_e) {
       return new Response(
         JSON.stringify({ error: "Invalid JSON body" }),
         {
@@ -133,8 +133,9 @@ serve(async (req) => {
         success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/dashboard`,
       });
-    } catch (stripeError) {
+    } catch (error: any) {
       // Self-healing: If customer not found (e.g. switching between Test/Live mode), create a new one
+      const stripeError = error as { code: string; message: string };
       if (
         stripeError.code === "resource_missing" &&
         stripeError.message.includes("No such customer")
@@ -179,7 +180,7 @@ serve(async (req) => {
           cancel_url: `${origin}/dashboard`,
         });
       } else {
-        throw stripeError; // Re-throw other errors
+        throw error; // Re-throw other errors
       }
     }
 
@@ -187,10 +188,10 @@ serve(async (req) => {
       JSON.stringify({ sessionId: session.id, url: session.url }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("General Error:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || "An unknown error occurred" }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

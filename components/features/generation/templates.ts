@@ -2,6 +2,7 @@ export interface CarouselTemplate {
     id: string;
     name: string;
     description: string;
+    category: "Professional" | "Creative" | "Dark" | "Minimal" | "Premium";
     previewColor: string;
     styles: {
         container: string;
@@ -25,6 +26,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         name: "Executive Minimal",
         description:
             "Clean, professional, and authoritative. Best for thought leadership.",
+        category: "Professional",
         previewColor: "#f8fafc",
         styles: {
             container:
@@ -48,6 +50,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         name: "Tech Dark Mode",
         description:
             "Modern, high-contrast dark theme with glassmorphism effects.",
+        category: "Dark",
         previewColor: "#0f172a",
         styles: {
             container:
@@ -74,6 +77,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         name: "Bold Impact",
         description:
             "High energy, brutalist typographic style for maximum feed stopping power.",
+        category: "Creative",
         previewColor: "#fbbf24",
         styles: {
             container:
@@ -98,6 +102,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         id: "elegance-dark",
         name: "Elegance Dark",
         description: "Sophisticated navy and gold theme for high-end brands.",
+        category: "Premium",
         previewColor: "#0f172a",
         styles: {
             container:
@@ -123,6 +128,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         id: "cyberpunk-neon",
         name: "Cyberpunk Neon",
         description: "Futuristic dark theme with vibrant neon glow effects.",
+        category: "Creative",
         previewColor: "#000000",
         styles: {
             container:
@@ -149,6 +155,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         id: "newspaper-classic",
         name: "Newspaper Classic",
         description: "Timeless black and white aesthetic with a classic font.",
+        category: "Professional",
         previewColor: "#f5f5f4",
         styles: {
             container:
@@ -172,6 +179,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         id: "minimalist-dark",
         name: "Minimalist Dark",
         description: "Sleek and professional dark theme with ruby accents.",
+        category: "Dark",
         previewColor: "#171717",
         styles: {
             container: "bg-[#0A0A0A] text-white font-sans",
@@ -195,6 +203,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         name: "Modern Corporate",
         description:
             "Clean enterprise aesthetic with professional blue accents.",
+        category: "Professional",
         previewColor: "#ffffff",
         styles: {
             container:
@@ -220,6 +229,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         id: "storytelling-pastel",
         name: "Storytelling Pastel",
         description: "Warm and inviting layout for personal brand stories.",
+        category: "Creative",
         previewColor: "#fff7ed",
         styles: {
             container: "bg-[#FFFBF5] text-orange-950 font-sans",
@@ -244,6 +254,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         id: "founder-elite",
         name: "Founder Elite",
         description: "Elegant, high-authority look for top-tier creators.",
+        category: "Premium",
         previewColor: "#0f172a",
         styles: {
             container:
@@ -270,6 +281,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         id: "viral-gradient",
         name: "Viral Gradient",
         description: "Vibrant and energetic, impossible to scroll past.",
+        category: "Creative",
         previewColor: "#8b5cf6",
         styles: {
             container:
@@ -296,6 +308,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         id: "soft-aesthetic",
         name: "Soft Aesthetic",
         description: "Minimalist, clean, and beautifully spaced.",
+        category: "Minimal",
         previewColor: "#fffbeb",
         styles: {
             container: "bg-[#FAFAFA] text-slate-900 font-sans",
@@ -320,6 +333,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         id: "blueprint-tech",
         name: "Blueprint Tech",
         description: "Technical, structured layout with a grid feel.",
+        category: "Dark",
         previewColor: "#1e3a8a",
         styles: {
             container:
@@ -345,6 +359,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         name: "SaaS Modern",
         description:
             "Trustworthy, clean enterprise aesthetic with blue accents.",
+        category: "Professional",
         previewColor: "#eff6ff",
         styles: {
             container:
@@ -370,6 +385,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         name: "Gradient Flow",
         description:
             "Trendy, Instagram-style fluent gradients for creative brands.",
+        category: "Creative",
         previewColor: "#c026d3",
         styles: {
             container:

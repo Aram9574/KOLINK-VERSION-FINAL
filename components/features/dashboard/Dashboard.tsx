@@ -13,28 +13,30 @@ import HistoryView from "../history/HistoryView";
 import SettingsView from "../settings/SettingsView";
 
 import AutoPilotView from "../autopilot/AutoPilotView";
-import OnboardingFlow from "../onboarding/OnboardingFlow";
 import UpgradeModal from "../../modals/UpgradeModal";
 import CancellationModal from "../../modals/CancellationModal";
-import WelcomeModal from "../../modals/WelcomeModal";
-import TourGuide from "./ProductTour";
 import LevelUpModal from "../../modals/LevelUpModal";
 import { updateUserProfile } from "../../../services/userRepository";
 import ProfileAuditor from "../auditor/ProfileAuditor";
 import LockedAuditorState from "../auditor/LockedAuditorState";
 import LockedAutoPilotState from "../autopilot/LockedAutoPilotState";
 import LockedHistoryState from "../history/LockedHistoryState";
+import LockedCarouselState from "../generation/LockedCarouselState";
+import LockedChatState from "../chat/LockedChatState";
 import ReferralModal from "../../modals/ReferralModal";
 import { Gift } from "lucide-react";
 
 import { toast } from "sonner";
-import { Post, UserProfile } from "../../../types";
+import { AppTab, Post, UserProfile } from "../../../types";
 import { translations } from "../../../translations";
 import { Suspense } from "react";
 
 // Lazy load PostGenerator to reduce initial Dashboard bundle size
 const PostCreator = React.lazy(() => import("../generation/PostGenerator"));
 const CarouselStudio = React.lazy(() => import("../generation/CarouselStudio"));
+const LinkedInExpertChat = React.lazy(() =>
+    import("../chat/LinkedInExpertChat")
+);
 
 const DashboardContent: React.FC = () => {
     const { user, refreshUser, setUser, language, setLanguage } = useUser();
@@ -50,8 +52,6 @@ const DashboardContent: React.FC = () => {
         updatePost,
     } = usePosts();
 
-    const t = translations[language].productTour;
-
     // Prefetch PostGenerator for smoother experience
     useEffect(() => {
         const prefetchPostGenerator = async () => {
@@ -66,39 +66,19 @@ const DashboardContent: React.FC = () => {
 
     // UI State
     // Persist active tab selection
-    const [activeTab, setActiveTabRaw] = useState<
-        | "create"
-        | "history"
-        | "settings"
-        | "autopilot"
-        | "auditor"
-        | "ideas"
-        | "carousel"
-    >(() => {
+    const [activeTab, setActiveTabRaw] = useState<AppTab>(() => {
         const saved = localStorage.getItem("kolink_active_tab");
         if (saved === "ideas") return "create"; // Legacy
         return (saved as any) || "create";
     });
 
-    const setActiveTab = (
-        tab:
-            | "create"
-            | "history"
-            | "settings"
-            | "autopilot"
-            | "auditor"
-            | "ideas"
-            | "carousel",
-    ) => {
+    const setActiveTab = (tab: AppTab) => {
         setActiveTabRaw(tab);
         localStorage.setItem("kolink_active_tab", tab);
     };
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [showCreditDeduction, setShowCreditDeduction] = useState(false);
-    const [isOnboarding, setIsOnboarding] = useState(false);
-    const [showWelcome, setShowWelcome] = useState(false);
-    const [isTourActive, setIsTourActive] = useState(false);
     const [showReferralModal, setShowReferralModal] = useState(false);
     const [levelUpData, setLevelUpData] = useState<any>(null);
     const [carouselDraftContent, setCarouselDraftContent] = useState<string>(
@@ -145,22 +125,6 @@ const DashboardContent: React.FC = () => {
     });
 
     // Effects
-    useEffect(() => {
-        if (user.hasOnboarded === false && !isOnboarding) {
-            setIsOnboarding(true);
-        }
-    }, [user.hasOnboarded]);
-
-    useEffect(() => {
-        const hasSeenTour = localStorage.getItem(`kolink_tour_seen_${user.id}`);
-        // If onboarded but hasn't seen tour, show Welcome Modal first
-        if (!hasSeenTour && !isOnboarding && user.hasOnboarded) {
-            // Only show if not already showing tour
-            if (!isTourActive) {
-                setShowWelcome(true);
-            }
-        }
-    }, [user.id, isOnboarding, user.hasOnboarded, isTourActive]);
 
     // Handle Stripe Success Redirect
     useEffect(() => {
@@ -187,82 +151,6 @@ const DashboardContent: React.FC = () => {
             toast.success("Post deleted");
         }
     };
-
-    const handleOnboardingComplete = async (
-        updatedData: Partial<UserProfile>,
-    ) => {
-        // 1. Update DB and Local State
-        await handleUpdateUser(updatedData);
-
-        // 2. Close Onboarding
-        setIsOnboarding(false);
-
-        // 3. Refresh to verify state
-        await refreshUser();
-
-        // 4. Trigger Welcome Modal
-        setShowWelcome(true);
-    };
-
-    const handleStartTour = () => {
-        setShowWelcome(false);
-        setIsTourActive(true);
-        setActiveTab("create"); // Ensure we start at first step
-    };
-
-    const handleSkipTour = () => {
-        setShowWelcome(false);
-        localStorage.setItem(`kolink_tour_seen_${user.id}`, "true");
-    };
-
-    const handleTourComplete = () => {
-        setIsTourActive(false);
-        localStorage.setItem(`kolink_tour_seen_${user.id}`, "true");
-    };
-
-    // Tour Steps
-    // Tour Steps with Tab Navigation
-    const TOUR_STEPS = [
-        {
-            targetId: "viral-engine-view",
-            title: language === "es" ? "Motor Viral" : "Viral Engine",
-            description: language === "es"
-                ? "Genera tu primer post aquí con nuestra IA entrenada."
-                : "Generate your first post here with our trained AI.",
-            tab: "create" as const,
-        },
-        {
-            targetId: "brand-voice-manager",
-            title: language === "es" ? "Voz de Marca" : "Brand Voice",
-            description: language === "es"
-                ? "Entrena a la IA para que suene exactamente como tú."
-                : "Train the AI to sound exactly like you.",
-            tab: "settings" as const,
-        },
-        {
-            targetId: "autopilot-view",
-            title: "AutoPilot",
-            description: language === "es"
-                ? "Programa y automatiza tu contenido en piloto automático."
-                : "Schedule and automate your content on autopilot.",
-            tab: "autopilot" as const,
-        },
-    ];
-
-    const handleTourStepChange = (index: number) => {
-        if (index >= 0 && index < TOUR_STEPS.length) {
-            const step = TOUR_STEPS[index];
-            if (step.tab && step.tab !== activeTab) {
-                setActiveTab(step.tab);
-            }
-        }
-    };
-
-    if (isOnboarding) {
-        return (
-            <OnboardingFlow user={user} onComplete={handleOnboardingComplete} />
-        );
-    }
 
     return (
         <DashboardLayout
@@ -410,10 +298,32 @@ const DashboardContent: React.FC = () => {
                                     </div>
                                 }
                             >
-                                <CarouselStudio
-                                    initialContent={carouselDraftContent}
-                                />
+                                {user.planTier === "free"
+                                    ? (
+                                        <LockedCarouselState
+                                            onUpgrade={() =>
+                                                setShowUpgradeModal(true)}
+                                        />
+                                    )
+                                    : (
+                                        <CarouselStudio
+                                            initialContent={carouselDraftContent}
+                                        />
+                                    )}
                             </Suspense>
+                        </div>
+                    )}
+
+                    {activeTab === "chat" && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            {user.planTier === "free"
+                                ? (
+                                    <LockedChatState
+                                        onUpgrade={() =>
+                                            setShowUpgradeModal(true)}
+                                    />
+                                )
+                                : <LinkedInExpertChat />}
                         </div>
                     )}
                 </div>
@@ -436,23 +346,6 @@ const DashboardContent: React.FC = () => {
                     userEmail={user.email || ""}
                     planPrice={19}
                     language={user.language || "en"}
-                />
-            )}
-
-            {showWelcome && (
-                <WelcomeModal
-                    user={user}
-                    onStartTour={handleStartTour}
-                    onSkip={handleSkipTour}
-                />
-            )}
-
-            {isTourActive && (
-                <TourGuide
-                    steps={TOUR_STEPS}
-                    onComplete={handleTourComplete}
-                    onStepChange={handleTourStepChange}
-                    labels={t}
                 />
             )}
 

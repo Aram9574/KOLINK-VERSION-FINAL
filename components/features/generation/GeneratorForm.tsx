@@ -37,6 +37,7 @@ import Tooltip from "../../ui/Tooltip";
 import { toast } from "sonner";
 import { GenerationParamsSchema } from "../../../schemas";
 import { CustomSelect } from "../../ui/CustomSelect";
+import LoadingProgress from "../../ui/LoadingProgress";
 
 interface GeneratorFormProps {
     params: GenerationParams;
@@ -605,15 +606,40 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                             { value: 5, label: "5 (Máximo)" },
                                         ]}
                                         value={params.hashtagCount || 3}
-                                        onChange={(val) => onUpdateParams({
-                                            hashtagCount: parseInt(val),
-                                        })}
+                                        onChange={(val) =>
+                                            onUpdateParams({
+                                                hashtagCount: parseInt(val),
+                                            })}
                                     />
                                 </div>
                             </div>
                         </div>
                     )}
                 </div>
+
+                {/* Loading State Overlay/Progress */}
+                {isGenerating && (
+                    <div className="mt-4 pt-4 border-t border-slate-100 animate-in fade-in slide-in-from-top-4 duration-500">
+                        <LoadingProgress
+                            steps={language === "es"
+                                ? [
+                                    "Analizando tu marca Persona...",
+                                    "Arquitectando Post Viral...",
+                                    "Orquestando IA Generativa...",
+                                    "Diseñando Estructura de Gancho...",
+                                    "Afinando detalles finales...",
+                                ]
+                                : [
+                                    "Analyzing your Personal Brand...",
+                                    "Architecting Viral Post...",
+                                    "Orchestrating Generative AI...",
+                                    "Designing Hook Structure...",
+                                    "Polishing final details...",
+                                ]}
+                            duration={12000}
+                        />
+                    </div>
+                )}
 
                 {/* Generate Button */}
                 <button
@@ -632,9 +658,12 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                     {isGenerating
                         ? (
                             <>
-                                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent">
-                                </div>
-                                <span>{t.generatingBtn}</span>
+                                <Wand2 className="w-5 h-5 animate-pulse" />
+                                <span>
+                                    {language === "es"
+                                        ? "Arquitectando Post..."
+                                        : "Architecting Post..."}
+                                </span>
                             </>
                         )
                         : isCancelled

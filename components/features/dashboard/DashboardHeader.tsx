@@ -42,15 +42,15 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = (
                             ? "Generador de Ideas"
                             : "Idea Generator")}
                         {activeTab === "autopilot" && "AutoPilot"}
+                        {activeTab === "auditor" &&
+                            (language === "es"
+                                ? "Auditor de Perfil"
+                                : "Profile Auditor")}
+                        {activeTab === "carousel" &&
+                            (language === "es"
+                                ? "Generador de Carrusel"
+                                : "Carousel Generator")}
                     </h1>
-                    {activeTab === "create" && (
-                        <div className="flex items-center gap-2 px-3 py-1 bg-brand-50 text-brand-700 rounded-full text-xs font-bold border border-brand-100 animate-in fade-in slide-in-from-left-4 duration-500">
-                            <Zap className="w-3 h-3 fill-current" />
-                            {language === "es"
-                                ? "Modo Turbo Activo"
-                                : "Turbo Mode Active"}
-                        </div>
-                    )}
                 </div>
 
                 <div className="flex items-center gap-6">

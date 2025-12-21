@@ -7,10 +7,11 @@ import {
     LayoutGrid,
     Lightbulb,
     LogOut,
+    MessageSquareText,
     Settings as SettingsIcon,
     Sparkles,
 } from "lucide-react";
-import { AppLanguage, Post, UserProfile } from "../../../types";
+import { AppLanguage, AppTab, Post, UserProfile } from "../../../types";
 import GamificationWidget from "./GamificationWidget";
 import History from "../history/History";
 import { translations } from "../../../translations";
@@ -21,24 +22,8 @@ import { getAvatarUrl } from "../../../utils";
 interface SidebarProps {
     posts: Post[];
     currentPost: Post | null;
-    activeTab:
-        | "create"
-        | "history"
-        | "settings"
-        | "autopilot"
-        | "auditor"
-        | "carousel"
-        | "ideas";
-    setActiveTab: (
-        tab:
-            | "create"
-            | "history"
-            | "settings"
-            | "autopilot"
-            | "auditor"
-            | "carousel"
-            | "ideas",
-    ) => void;
+    activeTab: AppTab;
+    setActiveTab: (tab: AppTab) => void;
     onSelectPost: (post: Post) => void;
     onDeletePost: (id: string, e: React.MouseEvent) => void;
     onUpgrade: () => void;
@@ -123,12 +108,30 @@ const Sidebar: React.FC<SidebarProps> = ({
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
                 ${
                         activeTab === "carousel"
-                            ? "bg-brand-50 text-indigo-700 shadow-sm ring-1 ring-indigo-200"
+                            ? "bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200"
                             : "text-slate-600 hover:bg-slate-50"
                     }`}
                 >
-                    <Crown className="w-5 h-5 text-amber-500" />
-                    {language === "es" ? "Carrusel Studio" : "Carousel Studio"}
+                    <Crown className="w-5 h-5" />
+                    {language === "es"
+                        ? "Generador de Carrusel"
+                        : "Carousel Generator"}
+                    {!user.isPremium && (
+                        <Crown className="w-4 h-4 text-amber-500 fill-amber-500/20 ml-auto flex-shrink-0" />
+                    )}
+                </button>
+
+                <button
+                    onClick={() => setActiveTab("chat")}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
+                ${
+                        activeTab === "chat"
+                            ? "bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200"
+                            : "text-slate-600 hover:bg-slate-50"
+                    }`}
+                >
+                    <MessageSquareText className="w-5 h-5" />
+                    Nexus
                     {!user.isPremium && (
                         <Crown className="w-4 h-4 text-amber-500 fill-amber-500/20 ml-auto flex-shrink-0" />
                     )}
@@ -193,7 +196,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     onClick={onReferral}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all duration-200 group"
                 >
-                    <Gift className="w-5 h-5 text-violet-500 group-hover:scale-110 transition-transform" />
+                    <Gift className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent font-bold">
                         {language === "es"
                             ? "Gana 1 Mes Gratis"
@@ -206,22 +209,22 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {!user.isPremium && (
                     <div
                         onClick={onUpgrade}
-                        className="bg-slate-900 rounded-2xl p-5 text-white mb-5 relative overflow-hidden group cursor-pointer shadow-xl shadow-slate-900/10 transition-transform hover:-translate-y-1"
+                        className="bg-white dark:bg-slate-900 rounded-2xl p-5 text-slate-900 dark:text-white mb-5 relative overflow-hidden group cursor-pointer border border-slate-100 dark:border-slate-800 shadow-sm shadow-slate-200/50 transition-transform hover:-translate-y-1"
                     >
-                        <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <div className="absolute top-0 right-0 p-2 opacity-5 group-hover:opacity-10 transition-opacity">
                             <Crown className="w-20 h-20 rotate-12 translate-x-4 -translate-y-4" />
                         </div>
                         <div className="relative z-10">
                             <div className="flex items-center gap-2 mb-2">
-                                <Sparkles className="w-4 h-4 text-amber-300" />
+                                <Sparkles className="w-4 h-4 text-amber-500" />
                                 <h4 className="font-bold text-sm">
                                     {t.goPremium}
                                 </h4>
                             </div>
-                            <p className="text-xs text-slate-300 mb-3 leading-relaxed">
+                            <p className="text-xs text-slate-500 dark:text-slate-300 mb-3 leading-relaxed">
                                 {t.unlockDesc}
                             </p>
-                            <button className="text-xs bg-white text-slate-900 font-bold px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors w-full">
+                            <button className="text-xs bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold px-3 py-2 rounded-lg hover:opacity-90 transition-opacity w-full">
                                 {t.upgradeNow}
                             </button>
                         </div>

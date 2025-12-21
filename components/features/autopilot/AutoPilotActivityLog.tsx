@@ -53,31 +53,13 @@ const AutoPilotActivityLog: React.FC<AutoPilotActivityLogProps> = ({
                                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500">
                                     </span>
                                 </span>
-                                LIVE_MONITORING: [READY]
+                                {t.console.liveMonitoring}: [{t.console.ready}]
                             </div>
                         )}
                     </div>
                 </div>
 
                 <div className="flex-1 space-y-4 overflow-y-auto min-h-0 pr-2 custom-scrollbar font-mono text-[11px]">
-                    {/* Log Header Info */}
-                    <div className="mb-6 p-3 bg-slate-50 rounded-xl border border-slate-100 text-[10px] text-slate-500 space-y-1">
-                        <p className="flex justify-between">
-                            <span>CPU_PRIORITY:</span>{" "}
-                            <span className="text-sky-600 font-bold">
-                                MAX_HIGH
-                            </span>
-                        </p>
-                        <p className="flex justify-between">
-                            <span>QUEUE_STATUS:</span>{" "}
-                            <span className="text-slate-600">
-                                {automatedPosts.length > 0
-                                    ? "WAITING_SCHEDULE"
-                                    : "IDLE"}
-                            </span>
-                        </p>
-                    </div>
-
                     {/* Manual Override Section */}
                     {isEnabled && (
                         <div className="p-4 bg-sky-50 rounded-2xl border border-sky-100 mb-6 group/override">
@@ -114,7 +96,7 @@ const AutoPilotActivityLog: React.FC<AutoPilotActivityLogProps> = ({
                                     {t.activity.empty}
                                 </p>
                                 <p className="text-[9px] mt-2 opacity-30">
-                                    // Awaiting initial generation signal
+                                    {t.console.awaitingSignal}
                                 </p>
                             </div>
                         )
@@ -159,7 +141,7 @@ const AutoPilotActivityLog: React.FC<AutoPilotActivityLogProps> = ({
                                             </div>
                                             <div className="space-y-1">
                                                 <p className="text-slate-400 text-[10px] uppercase tracking-wide">
-                                                    Output Generated:
+                                                    {t.console.outputGenerated}
                                                 </p>
                                                 <p className="text-slate-600 line-clamp-2 leading-relaxed italic text-[11px]">
                                                     "{post.params.topic}"
@@ -198,7 +180,7 @@ const AutoPilotActivityLog: React.FC<AutoPilotActivityLogProps> = ({
                             <span className="w-1.5 h-1.5 bg-sky-600/50 rounded-full animate-pulse">
                             </span>
                             <span className="animate-pulse">
-                                Awaiting next operational cycle...
+                                {t.console.awaitingCycle}
                             </span>
                         </div>
                     )}

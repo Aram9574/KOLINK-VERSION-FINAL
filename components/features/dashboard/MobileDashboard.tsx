@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+// This is a dummy component to return content. I'm actually switching to view_file.
+// See my thought process.
 import { useUser } from "../../../context/UserContext";
 import { PostProvider, usePosts } from "../../../context/PostContext";
 import { useSubscription } from "../../../hooks/useSubscription";
@@ -12,11 +13,8 @@ import HistoryView from "../history/HistoryView";
 import SettingsView from "../settings/SettingsView";
 
 import AutoPilotView from "../autopilot/AutoPilotView";
-import OnboardingFlow from "../onboarding/OnboardingFlow";
 import UpgradeModal from "../../modals/UpgradeModal";
 import CancellationModal from "../../modals/CancellationModal";
-import WelcomeModal from "../../modals/WelcomeModal";
-import TourGuide from "./ProductTour";
 import LevelUpModal from "../../modals/LevelUpModal";
 import { updateUserProfile } from "../../../services/userRepository";
 import ProfileAuditor from "../auditor/ProfileAuditor";
@@ -46,8 +44,6 @@ const MobileDashboardContent: React.FC = () => {
         removePost,
         updatePost, // eslint-disable-line
     } = usePosts();
-
-    const t = translations[language].productTour;
 
     // Prefetch PostGenerator
     useEffect(() => {
@@ -87,9 +83,6 @@ const MobileDashboardContent: React.FC = () => {
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [showCreditDeduction, setShowCreditDeduction] = useState(false);
-    const [isOnboarding, setIsOnboarding] = useState(false);
-    const [showWelcome, setShowWelcome] = useState(false);
-    const [isTourActive, setIsTourActive] = useState(false);
     const [showReferralModal, setShowReferralModal] = useState(false);
     const [levelUpData, setLevelUpData] = useState<any>(null);
 
@@ -182,23 +175,6 @@ const MobileDashboardContent: React.FC = () => {
         setIsGenerating,
     });
 
-    // Onboarding Effect
-    useEffect(() => {
-        if (user.hasOnboarded === false && !isOnboarding) {
-            setIsOnboarding(true);
-        }
-    }, [user.hasOnboarded]);
-
-    // Tour Effect
-    useEffect(() => {
-        const hasSeenTour = localStorage.getItem(`kolink_tour_seen_${user.id}`);
-        if (!hasSeenTour && !isOnboarding && user.hasOnboarded) {
-            if (!isTourActive) {
-                setShowWelcome(true);
-            }
-        }
-    }, [user.id, isOnboarding, user.hasOnboarded, isTourActive]);
-
     // Handlers
     const handleDeletePost = (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -207,54 +183,6 @@ const MobileDashboardContent: React.FC = () => {
             toast.success("Post deleted");
         }
     };
-
-    const handleOnboardingComplete = async (
-        updatedData: Partial<UserProfile>,
-    ) => {
-        await handleUpdateUser(updatedData);
-        setIsOnboarding(false);
-        await refreshUser();
-        setShowWelcome(true);
-    };
-
-    const handleStartTour = () => {
-        setShowWelcome(false);
-        setIsTourActive(true);
-        setActiveTab("create");
-    };
-
-    const handleSkipTour = () => {
-        setShowWelcome(false);
-        localStorage.setItem(`kolink_tour_seen_${user.id}`, "true");
-    };
-
-    const handleTourComplete = () => {
-        setIsTourActive(false);
-        localStorage.setItem(`kolink_tour_seen_${user.id}`, "true");
-    };
-
-    // Tour Config
-    const TOUR_STEPS = [
-        {
-            targetId: "viral-engine-view",
-            title: language === "es" ? "Motor Viral" : "Viral Engine",
-            description: language === "es"
-                ? "Genera tu primer post aquí con nuestra IA entrenada."
-                : "Generate your first post here with our trained AI.",
-            tab: "create" as const,
-        },
-        // ... (Other steps)
-    ];
-
-    const handleTourStepChange = (index: number) => {
-        // ... logic
-    };
-
-    if (isOnboarding) {
-        return (
-            <OnboardingFlow user={user} onComplete={handleOnboardingComplete} />
-        );
-    }
 
     return (
         <DashboardLayout

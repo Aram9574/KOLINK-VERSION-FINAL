@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { GenerationParams, Post, UserProfile } from "../types";
+import { AppTab, GenerationParams, Post, UserProfile } from "../types";
 import { executePostGeneration } from "../services/postWorkflow";
 import { supabase } from "../services/supabaseClient";
 import { fetchUserProfile } from "../services/userRepository";
@@ -11,17 +11,7 @@ interface UseGenerationLogicProps {
     posts: Post[];
     setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
     setCurrentPost: React.Dispatch<React.SetStateAction<Post | null>>;
-    setActiveTab: React.Dispatch<
-        React.SetStateAction<
-            | "create"
-            | "history"
-            | "settings"
-            | "autopilot"
-            | "auditor"
-            | "ideas"
-            | "carousel"
-        >
-    >;
+    setActiveTab: (tab: AppTab) => void;
     handleUpdateUser: (updates: Partial<UserProfile>) => Promise<void>;
     setShowUpgradeModal: (show: boolean) => void;
     setShowCreditDeduction: (show: boolean) => void;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { GenerationParams, Post, UserProfile } from "../types";
+import { AppTab, GenerationParams, Post, UserProfile } from "../types";
 import { useGenerationLogic } from "./useGenerationLogic";
 import { useLinkedInPublishing } from "./useLinkedInPublishing";
 import { usePostHistory } from "./usePostHistory";
@@ -11,18 +11,8 @@ interface UsePostGenerationProps {
     setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
     currentPost: Post | null;
     setCurrentPost: React.Dispatch<React.SetStateAction<Post | null>>;
-    activeTab: string;
-    setActiveTab: React.Dispatch<
-        React.SetStateAction<
-            | "create"
-            | "history"
-            | "settings"
-            | "autopilot"
-            | "auditor"
-            | "ideas"
-            | "carousel"
-        >
-    >;
+    activeTab: AppTab;
+    setActiveTab: (tab: AppTab) => void;
     handleUpdateUser: (updates: Partial<UserProfile>) => Promise<void>;
     setShowUpgradeModal: (show: boolean) => void;
     setShowCreditDeduction: (show: boolean) => void;

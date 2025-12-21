@@ -355,7 +355,7 @@ export const translations = {
     app: {
       sidebar: {
         studio: "Studio",
-        carousel: "Carousel Studio",
+        carousel: "Carousel Generator",
         ideas: "Idea Generator",
         autopilot: "AutoPilot",
         history: "History",
@@ -406,9 +406,28 @@ export const translations = {
       },
       autopilot: {
         title: "AutoPilot",
-        subtitle: "Put your LinkedIn growth on cruise control.",
         description:
           "AutoPilot generates high-quality drafts automatically based on your topics. Click 'View Output' on any draft to open it in the Studio for editing and publishing.",
+        stats: {
+          systemHealth: "System Health",
+          optimal: "OPTIMAL",
+          generations: "Generations",
+        },
+        insight: {
+          title: "Kolink AI Insight",
+        },
+        console: {
+          liveMonitoring: "LIVE_MONITORING",
+          ready: "READY",
+          cpuPriority: "CPU_PRIORITY",
+          maxHigh: "MAX_HIGH",
+          queueStatus: "QUEUE_STATUS",
+          waitingSchedule: "WAITING_SCHEDULE",
+          idle: "IDLE",
+          awaitingSignal: "// Awaiting initial generation signal",
+          outputGenerated: "Output Generated:",
+          awaitingCycle: "Awaiting next operational cycle...",
+        },
         statusCard: {
           active: "SYSTEM ACTIVE",
           inactive: "SYSTEM OFFLINE",
@@ -417,6 +436,12 @@ export const translations = {
           activateBtn: "Activate AutoPilot",
           deactivateBtn: "Deactivate",
           forceRunBtn: "Run Now",
+          systemLive: "System Live",
+          systemOff: "System Off",
+          systemStandby: "SYS_STANDBY // WAITING_INPUT",
+          cloudSyncOk: "CLOUD_SYNC_OK",
+          neuralProcessing:
+            "NEURAL_ENGINE_PROCESSING: Optimizing for next deployment...",
         },
         config: {
           title: "Flight Parameters",
@@ -433,6 +458,10 @@ export const translations = {
           postCountTooltip:
             "Number of posts to generate each time AutoPilot runs (1 credit per post).",
           save: "Update Configuration",
+          description: "Define your automated content strategy parameters.",
+          expand: "Click to expand settings.",
+          syncing: "Syncing...",
+          addTheme: "Add Theme",
         },
         activity: {
           title: "Flight Log",
@@ -1097,7 +1126,7 @@ export const translations = {
     app: {
       sidebar: {
         studio: "Estudio",
-        carousel: "Carrusel Studio",
+        carousel: "Generador de Carrusel",
         ideas: "Generador de Ideas",
         autopilot: "AutoPilot",
         history: "Historial",
@@ -1153,6 +1182,26 @@ export const translations = {
         subtitle: "Pon tu crecimiento en LinkedIn en piloto automático.",
         description:
           "AutoPilot genera borradores automáticamente basados en tus temas. Haz clic en 'Ver Resultado' en cualquier borrador para abrirlo en el Estudio, editarlo y publicarlo.",
+        stats: {
+          systemHealth: "Salud del Sistema",
+          optimal: "ÓPTIMO",
+          generations: "Generaciones",
+        },
+        insight: {
+          title: "Insight de IA Kolink",
+        },
+        console: {
+          liveMonitoring: "MONITOREO_EN_VIVO",
+          ready: "LISTO",
+          cpuPriority: "PRIORIDAD_CPU",
+          maxHigh: "MÁX_ALTA",
+          queueStatus: "ESTADO_COLA",
+          waitingSchedule: "ESPERANDO_PROGRAMACIÓN",
+          idle: "INACTIVO",
+          awaitingSignal: "// Esperando señal de generación inicial",
+          outputGenerated: "Resultado Generado:",
+          awaitingCycle: "Esperando siguiente ciclo operativo...",
+        },
         statusCard: {
           active: "SISTEMA ACTIVO",
           inactive: "SISTEMA OFFLINE",
@@ -1161,6 +1210,12 @@ export const translations = {
           activateBtn: "Activar AutoPilot",
           deactivateBtn: "Desactivar",
           forceRunBtn: "Ejecutar Ahora",
+          systemLive: "Sistema en Línea",
+          systemOff: "Sistema Apagado",
+          systemStandby: "SIS_ESPERA // ESPERANDO_ENTRADA",
+          cloudSyncOk: "SICRONIZACIÓN_NUBE_OK",
+          neuralProcessing:
+            "PROCESAMIENTO_MOTOR_NEURAL: Optimizando para el próximo despliegue...",
         },
         config: {
           title: "Parámetros de Vuelo",
@@ -1178,6 +1233,11 @@ export const translations = {
           postCountTooltip:
             "Número de posts a generar cada vez que se ejecute AutoPilot (1 crédito por post).",
           save: "Actualizar Configuración",
+          description:
+            "Define tus parámetros estratégicos de contenido autónomo.",
+          expand: "Haz clic para expandir ajustes.",
+          syncing: "Sincronizando...",
+          addTheme: "Añadir Tema",
         },
         activity: {
           title: "Bitácora de Vuelo",

@@ -1,0 +1,88 @@
+import React from "react";
+import { Check, Lock, MessageSquare, Sparkles } from "lucide-react";
+import { useUser } from "../../../context/UserContext";
+
+interface LockedChatStateProps {
+    onUpgrade: () => void;
+}
+
+const LockedChatState: React.FC<LockedChatStateProps> = ({ onUpgrade }) => {
+    const { language } = useUser();
+
+    // Hardcoded translations
+    const t = {
+        title: language === "es"
+            ? "Desbloquea Nexus AI Expert"
+            : "Unlock Nexus AI Expert",
+        subtitle: language === "es"
+            ? "Tu consultor estratégico personal disponible 24/7 para potenciar tu marca."
+            : "Your personal strategic consultant available 24/7 to boost your brand.",
+        features: [
+            language === "es"
+                ? "Consultoría ilimitada de estrategia LinkedIn"
+                : "Unlimited LinkedIn strategy consulting",
+            language === "es"
+                ? "Análisis de tendencias en tiempo real"
+                : "Real-time trend analysis",
+            language === "es"
+                ? "Ideas de contenido personalizadas"
+                : "Personalized content ideas",
+            language === "es"
+                ? "Respuestas instantáneas a dudas técnicas"
+                : "Instant answers to technical questions",
+        ],
+        cta: language === "es" ? "Desbloquear Nexus" : "Unlock Nexus",
+    };
+
+    return (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center animate-in fade-in zoom-in duration-500">
+            <div className="w-20 h-20 bg-brand-100 rounded-full flex items-center justify-center mb-6 relative group">
+                <Lock className="w-10 h-10 text-brand-600 relative z-10" />
+                <div className="absolute inset-0 bg-brand-400 opacity-20 rounded-full animate-ping group-hover:animate-none">
+                </div>
+                <div className="absolute -top-2 -right-2 bg-purple-500 rounded-full p-2 border-4 border-white">
+                    <MessageSquare className="w-4 h-4 text-white" />
+                </div>
+            </div>
+
+            <h2 className="text-3xl font-bold text-slate-900 mb-3 font-outfit">
+                {t.title}
+            </h2>
+            <p className="text-slate-600 max-w-lg text-lg mb-8 text-balance">
+                {t.subtitle}
+            </p>
+
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8 max-w-md w-full">
+                <ul className="space-y-4 text-left">
+                    {t.features.map((feature, i) => (
+                        <li
+                            key={i}
+                            className="flex items-start gap-3 text-slate-700"
+                        >
+                            <div className="mt-0.5 min-w-5">
+                                <Check
+                                    className="w-5 h-5 text-brand-500"
+                                    strokeWidth={3}
+                                />
+                            </div>
+                            <span>{feature}</span>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            <button
+                onClick={onUpgrade}
+                className="group relative px-8 py-4 bg-gradient-to-r from-brand-600 to-purple-600 text-white font-semibold rounded-xl hover:from-brand-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-brand-500/30 hover:-translate-y-1 overflow-hidden"
+            >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:animate-shimmer" />
+                <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" />
+                    {t.cta}
+                </div>
+            </button>
+        </div>
+    );
+};
+
+export default LockedChatState;

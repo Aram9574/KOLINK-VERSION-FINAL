@@ -545,12 +545,12 @@ const AuditResults: React.FC<AuditResultsProps> = ({ data }) => {
                                         ))}
                                     </div>
                                 </SectionCard>
-                                <div className="bg-slate-900 dark:bg-blue-600 rounded-[2.5rem] p-8 text-white relative shadow-2xl">
+                                <div className="bg-white dark:bg-slate-950 rounded-[2.5rem] p-8 text-slate-900 dark:text-white relative border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50">
                                     <div className="relative z-10 space-y-6">
                                         <h3 className="text-2xl font-black">
                                             Tu Roadmap
                                         </h3>
-                                        <div className="space-y-4 text-sm font-bold opacity-80">
+                                        <div className="space-y-4 text-sm font-bold text-slate-500 dark:text-slate-400">
                                             <p>1. Optimiza Fundamentos (SEO)</p>
                                             <p>
                                                 2. Reescribe Narrativa
@@ -564,7 +564,7 @@ const AuditResults: React.FC<AuditResultsProps> = ({ data }) => {
                                         <button
                                             onClick={() =>
                                                 setActiveTab("pilar1")}
-                                            className="w-full py-4 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-black rounded-2xl text-sm transition-all hover:scale-[1.02]"
+                                            className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black rounded-2xl text-sm transition-all hover:scale-[1.02]"
                                         >
                                             Comenzar Optimización
                                         </button>
@@ -873,20 +873,20 @@ const AuditResults: React.FC<AuditResultsProps> = ({ data }) => {
                         </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2.5rem] p-8 text-white relative overflow-hidden group/ia shadow-2xl">
-                        <div className="absolute inset-0 bg-blue-600/10 group-hover/ia:opacity-20 transition-opacity" />
+                    <div className="bg-white dark:bg-slate-950 rounded-[2.5rem] p-8 text-slate-900 dark:text-white relative overflow-hidden group/ia border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50">
+                        <div className="absolute inset-0 bg-blue-500/5 dark:bg-blue-600/10 group-hover/ia:opacity-20 transition-opacity" />
                         <div className="relative z-10">
                             <div className="flex items-center gap-3 mb-4">
-                                <Sparkles className="w-5 h-5 text-blue-400 animate-pulse" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">
+                                <Sparkles className="w-5 h-5 text-blue-500 dark:text-blue-400 animate-pulse" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 dark:text-blue-400">
                                     Kolink AI Insight
                                 </span>
                             </div>
-                            <p className="text-sm font-bold leading-relaxed mb-6 italic opacity-90">
+                            <p className="text-sm font-bold leading-relaxed mb-6 italic text-slate-600 dark:text-slate-300">
                                 Un perfil con score superior al 80% genera 4.5x
                                 más leads cualificados.
                             </p>
-                            <div className="flex items-center justify-between text-[10px] font-black opacity-30 uppercase">
+                            <div className="flex items-center justify-between text-[10px] font-black opacity-20 uppercase">
                                 <span>K-CORE ENGINE</span>
                                 <span>v2.5</span>
                             </div>

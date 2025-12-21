@@ -4,33 +4,18 @@ import {
     Crown,
     History as HistoryIcon,
     LayoutGrid,
+    MessageSquareText,
     Settings,
     Sparkles,
 } from "lucide-react";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { useUser } from "../../context/UserContext";
 import { translations } from "../../translations";
-import { Post } from "../../types";
+import { AppTab, Post } from "../../types";
 
 interface MobileBottomNavProps {
-    activeTab:
-        | "create"
-        | "history"
-        | "settings"
-        | "autopilot"
-        | "auditor"
-        | "carousel"
-        | "ideas";
-    setActiveTab: (
-        tab:
-            | "create"
-            | "history"
-            | "settings"
-            | "autopilot"
-            | "auditor"
-            | "carousel"
-            | "ideas",
-    ) => void;
+    activeTab: AppTab;
+    setActiveTab: (tab: AppTab) => void;
 }
 
 const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
@@ -67,6 +52,12 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             id: "carousel" as const,
             icon: Crown,
             label: language === "es" ? "Carrusel" : "Carousel",
+            isPremium: true,
+        },
+        {
+            id: "chat" as const,
+            icon: MessageSquareText,
+            label: "Nexus",
             isPremium: true,
         },
         {

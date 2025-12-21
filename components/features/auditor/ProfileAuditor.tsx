@@ -4,6 +4,7 @@ import AuditResults from "./AuditResults";
 import { AuditService } from "../../../services/AuditService";
 import { toast } from "sonner";
 import { useUser } from "../../../context/UserContext";
+import LoadingProgress from "../../ui/LoadingProgress";
 
 const ProfileAuditor: React.FC = () => {
     const [results, setResults] = useState<any>(() => {
@@ -51,15 +52,15 @@ const ProfileAuditor: React.FC = () => {
 
     return (
         <div className="relative min-h-[90vh] pb-20 overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
-                <div className="mt-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10">
+                <div className="mt-4">
                     {step === "upload" && (
                         <div className="space-y-12">
                             {/* Visual Stepper Instructions */}
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                                 {[
                                     {
-                                        step: "01",
+                                        step: "1",
                                         title: language === "es"
                                             ? "Perfil"
                                             : "Profile",
@@ -70,7 +71,7 @@ const ProfileAuditor: React.FC = () => {
                                         link: "https://www.linkedin.com/in/",
                                     },
                                     {
-                                        step: "02",
+                                        step: "2",
                                         title: language === "es"
                                             ? "Recursos"
                                             : "Resources",
@@ -80,7 +81,7 @@ const ProfileAuditor: React.FC = () => {
                                         icon: "📂",
                                     },
                                     {
-                                        step: "03",
+                                        step: "3",
                                         title: language === "es"
                                             ? "Guardar"
                                             : "Save",
@@ -90,7 +91,7 @@ const ProfileAuditor: React.FC = () => {
                                         icon: "📄",
                                     },
                                     {
-                                        step: "04",
+                                        step: "4",
                                         title: language === "es"
                                             ? "Subir"
                                             : "Upload",
@@ -104,7 +105,7 @@ const ProfileAuditor: React.FC = () => {
                                         key={idx}
                                         className="group relative bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 p-6 rounded-[2rem] hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                                     >
-                                        <div className="absolute top-4 right-6 text-3xl font-black opacity-5 dark:opacity-10 select-none">
+                                        <div className="absolute top-4 right-6 text-3xl font-black text-black dark:text-white select-none">
                                             {item.step}
                                         </div>
                                         <div className="w-12 h-12 bg-slate-50 dark:bg-slate-700/50 rounded-2xl flex items-center justify-center text-xl mb-4 shadow-inner group-hover:scale-110 transition-transform">
@@ -145,14 +146,17 @@ const ProfileAuditor: React.FC = () => {
                     )}
 
                     {step === "analyzing" && (
-                        <div className="flex flex-col items-center justify-center py-20 space-y-8 animate-pulse">
-                            <div className="relative">
-                                <div className="absolute -inset-8 bg-blue-500/20 rounded-full blur-[40px] animate-pulse" />
-                                <PDFUploader
-                                    onFileSelect={() => {}}
-                                    isAnalyzing={true}
-                                />
-                            </div>
+                        <div className="flex flex-col items-center justify-center py-20 max-w-md mx-auto">
+                            <LoadingProgress
+                                steps={[
+                                    "Escaneando estructura del PDF...",
+                                    "Auditando perfil de LinkedIn...",
+                                    "Analizando marca personal...",
+                                    "Generando roadmap de impacto...",
+                                    "Finalizando informe de auditoría...",
+                                ]}
+                                duration={15000}
+                            />
                         </div>
                     )}
 
