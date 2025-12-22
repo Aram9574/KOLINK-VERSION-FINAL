@@ -2,6 +2,7 @@ import React from "react";
 import {
     Bot,
     Crown,
+    Edit3,
     Gift,
     History as HistoryIcon,
     LayoutGrid,
@@ -104,6 +105,38 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </button>
 
                 <button
+                    onClick={() => setActiveTab("chat")}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
+                ${
+                        activeTab === "chat"
+                            ? "bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200"
+                            : "text-slate-600 hover:bg-slate-50"
+                    }`}
+                >
+                    <MessageSquareText className="w-5 h-5" />
+                    Nexus AI
+                    {!user.isPremium && (
+                        <Crown className="w-4 h-4 text-amber-500 fill-amber-500/20 ml-auto flex-shrink-0" />
+                    )}
+                </button>
+
+                <button
+                    onClick={() => setActiveTab("editor")}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
+                ${
+                        activeTab === "editor"
+                            ? "bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200"
+                            : "text-slate-600 hover:bg-slate-50"
+                    }`}
+                >
+                    <Edit3 className="w-5 h-5" />
+                    {translations[language].app.sidebar.editor}
+                    {!user.isPremium && (
+                        <Crown className="w-4 h-4 text-amber-500 fill-amber-500/20 ml-auto flex-shrink-0" />
+                    )}
+                </button>
+
+                <button
                     onClick={() => setActiveTab("carousel")}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
                 ${
@@ -116,22 +149,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                     {language === "es"
                         ? "Generador de Carrusel"
                         : "Carousel Generator"}
-                    {!user.isPremium && (
-                        <Crown className="w-4 h-4 text-amber-500 fill-amber-500/20 ml-auto flex-shrink-0" />
-                    )}
-                </button>
-
-                <button
-                    onClick={() => setActiveTab("chat")}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
-                ${
-                        activeTab === "chat"
-                            ? "bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200"
-                            : "text-slate-600 hover:bg-slate-50"
-                    }`}
-                >
-                    <MessageSquareText className="w-5 h-5" />
-                    Nexus
                     {!user.isPremium && (
                         <Crown className="w-4 h-4 text-amber-500 fill-amber-500/20 ml-auto flex-shrink-0" />
                     )}
@@ -184,13 +201,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <SettingsIcon className="w-5 h-5" />
                     <div className="flex-1 text-left">{t.settings}</div>
                 </button>
-                <button
-                    onClick={logout}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all duration-200"
-                >
-                    <LogOut className="w-5 h-5" />
-                    {t.logout}
-                </button>
 
                 <button
                     onClick={onReferral}
@@ -202,6 +212,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                             ? "Gana 1 Mes Gratis"
                             : "Get 1 Month Free"}
                     </span>
+                </button>
+
+                <button
+                    onClick={logout}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-all duration-200"
+                >
+                    <LogOut className="w-5 h-5" />
+                    {t.logout}
                 </button>
             </div>
 

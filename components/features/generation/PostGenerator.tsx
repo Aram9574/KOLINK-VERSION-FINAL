@@ -55,6 +55,7 @@ interface PostGeneratorProps {
   initialParams?: GenerationParams | null;
   isCancelled?: boolean;
   onGoToCarousel?: (content: string) => void;
+  onEdit?: (post: any) => void;
 }
 
 const PostGenerator: React.FC<PostGeneratorProps> = ({
@@ -67,6 +68,7 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
   initialParams = null,
   isCancelled = false,
   onGoToCarousel,
+  onEdit,
 }) => {
   const { user } = useUser();
   const { params, updateParams } = useGeneratorForm({
@@ -320,9 +322,9 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
               onSchedule={handleSchedule}
               viralScore={currentPost?.viralScore}
               viralAnalysis={currentPost?.viralAnalysis}
-              onConvertToCarousel={onGoToCarousel
-                ? () => onGoToCarousel(currentPost?.content || "")
-                : undefined}
+              // Carousel button removed from Studio view as per request
+              onEdit={onEdit ? () => onEdit(currentPost) : undefined}
+              isMobilePreview={viewMode === "mobile"}
             />
           </div>
         </div>

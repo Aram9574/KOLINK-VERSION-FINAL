@@ -2,6 +2,7 @@ import React from "react";
 import {
     Bot,
     Crown,
+    Edit3,
     History as HistoryIcon,
     LayoutGrid,
     MessageSquareText,
@@ -58,6 +59,12 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             id: "chat" as const,
             icon: MessageSquareText,
             label: "Nexus",
+            isPremium: true,
+        },
+        {
+            id: "editor" as const,
+            icon: Edit3,
+            label: language === "es" ? "Editor" : "Editor",
             isPremium: true,
         },
         {

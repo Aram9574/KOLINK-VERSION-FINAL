@@ -119,7 +119,8 @@ export type AppTab =
   | "auditor"
   | "ideas"
   | "carousel"
-  | "chat";
+  | "chat"
+  | "editor";
 
 export interface AutoPilotConfig {
   enabled: boolean;

@@ -23,6 +23,7 @@ import LockedAutoPilotState from "../autopilot/LockedAutoPilotState";
 import LockedHistoryState from "../history/LockedHistoryState";
 import LockedCarouselState from "../generation/LockedCarouselState";
 import LockedChatState from "../chat/LockedChatState";
+import LockedEditorState from "../editor/LockedEditorState";
 import ReferralModal from "../../modals/ReferralModal";
 import { Gift } from "lucide-react";
 
@@ -37,6 +38,7 @@ const CarouselStudio = React.lazy(() => import("../generation/CarouselStudio"));
 const LinkedInExpertChat = React.lazy(() =>
     import("../chat/LinkedInExpertChat")
 );
+const PostEditorView = React.lazy(() => import("../editor/PostEditorView"));
 
 const DashboardContent: React.FC = () => {
     const { user, refreshUser, setUser, language, setLanguage } = useUser();
@@ -163,15 +165,19 @@ const DashboardContent: React.FC = () => {
         >
             <div
                 className={`h-full ${
-                    activeTab === "history"
+                    ["history", "editor", "chat", "carousel"].includes(
+                            activeTab,
+                        )
                         ? "overflow-hidden"
                         : "overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent"
                 }`}
             >
                 <div
                     className={`${
-                        activeTab === "history"
-                            ? "h-full ml-1"
+                        ["history", "editor", "chat", "carousel"].includes(
+                                activeTab,
+                            )
+                            ? "h-full w-full flex flex-col"
                             : "max-w-7xl mx-auto p-4 lg:p-8 pb-24"
                     }`}
                 >
@@ -201,6 +207,10 @@ const DashboardContent: React.FC = () => {
                                         setCarouselDraftContent(content);
                                         setActiveTab("carousel");
                                     }}
+                                    onEdit={(post) => {
+                                        setCurrentPost(post);
+                                        setActiveTab("editor");
+                                    }}
                                 />
                             </Suspense>
                         </div>
@@ -219,7 +229,7 @@ const DashboardContent: React.FC = () => {
                                     <HistoryView
                                         onSelect={(post) => {
                                             setCurrentPost(post);
-                                            setActiveTab("create");
+                                            setActiveTab("editor");
                                         }}
                                         onReuse={(params) => {
                                             setCurrentPost({
@@ -289,7 +299,7 @@ const DashboardContent: React.FC = () => {
                     )}
 
                     {activeTab === "carousel" && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0">
                             <Suspense
                                 fallback={
                                     <div className="flex justify-center items-center h-64">
@@ -315,7 +325,7 @@ const DashboardContent: React.FC = () => {
                     )}
 
                     {activeTab === "chat" && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">
                             {user.planTier === "free"
                                 ? (
                                     <LockedChatState
@@ -324,6 +334,27 @@ const DashboardContent: React.FC = () => {
                                     />
                                 )
                                 : <LinkedInExpertChat />}
+                        </div>
+                    )}
+
+                    {activeTab === "editor" && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex-1 h-full flex flex-col min-h-0">
+                            <Suspense
+                                fallback={
+                                    <div className="flex-1 flex items-center justify-center">
+                                        <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                                    </div>
+                                }
+                            >
+                                {user.planTier === "free"
+                                    ? (
+                                        <LockedEditorState
+                                            onUpgrade={() =>
+                                                setShowUpgradeModal(true)}
+                                        />
+                                    )
+                                    : <PostEditorView />}
+                            </Suspense>
                         </div>
                     )}
                 </div>

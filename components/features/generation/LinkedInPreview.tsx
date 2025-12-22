@@ -37,6 +37,9 @@ interface LinkedInPreviewProps {
     onUpdate?: (newContent: string) => void;
     onSchedule?: (date: Date) => void;
     onConvertToCarousel?: () => void;
+    onEdit?: () => void;
+    showEditButton?: boolean;
+    isMobilePreview?: boolean;
     viralScore?: number;
     viralAnalysis?: ViralAnalysis;
 }
@@ -50,6 +53,9 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
         onUpdate,
         onSchedule,
         onConvertToCarousel,
+        onEdit,
+        showEditButton = true,
+        isMobilePreview = false,
         viralScore,
         viralAnalysis,
     },
@@ -193,19 +199,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
         );
     }
 
-    if (!content) {
-        return (
-            <div
-                id="tour-preview"
-                className="bg-white/40 backdrop-blur-md border border-white/50 border-dashed rounded-xl h-96 flex flex-col items-center justify-center text-slate-400 w-full max-w-xl mx-auto"
-            >
-                <div className="bg-indigo-50 p-5 rounded-full mb-4 shadow-sm animate-bounce duration-1000">
-                    <Send className="w-8 h-8 text-brand-400 ml-1 mt-1" />
-                </div>
-                <p className="font-medium">{t.placeholder}</p>
-            </div>
-        );
-    }
+    // if (!content) block removed to show empty preview structure
 
     return (
         <div className="space-y-4 w-full max-w-xl mx-auto">
@@ -374,13 +368,18 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
                             )
                             : (
                                 <div className="flex items-center gap-1.5">
-                                    <button
-                                        onClick={() => setIsEditing(true)}
-                                        className="px-3 h-9 rounded-lg bg-white border border-slate-200 text-blue-600 text-[11px] font-bold hover:border-blue-300 hover:bg-blue-50/30 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-1.5"
-                                    >
-                                        <PenSquare className="w-3.5 h-3.5" />
-                                        {t.edit}
-                                    </button>
+                                    {showEditButton && (
+                                        <button
+                                            onClick={() =>
+                                                onEdit
+                                                    ? onEdit()
+                                                    : setIsEditing(true)}
+                                            className="px-3 h-9 rounded-lg bg-white border border-slate-200 text-blue-600 text-[11px] font-bold hover:border-blue-300 hover:bg-blue-50/30 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-1.5"
+                                        >
+                                            <PenSquare className="w-3.5 h-3.5" />
+                                            {t.edit}
+                                        </button>
+                                    )}
                                     <button
                                         onClick={() => setIsScheduling(true)}
                                         className="px-3 h-9 rounded-lg bg-white border border-slate-200 text-slate-700 text-[11px] font-bold hover:border-slate-300 hover:bg-slate-50 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-1.5"
@@ -521,25 +520,27 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
                         }
                         label="Comment"
                     />
-                    <ActionButton
-                        icon={<Repeat className="w-5 h-5 stroke-[1.5]" />}
-                        label="Repost"
-                    />
+                    {!isMobilePreview && (
+                        <ActionButton
+                            icon={<Repeat className="w-5 h-5 stroke-[1.5]" />}
+                            label="Repost"
+                        />
+                    )}
                     <button
                         onClick={handlePublish}
                         disabled={isPublishing}
-                        className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#0077b5] text-white font-black text-sm hover:bg-[#006097] transition-all duration-200 active:scale-95 shadow-md shadow-blue-500/20 disabled:opacity-70 disabled:cursor-wait"
+                        className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full bg-[#0077b5] text-white font-bold text-xs hover:bg-[#006097] transition-all duration-200 active:scale-95 shadow-sm shadow-blue-500/20 disabled:opacity-70 disabled:cursor-wait ml-auto"
                     >
                         {isPublishing
                             ? (
-                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             )
                             : (
-                                <div className="bg-white p-0.5 rounded-sm">
-                                    <Linkedin className="w-4 h-4 text-[#0077b5] fill-[#0077b5]" />
+                                <div className="bg-white p-0.5 rounded-[2px]">
+                                    <Linkedin className="w-3 h-3 text-[#0077b5] fill-[#0077b5]" />
                                 </div>
                             )}
-                        <span className="uppercase tracking-wider">
+                        <span className="uppercase tracking-wide">
                             {isPublishing
                                 ? (language === "es"
                                     ? "Publicando..."
