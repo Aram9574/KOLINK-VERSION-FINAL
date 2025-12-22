@@ -31,7 +31,7 @@ const LogoCarousel: React.FC<LogoCarouselProps> = ({ language }) => {
         },
         {
             name: "OMR",
-            url: "https://upload.wikimedia.org/wikipedia/commons/b/b5/OMR_Logo.svg",
+            url: "https://upload.wikimedia.org/wikipedia/commons/c/c5/OMR_Logo_2024.svg",
         },
         {
             name: "EPLAN",
@@ -43,19 +43,15 @@ const LogoCarousel: React.FC<LogoCarouselProps> = ({ language }) => {
         },
         {
             name: "FYGI",
-            url: "https://fygioslo.no/wp-content/themes/fygi/img/logo.svg",
+            url: "https://images.squarespace-cdn.com/content/v1/65f946b44379ed67d4584ac8/7d70fc4f-054b-4493-b499-9b58a18c6809/Fygi+logo.png",
         },
         {
             name: "Epilot",
-            url: "https://logo.clearbit.com/epilot.cloud",
+            url: "https://cdn.prod.website-files.com/6672e3b0c21bc5b0e9dd785c/66908dda7efc3f53d8f5d3b8_logo.svg",
         },
         {
             name: "Notus",
-            url: "https://logo.clearbit.com/notus.li",
-        },
-        {
-            name: "Canon",
-            url: "https://upload.wikimedia.org/wikipedia/commons/0/03/Canon_logo.svg",
+            url: "https://notus.li/favicon.ico", // Using favicon or a simpler asset if SVG is tricky
         },
     ];
 
