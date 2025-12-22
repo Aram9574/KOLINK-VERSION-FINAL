@@ -43,7 +43,7 @@ const StrategicComparison: React.FC<StrategicComparisonProps> = (
                     </p>
                 </div>
 
-                <div className="bg-white rounded-[32px] shadow-2xl shadow-slate-200/50 border border-slate-200/60 overflow-hidden pt-10">
+                <div className="bg-white rounded-[32px] shadow-2xl shadow-slate-200/50 border border-slate-200/60 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
@@ -54,14 +54,14 @@ const StrategicComparison: React.FC<StrategicComparisonProps> = (
                                     {competitors.map((comp) => (
                                         <th
                                             key={comp.key}
-                                            className={`p-8 text-center border-b border-slate-100 min-w-[200px] relative ${
+                                            className={`pt-12 pb-8 px-8 text-center border-b border-slate-100 min-w-[200px] relative ${
                                                 comp.isKolink
                                                     ? "bg-brand-50/40"
                                                     : ""
                                             }`}
                                         >
                                             {comp.isKolink && (
-                                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-xl flex items-center gap-2 border border-slate-800">
+                                                <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-xl flex items-center gap-2 border border-slate-800 whitespace-nowrap">
                                                     <Trophy className="w-3 h-3 text-yellow-400" />
                                                     {t.bestChoice}
                                                 </div>
