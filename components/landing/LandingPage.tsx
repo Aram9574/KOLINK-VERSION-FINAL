@@ -8,6 +8,7 @@ import HeroSection from "./HeroSection";
 import ToolsSection from "./ToolsSection";
 import HowItWorksSection from "./HowItWorksSection";
 import ComparisonSection from "./ComparisonSection";
+import StrategicComparison from "./StrategicComparison";
 import RoiSection from "./RoiSection";
 import PricingSection from "./PricingSection";
 import FaqSection from "./FaqSection";
@@ -127,6 +128,7 @@ const LandingPage: React.FC = () => {
                 "demo",
                 "tools",
                 "how-it-works",
+                "comparison",
                 "pricing",
                 "faq",
             ];
@@ -185,6 +187,8 @@ const LandingPage: React.FC = () => {
                     language={language}
                     mockContent={mockContent}
                 />
+
+                <StrategicComparison language={language} />
 
                 <RoiSection language={language} />
 

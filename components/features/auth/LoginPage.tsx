@@ -19,6 +19,7 @@ const LoginPage: React.FC = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [acceptedPolicy, setAcceptedPolicy] = useState(false);
 
     // Reset loading state if session is established or component re-mounts
     useEffect(() => {
@@ -274,6 +275,12 @@ const LoginPage: React.FC = () => {
                         onSocialLogin={handleSocialLogin}
                     />
 
+                    <p className="text-center text-[10px] text-slate-400 mb-6">
+                        {language === "es"
+                            ? "Al continuar, aceptas nuestra política de tratamiento de datos."
+                            : "By continuing, you agree to our data treatment policy."}
+                    </p>
+
                     <div className="relative mb-8">
                         <div className="absolute inset-0 flex items-center">
                             <div className="w-full border-t border-slate-200">
@@ -300,6 +307,8 @@ const LoginPage: React.FC = () => {
                         setIsLoginMode={setIsLoginMode}
                         onForgotPassword={() => setIsForgotPasswordMode(true)}
                         onSubmit={handleAuth}
+                        acceptedPolicy={acceptedPolicy}
+                        setAcceptedPolicy={setAcceptedPolicy}
                     />
                 </div>
             </div>

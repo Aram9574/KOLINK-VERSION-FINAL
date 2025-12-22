@@ -9,6 +9,7 @@ export const translations = {
       tools: "Tools",
       testimonials: "Results",
       pricing: "Pricing",
+      comparison: "Compare",
       faq: "FAQ",
       login: "Log In",
       getStarted: "Get Started",
@@ -74,6 +75,99 @@ export const translations = {
       visualList1: "Systematize output",
       visualList2: "Leverage psychology",
       viralBadge: "Viral",
+    },
+    strategicComparison: {
+      title: "The Most Comprehensive AI Platform",
+      subtitle: "Features that others can't match. See for yourself.",
+      bestChoice: "Best Choice",
+      features: "Features",
+      kolink: "Kolink",
+      taplio: "Taplio",
+      supergrow: "Supergrow",
+      authoredUp: "AuthoredUp",
+      rows: [
+        {
+          name: "Base Price",
+          values: {
+            kolink: "€29/mo",
+            taplio: "$65/mo",
+            supergrow: "$19/mo",
+            authored: "$20/mo",
+          },
+        },
+        {
+          name: "Viral AI Generator",
+          values: {
+            kolink: "✅ (Full)",
+            taplio: "✅",
+            supergrow: "✅",
+            authored: "❌",
+          },
+        },
+        {
+          name: "Pro LLM Models (GPT-4o/Claude 3.5)",
+          values: {
+            kolink: "✅ Included",
+            taplio: "⚠️ (Limited)",
+            supergrow: "❌ (Basic)",
+            authored: "❌",
+          },
+        },
+        {
+          name: "Real-time Preview",
+          values: {
+            kolink: "✅",
+            taplio: "✅",
+            supergrow: "✅",
+            authored: "✅",
+          },
+        },
+        {
+          name: "Integrated Browser Extension",
+          values: {
+            kolink: "✅",
+            taplio: "✅",
+            supergrow: "✅",
+            authored: "✅",
+          },
+        },
+        {
+          name: "Custom Ghostwriting",
+          values: {
+            kolink: "✅ (High Fidelity)",
+            taplio: "✅",
+            supergrow: "⚠️",
+            authored: "❌",
+          },
+        },
+        {
+          name: "Viral Hook Analysis",
+          values: {
+            kolink: "✅",
+            taplio: "✅",
+            supergrow: "⚠️",
+            authored: "❌",
+          },
+        },
+        {
+          name: "Advanced Multilingual Support",
+          values: {
+            kolink: "✅",
+            taplio: "⚠️",
+            supergrow: "✅",
+            authored: "⚠️",
+          },
+        },
+        {
+          name: "Access to Viral Posts Database",
+          values: {
+            kolink: "✅",
+            taplio: "✅",
+            supergrow: "✅",
+            authored: "❌",
+          },
+        },
+      ],
     },
     roi: {
       title: "Stop burning money on multiple tools",
@@ -760,6 +854,7 @@ export const translations = {
       tools: "Herramientas",
       testimonials: "Resultados",
       pricing: "Precios",
+      comparison: "Comparativa",
       faq: "Preguntas",
       login: "Comenzar Gratis",
       getStarted: "Empezar",
@@ -834,6 +929,100 @@ export const translations = {
       visualList1: "Sistematizar output",
       visualList2: "Apalancar psicología",
       viralBadge: "Viral",
+    },
+    strategicComparison: {
+      title: "La Plataforma de IA más Completa",
+      subtitle:
+        "Funcionalidades que otros no pueden igualar. Compruébalo tú mismo.",
+      bestChoice: "Mejor Opción",
+      features: "Características",
+      kolink: "Kolink",
+      taplio: "Taplio",
+      supergrow: "Supergrow",
+      authoredUp: "AuthoredUp",
+      rows: [
+        {
+          name: "Precio Base",
+          values: {
+            kolink: "€29/mes",
+            taplio: "$65/mes",
+            supergrow: "$19/mes",
+            authored: "$20/mes",
+          },
+        },
+        {
+          name: "Generador Viral AI",
+          values: {
+            kolink: "✅ (Full)",
+            taplio: "✅",
+            supergrow: "✅",
+            authored: "❌",
+          },
+        },
+        {
+          name: "Modelos LLM Pro (GPT-4o/Claude 3.5)",
+          values: {
+            kolink: "✅ Incluido",
+            taplio: "⚠️ (Limitado)",
+            supergrow: "❌ (Básico)",
+            authored: "❌",
+          },
+        },
+        {
+          name: "Pre-visualización Real-time",
+          values: {
+            kolink: "✅",
+            taplio: "✅",
+            supergrow: "✅",
+            authored: "✅",
+          },
+        },
+        {
+          name: "Extensión de Navegador Integrada",
+          values: {
+            kolink: "✅",
+            taplio: "✅",
+            supergrow: "✅",
+            authored: "✅",
+          },
+        },
+        {
+          name: "Ghostwriting Personalizado",
+          values: {
+            kolink: "✅ (Alta Fidelidad)",
+            taplio: "✅",
+            supergrow: "⚠️",
+            authored: "❌",
+          },
+        },
+        {
+          name: "Análisis de Gancho (Hooks) Virales",
+          values: {
+            kolink: "✅",
+            taplio: "✅",
+            supergrow: "⚠️",
+            authored: "❌",
+          },
+        },
+        {
+          name: "Soporte Multilingüe Avanzado",
+          values: {
+            kolink: "✅",
+            taplio: "⚠️",
+            supergrow: "✅",
+            authored: "⚠️",
+          },
+        },
+        {
+          name: "Acceso a Base de Datos de Posts Virales",
+          values: {
+            kolink: "✅",
+            taplio: "✅",
+            supergrow: "✅",
+            authored: "❌",
+          },
+        },
+      ],
     },
     roi: {
       title: "Deja de quemar dinero en múltiples herramientas",

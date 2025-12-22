@@ -80,6 +80,13 @@ const Navbar: React.FC<NavbarProps> = (
                         {t.nav.pricing}
                     </a>
                     <a
+                        href="#comparison"
+                        onClick={(e) => scrollToSection(e, "comparison")}
+                        className={getNavLinkClass("comparison")}
+                    >
+                        {t.nav.comparison}
+                    </a>
+                    <a
                         href="#faq"
                         onClick={(e) => scrollToSection(e, "faq")}
                         className={getNavLinkClass("faq")}
