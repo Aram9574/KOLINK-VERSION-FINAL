@@ -43,7 +43,7 @@ const StrategicComparison: React.FC<StrategicComparisonProps> = (
                     </p>
                 </div>
 
-                <div className="bg-white rounded-[32px] shadow-2xl shadow-slate-200/50 border border-slate-200/60 overflow-hidden">
+                <div className="bg-white rounded-[32px] shadow-2xl shadow-slate-200/50 border border-slate-200/60 overflow-hidden pt-10">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>

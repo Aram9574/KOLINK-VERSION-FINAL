@@ -89,7 +89,7 @@ export const translations = {
         {
           name: "Base Price",
           values: {
-            kolink: "€29/mo",
+            kolink: "€19/mo",
             taplio: "$65/mo",
             supergrow: "$19/mo",
             authored: "$20/mo",
@@ -944,7 +944,7 @@ export const translations = {
         {
           name: "Precio Base",
           values: {
-            kolink: "€29/mes",
+            kolink: "€19/mes",
             taplio: "$65/mes",
             supergrow: "$19/mes",
             authored: "$20/mes",
