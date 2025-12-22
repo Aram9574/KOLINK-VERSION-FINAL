@@ -838,12 +838,48 @@ export const translations = {
       },
     },
     footer: {
-      privacy: "Privacy Policy",
-      terms: "Terms of Service",
-      contact: "Contact",
-      rights: "© 2024 Kolink Inc. All rights reserved.",
       description:
-        "Architecting viral moments for the world's most ambitious creators.",
+        "The ultimate content creation & analytics tool for LinkedIn™.",
+      rights: "© 2025 Kolink Inc. All rights reserved.",
+      disclaimer:
+        "Kolink is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the LinkedIn Corporation, registered in the U.S. and other countries LinkedIn is a trademark of the LinkedIn Corporation.",
+      columns: {
+        company: {
+          title: "Company",
+          links: [
+            { label: "About", href: "/about" },
+            { label: "Pricing", href: "/#pricing" },
+            { label: "Made with Kolink", href: "/#carousel" },
+            { label: "Contact us", href: "mailto:info@kolink.es" },
+            { label: "Become an Affiliate", href: "/affiliate" },
+          ],
+        },
+        legal: {
+          title: "Legal",
+          links: [
+            { label: "Cookie Policy", href: "/cookies" },
+            { label: "Privacy Policy", href: "/privacy" },
+            { label: "Terms and Conditions", href: "/terms" },
+          ],
+        },
+        resources: {
+          title: "Resources",
+          links: [
+            { label: "Blog", href: "/blog" },
+            { label: "News", href: "/news" },
+            { label: "Roadmap", href: "/roadmap" },
+            { label: "Help Center", href: "/help" },
+          ],
+        },
+        alternatives: {
+          title: "Alternatives",
+          links: [
+            { label: "Kolink vs Taplio", href: "/#comparison" },
+            { label: "Kolink vs Supergrow", href: "/#comparison" },
+            { label: "Kolink vs AuthoredUp", href: "/#comparison" },
+          ],
+        },
+      },
     },
   },
   es: {
@@ -860,12 +896,48 @@ export const translations = {
       getStarted: "Empezar",
     },
     footer: {
-      privacy: "Política de Privacidad",
-      terms: "Términos de Servicio",
-      contact: "Contacto",
-      rights: "© 2024 Kolink Inc. Todos los derechos reservados.",
       description:
-        "Arquitectando momentos virales para los creadores más ambiciosos del mundo.",
+        "La herramienta definitiva de creación de contenido y analítica para LinkedIn™.",
+      rights: "© 2025 Kolink Inc. Todos los derechos reservados.",
+      disclaimer:
+        "Kolink no está afiliado, asociado, autorizado, respaldado ni conectado oficialmente de ninguna manera con LinkedIn Corporation, registrada en los EE. UU. y otros países. LinkedIn es una marca comercial de LinkedIn Corporation.",
+      columns: {
+        company: {
+          title: "Compañía",
+          links: [
+            { label: "Sobre Nosotros", href: "/about" },
+            { label: "Precios", href: "/#pricing" },
+            { label: "Hecho con Kolink", href: "/#carousel" },
+            { label: "Contacto", href: "mailto:info@kolink.es" },
+            { label: "Programa de Afiliados", href: "/affiliate" },
+          ],
+        },
+        legal: {
+          title: "Legal",
+          links: [
+            { label: "Política de Cookies", href: "/cookies" },
+            { label: "Política de Privacidad", href: "/privacy" },
+            { label: "Términos y Condiciones", href: "/terms" },
+          ],
+        },
+        resources: {
+          title: "Recursos",
+          links: [
+            { label: "Blog", href: "/blog" },
+            { label: "Noticias", href: "/news" },
+            { label: "Hoja de Ruta", href: "/roadmap" },
+            { label: "Centro de Ayuda", href: "/help" },
+          ],
+        },
+        alternatives: {
+          title: "Alternativas",
+          links: [
+            { label: "Kolink vs Taplio", href: "/#comparison" },
+            { label: "Kolink vs Supergrow", href: "/#comparison" },
+            { label: "Kolink vs AuthoredUp", href: "/#comparison" },
+          ],
+        },
+      },
     },
     hero: {
       badge: "#1 Herramienta de IA para LinkedIn",
