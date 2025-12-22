@@ -76,13 +76,14 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     return (
                         <button
                             key={item.id}
-                            onClick={async () => {
-                                if (!isActive) {
-                                    await Haptics.impact({
-                                        style: ImpactStyle.Light,
-                                    });
-                                }
+                            onClick={() => {
                                 setActiveTab(item.id);
+                                if (!isActive) {
+                                    // Fire and forget haptics so it doesn't block UI
+                                    Haptics.impact({
+                                        style: ImpactStyle.Light,
+                                    }).catch(() => {});
+                                }
                             }}
                             className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all w-16 mb-2 active:scale-90 ${
                                 isActive
