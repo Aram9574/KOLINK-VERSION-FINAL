@@ -850,11 +850,14 @@ export const translations = {
         company: {
           title: "Company",
           links: [
-            { label: "About", href: "/about" },
+            { label: "About", href: "/#hero" },
             { label: "Pricing", href: "/#pricing" },
             { label: "Made with Kolink", href: "/#carousel" },
             { label: "Contact us", href: "mailto:info@kolink.es" },
-            { label: "Become an Affiliate", href: "/affiliate" },
+            {
+              label: "Become an Affiliate",
+              href: "mailto:info@kolink.es?subject=Affiliate Program",
+            },
           ],
         },
         legal: {
@@ -868,10 +871,10 @@ export const translations = {
         resources: {
           title: "Resources",
           links: [
-            { label: "Blog", href: "/blog" },
-            { label: "News", href: "/news" },
-            { label: "Roadmap", href: "/roadmap" },
-            { label: "Help Center", href: "/help" },
+            { label: "Blog", href: "/#tools" },
+            { label: "News", href: "/#tools" },
+            { label: "Roadmap", href: "/#tools" },
+            { label: "Help Center", href: "mailto:info@kolink.es" },
           ],
         },
         alternatives: {
@@ -911,11 +914,14 @@ export const translations = {
         company: {
           title: "Compañía",
           links: [
-            { label: "Sobre Nosotros", href: "/about" },
+            { label: "Sobre Nosotros", href: "/#hero" },
             { label: "Precios", href: "/#pricing" },
             { label: "Hecho con Kolink", href: "/#carousel" },
             { label: "Contacto", href: "mailto:info@kolink.es" },
-            { label: "Programa de Afiliados", href: "/affiliate" },
+            {
+              label: "Programa de Afiliados",
+              href: "mailto:info@kolink.es?subject=Programa de Afiliados",
+            },
           ],
         },
         legal: {
@@ -929,10 +935,10 @@ export const translations = {
         resources: {
           title: "Recursos",
           links: [
-            { label: "Blog", href: "/blog" },
-            { label: "Noticias", href: "/news" },
-            { label: "Hoja de Ruta", href: "/roadmap" },
-            { label: "Centro de Ayuda", href: "/help" },
+            { label: "Blog", href: "/#tools" },
+            { label: "Noticias", href: "/#tools" },
+            { label: "Hoja de Ruta", href: "/#tools" },
+            { label: "Centro de Ayuda", href: "mailto:info@kolink.es" },
           ],
         },
         alternatives: {

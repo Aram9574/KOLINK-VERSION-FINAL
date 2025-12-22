@@ -58,7 +58,7 @@ const LogoCarousel: React.FC<LogoCarouselProps> = ({ language }) => {
     // Duplicate the logos to create a seamless infinite loop
     const carouselLogos = [...logos, ...logos, ...logos];
     return (
-        <div className="w-full py-8 overflow-hidden">
+        <div id="carousel" className="w-full py-8 overflow-hidden">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 text-center">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
                     {t.socialProof}

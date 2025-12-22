@@ -6,9 +6,13 @@ import { AppLanguage } from "../../types";
 
 interface FooterProps {
     language: AppLanguage;
+    scrollToSection: (
+        e: React.MouseEvent<HTMLAnchorElement>,
+        sectionId: string,
+    ) => void;
 }
 
-const Footer: React.FC<FooterProps> = ({ language }) => {
+const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
     const t = translations[language];
     const footer = t.footer;
 
@@ -104,7 +108,23 @@ const Footer: React.FC<FooterProps> = ({ language }) => {
                                         idx: number,
                                     ) => (
                                         <li key={idx}>
-                                            {link.href.startsWith("/")
+                                            {link.href.startsWith("/#")
+                                                ? (
+                                                    <a
+                                                        href={link.href}
+                                                        onClick={(e) =>
+                                                            scrollToSection(
+                                                                e,
+                                                                link.href.split(
+                                                                    "#",
+                                                                )[1],
+                                                            )}
+                                                        className="text-slate-500 hover:text-brand-600 transition-colors text-sm font-medium"
+                                                    >
+                                                        {link.label}
+                                                    </a>
+                                                )
+                                                : link.href.startsWith("/")
                                                 ? (
                                                     <Link
                                                         to={link.href}

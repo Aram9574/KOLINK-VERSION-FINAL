@@ -197,7 +197,7 @@ const LandingPage: React.FC = () => {
                 <FaqSection language={language} />
             </main>
 
-            <Footer language={language} />
+            <Footer language={language} scrollToSection={scrollToSection} />
         </div>
     );
 };
