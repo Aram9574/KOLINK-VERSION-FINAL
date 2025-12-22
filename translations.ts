@@ -24,7 +24,7 @@ export const translations = {
       ctaSecondary: "Watch Demo",
       generating: "Generating Viral Post...",
     },
-    socialProof: "Trusted by creators at top companies",
+    socialProof: "1500+ companies & creators trust Kolink",
     workflow: {
       badge: "SYSTEM ARCHITECTURE",
       title: "THE VIRAL ASSEMBLY LINE",
@@ -91,7 +91,7 @@ export const translations = {
           values: {
             kolink: "€19/mo",
             taplio: "$65/mo",
-            supergrow: "$19/mo",
+            supergrow: "€49/mo",
             authored: "$20/mo",
           },
         },
@@ -877,7 +877,7 @@ export const translations = {
       ctaSecondary: "Ver Demo",
       generating: "Generando Post Viral...",
     },
-    socialProof: "Con la confianza de creadores en",
+    socialProof: "1500+ compañias y creadores confian en Kolink",
     workflow: {
       badge: "EL MOTOR",
       title: "LA LÍNEA DE ENSAMBLAJE VIRAL",
@@ -946,7 +946,7 @@ export const translations = {
           values: {
             kolink: "€19/mes",
             taplio: "$65/mes",
-            supergrow: "$19/mes",
+            supergrow: "€49/mes",
             authored: "$20/mes",
           },
         },

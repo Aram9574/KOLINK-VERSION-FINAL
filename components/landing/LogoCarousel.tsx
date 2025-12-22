@@ -1,4 +1,5 @@
 import React from "react";
+import { translations } from "../../translations";
 import { AppLanguage } from "../../types";
 
 interface LogoCarouselProps {
@@ -6,38 +7,55 @@ interface LogoCarouselProps {
 }
 
 const LogoCarousel: React.FC<LogoCarouselProps> = ({ language }) => {
+    const t = translations[language];
     const logos = [
-        {
-            name: "Google",
-            url: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg",
-        },
         {
             name: "Microsoft",
             url: "https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg",
         },
         {
-            name: "Spotify",
-            url: "https://upload.wikimedia.org/wikipedia/commons/2/26/Spotify_logo_with_text.svg",
+            name: "SAP",
+            url: "https://upload.wikimedia.org/wikipedia/commons/5/59/SAP_2011_logo.svg",
         },
         {
-            name: "Amazon",
-            url: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
+            name: "Canon",
+            url: "https://upload.wikimedia.org/wikipedia/commons/0/03/Canon_logo.svg",
         },
         {
-            name: "OpenAI",
-            url: "https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg",
+            name: "EY",
+            url: "https://upload.wikimedia.org/wikipedia/commons/3/34/EY_logo_2019.svg",
         },
         {
-            name: "TechCrunch",
-            url: "https://upload.wikimedia.org/wikipedia/commons/b/b9/TechCrunch_logo.svg",
+            name: "Accenture",
+            url: "https://upload.wikimedia.org/wikipedia/commons/c/cd/Accenture.svg",
         },
         {
-            name: "The Verge",
-            url: "https://upload.wikimedia.org/wikipedia/commons/a/af/The_Verge_logo.svg",
+            name: "OMR",
+            url: "https://upload.wikimedia.org/wikipedia/commons/b/b5/OMR_Logo.svg",
         },
         {
-            name: "Wired",
-            url: "https://upload.wikimedia.org/wikipedia/commons/9/95/Wired_logo.svg",
+            name: "EPLAN",
+            url: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Eplan_Logo.svg",
+        },
+        {
+            name: "WTS",
+            url: "https://upload.wikimedia.org/wikipedia/commons/e/e9/WTS_Group_logo.svg",
+        },
+        {
+            name: "FYGI",
+            url: "https://fygioslo.no/wp-content/themes/fygi/img/logo.svg",
+        },
+        {
+            name: "Epilot",
+            url: "https://logo.clearbit.com/epilot.cloud",
+        },
+        {
+            name: "Notus",
+            url: "https://logo.clearbit.com/notus.li",
+        },
+        {
+            name: "Canon",
+            url: "https://upload.wikimedia.org/wikipedia/commons/0/03/Canon_logo.svg",
         },
     ];
 
@@ -47,9 +65,7 @@ const LogoCarousel: React.FC<LogoCarouselProps> = ({ language }) => {
         <div className="w-full py-8 overflow-hidden">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 text-center">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
-                    {language === "es"
-                        ? "Reconocido por líderes de la industria"
-                        : "Trusted by industry leaders"}
+                    {t.socialProof}
                 </p>
             </div>
 
