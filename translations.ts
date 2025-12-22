@@ -843,6 +843,9 @@ export const translations = {
       rights: "© 2025 Kolink Inc. All rights reserved.",
       disclaimer:
         "Kolink is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the LinkedIn Corporation, registered in the U.S. and other countries LinkedIn is a trademark of the LinkedIn Corporation.",
+      verifiedLabel: "Verified",
+      compliantLabel: "Compliant",
+      madeWith: "Made with ❤️ for LinkedIn Creators",
       columns: {
         company: {
           title: "Company",
@@ -901,6 +904,9 @@ export const translations = {
       rights: "© 2025 Kolink Inc. Todos los derechos reservados.",
       disclaimer:
         "Kolink no está afiliado, asociado, autorizado, respaldado ni conectado oficialmente de ninguna manera con LinkedIn Corporation, registrada en los EE. UU. y otros países. LinkedIn es una marca comercial de LinkedIn Corporation.",
+      verifiedLabel: "Verificado",
+      compliantLabel: "Certificado",
+      madeWith: "Hecho con ❤️ para creadores de LinkedIn",
       columns: {
         company: {
           title: "Compañía",

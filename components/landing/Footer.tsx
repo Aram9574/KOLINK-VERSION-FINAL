@@ -55,7 +55,7 @@ const Footer: React.FC<FooterProps> = ({ language }) => {
                                     </div>
                                 </div>
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                                    Verified
+                                    {footer.verifiedLabel}
                                 </span>
                             </div>
                             <div className="flex flex-col items-center gap-1 group">
@@ -83,7 +83,7 @@ const Footer: React.FC<FooterProps> = ({ language }) => {
                                     </div>
                                 </div>
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                                    Compliant
+                                    {footer.compliantLabel}
                                 </span>
                             </div>
                         </div>
@@ -154,7 +154,7 @@ const Footer: React.FC<FooterProps> = ({ language }) => {
                         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-sm border-t border-slate-50 pt-8">
                             <p>{footer.rights}</p>
                             <p className="font-medium">
-                                Made with ❤️ for LinkedIn Creators
+                                {footer.madeWith}
                             </p>
                         </div>
                     </div>
