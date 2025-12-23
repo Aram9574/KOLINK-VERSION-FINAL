@@ -657,7 +657,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
             }
         };
 
-        const fontScale = isPreview ? 0.45 : 1;
+        const fontScale = isPreview ? 0.36 : 1;
 
         const headshotSrc = settings.showHeadshot
             ? (avatarUrl || brandSettings?.logo_url)
@@ -669,7 +669,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                     aspectClasses[aspectRatio]
                 } flex flex-col transition-all duration-500 overflow-hidden relative ${template.styles.container} ${
                     isPreview
-                        ? `${currentDims} rounded-xl shadow-2xl p-12`
+                        ? `${currentDims} rounded-xl shadow-2xl p-9`
                         : `p-24`
                 }`}
                 style={{
@@ -716,7 +716,11 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                         {slide.title}
                     </h2>
 
-                    <div className="flex-1 min-h-0 flex flex-col justify-center gap-6 overflow-hidden">
+                    <div
+                        className={`flex-1 min-h-0 flex flex-col justify-center overflow-hidden ${
+                            isPreview ? "gap-2" : "gap-6"
+                        }`}
+                    >
                         <div className="overflow-y-auto custom-scrollbar pr-2">
                             <p
                                 className={template.styles.content}
@@ -729,6 +733,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                         settings.bodyFontSize * fontScale
                                     }px`,
                                     lineHeight: 1.5,
+                                    whiteSpace: "pre-wrap",
                                 }}
                             >
                                 {slide.content}
@@ -737,7 +742,9 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                     </div>
 
                     <div
-                        className={`shrink-0 mt-8 flex justify-between items-center relative z-20 ${template.styles.footer}`}
+                        className={`shrink-0 flex justify-between items-center relative z-20 ${template.styles.footer} ${
+                            isPreview ? "mt-3" : "mt-8"
+                        }`}
                     >
                         <div className="flex flex-col">
                             {settings.showName && (
@@ -880,6 +887,9 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                     brandSettings?.linkedin_handle || "",
                                 showSlideNumber: true,
                             });
+
+                            // Reset content and slides
+                            setData(initialData);
 
                             onReset?.();
                         }}
