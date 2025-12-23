@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { getAvatarUrl } from "../../../utils";
 import {
     Loader2,
     MessageSquareText,
@@ -136,7 +137,17 @@ const LinkedInExpertChat: React.FC = () => {
                                 }`}
                             >
                                 {msg.role === "user"
-                                    ? <UserCircle2 size={24} />
+                                    ? (
+                                        user && getAvatarUrl(user)
+                                            ? (
+                                                <img
+                                                    src={getAvatarUrl(user)}
+                                                    alt={user.name}
+                                                    className="w-full h-full rounded-full object-cover border-2 border-white/20"
+                                                />
+                                            )
+                                            : <UserCircle2 size={24} />
+                                    )
                                     : <MessageSquareText size={20} />}
                             </div>
 
