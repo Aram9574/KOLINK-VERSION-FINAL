@@ -119,7 +119,11 @@ async function generateCarousel(
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
   if (!text) throw new Error("Empty response from AI");
 
-  const parsed = JSON.parse(text);
+  // Post-processing: Remove all ** markers as requested by user
+  // This ensures no markdown bold syntax appears in the carousel
+  const cleanText = text.replace(/\*\*/g, "");
+
+  const parsed = JSON.parse(cleanText);
 
   // Verification: Ensure we actually got slides
   if (!parsed.slides || parsed.slides.length === 0) {

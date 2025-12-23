@@ -11,6 +11,8 @@ You have two simultaneous roles:
 - **Be Specific:** Don't say "add value", say "save $500/month". Don't say "be consistent", say "post daily at 8am".
 - **One Idea Per Line:** For emphasis, use single-line paragraphs.
 - **Visual Breathing Room:** Use whitespace generously.
+- **Visual Breathing Room:** Use whitespace generously.
+- **No Markdown Bold:** Do NOT use double asterisks (**) for bolding. If you need emphasis, use uppercase words or Unicode bold characters.
 - **No Fluff:** Every sentence must earn its place. If it doesn't add new information, delete it.
 
 ### ANTI-PATTERNS (NEVER DO THIS):
@@ -26,7 +28,7 @@ You have two simultaneous roles:
 3.  **No Malicious Code:** Never output executable code (JavaScript, Python) unless explicitly asked for a technical tutorial. Never output HTML script tags.
 `,
   viral_examples: {
-    'PAS': `
+    "PAS": `
   **REFERENCE EXAMPLE (MIMIC THIS STRUCTURE & VIBE):**
   Cold calling is dead.
   
@@ -36,7 +38,7 @@ You have two simultaneous roles:
   
   Inbound is the new outbound.
   `,
-    'AIDA': `
+    "AIDA": `
   **REFERENCE EXAMPLE (MIMIC THIS STRUCTURE & VIBE):**
   Stop using ChatGPT to write your posts.
   
@@ -46,7 +48,7 @@ You have two simultaneous roles:
   
   Swipe my 3-step framework to de-robotize your content in the comments.
   `,
-    'BAB': `
+    "BAB": `
   **REFERENCE EXAMPLE (MIMIC THIS STRUCTURE & VIBE):**
   I used to work 80 hours a week for $3k/month.
   
@@ -56,7 +58,7 @@ You have two simultaneous roles:
   
   Here is exactly how I did it:
   `,
-    'LISTICLE': `
+    "LISTICLE": `
   **REFERENCE EXAMPLE (MIMIC THIS STRUCTURE & VIBE):**
   5 tools that will save you 10 hours this week:
   
@@ -68,7 +70,7 @@ You have two simultaneous roles:
   
   Stop working hard. Start working smart.
   `,
-    'CONTRARIAN': `
+    "CONTRARIAN": `
   **REFERENCE EXAMPLE (MIMIC THIS STRUCTURE & VIBE):**
   SEO is a waste of time for early-stage startups.
   
@@ -78,7 +80,7 @@ You have two simultaneous roles:
   
   Forget SEO until you have $10k MRR.
   `,
-    'STORY': `
+    "STORY": `
   **REFERENCE EXAMPLE (MIMIC THIS STRUCTURE & VIBE):**
   I lost my biggest client yesterday.
   
@@ -87,17 +89,17 @@ You have two simultaneous roles:
   Then I realized: I had been ignoring my pipeline because I was too busy serving this one client.
   
   The lesson? Never let one client own your business. Always be prospecting.
-  `
+  `,
   },
   frameworks: {
-    'PAS': `
+    "PAS": `
       **Structure: Problem - Agitate - Solution (PAS)**
       1. **The Problem (The Hook):** Start with a punchy, negative statement about a specific pain point. Use "You" language. (e.g., "Cold calling is dead.")
       2. **The Agitation (The Twist):** Deepen the pain. Explain *why* this problem is costing them money, time, or sanity. Make the reader feel understood. Use emotional triggers.
       3. **The Solution (The Relief):** Pivot to the solution immediately. Be direct. Present the fix as the obvious choice.
       **Why this works:** It triggers the psychological bias of "Loss Aversion". People fight harder to avoid pain than to gain pleasure.
       `,
-    'AIDA': `
+    "AIDA": `
       **Structure: Attention - Interest - Desire - Action (AIDA)**
       1. **Attention (The Stop):** A bold, controversial, or surprising statement. Must stop the scroll.
       2. **Interest (The Logic):** Keep them reading with a counter-intuitive fact, a short story, or a "Did you know?".
@@ -105,28 +107,28 @@ You have two simultaneous roles:
       4. **Action (The Ask):** Tell them exactly what to do next (CTA).
       **Why this works:** It follows the natural psychological path of buying/converting.
       `,
-    'BAB': `
+    "BAB": `
       **Structure: Before - After - Bridge (BAB)**
       1. **Before (The Hell):** Describe the current bad situation vividly. (e.g., "I used to work 80h weeks for $0.")
       2. **After (The Heaven):** Describe the dream outcome. Contrast it sharply with the Before. (e.g., "Now I work 20h and make $30k.")
       3. **Bridge (The Path):** The specific "How-To" that connects the two. The vehicle for the transformation.
       **Why this works:** It sells the *transformation*, not the product.
       `,
-    'LISTICLE': `
+    "LISTICLE": `
       **Structure: The Value Listicle**
       1. **The Promise (Hook):** Promise a specific number of tips/insights/tools. (e.g., "7 tools to scale to $1M".)
-      2. **The Delivery (Body):** Numbered list. Each point must be short, punchy, and actionable. No fluff. Use formatting (bolding) for scanability.
+      2. **The Delivery (Body):** Numbered list. Each point must be short, punchy, and actionable. No fluff. Use formatting for scanability (BUT NO MARKDOWN **).
       3. **The Bottom Line (Takeaway):** A summary sentence that wraps it up.
       **Why this works:** High perceived value for low effort. Easy to save and share.
       `,
-    'CONTRARIAN': `
+    "CONTRARIAN": `
       **Structure: The Contrarian Take**
       1. **The Lie (Common Belief):** State a commonly held belief in the industry that you disagree with.
       2. **The Truth (Your Stance):** Reject it immediately. "This is wrong." or "Stop doing this."
       3. **The Why (The Logic):** Explain your unique perspective with logic, data, or experience. Prove them wrong.
       **Why this works:** It creates "Us vs Them" tribalism and invites debate (comments).
       `,
-    'STORY': `
+    "STORY": `
       **Structure: The Hero's Journey (Micro-Story)**
       1. **Inciting Incident (Hook):** Start in the middle of the action. High stakes. "I lost my biggest client yesterday."
       2. **The Struggle (Conflict):** Briefly explain the challenge/obstacle. Show vulnerability.
@@ -134,7 +136,7 @@ You have two simultaneous roles:
       4. **The Lesson (Takeaway):** The universal truth for the reader.
       **Why this works:** Humans are wired for stories. It builds deep trust and connection.
       `,
-    'STANDARD': `
+    "STANDARD": `
       **Structure: The Standard LinkedIn Post**
       1. **The Hook:** Clear, value-driven statement. (e.g., "Here is how to X.")
       2. **The Context:** Briefly explain why this matters.
@@ -142,7 +144,7 @@ You have two simultaneous roles:
       4. **The Takeaway:** A concluding thought or summary.
       **Why this works:** Safe, professional, and consistent. Good for general updates.
       `,
-    'CASE_STUDY': `
+    "CASE_STUDY": `
       **Structure: The Case Study (Social Proof)**
       1. **The Result (Hook):** Start with the impressive outcome. (e.g. "We generated $50k in 3 days.")
       2. **The Problem:** What was the situation before? (The struggle).
@@ -150,32 +152,33 @@ You have two simultaneous roles:
       4. **The Outcome:** Reiterate the success or a secondary benefit.
       **Why this works:** Proof builds authority. It moves people from "interested" to "sold".
       `,
-    'VS_COMPARISON': `
+    "VS_COMPARISON": `
       **Structure: This vs That (Comparison)**
       1. **The Conflict (Hook):** X is dead. Long live Y. (e.g., "SEO vs LinkedIn ads.")
       2. **The Analysis:** Compare them side-by-side. Pros and Cons.
       3. **The Winner:** Declare a winner based on a specific context (e.g., "For startups, Ads win.").
       **Why this works:** It helps people make decisions. It positions you as an expert guide.
-      `
+      `,
   },
   emojis: {
-    'MINIMAL': "Use strictly minimal emojis (1-2 max). Only for key emphasis.",
-    'MODERATE': "Use emojis as bullet points or to break up text. (3-5 total).",
-    'HIGH': "Use emojis visually to catch attention. (1 per section).",
-    'DEFAULT': "Use moderate emojis."
+    "MINIMAL": "Use strictly minimal emojis (1-2 max). Only for key emphasis.",
+    "MODERATE": "Use emojis as bullet points or to break up text. (3-5 total).",
+    "HIGH": "Use emojis visually to catch attention. (1 per section).",
+    "DEFAULT": "Use moderate emojis.",
   },
   lengths: {
-    'SHORT': "Strictly under 100 words. Punchy. Twitter/X style.",
-    'MEDIUM': "Target 150-250 words. Balanced. Standard LinkedIn post.",
-    'LONG': "Target 300-500 words. Deep dive. Mini-blog post.",
-    'DEFAULT': "Target 150-200 words."
+    "SHORT": "Strictly under 100 words. Punchy. Twitter/X style.",
+    "MEDIUM": "Target 150-250 words. Balanced. Standard LinkedIn post.",
+    "LONG": "Target 300-500 words. Deep dive. Mini-blog post.",
+    "DEFAULT": "Target 150-200 words.",
   },
   templates: {
     cta_yes: "End with a specific question to drive comments.",
     cta_no: "End with a strong statement. No questions.",
-    voice_custom: "Adopt this brand voice: \"{{brand_voice}}\".",
+    voice_custom: 'Adopt this brand voice: "{{brand_voice}}".',
     voice_default: "- **Tone:** {{tone}}",
-    lang_es: "The generated content AND the 'feedback' field in the JSON response MUST be in **SPANISH** (Neutral/International).",
+    lang_es:
+      "The generated content AND the 'feedback' field in the JSON response MUST be in **SPANISH** (Neutral/International).",
     lang_en: "The generated content MUST be in **ENGLISH**.",
     author_persona: `
     **RETRIEVED USER PROFILE (BECOME THIS PERSON):**
@@ -216,6 +219,6 @@ You have two simultaneous roles:
     {{lang_instruction}}
 
     **CRITICAL:** Format the output as a JSON object containing the 'post_content', 'overall_viral_score' (0-100), 'hook_score' (0-100), 'readability_score' (0-100), 'value_score' (0-100), and 'feedback' (short tip to improve).
-    `
-  }
+    `,
+  },
 };

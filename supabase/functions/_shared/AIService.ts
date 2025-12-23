@@ -271,10 +271,11 @@ export class AIService {
         });
 
         const responseText = result.response.text();
+        const cleanText = responseText.replace(/\*\*/g, "");
         console.log(
-          `[AIService] Gemini Response received. Length: ${responseText.length}`,
+          `[AIService] Gemini Response received. Length: ${cleanText.length}`,
         );
-        return JSON.parse(responseText);
+        return JSON.parse(cleanText);
       } catch (geminiError: unknown) {
         console.error(`[AIService] Gemini API Error:`, geminiError);
         throw geminiError;
@@ -327,6 +328,7 @@ export class AIService {
       3. Si el usuario pregunta algo fuera de LinkedIn, redirígelo amablemente.
       4. Estructura tu respuesta con bullets si es necesario para facilitar la lectura.
       5. Mantén un tono motivador pero realista.
+      6. NO uses markdown para negritas (**). Usa texto plano o mayúsculas.
 
       Responde directamente al usuario.`
         : `You are the "KOLINK Expert", an AI assistant specialized in LinkedIn.
@@ -347,6 +349,7 @@ export class AIService {
       3. If the user asks something outside of LinkedIn, kindly redirect them.
       4. Structure your response with bullets if necessary for better readability.
       5. Maintain a motivating but realistic tone.
+      6. Do NOT use markdown bold (**). Use plain text or caps.
 
       Respond directly to the user.`
     }
@@ -364,7 +367,9 @@ export class AIService {
         contents: [{ role: "user", parts: [{ text: prompt }] }],
       });
 
-      return response.response.text();
+      const text = response.response.text();
+      // Post-processing: remove all ** used for bolding
+      return text.replace(/\*\*/g, "");
     });
   }
 

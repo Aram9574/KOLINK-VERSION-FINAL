@@ -156,7 +156,7 @@ const LinkedInExpertChat: React.FC = () => {
                                 >
                                     {msg.content.split("\n").map((line, j) => (
                                         <React.Fragment key={j}>
-                                            {line}
+                                            {line.replace(/\*\*/g, "")}
                                             {j <
                                                     msg.content.split("\n")
                                                             .length - 1 && (

@@ -150,7 +150,14 @@ export const useGenerationLogic = ({
                 posts,
                 isAutoPilot,
             );
-            const { post: newPost, updatedUser, gamificationResult } = result;
+            const { post: generatedPost, updatedUser, gamificationResult } =
+                result;
+
+            // Frontend Post-processing: Remove all ** used for bolding
+            const newPost: Post = {
+                ...generatedPost,
+                content: generatedPost.content.replace(/\*\*/g, ""),
+            };
 
             setUser(updatedUser);
             savePostToHistory(newPost);

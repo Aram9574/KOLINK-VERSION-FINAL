@@ -1164,6 +1164,16 @@ const PostEditorView: React.FC = () => {
         );
     };
 
+    const handlePublish = () => {
+        navigator.clipboard.writeText(editorContent);
+        toast.success(
+            language === "es"
+                ? "Texto copiado. Pegalo en LinkedIn."
+                : "Text copied. Paste it on LinkedIn.",
+        );
+        window.open("https://www.linkedin.com/feed/", "_blank");
+    };
+
     const handleSave = async () => {
         if (!editorContent.trim()) {
             toast.error(
@@ -1771,13 +1781,8 @@ const PostEditorView: React.FC = () => {
                         )}
                     </div>
                     <div className="flex items-center gap-4">
-                        <button className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">
-                            <Paperclip className="w-4 h-4" />
-                            {t.attach}
-                            <ChevronDown className="w-3 h-3" />
-                        </button>
                         <button
-                            onClick={handleCopy}
+                            onClick={handlePublish}
                             className="px-6 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-bold hover:bg-brand-700 shadow-lg shadow-brand-500/10 active:scale-95 transition-all flex items-center gap-2"
                         >
                             {t.continueLinkedIn}

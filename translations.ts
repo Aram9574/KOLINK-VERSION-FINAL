@@ -506,7 +506,7 @@ export const translations = {
         openDraft: "Open draft",
         grade: "Grade",
         attach: "Attach",
-        continueLinkedIn: "Continue on LinkedIn",
+        continueLinkedIn: "Publish on LinkedIn",
         copyText: "Copy text",
         theme: "Theme",
         status: {
@@ -1510,7 +1510,7 @@ export const translations = {
         openDraft: "Abrir borrador",
         grade: "Grado",
         attach: "Adjuntar",
-        continueLinkedIn: "Continuar en LinkedIn",
+        continueLinkedIn: "Publicar en LinkedIn",
         copyText: "Copiar texto",
         theme: "Tema",
         status: {

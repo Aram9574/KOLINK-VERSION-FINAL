@@ -160,7 +160,10 @@ export class AIService {
       const text = response.text;
       if (!text) throw new Error("No content generated");
 
-      return JSON.parse(text);
+      // Post-processing: remove all ** used for bolding
+      const cleanText = text.replace(/\*\*/g, "");
+
+      return JSON.parse(cleanText);
     });
   }
 
