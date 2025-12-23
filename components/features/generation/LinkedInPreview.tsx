@@ -105,66 +105,23 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
         setIsEditing(false);
     };
 
-    const handlePublish = async () => {
-        setIsPublishing(true);
-        try {
-            const { data: { session } } = await supabase.auth.getSession();
-            let providerToken = session?.provider_token;
-
-            // FALLBACK FOR MOBILE: If session doesn't have it, check localStorage
-            if (!providerToken) {
-                providerToken = localStorage.getItem("linkedin_provider_token");
-                console.log(
-                    "Using provider_token from localStorage fallback:",
-                    !!providerToken,
-                );
-            }
-
-            if (!providerToken) {
-                toast.error(
-                    "No se detectó conexión con LinkedIn. Por favor inicia sesión nuevamente con LinkedIn.",
-                );
-                return;
-            }
-
-            const { data, error } = await supabase.functions.invoke(
-                "publish-to-linkedin",
-                {
-                    body: {
-                        content: displayContent,
-                        providerToken: providerToken,
-                        visibility: "PUBLIC",
-                    },
-                },
+    const handlePublish = () => {
+        const textToCopy = displayContent || "";
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            toast.success(
+                language === "es"
+                    ? "Texto copiado. Ahora pégalo en LinkedIn."
+                    : "Text copied. Now paste it on LinkedIn.",
             );
-
-            if (error) throw error;
-
-            if (data && !data.success) {
-                throw new Error(data.error || "Error desconocido al publicar");
-            }
-
-            // Success feedback
-            await Haptics.notification({
-                type: NotificationType.Success,
-            });
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 },
-                zIndex: 1000,
-            });
-
-            toast.success("¡Post publicado exitosamente en LinkedIn!");
-        } catch (error: any) {
-            console.error("Publishing error:", error);
-            await Haptics.notification({
-                type: NotificationType.Error,
-            });
-            toast.error(error.message || "Error al publicar en LinkedIn");
-        } finally {
-            setIsPublishing(false);
-        }
+            // Open LinkedIn in a new tab
+            window.open("https://www.linkedin.com/feed/", "_blank");
+        }).catch(() => {
+            toast.error(
+                language === "es"
+                    ? "Error al copiar el texto"
+                    : "Failed to copy text",
+            );
+        });
     };
 
     const getScoreColor = (score: number) => {
