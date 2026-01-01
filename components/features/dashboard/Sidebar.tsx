@@ -11,6 +11,7 @@ import {
     MessageSquareText,
     Settings as SettingsIcon,
     Sparkles,
+    FileText,
 } from "lucide-react";
 import { AppLanguage, AppTab, Post, UserProfile } from "../../../types";
 import GamificationWidget from "./GamificationWidget";
@@ -87,18 +88,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </button>
 
                 <button
-                    onClick={() => setActiveTab("auditor")}
+                    onClick={() => setActiveTab("audit")}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
                 ${
-                        activeTab === "auditor"
+                        activeTab === "audit"
                             ? "bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-200"
                             : "text-slate-600 hover:bg-slate-50"
                     }`}
                 >
-                    <Sparkles className="w-5 h-5" />
-                    {language === "es"
-                        ? "Auditor de Perfil"
-                        : "Profile Auditor"}
+                    <FileText className="w-5 h-5" />
+                    {t.audit}
                     {!user.isPremium && (
                         <Crown className="w-4 h-4 text-amber-500 fill-amber-500/20 ml-auto flex-shrink-0" />
                     )}

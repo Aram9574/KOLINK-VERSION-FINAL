@@ -1,5 +1,4 @@
-// This is a dummy component to return content. I'm actually switching to view_file.
-// See my thought process.
+import React, { useState, useEffect } from 'react';
 import { useUser } from "../../../context/UserContext";
 import { PostProvider, usePosts } from "../../../context/PostContext";
 import { useSubscription } from "../../../hooks/useSubscription";
@@ -12,18 +11,17 @@ import DashboardLayout from "../../layouts/DashboardLayout";
 import HistoryView from "../history/HistoryView";
 import SettingsView from "../settings/SettingsView";
 
-import AutoPilotView from "../autopilot/AutoPilotView";
+import AutoPostView from "../autopost/AutoPostView";
 import UpgradeModal from "../../modals/UpgradeModal";
 import CancellationModal from "../../modals/CancellationModal";
 import LevelUpModal from "../../modals/LevelUpModal";
 import { updateUserProfile } from "../../../services/userRepository";
-import ProfileAuditor from "../auditor/ProfileAuditor";
-import LockedAuditorState from "../auditor/LockedAuditorState";
-import LockedAutoPilotState from "../autopilot/LockedAutoPilotState";
+
+import LockedAutoPostState from "../autopost/LockedAutoPostState";
 import LockedHistoryState from "../history/LockedHistoryState";
 import ReferralModal from "../../modals/ReferralModal";
 import { toast } from "sonner";
-import { UserProfile } from "../../../types";
+import { AppLanguage, AppTab, UserProfile } from "../../../types";
 import { translations } from "../../../translations";
 import { Suspense } from "react";
 
@@ -58,23 +56,13 @@ const MobileDashboardContent: React.FC = () => {
     }, []);
 
     // UI State
-    const [activeTab, setActiveTabRaw] = useState<
-        "create" | "history" | "settings" | "autopilot" | "auditor" | "ideas"
-    >(() => {
+    const [activeTab, setActiveTabRaw] = useState<AppTab>(() => {
         const saved = localStorage.getItem("kolink_active_tab");
         if (saved === "ideas") return "create";
         return (saved as any) || "create";
     });
 
-    const setActiveTab = (
-        tab:
-            | "create"
-            | "history"
-            | "settings"
-            | "autopilot"
-            | "auditor"
-            | "ideas",
-    ) => {
+    const setActiveTab = (tab: AppTab) => {
         setActiveTabRaw(tab);
         localStorage.setItem("kolink_active_tab", tab);
     };
@@ -344,13 +332,13 @@ const MobileDashboardContent: React.FC = () => {
                                 </div>
                                 {user.planTier === "free"
                                     ? (
-                                        <LockedAutoPilotState
+                                        <LockedAutoPostState
                                             onUpgrade={() =>
                                                 setShowUpgradeModal(true)}
                                         />
                                     )
                                     : (
-                                        <AutoPilotView
+                                        <AutoPostView
                                             user={user}
                                             language={language}
                                             onViewPost={(post) => {
@@ -390,30 +378,7 @@ const MobileDashboardContent: React.FC = () => {
                             </div>
                         )}
 
-                        {activeTab === "auditor" && (
-                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div className="px-6 pt-6 pb-2">
-                                    <h1 className="text-3xl font-display font-bold text-slate-900 leading-tight">
-                                        {language === "es"
-                                            ? "Auditor"
-                                            : "Auditor"}
-                                    </h1>
-                                    <p className="text-slate-500 text-sm mt-1">
-                                        {language === "es"
-                                            ? "Analiza tu perfil de LinkedIn."
-                                            : "Analyze your LinkedIn profile."}
-                                    </p>
-                                </div>
-                                {user.planTier === "free"
-                                    ? (
-                                        <LockedAuditorState
-                                            onUpgrade={() =>
-                                                setShowUpgradeModal(true)}
-                                        />
-                                    )
-                                    : <ProfileAuditor />}
-                            </div>
-                        )}
+
                     </div>
                 </div>
             </div>

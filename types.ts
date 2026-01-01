@@ -116,11 +116,10 @@ export type AppTab =
   | "history"
   | "settings"
   | "autopilot"
-  | "auditor"
-  | "ideas"
   | "carousel"
   | "chat"
-  | "editor";
+  | "editor"
+  | "audit";
 
 export interface AutoPilotConfig {
   enabled: boolean;
@@ -166,6 +165,10 @@ export interface UserProfile {
   unlockedAchievements: string[]; // Array of Achievement IDs
   // AutoPilot
   autoPilot?: AutoPilotConfig;
+  // Deletion Policy
+  created_at?: string;
+  scheduled_for_deletion?: boolean;
+  deletion_date?: string;
 }
 
 export interface CustomSource {
@@ -191,37 +194,37 @@ export interface BrandVoice {
   isActive?: boolean;
   created_at?: string;
 }
-
-export interface AuditResult {
-  perfil_resumen: {
-    nombre: string;
-    sector: string;
-    score_actual: number; // Overall Score
+export interface LinkedInAuditResult {
+  score: number;
+  summary: string;
+  headline: {
+    current: string;
+    suggested: string;
+    analysis: string;
   };
-  pilares: {
-    pilar_1_fundamento: {
-      score: number; // 0-100
-      analisis_titular: string; // Formula check
-      propuesta_titular_a: string;
-      propuesta_titular_b: string;
-      foto_banner_check: string; // "Professional", "Needs Improvement"
-      url_check: string;
-    };
-    pilar_2_narrativa: {
-      score: number; // 0-100
-      gancho_analisis: string; // First 2 lines check
-      redaccion_gancho_sugerida: string;
-      experiencia_analisis: string; // Metrics check
-      experiencia_mejoras: Array<{
-        empresa: string;
-        propuesta_metrica: string;
-      }>;
-    };
-    pilar_3_visibilidad: {
-      score: number; // 0-100
-      estrategia_contenido: string; // Carousel, etc.
-      estrategia_networking: string; // 15 words rule, etc.
-    };
+  about: {
+    analysis: string;
+    suggested: string;
+    missingKeywords: string[];
   };
-  quick_wins: string[];
+  experience: {
+    company: string;
+    position: string;
+    analysis: string;
+    suggestions: string[];
+  }[];
+  skills: {
+    current: string[];
+    missing: string[];
+    analysis: string;
+  };
 }
+
+export interface LinkedInAudit {
+  id: string;
+  user_id: string;
+  profile_url: string;
+  results: LinkedInAuditResult;
+  created_at: string;
+}
+

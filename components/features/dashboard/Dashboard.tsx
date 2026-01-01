@@ -12,18 +12,18 @@ import DashboardLayout from "../../layouts/DashboardLayout";
 import HistoryView from "../history/HistoryView";
 import SettingsView from "../settings/SettingsView";
 
-import AutoPilotView from "../autopilot/AutoPilotView";
+import AutoPostView from "../autopost/AutoPostView";
 import UpgradeModal from "../../modals/UpgradeModal";
 import CancellationModal from "../../modals/CancellationModal";
 import LevelUpModal from "../../modals/LevelUpModal";
 import { updateUserProfile } from "../../../services/userRepository";
-import ProfileAuditor from "../auditor/ProfileAuditor";
-import LockedAuditorState from "../auditor/LockedAuditorState";
-import LockedAutoPilotState from "../autopilot/LockedAutoPilotState";
+
+import LockedAutoPostState from "../autopost/LockedAutoPostState";
 import LockedHistoryState from "../history/LockedHistoryState";
 import LockedCarouselState from "../generation/LockedCarouselState";
 import LockedChatState from "../chat/LockedChatState";
 import LockedEditorState from "../editor/LockedEditorState";
+import LockedAuditState from "../audit/LockedAuditState";
 import ReferralModal from "../../modals/ReferralModal";
 import { Gift } from "lucide-react";
 
@@ -39,6 +39,9 @@ const LinkedInExpertChat = React.lazy(() =>
     import("../chat/LinkedInExpertChat")
 );
 const PostEditorView = React.lazy(() => import("../editor/PostEditorView"));
+const LinkedInAuditView = React.lazy(() =>
+    import("../audit/LinkedInAuditView")
+);
 
 const DashboardContent: React.FC = () => {
     const { user, refreshUser, setUser, language, setLanguage } = useUser();
@@ -165,7 +168,7 @@ const DashboardContent: React.FC = () => {
         >
             <div
                 className={`h-full ${
-                    ["history", "editor", "chat", "carousel"].includes(
+                    ["history", "editor", "chat", "carousel", "audit"].includes(
                             activeTab,
                         )
                         ? "overflow-hidden"
@@ -174,7 +177,7 @@ const DashboardContent: React.FC = () => {
             >
                 <div
                     className={`${
-                        ["history", "editor", "chat", "carousel"].includes(
+                        ["history", "editor", "chat", "carousel", "audit"].includes(
                                 activeTab,
                             )
                             ? "h-full w-full flex flex-col"
@@ -255,13 +258,13 @@ const DashboardContent: React.FC = () => {
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                             {user.planTier === "free"
                                 ? (
-                                    <LockedAutoPilotState
+                                    <LockedAutoPostState
                                         onUpgrade={() =>
                                             setShowUpgradeModal(true)}
                                     />
                                 )
                                 : (
-                                    <AutoPilotView
+                                    <AutoPostView
                                         user={user}
                                         language={language}
                                         onViewPost={(post) => {
@@ -285,18 +288,10 @@ const DashboardContent: React.FC = () => {
                         </div>
                     )}
 
-                    {activeTab === "auditor" && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            {user.planTier === "free"
-                                ? (
-                                    <LockedAuditorState
-                                        onUpgrade={() =>
-                                            setShowUpgradeModal(true)}
-                                    />
-                                )
-                                : <ProfileAuditor />}
-                        </div>
-                    )}
+
+
+
+
 
                     {activeTab === "carousel" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0">
@@ -354,6 +349,27 @@ const DashboardContent: React.FC = () => {
                                         />
                                     )
                                     : <PostEditorView />}
+                            </Suspense>
+                        </div>
+                    )}
+
+                    {activeTab === "audit" && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">
+                            <Suspense
+                                fallback={
+                                    <div className="flex-1 flex items-center justify-center">
+                                        <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                                    </div>
+                                }
+                            >
+                                {user.planTier === "free"
+                                    ? (
+                                        <LockedAuditState
+                                            onUpgrade={() =>
+                                                setShowUpgradeModal(true)}
+                                        />
+                                    )
+                                    : <LinkedInAuditView />}
                             </Suspense>
                         </div>
                     )}

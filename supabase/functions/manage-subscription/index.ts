@@ -69,24 +69,68 @@ serve(async (req) => {
         const subscriptionId = activeSub.id
 
         if (action === 'cancel') {
-            // Cancel at period end
-            const updatedSub = await stripe.subscriptions.update(subscriptionId, {
-                cancel_at_period_end: true,
-                metadata: {
-                    cancellation_reason: reason || 'Unknown'
-                }
-            })
-
-            // Update profile
-            await supabaseClient
+            // Get profile creation date
+            const { data: profileData, error: profileFetchError } = await supabaseClient
                 .from('profiles')
-                .update({ subscription_status: 'canceled_pending', cancel_at_period_end: true })
+                .select('created_at')
                 .eq('id', user.id)
+                .single()
 
-            return new Response(
-                JSON.stringify({ success: true, message: 'Subscription canceled at period end', subscription: updatedSub }),
-                { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-            )
+            if (profileFetchError) throw profileFetchError
+
+            const createdAt = new Date(profileData.created_at)
+            const thirtyDaysAgo = new Date()
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+            const isNewAccount = createdAt > thirtyDaysAgo
+
+            if (isNewAccount) {
+                // Schedule for deletion in 3 days
+                const deletionDate = new Date()
+                deletionDate.setDate(deletionDate.getDate() + 3)
+
+                await supabaseClient
+                    .from('profiles')
+                    .update({ 
+                        scheduled_for_deletion: true, 
+                        deletion_date: deletionDate.toISOString(),
+                        subscription_status: 'canceled'
+                    })
+                    .eq('id', user.id)
+
+                // We also cancel stripe sub immediately to avoid further charges
+                await stripe.subscriptions.update(subscriptionId, {
+                    cancel_at_period_end: false, // immediate cancel if we are deleting the account
+                })
+                
+                return new Response(
+                    JSON.stringify({ 
+                        success: true, 
+                        message: 'Account scheduled for deletion in 3 days due to cancellation policy for new accounts.', 
+                        scheduledForDeletion: true,
+                        deletionDate: deletionDate.toISOString()
+                    }),
+                    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                )
+            } else {
+                // Regular cancellation at period end for older accounts
+                const updatedSub = await stripe.subscriptions.update(subscriptionId, {
+                    cancel_at_period_end: true,
+                    metadata: {
+                        cancellation_reason: reason || 'Unknown'
+                    }
+                })
+
+                await supabaseClient
+                    .from('profiles')
+                    .update({ subscription_status: 'canceled_pending', cancel_at_period_end: true })
+                    .eq('id', user.id)
+
+                return new Response(
+                    JSON.stringify({ success: true, message: 'Subscription canceled at period end', subscription: updatedSub }),
+                    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                )
+            }
         } else if (action === 'apply_coupon') {
             if (!couponId) throw new Error('Coupon ID required')
 

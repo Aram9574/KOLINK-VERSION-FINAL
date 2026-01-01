@@ -42,10 +42,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = (
                             ? "Generador de Ideas"
                             : "Idea Generator")}
                         {activeTab === "autopilot" && "AutoPilot"}
-                        {activeTab === "auditor" &&
-                            (language === "es"
-                                ? "Auditor de Perfil"
-                                : "Profile Auditor")}
                         {activeTab === "carousel" &&
                             (language === "es"
                                 ? "Generador de Carrusel"

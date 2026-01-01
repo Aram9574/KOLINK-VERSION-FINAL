@@ -88,7 +88,7 @@ const LoginPage: React.FC = () => {
                     email,
                     password,
                     options: {
-                        emailRedirectTo: `https://${APP_DOMAIN}/dashboard`,
+                        emailRedirectTo: `${window.location.origin}/auth/callback`,
                         data: localStorage.getItem("kolink_referral_code")
                             ? {
                                 referred_by: localStorage.getItem(

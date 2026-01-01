@@ -15,6 +15,7 @@ import FaqSection from "./FaqSection";
 import Footer from "./Footer";
 import { useUser } from "../../context/UserContext";
 import LogoCarousel from "./LogoCarousel";
+import VideoDemoSection from "./VideoDemoSection";
 
 const LandingPage: React.FC = () => {
     const { user, language, setLanguage } = useUser();
@@ -178,6 +179,8 @@ const LandingPage: React.FC = () => {
                     mockContent={mockContent}
                     scrollToSection={scrollToSection}
                 />
+
+                <VideoDemoSection language={language} />
 
                 <ToolsSection language={language} />
 

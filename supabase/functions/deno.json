@@ -10,10 +10,13 @@
     "zod": "https://esm.sh/zod@3.22.4",
     "std/http/server": "https://deno.land/std@0.168.0/http/server.ts",
     "stripe": "npm:stripe@^14.0.0",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
     "@google/genai": "npm:@google/genai@^0.2.0",
     "@google/generative-ai": "npm:@google/generative-ai@^0.22.0",
     "youtube-transcript": "https://esm.sh/youtube-transcript@1.2.1",
-    "cheerio": "https://esm.sh/cheerio@1.0.0-rc.12"
+    "cheerio": "https://esm.sh/cheerio@1.0.0-rc.12",
+    "unpdf": "https://esm.sh/unpdf@0.1.1",
+    "pdf-parse": "npm:pdf-parse@1.1.1",
+    "base64": "https://deno.land/std@0.208.0/encoding/base64.ts"
   }
 }

@@ -14,6 +14,7 @@ interface CancellationModalProps {
     subscriptionId?: string;
     onCancelSuccess?: () => void;
     planPrice: number;
+    userCreatedAt?: string;
 }
 
 const CancellationModal: React.FC<CancellationModalProps> = ({
@@ -24,6 +25,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
     subscriptionId,
     onCancelSuccess,
     planPrice,
+    userCreatedAt,
 }) => {
     const [step, setStep] = useState<"reason" | "offer" | "confirm">("reason");
     const [reason, setReason] = useState("");
@@ -120,6 +122,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
                         onClose={() => setStep("offer")}
                         isLoading={loading}
                         language={language}
+                        userCreatedAt={userCreatedAt}
                     />
                 );
         }

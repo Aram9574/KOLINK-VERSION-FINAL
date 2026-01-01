@@ -101,6 +101,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpg
                 isOpen={showCancelModal}
                 onClose={() => setShowCancelModal(false)}
                 userEmail={user.email || ''}
+                userCreatedAt={user.created_at}
                 subscriptionId={user.subscriptionId}
                 language={language}
                 planPrice={PLANS.find(p => p.id === user.planTier)?.price || 0}

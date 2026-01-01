@@ -3,7 +3,8 @@ import {
   Schema,
   SchemaType,
   Tool,
-} from "@google/generative-ai";
+} from "npm:@google/generative-ai@^0.22.0";
+import { LinkedInAuditResult, LinkedInPDFData } from "./types.ts";
 import {
   getEmojiInstructions,
   getFrameworkInstructions,
@@ -370,6 +371,146 @@ export class AIService {
       const text = response.response.text();
       // Post-processing: remove all ** used for bolding
       return text.replace(/\*\*/g, "");
+    });
+  }
+
+  /**
+   * Extracts structured data from a LinkedIn profile PDF using multimodal Gemini.
+   */
+  async extractLinkedInPDF(pdfBase64: string): Promise<LinkedInPDFData> {
+    const prompt = `
+      You are a data extraction expert. Below is a LinkedIn profile PDF (provided as base64).
+      Extract all relevant professional information into the following JSON structure:
+      
+      {
+        "full_name": "string",
+        "profile_url": "string (The LinkedIn profile URL usually found in the PDF footer or header)",
+        "headline": "string",
+        "summary": "string",
+        "occupation": "string",
+        "experiences": [
+          {
+            "company": "string",
+            "position": "string",
+            "duration": "string",
+            "description": "string"
+          }
+        ],
+        "skills": ["string"],
+        "education": ["string"]
+      }
+      
+      IMPORTANT: If the PDF is empty or invalid, return an empty object with an error field.
+      Look carefully for the 'linkedin.com/in/...' URL as it's crucial for the hybrid strategy.
+    `;
+
+    return await this.retryWithBackoff(async () => {
+      const model = this.genAI.getGenerativeModel({
+        model: this.model,
+      });
+
+      const result = await model.generateContent({
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: prompt },
+              {
+                inlineData: {
+                  data: pdfBase64,
+                  mimeType: "application/pdf",
+                },
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.1,
+          responseMimeType: "application/json",
+        },
+      });
+
+      return JSON.parse(result.response.text());
+    });
+  }
+
+  /**
+   * Performs a comprehensive LinkedIn Profile Audit.
+   */
+  async analyzeLinkedInProfile(
+    profileData: LinkedInPDFData & { avatar_url?: string; banner_url?: string | null },
+    language: string = "es",
+  ): Promise<LinkedInAuditResult> {
+    const isSpanish = language === "es";
+    
+    // Convert profileData to a consolidated text context for the AI
+    // We filter or clean it if needed, but for now we pass it as JSON
+    const profileContext = JSON.stringify(profileData);
+
+    const prompt = `
+      Act as a world-class Personal Branding Expert and LinkedIn Strategist.
+      Your task is to conduct a MASTER AUDIT of this LinkedIn profile.
+      
+      [INPUT DATA]
+      ${profileContext}
+      
+      [INSTRUCTIONS]
+      1. Analyze the current Headline, About/Summary, Experience/Roles, and listed Skills.
+      2. Identify content gaps, lack of metrics, and SEO opportunities.
+      3. Generate optimized alternatives for Headline and About that maximize visibility and authority.
+      4. For Experience, provide specific feedback for EACH role, emphasizing results and metrics (%, $, #).
+      5. Identify missing critical skills based on their current industry and position.
+      
+      [JSON STRUCTURE REQUIRED]
+      {
+        "score": number (0-100),
+        "summary": "One-sentence high-level assessment",
+        "headline": {
+          "current": "string",
+          "suggested": "string",
+          "analysis": "string"
+        },
+        "about": {
+          "analysis": "string",
+          "suggested": "string",
+          "missingKeywords": ["string"]
+        },
+        "experience": [
+          {
+            "company": "string",
+            "position": "string",
+            "analysis": "string",
+            "suggestions": ["string"]
+          }
+        ],
+        "skills": {
+          "current": ["string"],
+          "missing": ["string"],
+          "analysis": "string"
+        }
+      }
+      
+      IMPORTANT: All text in the JSON MUST be written in ${isSpanish ? "SPANISH (Español)" : "ENGLISH"}.
+      BE CRITICAL. If data is missing or poor, point it out.
+    `;
+
+    return await this.retryWithBackoff(async () => {
+      const model = this.genAI.getGenerativeModel({
+        model: this.model,
+      });
+
+      const response = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.2,
+          responseMimeType: "application/json",
+        },
+      });
+
+      const auditResult: LinkedInAuditResult = JSON.parse(response.response.text());
+      
+      
+      return auditResult;
     });
   }
 

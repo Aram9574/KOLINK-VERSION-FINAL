@@ -19,7 +19,7 @@ export const translations = {
       titleLine1: "Stop staring at a",
       titleLine2: "blank page.",
       subtitle:
-        'Kolink is the AI studio that architects viral LinkedIn posts using proven psychological frameworks. From idea to "Post" in 30 seconds.',
+        "Turn loose ideas into viral posts that connect. Your AI studio to dominate LinkedIn in seconds, not hours.",
       ctaPrimary: "Start Creating for Free",
       ctaSecondary: "Watch Demo",
       generating: "Generating Viral Post...",
@@ -158,15 +158,6 @@ export const translations = {
             authored: "⚠️",
           },
         },
-        {
-          name: "Access to Viral Posts Database",
-          values: {
-            kolink: "✅",
-            taplio: "✅",
-            supergrow: "✅",
-            authored: "❌",
-          },
-        },
       ],
     },
     roi: {
@@ -206,30 +197,40 @@ export const translations = {
       title: "Everything you need to go viral",
       subtitle:
         "We don't just write text. We engineer engagement using data-backed structures.",
-      tools: {
-        title: "Platform Tools",
-        subtitle: "A complete suite of tools to dominate LinkedIn.",
-        studio: {
-          title: "Viral Studio",
-          desc:
-            "Your creative command center. Generate viral posts, edit with AI, and perfect your content before publishing.",
+        tools: {
+          title: "Platform Tools",
+          subtitle: "A complete suite to dominate LinkedIn.",
+          studio: {
+            title: "Viral Studio",
+            desc:
+              "Your creative command center. Generate viral posts, edit with AI, and perfect your content before publishing.",
+          },
+          nexus: {
+            title: "Nexus AI",
+            desc:
+              "Your strategic AI assistant. Chat with your data, brainstorm angles, and get instant feedback on your strategy.",
+          },
+          editor: {
+            title: "Post Editor",
+            desc:
+              "Distraction-free editor with real-time preview. Format perfect hooks and snippets for maximum readability.",
+          },
+          carousel: {
+            title: "Carousel Generator",
+            desc:
+              "Turn any text or URL into a stunning PDF carousel. No design skills needed, just pure value.",
+          },
+          autopost: {
+            title: "AutoPost",
+            desc:
+              "Growth on autopilot. Schedule your strategy and let AI generate and publish content for you while you sleep.",
+          },
+          audit: {
+            title: "Profile Audit",
+            desc:
+              "Analyze your profile with AI to detect gaps and optimize keywords for maximum visibility.",
+          },
         },
-        autopilot: {
-          title: "AutoPilot",
-          desc:
-            "Growth on autopilot. Schedule your strategy and let AI generate and publish content for you while you sleep.",
-        },
-        audit: {
-          title: "Profile Audit",
-          desc:
-            "Analyze your LinkedIn profile. Discover what you're doing wrong and get personalized recommendations to optimize your conversion.",
-        },
-        brandVoice: {
-          title: "Brand Voice",
-          desc:
-            "Clone your unique style. Train the AI to write exactly like you, maintaining your authenticity in every post.",
-        },
-      },
       f1Title: "6 Viral Frameworks",
 
       f1Desc:
@@ -305,7 +306,6 @@ export const translations = {
           features: [
             "Everything in Pro",
             "Multi-Account",
-            "Monthly Audit",
             "Hook A/B Testing",
             "Buffer Integration",
             "24/7 VIP Support",
@@ -451,7 +451,7 @@ export const translations = {
         studio: "Studio",
         carousel: "Carousel Generator",
         ideas: "Idea Generator",
-        autopilot: "AutoPilot",
+        autopilot: "AutoPost",
         history: "History",
         settings: "Settings",
         library: "Library",
@@ -461,6 +461,34 @@ export const translations = {
         creditsLeft: "credits left",
         logout: "Log Out",
         editor: "Post Editor",
+        audit: "Profile Audit",
+      },
+      audit: {
+        title: "LinkedIn Profile Optimization",
+        subtitle: "Analyze your digital presence with our IA engine. We detect content gaps and optimize your visibility for recruiters.",
+        inputLabel: "Download the PDF from LinkedIn and upload it here",
+        inputPlaceholder: "Click to upload or drag your LinkedIn PDF",
+        buttonAction: "Start Hybrid Audit",
+        pdfHint: "The PDF identifies you and we use the URL to scrape visual elements.",
+        processing: {
+          step1: "Extracting profile text from PDF...",
+          step2: "Identifying your Profile URL...",
+          step3: "Scraping visual data with Bright Data...",
+          step4: "Generating deep AI audit results...",
+        },
+        results: {
+          scoreTitle: "Audit Score",
+          summaryTitle: "AI Summary",
+          headline: "Headline",
+          about: "About",
+          experience: "Experience",
+          skills: "Skills",
+          current: "Current",
+          suggested: "Suggested",
+          analysis: "AI Analysis",
+          copyBtn: "Copy to clipboard",
+          copied: "Copied!",
+        }
       },
       editor: {
         title: "Post Editor",
@@ -800,6 +828,7 @@ export const translations = {
           goBack: "Go Back",
           confirmBtn: "Confirm Cancellation",
           canceling: "Canceling...",
+          deletionWarning: "IMPORTANT: If you cancel now, your account will be PERMANENTLY DELETED in 3 days due to our coupon abuse policy (only for accounts under 1 month old).",
         },
       },
       upgrade: {
@@ -1009,7 +1038,7 @@ export const translations = {
       titleLine1: "Crea contenido de autoridad",
       titleLine2: "en LinkedIn 10x más rápido.",
       subtitle:
-        "Deja de perder horas frente a la pantalla. Kolink es el estudio de IA que utiliza estructuras virales probadas para convertir tus ideas en posts de alto impacto. Diseñado para profesionales que no tienen tiempo que perder.",
+        "Convierte ideas sueltas en posts virales que conectan. Tu estudio de IA para dominar LinkedIn en segundos, no horas.",
       ctaPrimary: "Generar mi primer post ahora",
       ctaSecondary: "Ver Demo",
       generating: "Generando Post Viral...",
@@ -1150,15 +1179,6 @@ export const translations = {
             authored: "⚠️",
           },
         },
-        {
-          name: "Acceso a Base de Datos de Posts Virales",
-          values: {
-            kolink: "✅",
-            taplio: "✅",
-            supergrow: "✅",
-            authored: "❌",
-          },
-        },
       ],
     },
     roi: {
@@ -1206,20 +1226,30 @@ export const translations = {
           desc:
             "Tu centro de comando creativo. Genera posts virales, edita con IA y perfecciona tu contenido antes de publicar.",
         },
-        autopilot: {
-          title: "AutoPilot",
+        nexus: {
+          title: "Nexus AI",
+          desc:
+            "Tu asistente estratégico IA. Chatea con tus datos, idea ángulos y recibe feedback instantáneo sobre tu estrategia.",
+        },
+        editor: {
+          title: "Editor de Posts",
+          desc:
+            "Editor sin distracciones con vista previa real. Formatea ganchos y snippets perfectos para máxima legibilidad.",
+        },
+        carousel: {
+          title: "Generador de Carrusel",
+          desc:
+            "Convierte cualquier texto o URL en un carrusel PDF impresionante. Sin habilidades de diseño, solo valor puro.",
+        },
+        autopost: {
+          title: "AutoPost",
           desc:
             "Crecimiento en piloto automático. Programa tu estrategia y deja que la IA genere y publique contenido por ti mientras duermes.",
         },
         audit: {
           title: "Auditoría de Perfil",
           desc:
-            "Analiza tu perfil de LinkedIn. Descubre puntos débiles y recibe recomendaciones para convertir visitas en seguidores.",
-        },
-        brandVoice: {
-          title: "Voz de Marca",
-          desc:
-            "Clona tu estilo único. Entrena a la IA para que escriba exactamente como tú, manteniendo tu autenticidad en cada post.",
+            "Analiza tu perfil con IA para detectar brechas y optimizar palabras clave para máxima visibilidad.",
         },
       },
       f1Title: "6 Marcos Virales",
@@ -1296,7 +1326,6 @@ export const translations = {
           features: [
             "Todo lo del Creador Pro, más:",
             "Multi-Cuenta (Agencias)",
-            "Auditoría de Perfil Mensual",
             "A/B Testing de Ganchos",
             "Integración Buffer/Hootsuite",
             "Soporte VIP Dedicado 24/7",
@@ -1454,7 +1483,7 @@ export const translations = {
         studio: "Estudio",
         carousel: "Generador de Carrusel",
         ideas: "Generador de Ideas",
-        autopilot: "AutoPilot",
+        autopilot: "AutoPost",
         history: "Historial",
         settings: "Ajustes",
         library: "Biblioteca",
@@ -1462,9 +1491,37 @@ export const translations = {
         upgradeNow: "Mejorar Plan",
         unlockDesc:
           "Desbloquea generaciones ilimitadas y modos virales avanzados.",
-        creditsLeft: "créditos",
+        creditsLeft: "créditos restantes",
         logout: "Cerrar Sesión",
         editor: "Editor de Posts",
+        audit: "Auditoría de Perfil",
+      },
+      audit: {
+        title: "Optimización de Perfil LinkedIn",
+        subtitle: "Analiza tu presencia digital con nuestro motor de IA. Detectamos brechas de contenido y optimizamos tu visibilidad para reclutadores.",
+        inputLabel: "Descarga el PDF de LinkedIn y súbelo aquí",
+        inputPlaceholder: "Haz clic para subir o arrastra tu PDF de LinkedIn",
+        buttonAction: "Iniciar Auditoría Híbrida",
+        pdfHint: "El PDF te identifica y usamos la URL interna para obtener tus fotos.",
+        processing: {
+          step1: "Extrayendo texto del PDF...",
+          step2: "Identificando tu URL de Perfil...",
+          step3: "Obteniendo datos visuales con Bright Data...",
+          step4: "Generando resultados de auditoría profunda...",
+        },
+        results: {
+          scoreTitle: "Puntuación de Auditoría",
+          summaryTitle: "Resumen IA",
+          headline: "Titular",
+          about: "Extracto",
+          experience: "Experiencia",
+          skills: "Aptitudes",
+          current: "Actual",
+          suggested: "Sugerido",
+          analysis: "Análisis IA",
+          copyBtn: "Copiar al portapapeles",
+          copied: "¡Copiado!",
+        }
       },
       editor: {
         title: "Editor de Posts",
@@ -1814,6 +1871,7 @@ export const translations = {
           goBack: "Volver",
           confirmBtn: "Confirmar Cancelación",
           canceling: "Cancelando...",
+          deletionWarning: "IMPORTANTE: Si cancelas ahora, tu cuenta será ELIMINADA PERMANENTEMENTE en 3 días debido a nuestra política contra el abuso de cupones (solo para cuentas con menos de 1 mes).",
         },
       },
       upgrade: {

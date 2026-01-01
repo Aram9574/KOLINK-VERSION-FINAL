@@ -44,12 +44,6 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             isPremium: true,
         },
         {
-            id: "auditor" as const,
-            icon: Sparkles,
-            label: language === "es" ? "Auditor" : "Auditor",
-            isPremium: true,
-        },
-        {
             id: "carousel" as const,
             icon: Crown,
             label: language === "es" ? "Carrusel" : "Carousel",

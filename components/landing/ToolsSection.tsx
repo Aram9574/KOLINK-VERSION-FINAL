@@ -1,9 +1,12 @@
 import React from "react";
 import {
     PiArrowRightBold,
-    PiFingerprintDuotone,
+    PiFilesDuotone,
+    PiFingerprintDuotone, // Kept generic import just in case, though unused in grid now
+    PiLightningDuotone,
     PiMagicWandDuotone,
     PiMagnifyingGlassDuotone,
+    PiPencilSimpleDuotone,
     PiRocketLaunchDuotone,
 } from "react-icons/pi";
 import { AppLanguage } from "../../types";
@@ -26,12 +29,36 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ language }) => {
             border: "group-hover:border-blue-200",
         },
         {
-            icon: PiRocketLaunchDuotone,
-            title: t.features.tools.autopilot.title,
-            desc: t.features.tools.autopilot.desc,
+            icon: PiLightningDuotone,
+            title: t.features.tools.nexus.title,
+            desc: t.features.tools.nexus.desc,
             color: "text-amber-600",
             bg: "bg-amber-50",
             border: "group-hover:border-amber-200",
+        },
+        {
+            icon: PiPencilSimpleDuotone,
+            title: t.features.tools.editor.title,
+            desc: t.features.tools.editor.desc,
+            color: "text-indigo-600",
+            bg: "bg-indigo-50",
+            border: "group-hover:border-indigo-200",
+        },
+        {
+            icon: PiFilesDuotone,
+            title: t.features.tools.carousel.title,
+            desc: t.features.tools.carousel.desc,
+            color: "text-pink-600",
+            bg: "bg-pink-50",
+            border: "group-hover:border-pink-200",
+        },
+        {
+            icon: PiRocketLaunchDuotone,
+            title: t.features.tools.autopost.title,
+            desc: t.features.tools.autopost.desc,
+            color: "text-orange-600",
+            bg: "bg-orange-50",
+            border: "group-hover:border-orange-200",
         },
         {
             icon: PiMagnifyingGlassDuotone,
@@ -40,14 +67,6 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ language }) => {
             color: "text-purple-600",
             bg: "bg-purple-50",
             border: "group-hover:border-purple-200",
-        },
-        {
-            icon: PiFingerprintDuotone,
-            title: t.features.tools.brandVoice.title,
-            desc: t.features.tools.brandVoice.desc,
-            color: "text-rose-600",
-            bg: "bg-rose-50",
-            border: "group-hover:border-rose-200",
         },
     ];
 
@@ -63,7 +82,7 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({ language }) => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {tools.map((tool, index) => (
                         <div
                             key={index}

@@ -2859,6 +2859,7 @@
     }
   },
   "redirects": {
+    "https://esm.run/@google/generative-ai": "https://cdn.jsdelivr.net/npm/@google/generative-ai/+esm",
     "https://esm.sh/@supabase/supabase-js@2": "https://esm.sh/@supabase/supabase-js@2.88.0",
     "https://esm.sh/boolbase@^1.0.0?target=denonext": "https://esm.sh/boolbase@1.0.0?target=denonext",
     "https://esm.sh/cheerio-select@^2.1.0?target=denonext": "https://esm.sh/cheerio-select@2.1.0?target=denonext",
@@ -2880,6 +2881,7 @@
     "https://esm.sh/youtube-transcript": "https://esm.sh/youtube-transcript@1.2.1"
   },
   "remote": {
+    "https://cdn.jsdelivr.net/npm/@google/generative-ai/+esm": "36aab967c6d304d4e1ba1efbec4eae36a92c165f1b3ddef88c74f087a0ef3539",
     "https://esm.sh/@supabase/auth-js@2.88.0/denonext/auth-js.mjs": "78b4ee0af024d453a9d9719768348f68caebb670b4197b4deb6e2cd9002be7d8",
     "https://esm.sh/@supabase/functions-js@2.88.0/denonext/functions-js.mjs": "01bbf2d2393c6e73b822584ce6da3709652fa69f60abf84575e21c8ab36dcf8c",
     "https://esm.sh/@supabase/postgrest-js@2.88.0/denonext/postgrest-js.mjs": "fe8314d8892efc93be789a0934af1bb31fb9ee59a96fc8aa89911739978dac2d",
@@ -2966,6 +2968,7 @@
         "npm:date-fns@^4.1.0",
         "npm:dotenv@^17.2.3",
         "npm:file-saver@^2.0.5",
+        "npm:framer-motion@^12.23.26",
         "npm:html2canvas-pro@^1.6.2",
         "npm:html2canvas@^1.4.1",
         "npm:html2pdf.js@~0.12.1",
