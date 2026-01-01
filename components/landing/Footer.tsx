@@ -38,7 +38,7 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
                                 <img
                                     src="/logo.png"
                                     alt="Kolink Logo"
-                                    className="w-full h-full object-contain rounded-xl shadow-lg shadow-brand-500/10"
+                                    className="w-full h-full object-cover scale-110 rounded-xl shadow-lg shadow-brand-500/10"
                                 />
                             </div>
                             <span>Kolink</span>

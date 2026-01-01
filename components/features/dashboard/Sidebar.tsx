@@ -61,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <img
                         src="/logo.png"
                         alt="Kolink Logo"
-                        className="w-full h-full object-contain rounded-xl shadow-lg shadow-brand-500/20"
+                        className="w-full h-full object-cover scale-110 rounded-xl shadow-lg shadow-brand-500/20"
                     />
                 </div>
                 <span className="font-display font-bold text-2xl text-slate-900 tracking-tight">
