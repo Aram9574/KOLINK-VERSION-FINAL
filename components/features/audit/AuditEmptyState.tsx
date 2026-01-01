@@ -57,23 +57,23 @@ const AuditEmptyState: React.FC<AuditEmptyStateProps> = ({ onStart, hasLatestAud
     };
 
     return (
-        <div className="flex flex-col items-center justify-center py-12 px-4">
+        <div className="flex flex-col items-center justify-center py-6 px-4">
             <div className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-[40px] shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden">
-                <div className="p-10 lg:p-14 space-y-10">
+                <div className="p-6 lg:p-8 space-y-6">
                     {/* Visual Icon */}
                     <div className="flex justify-center">
                         <div className="relative">
-                            <div className="w-24 h-24 bg-brand-500/10 dark:bg-brand-500/20 rounded-[32px] flex items-center justify-center transform rotate-6 transition-transform hover:rotate-0 duration-500">
-                                <FileText className="w-12 h-12 text-brand-600 dark:text-brand-400" />
+                            <div className="w-16 h-16 bg-brand-500/10 dark:bg-brand-500/20 rounded-[24px] flex items-center justify-center transform rotate-6 transition-transform hover:rotate-0 duration-500">
+                                <FileText className="w-8 h-8 text-brand-600 dark:text-brand-400" />
                             </div>
-                            <div className="absolute -top-2 -right-2 w-10 h-10 bg-white dark:bg-slate-700 rounded-2xl shadow-lg flex items-center justify-center transform -rotate-12 border border-slate-50 dark:border-slate-600">
-                                <Linkedin className="w-5 h-5 text-brand-500" />
+                            <div className="absolute -top-1.5 -right-1.5 w-8 h-8 bg-white dark:bg-slate-700 rounded-xl shadow-lg flex items-center justify-center transform -rotate-12 border border-slate-50 dark:border-slate-600">
+                                <Linkedin className="w-4 h-4 text-brand-500" />
                             </div>
                         </div>
                     </div>
 
                     <div className="text-center space-y-4">
-                        <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-slate-900 to-slate-600 dark:from-white dark:to-slate-400">
+                        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-slate-900 to-slate-600 dark:from-white dark:to-slate-400">
                             {t.title}
                         </h2>
                         <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
@@ -85,7 +85,7 @@ const AuditEmptyState: React.FC<AuditEmptyStateProps> = ({ onStart, hasLatestAud
 
                     <div className="space-y-6">
                         <div 
-                            className={`relative group cursor-pointer transition-all duration-300 rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center py-12 px-6 ${
+                            className={`relative group cursor-pointer transition-all duration-300 rounded-[24px] border-2 border-dashed flex flex-col items-center justify-center py-8 px-6 ${
                                 dragActive 
                                 ? "border-brand-500 bg-brand-50/50 dark:bg-brand-900/10 scale-[1.02]" 
                                 : file 
@@ -170,7 +170,7 @@ const AuditEmptyState: React.FC<AuditEmptyStateProps> = ({ onStart, hasLatestAud
             </div>
 
             {/* Steps help */}
-            <div className="mt-12 flex flex-col md:flex-row gap-8 items-center text-center">
+            <div className="mt-8 flex flex-col md:flex-row gap-6 items-center text-center">
                 <div className="flex-1 space-y-2">
                     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">1</span>
                     <p className="text-xs font-medium text-slate-600 dark:text-slate-400">

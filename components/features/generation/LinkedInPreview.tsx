@@ -418,8 +418,20 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
                             </div>
                         )
                         : (
-                            <div className="text-[14px] text-slate-900 whitespace-pre-wrap leading-normal font-normal break-words">
-                                {displayContent}
+                            <div className={`text-[14px] text-slate-900 whitespace-pre-wrap leading-normal font-normal break-words ${!displayContent ? 'text-slate-400' : ''}`}>
+                                {displayContent || `Tu perfil de LinkedIn es un desierto.
+
+Tienes años de experiencia, pero nadie lo nota. Pierdes clientes y alianzas solo porque no te comunicas.
+
+El silencio te está costando dinero.
+
+No necesitas ser un influencer. Solo necesitas ser visible.
+
+El contenido de calidad es el puente entre tu talento y tu próximo contrato. 🤝
+
+¿Qué oportunidad perdiste por no contar lo que sabes?
+
+#LinkedIn #MarcaPersonal #Estrategia`}
                                 {!isExpanded && needsSeeMore && (
                                     <button
                                         onClick={() => setIsExpanded(true)}

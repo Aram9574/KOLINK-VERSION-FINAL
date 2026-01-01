@@ -143,15 +143,7 @@ const LinkedInAuditView: React.FC = () => {
     return (
         <div className="h-full w-full bg-[#F9FAFB] dark:bg-[#0F172A] p-4 lg:p-8 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
             <div className="max-w-6xl mx-auto space-y-8">
-                {/* Header */}
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-                        {t.title}
-                    </h1>
-                    <p className="text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
-                        {t.subtitle}
-                    </p>
-                </div>
+
 
                 {/* Main Content with key to force fresh mount on status change */}
                 <div className="w-full" key={status}>
