@@ -75,7 +75,7 @@ const LinkedInExpertChat: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-180px)] max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 ring-1 ring-slate-900/5">
+        <div className="flex flex-col w-full h-full max-h-[85vh] max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 ring-1 ring-slate-900/5">
             {/* Header */}
             <div className="bg-gradient-to-r from-brand-600 via-brand-500 to-indigo-600 p-5 flex items-center justify-between shadow-lg relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-soft-light">

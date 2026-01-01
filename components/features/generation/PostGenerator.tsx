@@ -203,6 +203,23 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
     }
   };
 
+  // Cleanup effect: Clear the topic from localStorage when leaving the component
+  useEffect(() => {
+    return () => {
+      try {
+        const saved = localStorage.getItem('kolink_generator_params');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          // Only clear the topic, preserve other preferences like tone, length, etc.
+          parsed.topic = '';
+          localStorage.setItem('kolink_generator_params', JSON.stringify(parsed));
+        }
+      } catch (e) {
+        console.error("Failed to clear topic on unmount", e);
+      }
+    };
+  }, []);
+
   return (
     <div className="flex flex-col h-full animate-in fade-in duration-500">
       {/* Mobile-Only Header Toggle (Visible only on small screens) */}

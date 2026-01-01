@@ -40,7 +40,7 @@ const Navbar: React.FC<NavbarProps> = (
                 >
                     <div className="relative w-10 h-10 transition-transform duration-300 group-hover:scale-110">
                         <img
-                            src="/brand-logo.jpg"
+                            src="/logo.png"
                             alt="Kolink Logo"
                             className="w-full h-full object-contain rounded-xl shadow-lg shadow-brand-500/20"
                         />

@@ -59,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className="p-6 flex items-center gap-3 flex-shrink-0">
                 <div className="w-10 h-10 transition-transform duration-300 hover:scale-105">
                     <img
-                        src="/brand-logo.jpg"
+                        src="/logo.png"
                         alt="Kolink Logo"
                         className="w-full h-full object-contain rounded-xl shadow-lg shadow-brand-500/20"
                     />

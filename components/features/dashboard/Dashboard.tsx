@@ -40,7 +40,7 @@ const LinkedInExpertChat = React.lazy(() =>
 );
 const PostEditorView = React.lazy(() => import("../editor/PostEditorView"));
 const LinkedInAuditView = React.lazy(() =>
-    import("../audit/LinkedInAuditView")
+    import("../audit/LinkedInAuditView.tsx")
 );
 
 const DashboardContent: React.FC = () => {
@@ -320,7 +320,7 @@ const DashboardContent: React.FC = () => {
                     )}
 
                     {activeTab === "chat" && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col items-center justify-center p-4 lg:p-8">
                             {user.planTier === "free"
                                 ? (
                                     <LockedChatState

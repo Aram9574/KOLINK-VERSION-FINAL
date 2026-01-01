@@ -36,7 +36,7 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
                         <div className="flex items-center gap-3 font-display font-bold text-2xl text-slate-900 group cursor-pointer">
                             <div className="w-10 h-10 transition-transform duration-500 group-hover:rotate-[360deg]">
                                 <img
-                                    src="/brand-logo.jpg"
+                                    src="/logo.png"
                                     alt="Kolink Logo"
                                     className="w-full h-full object-contain rounded-xl shadow-lg shadow-brand-500/10"
                                 />
