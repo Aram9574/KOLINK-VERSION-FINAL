@@ -82,30 +82,42 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
 
   useEffect(() => {
     let interval: any;
-    if (isGenerating) {
-      // Pulse haptics while generating
-      interval = setInterval(async () => {
-        await Haptics.impact({ style: ImpactStyle.Light });
-      }, 3000);
-    }
-
-    if (prevIsGenerating.current && !isGenerating && currentPost?.content) {
-      // Just finished generating successfully
-      Haptics.notification({ type: NotificationType.Success });
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        zIndex: 1000,
-      });
-
-      // Check if we need to auto-redirect to Carousel Studio
-      if (params.generateCarousel && onGoToCarousel && currentPost?.content) {
-        setTimeout(() => {
-          onGoToCarousel(currentPost.content);
-          toast.success("Redirecting to Carousel Studio...");
-        }, 1500); // Small delay to let user see success confetti
+    try {
+      if (isGenerating) {
+        // Pulse haptics while generating
+        interval = setInterval(async () => {
+          try {
+            await Haptics.impact({ style: ImpactStyle.Light });
+          } catch (e) {
+            // Ignore haptics errors on unsupported platforms
+          }
+        }, 3000);
       }
+
+      if (prevIsGenerating.current && !isGenerating && currentPost?.content) {
+        // Just finished generating successfully
+        try {
+          Haptics.notification({ type: NotificationType.Success }).catch(() => {});
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            zIndex: 1000,
+          });
+
+          // Check if we need to auto-redirect to Carousel Studio
+          if (params.generateCarousel && onGoToCarousel && currentPost?.content) {
+            setTimeout(() => {
+              onGoToCarousel(currentPost.content);
+              toast.success("Redirecting to Carousel Studio...");
+            }, 1500); // Small delay to let user see success confetti
+          }
+        } catch (effectError) {
+          console.error("Visual feedback error:", effectError);
+        }
+      }
+    } catch (e) {
+      console.error("Effect error in PostGenerator:", e);
     }
 
     prevIsGenerating.current = isGenerating;
@@ -119,42 +131,49 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
   const [activeView, setActiveView] = useState<"editor" | "preview">("editor"); // For mobile only
 
   const handleGenerate = () => {
-    const isFreeUser = user?.planTier === "free";
+    try {
+      const isFreeUser = user?.planTier === "free";
 
-    // Filter options based on plan
-    const availableTones = isFreeUser
-      ? TONES.filter((t) => !t.isPremium)
-      : TONES;
-    const availableFrameworks = isFreeUser
-      ? FRAMEWORKS.filter((f) => !f.isPremium)
-      : FRAMEWORKS;
-    const availableHooks = isFreeUser
-      ? HOOK_STYLES.filter((h) => !h.isPremium)
-      : HOOK_STYLES;
+      // Filter options based on plan
+      const availableTones = isFreeUser
+        ? TONES.filter((t) => !t.isPremium)
+        : TONES;
+      const availableFrameworks = isFreeUser
+        ? FRAMEWORKS.filter((f) => !f.isPremium)
+        : FRAMEWORKS;
+      const availableHooks = isFreeUser
+        ? HOOK_STYLES.filter((h) => !h.isPremium)
+        : HOOK_STYLES;
 
-    // Resolve random values
-    const finalParams: GenerationParams = {
-      ...params,
-      tone: params.tone === "random"
-        ? pickRandom(availableTones) as ViralTone
-        : params.tone,
-      framework: params.framework === "random"
-        ? pickRandom(availableFrameworks) as ViralFramework
-        : params.framework,
-      length: params.length === "random"
-        ? pickRandom(LENGTH_OPTIONS) as PostLength
-        : params.length,
-      emojiDensity: params.emojiDensity === "random"
-        ? pickRandom(EMOJI_OPTIONS) as EmojiDensity
-        : params.emojiDensity,
-      hookStyle: params.hookStyle === "random"
-        ? pickRandom(availableHooks) as ViralHook
-        : params.hookStyle,
-    };
+      // Resolve random values
+      const finalParams: GenerationParams = {
+        ...params,
+        tone: params.tone === "random"
+          ? pickRandom(availableTones) as ViralTone
+          : params.tone,
+        framework: params.framework === "random"
+          ? pickRandom(availableFrameworks) as ViralFramework
+          : params.framework,
+        length: params.length === "random"
+          ? pickRandom(LENGTH_OPTIONS) as PostLength
+          : params.length,
+        emojiDensity: params.emojiDensity === "random"
+          ? pickRandom(EMOJI_OPTIONS) as EmojiDensity
+          : params.emojiDensity,
+        hookStyle: params.hookStyle === "random"
+          ? pickRandom(availableHooks) as ViralHook
+          : params.hookStyle,
+      };
 
-    onGenerate(finalParams);
-    if (window.innerWidth < 1024) {
-      setActiveView("preview"); // Switch to preview on mobile after generate
+      console.log("PostGenerator: invoking onGenerate with params", finalParams);
+      onGenerate(finalParams);
+      
+      if (window.innerWidth < 1024) {
+        setActiveView("preview"); // Switch to preview on mobile after generate
+      }
+    } catch (e) {
+      console.error("PostGenerator: sync logic error", e);
+      toast.error("Error preparing generation parameters");
     }
   };
 

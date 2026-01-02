@@ -1,118 +1,43 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { GoogleGenerativeAI } from "npm:@google/generative-ai@^0.22.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { AuditService } from "../_shared/services/AuditService.ts";
+import { corsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
     const { pdfText } = await req.json();
+    if (!pdfText) throw new Error("Missing PDF content");
 
-    // 0. Setup Supabase for Language Detection
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
-    // Get user from auth header
     const authHeader = req.headers.get("Authorization")!;
-    const { data: { user } } = await supabaseAdmin.auth.getUser(
-      authHeader.replace("Bearer ", ""),
-    );
-    const { data: profile } = await supabaseAdmin.from("profiles").select(
-      "language",
-    ).eq("id", user?.id).single();
+    const { data: { user } } = await supabaseAdmin.auth.getUser(authHeader.replace("Bearer ", ""));
+    const { data: profile } = await supabaseAdmin.from("profiles").select("language").eq("id", user?.id).single();
     const language = profile?.language || "es";
-    const isSpanish = language === "es";
 
-    const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY")!);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Use the specialized AuditService microservice
+    const auditService = new AuditService(Deno.env.get("GEMINI_API_KEY")!);
+    
+    // Convert text back to a simple data structure for the audit service
+    // In the future, we might want to use multimodal extractLinkedInPDF directly here
+    const result = await auditService.analyzeLinkedInProfile({ 
+      full_name: "User", 
+      summary: pdfText 
+    } as any, language);
 
-    const prompt = isSpanish
-      ? `
-      Eres un experto en Personal Branding y LinkedIn Coach con más de 10 años de experiencia ayudando a CEOs y emprendedores a escalar su presencia digital.
-      Tu tarea es realizar una AUDITORÍA MAESTRA de este perfil de LinkedIn basándote en el texto extraído del PDF.
-
-      [REGLAS CRÍTICAS]
-      1. SÉ CRÍTICO pero CONSTRUCTIVO. El usuario quiere mejorar, no que le digan que todo está bien.
-      2. USA MÉTRICAS Y FÓRMULAS: Evalúa si usan fórmulas en el titular o métricas en la experiencia.
-      3. RESPONDE SIEMPRE EN ESPAÑOL.
-      4. RESPONDE ESTRICTAMENTE EN FORMATO JSON. No incluyas texto fuera del JSON.
-      5. ELIMINA CARACTERES ESPECIALES: El JSON final debe ser limpio y fácil de parsear.
-
-      [ESTRUCTURA DEL JSON REQUERIDA]
-      {
-        "perfil_resumen": { "nombre": "string", "sector": "string", "score_actual": "number (0-100)" },
-        "pilares": {
-          "pilar_1_fundamento": { "score": "number", "analisis_titular": "...", "propuesta_titular_a": "...", "propuesta_titular_b": "...", "foto_banner_check": "...", "url_check": "..." },
-          "pilar_2_narrativa": { "score": "number", "gancho_analisis": "...", "redaccion_gancho_sugerida": "...", "experiencia_analisis": "...", "experiencia_mejoras": [] },
-          "pilar_3_visibilidad": { "score": "number", "estrategia_contenido": "...", "estrategia_networking": "..." }
-        },
-        "quick_wins": ["Victoria 1", "Victoria 2", "Victoria 3"]
-      }
-
-      [TEXTO DEL PDF]
-      ${pdfText}
-    `
-      : `
-      You are a Personal Branding expert and LinkedIn Coach with over 10 years of experience helping CEOs and entrepreneurs scale their digital presence.
-      Your task is to conduct a MASTER AUDIT of this LinkedIn profile based on the text extracted from the PDF.
-
-      [CRITICAL RULES]
-      1. BE CRITICAL but CONSTRUCTIVE. The user wants to improve, not to be told everything is fine.
-      2. USE METRICS AND FORMULAS: Evaluate if they use formulas in the headline or metrics in the experience.
-      3. ALWAYS RESPOND IN ENGLISH.
-      4. RESPOND STRICTLY IN JSON FORMAT. Do not include text outside the JSON.
-      5. REMOVE SPECIAL CHARACTERS: The final JSON must be clean and easy to parse.
-
-      [REQUIRED JSON STRUCTURE]
-      {
-        "perfil_resumen": { "nombre": "string", "sector": "string", "score_actual": "number (0-100)" },
-        "pilares": {
-          "pilar_1_fundamento": { "score": "number", "analisis_titular": "...", "propuesta_titular_a": "...", "propuesta_titular_b": "...", "foto_banner_check": "...", "url_check": "..." },
-          "pilar_2_narrativa": { "score": "number", "gancho_analisis": "...", "redaccion_gancho_sugerida": "...", "experiencia_analisis": "...", "experiencia_mejoras": [] },
-          "pilar_3_visibility": { "score": "number", "estrategia_contenido": "...", "estrategia_networking": "..." }
-        },
-        "quick_wins": ["Goal 1", "Goal 2", "Goal 3"]
-      }
-
-      [PDF TEXT]
-      ${pdfText}
-    `;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let text = response.text();
-
-    // Limpiar posibles bloques de código Markdown
-    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
-
-    // Validar JSON
-    try {
-      JSON.parse(text);
-    } catch (_e) {
-      console.error("Invalid JSON generated by AI:", text);
-      throw new Error("La IA generó una respuesta inválida. Reintenta.");
-    }
-
-    return new Response(text, {
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "application/json",
-      },
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
     const err = error as Error;
-    console.error("Error in analyze-profile:", error);
+    console.error("[ProfileAuditFunc] Error:", err.message);
     return new Response(
       JSON.stringify({ error: err.message || "Internal error" }),
       {

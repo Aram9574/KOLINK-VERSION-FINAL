@@ -12,7 +12,7 @@ export interface GeneratedPost {
 export class PostRepository {
   constructor(private supabaseAdmin: SupabaseClient) {}
 
-  async savePost(userId: string, content: GeneratedPost, params: any) {
+  async savePost(userId: string, content: GeneratedPost, params: unknown) {
     const { data: insertedPost, error } = await this.supabaseAdmin
       .from("posts")
       .insert({

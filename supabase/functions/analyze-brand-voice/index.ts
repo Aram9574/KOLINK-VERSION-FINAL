@@ -1,12 +1,7 @@
-import { serve } from "std/http/server";
-import { createClient } from "@supabase/supabase-js";
-import { AnalysisService } from "./services/AnalysisService.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { AuditService } from "../_shared/services/AuditService.ts";
+import { corsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -24,33 +19,23 @@ serve(async (req) => {
       },
     );
 
-    const { data: { user }, error: authError } = await supabaseClient.auth
-      .getUser();
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !user) throw new Error("Unauthorized");
 
-    const { contentSamples, language } = await req.json();
+    const { contentSamples, language = "en" } = await req.json();
 
-    if (
-      !contentSamples || !Array.isArray(contentSamples) ||
-      contentSamples.length === 0
-    ) {
+    if (!contentSamples || !Array.isArray(contentSamples) || contentSamples.length === 0) {
       throw new Error("Missing content samples");
     }
 
-    const analysisService = new AnalysisService(
-      Deno.env.get("GEMINI_API_KEY") ?? "",
-    );
+    const auditService = new AuditService(Deno.env.get("GEMINI_API_KEY") ?? "");
+    const result = await auditService.analyzeVoice(contentSamples, language);
 
-    const result = await analysisService.analyzeVoice({
-      contentSamples,
-      language: language || "en",
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-
-    return new Response(
-      JSON.stringify(result),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
   } catch (error: any) {
+    console.error("[BrandVoiceFunc] Error:", error.message);
     return new Response(
       JSON.stringify({
         error: error.message,

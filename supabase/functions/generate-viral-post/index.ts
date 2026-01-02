@@ -1,11 +1,11 @@
 import { serve } from "std/http/server";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { CreditService } from "./services/CreditService.ts";
-import { AIService, GenerationParams } from "./services/AIService.ts";
-import { PostRepository } from "./services/PostRepository.ts";
-import { GamificationService } from "./services/GamificationService.ts";
-import { sanitizeInput } from "./utils/validation.ts";
+import { CreditService } from "../_shared/services/CreditService.ts";
+import { ContentService as AIService, GenerationParams } from "../_shared/services/ContentService.ts";
+import { PostRepository } from "../_shared/services/PostRepository.ts";
+import { GamificationService } from "../_shared/services/GamificationService.ts";
+import { sanitizeInput } from "../_shared/validation.ts";
 import { GenerationParamsSchema } from "../_shared/schemas.ts";
 
 const corsHeaders = {
@@ -52,6 +52,7 @@ serve(async (req: Request) => {
         hashtagCount: parsed.hashtagCount,
         includeCTA: parsed.includeCTA,
         outputLanguage: parsed.outputLanguage,
+        brandVoiceId: parsed.brandVoiceId,
       } as GenerationParams;
     } catch (zodError: unknown) {
       if (zodError instanceof z.ZodError) {
@@ -120,8 +121,34 @@ serve(async (req: Request) => {
     }
 
     // 3. Prepare Params
+    let brandVoiceDescription = profile.brand_voice || "";
+
+    if (safeParams.brandVoiceId) {
+      // Validate UUID format to prevent database errors
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      
+      if (!uuidRegex.test(safeParams.brandVoiceId)) {
+        console.warn("Invalid Brand Voice ID format:", safeParams.brandVoiceId);
+        // Fallback to default, do not query DB
+      } else {
+        console.log("Fetching specific Brand Voice ID:", safeParams.brandVoiceId);
+        const { data: bVoice, error: bvError } = await supabaseAdmin
+          .from("brand_voices")
+          .select("description")
+          .eq("id", safeParams.brandVoiceId)
+          .eq("user_id", user.id) // Ensure ownership
+          .single();
+
+        if (bVoice && !bvError) {
+          brandVoiceDescription = bVoice.description;
+        } else {
+          console.warn("Brand Voice not found or access denied:", bvError);
+        }
+      }
+    }
+
     const userContext = {
-      brand_voice: sanitizeInput(profile.brand_voice || ""),
+      brand_voice: sanitizeInput(brandVoiceDescription),
       company_name: sanitizeInput(profile.company_name || ""),
       industry: sanitizeInput(profile.industry || ""),
       headline: sanitizeInput(profile.headline || ""),

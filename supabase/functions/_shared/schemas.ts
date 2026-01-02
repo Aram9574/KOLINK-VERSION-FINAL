@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "npm:zod@3.22.4";
 
 export const GenerationParamsSchema = z.object({
   topic: z.string().min(3).max(500),
@@ -11,6 +11,7 @@ export const GenerationParamsSchema = z.object({
   hashtagCount: z.number().min(0).max(5),
   includeCTA: z.boolean(),
   outputLanguage: z.enum(["en", "es"]).optional(),
+  brandVoiceId: z.string().optional(),
 });
 
 export const VariationParamsSchema = z.object({

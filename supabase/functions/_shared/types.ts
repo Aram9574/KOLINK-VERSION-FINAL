@@ -40,3 +40,23 @@ export interface LinkedInAuditResult {
     analysis: string;
   };
 }
+
+export interface Profile {
+  id: string;
+  email?: string;
+  plan_tier: string;
+  credits: number;
+  subscription_status?: string;
+  subscription_end_date?: string;
+  stripe_customer_id?: string;
+  referred_by?: string;
+  created_at: string;
+  brand_voice?: string;
+  company_name?: string;
+  industry?: string;
+  headline?: string;
+  xp?: number;
+  level?: number;
+  current_streak?: number;
+  last_post_date?: string;
+}

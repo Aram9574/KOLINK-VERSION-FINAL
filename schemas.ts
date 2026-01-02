@@ -17,7 +17,12 @@ export const GenerationParamsSchema = z.object({
     emojiDensity: z.string().optional().default("Moderate (Engaging)"),
     length: z.string().optional().default("Medium"),
     creativityLevel: z.number().min(0).max(100).optional().default(50),
-    includeCTA: z.boolean().optional().default(true)
+    includeCTA: z.boolean().optional().default(true),
+    hashtagCount: z.number().min(0).max(30).optional().default(3),
+    hookStyle: z.string().optional(),
+    brandVoiceId: z.string().optional(),
+    outputLanguage: z.enum(["en", "es"]).optional(),
+    generateCarousel: z.boolean().optional()
 });
 
 export type GenerationParams = z.infer<typeof GenerationParamsSchema>;

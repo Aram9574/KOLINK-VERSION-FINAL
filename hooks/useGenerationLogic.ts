@@ -109,9 +109,8 @@ export const useGenerationLogic = ({
                         console.error("Recovery failed", e);
                     } finally {
                         setIsGenerating(false);
-                        if (Date.now() - startTime > 60000) {
-                            localStorage.removeItem("kolink_is_generating");
-                        }
+                        // Always clear the flag after one recovery attempt to prevent loops
+                        localStorage.removeItem("kolink_is_generating");
                     }
                 } else {
                     localStorage.removeItem("kolink_is_generating");

@@ -1,0 +1,10 @@
+{
+  "nodeModulesDir": "auto",
+  "imports": {
+    "std/http/server": "https://deno.land/std@0.168.0/http/server.ts",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
+    "stripe": "https://esm.sh/stripe@14.25.0?target=deno",
+    "@google/generative-ai": "npm:@google/generative-ai@^0.22.0",
+    "zod": "npm:zod@3.22.4"
+  }
+}
