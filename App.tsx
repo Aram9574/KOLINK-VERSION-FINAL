@@ -27,13 +27,6 @@ const UpgradeModal = lazy(() => import("./components/modals/UpgradeModal"));
 const CancellationModal = lazy(() =>
     import("./components/modals/CancellationModal")
 );
-// AutoPilotView is still in root or needs move. Assuming root for now or next move.
-// Ideally should be features/autopilot. Let's fix App.tsx assuming I will move it next.
-// Or wait, I haven't moved it yet. I will leave it as is or move it now?
-// I will move it now to avoid breaking.
-const AutoPostView = lazy(() =>
-    import("./components/features/autopost/AutoPostView")
-);
 
 const PrivacyPolicy = lazy(() => import("./components/landing/PrivacyPolicy"));
 const TermsOfService = lazy(() =>
