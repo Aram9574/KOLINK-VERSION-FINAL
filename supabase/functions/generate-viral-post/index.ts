@@ -1,6 +1,7 @@
-import { serve } from "std/http/server";
-import { createClient } from "@supabase/supabase-js";
-import { z } from "zod";
+// No import needed for Deno.serve in modern Deno/Supabase environments.
+
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { z } from "npm:zod@3.22.4";
 import { CreditService } from "../_shared/services/CreditService.ts";
 import { ContentService as AIService, GenerationParams } from "../_shared/services/ContentService.ts";
 import { PostRepository } from "../_shared/services/PostRepository.ts";
@@ -8,13 +9,12 @@ import { GamificationService } from "../_shared/services/GamificationService.ts"
 import { sanitizeInput } from "../_shared/validation.ts";
 import { GenerationParamsSchema } from "../_shared/schemas.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { corsHeaders } from "../_shared/cors.ts";
 
-serve(async (req: Request) => {
+// Remove local corsHeaders definition
+
+
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }

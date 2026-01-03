@@ -25,7 +25,7 @@ const ReasonStepV2: React.FC<ReasonStepProps> = ({ language, reason, setReason, 
     return (
         <div className="space-y-8 p-1">
             <div className="text-center space-y-4 mb-8">
-                <div className="w-16 h-16 bg-white border border-slate-100 rounded-full flex items-center justify-center mx-auto shadow-sm">
+                <div className="w-16 h-16 bg-white border border-slate-200/60/60 rounded-full flex items-center justify-center mx-auto shadow-sm">
                     <AlertTriangle className="w-8 h-8 text-slate-900" strokeWidth={1.5} />
                 </div>
                 <div>
@@ -42,7 +42,7 @@ const ReasonStepV2: React.FC<ReasonStepProps> = ({ language, reason, setReason, 
                         className={`w-full p-4 rounded-xl border transition-all duration-200 flex items-center justify-between group
                         ${reason === r.label
                                 ? 'border-slate-900 bg-slate-900 text-white shadow-lg shadow-slate-900/10'
-                                : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                                : 'border-slate-200/60 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
                             }`}
                     >
                         <div className="flex items-center gap-3">

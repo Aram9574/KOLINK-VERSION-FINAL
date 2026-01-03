@@ -25,10 +25,10 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, currentPlanId, billingInterva
 
     return (
         <div
-            className={`relative rounded-2xl p-6 border transition-all duration-300 flex flex-col h-full
+            className={`relative rounded-xl p-6 border transition-all duration-300 flex flex-col h-full
         ${isHighlighted
                     ? 'bg-gradient-to-br from-brand-600 to-indigo-600 text-white border-brand-500 shadow-xl shadow-brand-900/20 scale-100 md:scale-105 z-10 ring-1 ring-white/20'
-                    : 'bg-white text-slate-900 border-slate-200 hover:border-brand-300 hover:shadow-lg'
+                    : 'bg-white text-slate-900 border-slate-200/60 hover:border-brand-300 hover:shadow-lg'
                 }`}
         >
             {isHighlighted && (
@@ -42,7 +42,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, currentPlanId, billingInterva
                 <p className={`text-xs mt-1 min-h-[40px] ${isHighlighted ? 'text-brand-100' : 'text-slate-500'}`}>{plan.description}</p>
             </div>
 
-            <div className="mb-6 text-center border-b border-white/10 pb-6 border-slate-100">
+            <div className="mb-6 text-center border-b border-white/10 pb-6 border-slate-200/60/60">
                 <div className="flex items-center justify-center gap-0.5">
                     <span className="text-5xl font-display font-bold tracking-tight">€{billingInterval === 'yearly' ? (plan.price * 0.8).toFixed(0) : plan.price}</span>
                     <span className={`text-base font-medium mb-1 ${isHighlighted ? 'text-brand-200' : 'text-slate-400'}`}>/mes</span>

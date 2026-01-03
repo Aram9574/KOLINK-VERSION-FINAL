@@ -37,12 +37,14 @@ const AutoPostActivityLog: React.FC<AutoPostActivityLogProps> = ({
     const t = translations[language].app.autopilot;
 
     return (
-        <div className="bg-white text-slate-600 rounded-[2.5rem] p-6 border border-slate-200 flex flex-col shadow-sm h-full relative overflow-hidden group/console">
+        <div className="relative overflow-hidden bg-white text-slate-600 rounded-xl p-6 border border-border flex flex-col shadow-sm h-full group transition-all duration-300 hover:border-brand-200">
+            {/* Bento Corner Light */}
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-brand-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             <div className="relative z-20 flex flex-col h-full">
-                <div className="flex items-center justify-between mb-6 shrink-0 border-b border-slate-100 pb-4">
+                <div className="flex items-center justify-between mb-6 shrink-0 border-b border-slate-200/60/60 pb-4">
                     <div className="space-y-1">
                         <h3 className="text-sm font-bold flex items-center gap-2 text-slate-900 uppercase tracking-[0.2em]">
-                            <Terminal className="w-4 h-4 text-sky-600" />
+                            <Terminal strokeWidth={1.5} className="w-4 h-4 text-brand-600" />
                             {t.activity.title}
                         </h3>
                         {isEnabled && (
@@ -62,7 +64,7 @@ const AutoPostActivityLog: React.FC<AutoPostActivityLogProps> = ({
                 <div className="flex-1 space-y-4 overflow-y-auto min-h-0 pr-2 custom-scrollbar font-mono text-[11px]">
                     {/* Manual Override Section */}
                     {isEnabled && (
-                        <div className="p-4 bg-sky-50 rounded-2xl border border-sky-100 mb-6 group/override">
+                        <div className="p-4 bg-sky-50 rounded-xl border border-sky-100 mb-6 group/override">
                             <div className="flex justify-between items-center mb-3">
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-sky-600">
                                     {t.activity.manualOverride}
@@ -88,7 +90,7 @@ const AutoPostActivityLog: React.FC<AutoPostActivityLogProps> = ({
 
                     {automatedPosts.length === 0
                         ? (
-                            <div className="text-slate-400 text-center py-16 italic border border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+                            <div className="text-slate-400 text-center py-16 italic border border-dashed border-slate-200/60/60 rounded-xl bg-slate-50/50">
                                 <div className="mb-4 text-slate-200 flex justify-center">
                                     <Zap className="w-8 h-8 opacity-20" />
                                 </div>
@@ -105,7 +107,7 @@ const AutoPostActivityLog: React.FC<AutoPostActivityLogProps> = ({
                                 {automatedPosts.map((post) => (
                                     <div
                                         key={post.id}
-                                        className="group/item bg-slate-50/50 rounded-2xl p-4 border border-slate-100 hover:border-sky-100 transition-all hover:bg-white"
+                                        className="group/item bg-slate-50/50 rounded-xl p-4 border border-slate-200/60/60 hover:border-sky-100 transition-all hover:bg-white"
                                     >
                                         <div className="flex justify-between items-center mb-3">
                                             <div className="flex items-center gap-2">
@@ -153,7 +155,7 @@ const AutoPostActivityLog: React.FC<AutoPostActivityLogProps> = ({
                                             <button
                                                 onClick={() => onViewPost &&
                                                     onViewPost(post)}
-                                                className="flex-1 h-9 rounded-xl bg-white border border-slate-200 hover:border-sky-200 text-[10px] font-bold text-slate-600 hover:text-sky-600 transition-all flex items-center justify-center gap-2 group/btn shadow-sm"
+                                                className="flex-1 h-9 rounded-xl bg-white border border-slate-200/60/60 hover:border-sky-200 text-[10px] font-bold text-slate-600 hover:text-sky-600 transition-all flex items-center justify-center gap-2 group/btn shadow-sm"
                                             >
                                                 <Eye className="w-3.5 h-3.5 text-slate-400 group-hover/btn:text-sky-600 transition-colors" />
                                                 {t.activity.viewOutput}
@@ -162,7 +164,7 @@ const AutoPostActivityLog: React.FC<AutoPostActivityLogProps> = ({
                                                 onClick={() =>
                                                     onDeletePost &&
                                                     onDeletePost(post.id)}
-                                                className="w-9 h-9 rounded-xl bg-white border border-slate-200 hover:bg-red-50 hover:border-red-200 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center shadow-sm"
+                                                className="w-9 h-9 rounded-xl bg-white border border-slate-200/60/60 hover:bg-red-50 hover:border-red-200 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center shadow-sm"
                                                 title={language === "es"
                                                     ? "Eliminar"
                                                     : "Delete"}

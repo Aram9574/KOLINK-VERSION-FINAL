@@ -334,3 +334,18 @@ export const ACHIEVEMENTS: Achievement[] = [
     xpReward: 100,
   },
 ];
+
+export const ALGORITHM_TIPS_CONTENT = {
+  es: [
+    { title: "Horario de Oro", desc: "Publicar entre las 8:00 AM y 10:00 AM aumenta el alcance inicial en un 20%." },
+    { title: "Espacios en Blanco", desc: "Los posts con más de 3 líneas sin un espacio blanco tienen un 40% menos de CTR." },
+    { title: "Regla de Oro: 60 min", desc: "Responder a los comentarios en los primeros 60 minutos es clave para la viralidad." },
+    { title: "Contenido Nativo", desc: "El algoritmo de LinkedIn prioriza el contenido nativo sobre los enlaces externos." },
+  ],
+  en: [
+    { title: "Golden Hours", desc: "Posting between 8:00 AM and 10:00 AM increases initial reach by 20%." },
+    { title: "Negative Space", desc: "Posts with more than 3 lines without white space have 40% less CTR." },
+    { title: "The 60-Min Rule", desc: "Responding to comments in the first 60 minutes is key to virality." },
+    { title: "Native Content", desc: "The LinkedIn algorithm prioritizes native content over external links." },
+  ],
+};

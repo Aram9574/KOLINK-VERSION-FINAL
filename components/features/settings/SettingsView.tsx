@@ -65,10 +65,10 @@ const SettingsView: React.FC<SettingsViewProps> = (
             </div>
 
             {/* Trophy Room (Gamification) */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <div className="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
                 <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
                     <div className="p-2 bg-orange-50 rounded-lg">
-                        <Trophy className="w-5 h-5 text-orange-600" />
+                        <Trophy strokeWidth={1.5} className="w-5 h-5 text-orange-600" />
                     </div>
                     {t.trophyRoom}
                 </h2>
@@ -83,12 +83,12 @@ const SettingsView: React.FC<SettingsViewProps> = (
                                 className={`relative p-4 rounded-xl border transition-all ${
                                     isUnlocked
                                         ? "bg-amber-50/50 border-amber-100"
-                                        : "bg-slate-50 border-slate-100 grayscale opacity-70"
+                                        : "bg-slate-50 border-slate-200/60 grayscale opacity-70"
                                 }`}
                             >
                                 {!isUnlocked && (
                                     <div className="absolute top-3 right-3 text-slate-400">
-                                        <Lock className="w-4 h-4" />
+                                        <Lock strokeWidth={1.5} className="w-4 h-4" />
                                     </div>
                                 )}
                                 <div
@@ -98,7 +98,7 @@ const SettingsView: React.FC<SettingsViewProps> = (
                                             : "bg-slate-200 text-slate-500"
                                     }`}
                                 >
-                                    <Trophy className="w-5 h-5 fill-current" />
+                                    <Trophy strokeWidth={1.5} className="w-5 h-5 fill-current" />
                                 </div>
                                 <h4 className="font-bold text-sm text-slate-900 mb-1">
                                     {ach.title}
@@ -107,7 +107,7 @@ const SettingsView: React.FC<SettingsViewProps> = (
                                     {ach.description}
                                 </p>
                                 <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-600">
-                                    <Zap className="w-3 h-3 fill-current" />
+                                    <Zap strokeWidth={1.5} className="w-3 h-3 fill-current" />
                                     +{ach.xpReward} XP
                                 </div>
                             </div>
@@ -137,7 +137,7 @@ const SettingsView: React.FC<SettingsViewProps> = (
                 onSave={onSave}
             />
 
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 pb-12 mt-8 border-t border-slate-100">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 pb-12 mt-8 border-t border-slate-200/60">
                 {onLogout && (
                     <button
                         onClick={onLogout}
@@ -165,8 +165,8 @@ const SettingsView: React.FC<SettingsViewProps> = (
                                 </div>
                             )
                             : showSaved
-                            ? <Check className="w-4 h-4" />
-                            : <Save className="w-4 h-4" />}
+                            ? <Check strokeWidth={1.5} className="w-4 h-4" />
+                            : <Save strokeWidth={1.5} className="w-4 h-4" />}
                         {isSavingProfile
                             ? t.saving
                             : showSaved

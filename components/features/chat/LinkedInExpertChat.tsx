@@ -1,18 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
 import { getAvatarUrl } from "../../../utils.ts";
 import {
-  Loader2,
   MessageSquareText,
   SendHorizontal,
   Sparkles,
   UserCircle2,
+  Paperclip,
+  BrainCircuit,
+  Bot,
+  Minimize2,
+  Maximize2,
+  X,
 } from "lucide-react";
+import Skeleton from "../../ui/Skeleton";
 import { useUser } from "../../../context/UserContext.tsx";
 import { supabase } from "../../../services/supabaseClient.ts";
+import { motion, AnimatePresence } from "framer-motion";
+import { hapticFeedback } from "../../../lib/animations.ts";
+import { toast } from "sonner";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
+  image?: string; // Base64 or URL
 }
 
 const LinkedInExpertChat: React.FC = () => {
@@ -21,19 +31,25 @@ const LinkedInExpertChat: React.FC = () => {
     {
       role: "assistant",
       content: language === "es"
-        ? "¡Hola! Soy Nexus. Estoy aquí para potenciar tu presencia en LinkedIn. ¿En qué estrategia trabajamos hoy?"
-        : "Hello! I'm Nexus. I'm here to boost your LinkedIn presence. What strategy shall we work on today?",
+        ? "Soy Nexus, tu Estratega de LinkedIn. Analizo tu perfil, audito tus posts y optimizo tu marca personal. ¿Por dónde empezamos hoy?"
+        : "I am Nexus, your LinkedIn Strategist. I analyze your profile, audit your posts, and optimize your personal brand. Where shall we start today?",
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isGhostwriter, setIsGhostwriter] = useState(false);
+  const [showContextSidebar, setShowContextSidebar] = useState(true);
+  
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isLoading]);
+  }, [messages, isLoading, imagePreview]);
 
   // Persistence: Load messages on mount
   useEffect(() => {
@@ -52,94 +68,93 @@ const LinkedInExpertChat: React.FC = () => {
 
   // Persistence: Save messages on change
   useEffect(() => {
-    if (messages.length > 1) { // Don't save if it's just the greeting
-      localStorage.setItem(
-        "kolink_nexus_chat_history",
-        JSON.stringify(messages),
-      );
+    if (messages.length > 1) { 
+      // Avoid saving very large base64 images to localstorage if possible, or limit history
+      // For now, we save everything but standard quota limits might apply.
+      try {
+          localStorage.setItem("kolink_nexus_chat_history", JSON.stringify(messages.slice(-50))); // Keep last 50
+      } catch (e) {
+          console.error("Storage quota exceeded", e);
+      }
     }
   }, [messages]);
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(language === "es" ? "Imagen demasiado grande (max 5MB)" : "Image too large (max 5MB)");
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setImagePreview(ev.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const clearImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const getErrorMessage = (code: string, lang: string) => {
     const messages: Record<string, { es: string; en: string }> = {
-      UNAUTHORIZED: {
-        es: "No estás autorizado para realizar esta acción.",
-        en: "You are not authorized to perform this action.",
-      },
-      QUERY_REQUIRED: {
-        es: "Por favor escribe una consulta.",
-        en: "Please enter a query.",
-      },
-      UNKNOWN_ERROR: {
-        es: "Ocurrió un error desconocido. Intenta de nuevo.",
-        en: "An unknown error occurred. Please try again.",
-      },
+      UNAUTHORIZED: { es: "No autorizado.", en: "Unauthorized." },
+      QUERY_REQUIRED: { es: "Escribe una consulta.", en: "Please enter a query." },
+      UNKNOWN_ERROR: { es: "Error de conexión.", en: "Connection error." },
     };
-
-    const defaults = {
-      es:
-        "Lo siento, hubo un error al procesar tu consulta. Por favor, intenta de nuevo.",
-      en: "Sorry, there was an error processing your query. Please try again.",
-    };
-
-    return messages[code]?.[lang as "es" | "en"] ||
-      defaults[lang as "es" | "en"];
+    return messages[code]?.[lang as "es" | "en"] || messages.UNKNOWN_ERROR[lang as "es" | "en"];
   };
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if ((!input.trim() && !imageFile) || isLoading) return;
 
     const userMessage = input.trim();
+    const currentImage = imagePreview;
+    
+    // Optimistic Update
+    const newMessage: Message = { 
+        role: "user", 
+        content: userMessage, 
+        image: currentImage || undefined 
+    };
+
+    setMessages((prev) => [...prev, newMessage]);
     setInput("");
-    setMessages(
-      (prev) => [...prev, { role: "user", content: userMessage }],
-    );
+    clearImage(); // Clear input state immediately
     setIsLoading(true);
 
     try {
+      // Prepare payload
+      const payload: any = { 
+          query: userMessage,
+          mode: isGhostwriter ? 'ghostwriter' : 'advisor'
+      };
+      if (currentImage) {
+          payload.imageBase64 = currentImage; // Send base64 to backend
+      }
+
       const { data, error } = await supabase.functions.invoke(
         "expert-chat",
-        {
-          body: { query: userMessage },
-        },
+        { body: payload }
       );
 
-      if (error) {
-        // Try to extract the error code from the response body if possible,
-        // strictly speaking supabase throws on network errors, but returns API errors in 'error'
-        // variable which might be an object or string.
-        // The backend sends { error: "CODE" }. Supabase client often parses this.
-        // Let's assume error.message or error context contains the code if it was a custom throw.
-        throw error;
-      }
-
-      setMessages(
-        (prev) => [...prev, {
-          role: "assistant",
-          content: data.response,
-        }],
-      );
-    } catch (error: unknown) {
-      console.error("Error in chat:", error);
-
-      // Attempt to extract the code.
-      let code = "UNKNOWN_ERROR";
-      const err = error as {
-        context?: { json?: { error?: string } };
-        message?: string;
-      };
-
-      if (typeof error === "string") {
-        code = error;
-      } else if (err?.context?.json?.error) {
-        code = err.context.json.error;
-      } else if (err?.message) {
-        code = err.message;
-      }
+      if (error) throw error;
 
       setMessages((prev) => [...prev, {
         role: "assistant",
-        content: getErrorMessage(code, language),
+        content: data.response,
+      }]);
+    } catch (error: any) {
+      console.error("Error in chat:", error);
+      const msg = error.message || "UNKNOWN_ERROR";
+      setMessages((prev) => [...prev, {
+        role: "assistant",
+        content: getErrorMessage(msg, language),
       }]);
     } finally {
       setIsLoading(false);
@@ -147,177 +162,210 @@ const LinkedInExpertChat: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col w-full h-full max-h-[85vh] max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 ring-1 ring-slate-900/5">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-brand-600 via-brand-500 to-indigo-600 p-5 flex items-center justify-between shadow-lg relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-soft-light">
-        </div>
-        <div className="absolute top-0 right-0 p-4 opacity-10">
-          <Sparkles
-            size={120}
-            className="text-white transform rotate-12"
-          />
-        </div>
-        <div className="flex items-center gap-4 relative z-10">
-          <div className="bg-white/10 p-2.5 rounded-2xl backdrop-blur-md border border-white/20 shadow-inner">
-            <MessageSquareText size={28} className="text-white" />
-          </div>
-          <div>
-            <h2 className="font-display font-bold text-xl text-white tracking-tight">
-              Nexus
-            </h2>
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)] animate-pulse">
-              </div>
-              <p className="text-xs text-brand-50 font-medium">
-                {language === "es"
-                  ? "Online • Experto en LinkedIn"
-                  : "Online • LinkedIn Expert"}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="flex w-full h-full bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/40 overflow-hidden ring-1 ring-slate-900/5 relative">
+      
+      {/* Background Grid */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 contrast-125 pointer-events-none z-0"></div>
+      <div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_1px_center] pointer-events-none z-0"></div>
 
-      {/* Messages Area */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent"
-      >
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex ${
-              msg.role === "user" ? "justify-end" : "justify-start"
-            } animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards`}
-            style={{ animationDelay: `${i * 50}ms` }}
-          >
-            <div
-              className={`flex gap-4 max-w-[85%] ${
-                msg.role === "user" ? "flex-row-reverse" : "flex-row"
-              }`}
+      {/* Sidebar: Context Hub */}
+      <AnimatePresence>
+        {showContextSidebar && (
+            <motion.div 
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: 280, opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                className="hidden md:flex flex-col border-r border-slate-200/60 bg-white/50 backdrop-blur-md z-10"
             >
-              <div
-                className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${
-                  msg.role === "user"
-                    ? "bg-gradient-to-br from-indigo-500 to-purple-600 text-white"
-                    : "bg-white text-brand-600 border border-slate-100"
-                }`}
-              >
-                {msg.role === "user"
-                  ? (
-                    user && getAvatarUrl(user)
-                      ? (
-                        <img
-                          src={getAvatarUrl(user)}
-                          alt={user.name}
-                          className="w-full h-full rounded-full object-cover border-2 border-white/20"
-                        />
-                      )
-                      : <UserCircle2 size={24} />
-                  )
-                  : <MessageSquareText size={20} />}
-              </div>
-
-              <div
-                className={`flex flex-col ${
-                  msg.role === "user" ? "items-end" : "items-start"
-                }`}
-              >
-                <div
-                  className={`p-5 rounded-2xl text-[15px] leading-relaxed shadow-sm transition-all hover:shadow-md ${
-                    msg.role === "user"
-                      ? "bg-gradient-to-br from-indigo-600 to-brand-600 text-white rounded-tr-sm"
-                      : "bg-white text-slate-700 border border-slate-100 rounded-tl-sm ring-1 ring-slate-900/5"
-                  }`}
-                >
-                  {msg.content.split("\n").map((line, j) => (
-                    <React.Fragment key={j}>
-                      {line.replace(/\*\*/g, "")}
-                      {j <
-                          msg.content.split("\n")
-                              .length - 1 && <br />}
-                    </React.Fragment>
-                  ))}
+                <div className="p-5 border-b border-slate-200/60 flex items-center gap-2">
+                    <BrainCircuit className="w-5 h-5 text-indigo-600" />
+                    <h3 className="font-bold text-slate-800 text-sm tracking-tight">Active Context</h3>
                 </div>
-                <span className="text-[10px] text-slate-400 mt-1.5 px-1 opacity-70">
-                  {new Date().toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
+                
+                <div className="flex-1 p-5 space-y-6 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Brand Voice</label>
+                        <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100/50 text-xs text-indigo-900 leading-relaxed font-medium">
+                            {user?.brandVoice || (language === "es" ? "No definido. Nexus usará un tono profesional estándar." : "Not defined. Nexus will use a standard professional tone.")}
+                        </div>
+                    </div>
 
-        {isLoading && (
-          <div className="flex justify-start animate-fade-in">
-            <div className="flex gap-4 max-w-[85%]">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white flex items-center justify-center border border-slate-100 shadow-sm">
-                <MessageSquareText
-                  size={20}
-                  className="text-brand-400 animate-pulse"
-                />
-              </div>
-              <div className="bg-white px-6 py-5 rounded-2xl rounded-tl-sm border border-slate-100 shadow-sm flex items-center gap-3">
-                <div className="flex gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-brand-400 animate-bounce [animation-delay:-0.3s]">
-                  </div>
-                  <div className="w-2 h-2 rounded-full bg-brand-400 animate-bounce [animation-delay:-0.15s]">
-                  </div>
-                  <div className="w-2 h-2 rounded-full bg-brand-400 animate-bounce">
-                  </div>
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">User Profile</label>
+                        <div className="flex items-center gap-3 p-2 bg-white/60 rounded-xl border border-slate-200/50">
+                            <img src={getAvatarUrl(user)} className="w-10 h-10 rounded-full border border-white shadow-sm" alt="User" />
+                            <div>
+                                <p className="text-sm font-bold text-slate-700 leading-none">{user?.name}</p>
+                                <p className="text-[10px] text-slate-500 truncate max-w-[140px] pt-1">{user?.headline || "No headline"}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                     <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Mode</label>
+                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200/50">
+                            <span className="text-xs font-medium text-slate-600">Ghostwriter</span>
+                            <button 
+                                onClick={() => setIsGhostwriter(!isGhostwriter)}
+                                className={`w-10 h-5 rounded-full relative transition-colors ${isGhostwriter ? "bg-indigo-600" : "bg-slate-300"}`}
+                            >
+                                <motion.div 
+                                    animate={{ x: isGhostwriter ? 20 : 2 }}
+                                    className="w-4 h-4 bg-white rounded-full absolute top-0.5 shadow-sm" 
+                                />
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <span className="text-xs font-medium text-slate-400 animate-pulse">
-                  {language === "es" ? "Pensando..." : "Thinking..."}
-                </span>
-              </div>
-            </div>
-          </div>
+            </motion.div>
         )}
-      </div>
+      </AnimatePresence>
 
-      {/* Input Area */}
-      <div className="p-5 bg-white border-t border-slate-100/80 backdrop-blur-sm relative z-20">
-        <div className="relative flex items-center gap-3 max-w-4xl mx-auto">
-          <div className="flex-1 relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-brand-200 to-indigo-200 rounded-2xl opacity-0 group-focus-within:opacity-50 transition-opacity -m-0.5 blur-sm">
-            </div>
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder={language === "es"
-                ? "Pregúntame sobre estrategias, posts virales..."
-                : "Ask me about strategies, viral posts..."}
-              className="w-full relative bg-slate-50 border-0 ring-1 ring-slate-200 rounded-2xl px-5 py-4 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:bg-white transition-all shadow-sm"
-              disabled={isLoading}
-            />
-          </div>
-          <button
-            type="button"
-            onClick={handleSend}
-            disabled={!input.trim() || isLoading}
-            className={`p-4 rounded-xl transition-all duration-300 transform ${
-              !input.trim() || isLoading
-                ? "bg-slate-100 text-slate-300 cursor-not-allowed"
-                : "bg-gradient-to-br from-brand-600 to-indigo-600 text-white shadow-lg shadow-brand-500/30 hover:shadow-brand-500/40 hover:-translate-y-0.5 active:scale-95 hover:rotate-2"
-            }`}
-          >
-            {isLoading
-              ? <Loader2 size={24} className="animate-spin" />
-              : <SendHorizontal size={24} />}
-          </button>
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col relative z-20">
+         {/* Toggle Sidebar Button (Mobile/Desktop) */}
+         <button 
+            onClick={() => setShowContextSidebar(!showContextSidebar)}
+            className="absolute top-4 left-4 z-50 p-2 bg-white/80 backdrop-blur-md rounded-lg shadow-sm border border-slate-200/60 hover:bg-white text-slate-500 hover:text-indigo-600 transition-all hidden md:block"
+        >
+            {showContextSidebar ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+         </button>
+
+        {/* Messages */}
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 scrollbar-thin scrollbar-thumb-slate-200/50">
+            {messages.map((msg, i) => (
+                <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 350, damping: 25, delay: i * 0.05 }}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                    <div className={`flex flex-col max-w-[85%] md:max-w-[70%] ${msg.role === "user" ? "items-end" : "items-start"}`}>
+                        <div className={`
+                            flex gap-3 p-4 rounded-2xl shadow-sm backdrop-blur-md border 
+                            ${msg.role === "user" 
+                                ? "bg-gradient-to-br from-indigo-600 to-indigo-500 text-white rounded-tr-sm border-indigo-400/20" 
+                                : "bg-white/70 text-slate-700 rounded-tl-sm border-white/50 shadow-soft-glow"}
+                        `}>
+                            <div className="flex-col w-full">
+                                {msg.image && (
+                                    <div className="mb-3 rounded-xl overflow-hidden shadow-md border border-white/20">
+                                        <img src={msg.image} alt="Uploaded content" className="w-full h-auto max-h-[200px] object-cover" />
+                                    </div>
+                                )}
+                                <div className="text-[15px] leading-relaxed whitespace-pre-line">
+                                    {msg.content}
+                                </div>
+                            </div>
+                        </div>
+                        <span className={`text-[10px] mt-1.5 opacity-40 font-medium px-1 ${msg.role === "user" ? "text-right" : "text-left"}`}>
+                             {msg.role === "assistant" ? "Nexus AI • Strategic Advisor" : "You"}
+                        </span>
+                    </div>
+                </motion.div>
+            ))}
+            
+             {/* Loading Indicator */}
+            {isLoading && (
+                 <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex justify-start w-full"
+                >
+                    <div className="bg-white/70 backdrop-blur-md border border-white/60 p-4 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-3">
+                         <div className="relative w-8 h-8 flex items-center justify-center">
+                            <motion.div 
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                className="w-full h-full rounded-full border-2 border-indigo-100 border-t-indigo-500"
+                            />
+                            <Bot className="w-4 h-4 text-indigo-500 absolute" />
+                         </div>
+                         <span className="text-xs font-semibold text-slate-500 animate-pulse">
+                             {language === "es" ? "Analizando estrategia..." : "Analyzing strategy..."}
+                         </span>
+                    </div>
+                </motion.div>
+            )}
         </div>
-        <div className="text-center mt-3 flex items-center justify-center gap-1.5 opacity-60">
-          <Sparkles size={10} className="text-brand-500" />
-          <p className="text-[10px] text-slate-400 font-medium">
-            {language === "es"
-              ? "Potenciado por Kolink AI"
-              : "Powered by Kolink AI"}
-          </p>
+
+        {/* Input Dock */}
+        <div className="p-5 bg-white/60 backdrop-blur-xl border-t border-white/50 relative z-30">
+            {/* Image Preview Area */}
+            <AnimatePresence>
+                {imagePreview && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 10, height: 0 }} 
+                        animate={{ opacity: 1, y: 0, height: "auto" }}
+                        exit={{ opacity: 0, y: 10, height: 0 }}
+                        className="mb-3 relative inline-block"
+                    >
+                        <div className="relative group rounded-xl overflow-hidden shadow-md border border-indigo-200">
+                             <img src={imagePreview} className="h-20 w-auto object-cover" alt="Preview" />
+                             <button 
+                                onClick={clearImage}
+                                className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                             >
+                                <X className="w-3 h-3" />
+                             </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <div className="relative flex items-end gap-2 bg-white border border-slate-200 hover:border-indigo-300 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 rounded-2xl p-2 transition-all shadow-sm">
+                {/* Clip Button */}
+                <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors self-end mb-0.5"
+                    title="Upload Image"
+                >
+                    <Paperclip className="w-5 h-5" />
+                </button>
+                <input 
+                    type="file" 
+                    ref={fileInputRef}
+                    className="hidden" 
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                />
+
+                <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSend();
+                        }
+                    }}
+                    placeholder={language === "es" ? "Escribe un borrador o pide consejo..." : "Type a draft or ask for advice..."}
+                    className="w-full max-h-[120px] bg-transparent border-0 focus:ring-0 text-slate-700 placeholder:text-slate-400 resize-none py-3.5 text-sm font-medium leading-relaxed"
+                    rows={1}
+                    style={{ minHeight: '48px' }}
+                />
+
+                <motion.button
+                    onClick={handleSend}
+                    disabled={(!input.trim() && !imageFile) || isLoading}
+                    whileTap={{ scale: 0.95 }}
+                    className={`p-3 rounded-xl mb-0.5 transition-all self-end ${
+                        (!input.trim() && !imageFile) || isLoading
+                         ? "bg-slate-100 text-slate-300"
+                         : "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-700"
+                    }`}
+                >
+                    <SendHorizontal className="w-5 h-5" />
+                </motion.button>
+            </div>
+            
+            <div className="text-center mt-3">
+                 <p className="text-[10px] text-slate-400 font-medium flex items-center justify-center gap-1.5">
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    <span>Nexus AI Strategic Engine (Gemini 2.0 Flash)</span>
+                 </p>
+            </div>
         </div>
       </div>
     </div>

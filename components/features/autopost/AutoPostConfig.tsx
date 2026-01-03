@@ -63,7 +63,9 @@ const AutoPostConfig: React.FC<AutoPostConfigProps> = ({
     };
 
     return (
-        <div className="bg-white border border-slate-200 rounded-[2.5rem] p-5 shadow-sm relative overflow-hidden group">
+        <div className="relative overflow-hidden bg-white border border-border rounded-xl p-5 shadow-sm group transition-all duration-300 hover:border-brand-200">
+            {/* Bento Corner Light */}
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-brand-500/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             {/* Pocket Header */}
             <div
                 className="flex items-center justify-between mb-4 cursor-pointer group/header"
@@ -72,7 +74,8 @@ const AutoPostConfig: React.FC<AutoPostConfigProps> = ({
                 <div className="space-y-1">
                     <h3 className="text-xl font-display font-bold text-slate-900 flex items-center gap-2">
                         <Sliders
-                            className={`w-5 h-5 text-sky-600 transition-transform duration-300 ${
+                            strokeWidth={1.5}
+                            className={`w-5 h-5 text-brand-600 transition-transform duration-300 ${
                                 isConfigOpen ? "rotate-90" : ""
                             }`}
                         />
@@ -108,7 +111,7 @@ const AutoPostConfig: React.FC<AutoPostConfigProps> = ({
             {isConfigOpen && (
                 <div className="space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
                     {/* Core Parameters Row */}
-                    <div className="grid grid-cols-1 gap-4 p-4 bg-slate-50/50 rounded-3xl border border-slate-100/50">
+                    <div className="grid grid-cols-1 gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-200/60/60/50">
                         {/* Frequency Area */}
                         <div className="space-y-3">
                             <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
@@ -138,7 +141,7 @@ const AutoPostConfig: React.FC<AutoPostConfigProps> = ({
                         {/* Tone Area */}
                         <div className="space-y-3">
                             <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                                <Palette className="w-3.5 h-3.5" />
+                                <Palette strokeWidth={1.5} className="w-3.5 h-3.5" />
                                 {t.activity.autoPilotTone}
                             </label>
                             <CustomSelect
@@ -166,7 +169,7 @@ const AutoPostConfig: React.FC<AutoPostConfigProps> = ({
                                 onChange={(e) => setAudience(e.target.value)}
                                 placeholder={t.config.audiencePlaceholder ||
                                     "e.g. SaaS Founders, Marketing Managers"}
-                                className="w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 outline-none text-sm font-semibold transition-all hover:bg-white placeholder:text-slate-400"
+                                className="w-full h-11 px-4 bg-slate-50 border border-slate-200/60/60 rounded-xl focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 outline-none text-sm font-semibold transition-all hover:bg-white placeholder:text-slate-400"
                             />
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600 border border-sky-100 opacity-60">
                                 <Bot className="w-4 h-4" />
@@ -192,13 +195,13 @@ const AutoPostConfig: React.FC<AutoPostConfigProps> = ({
                                         e.key === "Enter" && handleAddTopic()}
                                     placeholder={t.config.topicsPlaceholder ||
                                         "Add industrial niche..."}
-                                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 outline-none text-sm font-semibold transition-all hover:bg-white placeholder:text-slate-400"
+                                    className="w-full h-11 px-4 bg-slate-50 border border-slate-200/60/60 rounded-xl focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 outline-none text-sm font-semibold transition-all hover:bg-white placeholder:text-slate-400"
                                 />
                             </div>
                             <button
                                 onClick={handleAddTopic}
                                 disabled={!newTopic.trim()}
-                                className="h-11 px-4 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale"
+                                className="h-11 px-4 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale"
                             >
                                 <Plus className="w-5 h-5" />
                                 <span className="text-sm font-bold hidden md:block">
@@ -208,7 +211,7 @@ const AutoPostConfig: React.FC<AutoPostConfigProps> = ({
                         </div>
 
                         {/* Modern Topic Chips Layout */}
-                        <div className="flex flex-wrap gap-2.5 min-h-[80px] p-4 bg-white border border-slate-100 rounded-[1.5rem] shadow-inner shadow-slate-100/50 relative overflow-hidden group/chips">
+                        <div className="flex flex-wrap gap-2.5 min-h-[80px] p-4 bg-white border border-slate-200/60/60 rounded-[1.5rem] shadow-inner shadow-slate-100/50 relative overflow-hidden group/chips">
                             {/* Faint Grid Background */}
                             <div
                                 className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -249,11 +252,11 @@ const AutoPostConfig: React.FC<AutoPostConfigProps> = ({
                     </div>
 
                     {/* Final Footer Actions */}
-                    <div className="flex justify-end pt-4 border-t border-slate-100/60">
+                    <div className="flex justify-end pt-4 border-t border-slate-200/60/60/60">
                         <button
                             onClick={onSave}
                             disabled={isSaving}
-                            className="group relative px-6 h-11 bg-sky-600 text-white font-bold rounded-2xl shadow-xl shadow-sky-500/20 hover:bg-sky-700 hover:-translate-y-1 transition-all flex items-center gap-3 disabled:opacity-70 disabled:cursor-wait"
+                            className="group relative px-6 h-11 bg-sky-600 text-white font-bold rounded-xl shadow-xl shadow-sky-500/20 hover:bg-sky-700 hover:-translate-y-1 transition-all flex items-center gap-3 disabled:opacity-70 disabled:cursor-wait"
                         >
                             {isSaving
                                 ? <Loader2 className="w-5 h-5 animate-spin" />

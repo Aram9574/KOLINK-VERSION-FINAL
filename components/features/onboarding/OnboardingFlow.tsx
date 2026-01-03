@@ -63,7 +63,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-brand-200/30 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-200/30 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="bg-white/80 backdrop-blur-xl border border-white/50 w-full max-w-xl p-8 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 my-auto">
+      <div className="bg-white/80 backdrop-blur-xl border border-white/50 w-full max-w-xl p-8 rounded-xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 my-auto">
         {/* Progress Bar */}
         <div className="flex gap-2 mb-8">
           <div className={`h-1.5 rounded-full flex-1 transition-all duration-500 ${step >= 1 ? 'bg-brand-600' : 'bg-slate-100'}`} />
@@ -103,7 +103,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
         )}
 
         {/* Footer Disclaimer */}
-        <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+        <div className="mt-6 pt-6 border-t border-slate-200/60/60 text-center">
           <p className="text-xs text-slate-400 flex items-center justify-center gap-1.5">
             <Lock className="w-3 h-3" />
             {t.footer}

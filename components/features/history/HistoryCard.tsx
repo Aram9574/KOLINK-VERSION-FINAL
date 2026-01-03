@@ -69,7 +69,7 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
     return (
         <div
             onClick={() => onSelect(post)}
-            className="break-inside-avoid group bg-white rounded-2xl border border-slate-200 p-6 hover:border-brand-300 hover:shadow-xl hover:shadow-brand-500/5 transition-all duration-300 cursor-pointer flex flex-col hover:-translate-y-1 relative overflow-hidden"
+            className="break-inside-avoid group bg-white/40 backdrop-blur-md border border-slate-200/50 hover:border-brand-500/40 shadow-ai hover:shadow-ai-hover p-6 cursor-pointer flex flex-col hover:-translate-y-1 relative overflow-hidden transition-all duration-300 rounded-xl"
         >
             {/* Status Icons & Action */}
             <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
@@ -93,18 +93,18 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
             <div className="flex flex-wrap items-center mb-4 gap-2 pr-8">
                 {post.status === "scheduled" && (
                     <span className="flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider rounded-md border border-blue-100">
-                        <Clock className="w-3 h-3" />
+                        <Clock strokeWidth={1.5} className="w-3 h-3" />
                         {language === "es" ? "Prog" : "Sched"}
                     </span>
                 )}
                 {post.status === "draft" && (
-                    <span className="flex items-center gap-1 px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider rounded-md border border-slate-200">
-                        <FileEdit className="w-3 h-3" />
+                    <span className="flex items-center gap-1 px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider rounded-md border border-slate-200/60">
+                        <FileEdit strokeWidth={1.5} className="w-3 h-3" />
                         {language === "es" ? "Borrador" : "Draft"}
                     </span>
                 )}
                 <div className="flex gap-2">
-                    <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider rounded-md border border-slate-200 group-hover:bg-brand-50 group-hover:text-brand-700 group-hover:border-brand-200 transition-colors">
+                    <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider rounded-md border border-slate-200/60 group-hover:bg-brand-50 group-hover:text-brand-700 group-hover:border-brand-200 transition-colors">
                         {toneLabel}
                     </span>
                     <span className="px-2.5 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase tracking-wider rounded-md border border-indigo-100 group-hover:border-indigo-200 transition-colors">
@@ -132,7 +132,7 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
                         {post.tags.slice(0, 3).map((tag) => (
                             <span
                                 key={tag}
-                                className="text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100"
+                                className="text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200/60"
                             >
                                 #{tag}
                             </span>
@@ -142,10 +142,10 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
             </div>
 
             {/* Footer Stats & Actions */}
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
+            <div className="pt-4 border-t border-slate-200/60 flex items-center justify-between mt-auto">
                 <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1.5 text-xs text-slate-400 font-medium whitespace-nowrap">
-                        <Calendar className="w-3.5 h-3.5" />
+                        <Calendar strokeWidth={1.5} className="w-3.5 h-3.5" />
                         {new Date(post.createdAt).toLocaleDateString(
                             language === "es" ? "es-ES" : "en-US",
                             { month: "short", day: "numeric" },
@@ -157,7 +157,7 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
                                 getScoreColor(score)
                             } text-[10px] font-bold`}
                         >
-                            <TrendingUp className="w-3 h-3" />
+                            <TrendingUp strokeWidth={1.5} className="w-3 h-3" />
                             {score}
                         </div>
                     )}
@@ -169,7 +169,7 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
                         className="p-2 hover:bg-brand-50 text-slate-400 hover:text-brand-600 rounded-lg transition-colors"
                         title={t.copy}
                     >
-                        <Copy className="w-4 h-4" />
+                        <Copy strokeWidth={1.5} className="w-4 h-4" />
                     </button>
                     {onShare && (
                         <button
@@ -180,7 +180,7 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
                             className="p-2 hover:bg-green-50 text-slate-400 hover:text-green-600 rounded-lg transition-colors lg:hidden"
                             title="Share"
                         >
-                            <Share2 className="w-4 h-4" />
+                            <Share2 strokeWidth={1.5} className="w-4 h-4" />
                         </button>
                     )}
                     <button
@@ -191,14 +191,14 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
                         className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"
                         title={t.actions.reuse}
                     >
-                        <RotateCcw className="w-4 h-4" />
+                        <RotateCcw strokeWidth={1.5} className="w-4 h-4" />
                     </button>
                     <button
                         onClick={(e) => onDelete(post.id, e)}
                         className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-lg transition-colors"
                         title={t.delete}
                     >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 strokeWidth={1.5} className="w-4 h-4" />
                     </button>
                 </div>
             </div>

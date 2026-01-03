@@ -36,7 +36,7 @@ const MiniPreview = ({ template }: { template: CarouselTemplate }) => {
     // A simplified CSS representation of the template's vibe
     return (
         <div
-            className={`w-full aspect-[4/5] rounded-lg border border-slate-200 overflow-hidden relative shadow-inner group-hover/card:shadow-md transition-all duration-500 ${
+            className={`w-full aspect-[4/5] rounded-lg border border-slate-200/60/60 overflow-hidden relative shadow-inner group-hover/card:shadow-md transition-all duration-500 ${
                 template.styles.container.replace("aspect-[4/5]", "")
             }`}
             style={{ fontSize: "4px" }}
@@ -94,7 +94,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
             {/* Trigger Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-4 px-5 py-2.5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300 group relative overflow-hidden"
+                className="flex items-center gap-4 px-5 py-2.5 bg-white border border-slate-200/60/60 rounded-xl shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300 group relative overflow-hidden"
             >
                 <div className="flex items-center gap-3 relative z-10">
                     <div className="p-2 bg-blue-50 rounded-xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
@@ -119,13 +119,13 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                         isOpen ? "rotate-180 text-blue-500" : ""
                     }`}
                 >
-                    <ChevronDown size={18} strokeWidth={3} />
+                    <ChevronDown size={18} strokeWidth={1.5} />
                 </div>
             </button>
 
             {/* Pocket Content */}
             {isOpen && (
-                <div className="w-full max-w-4xl mt-6 p-8 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-500 z-50 overflow-hidden">
+                <div className="w-full max-w-4xl mt-6 p-8 bg-white/80 backdrop-blur-xl border border-slate-200/60/60 rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-500 z-50 overflow-hidden">
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex flex-col">
                             <h3 className="text-lg font-black text-slate-900">
@@ -145,7 +145,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                             ].map((cat) => (
                                 <div
                                     key={cat}
-                                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-100 text-[9px] font-bold text-slate-400"
+                                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200/60/60 text-[9px] font-bold text-slate-400"
                                 >
                                     <CategoryIcon category={cat} />
                                     {cat}
@@ -165,10 +165,10 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                                         onSelect(template.id);
                                         setIsOpen(false);
                                     }}
-                                    className={`group/card relative p-2 rounded-2xl border transition-all duration-500 flex flex-col gap-3 ${
+                                    className={`group/card relative p-2 rounded-xl border transition-all duration-500 flex flex-col gap-3 ${
                                         isSelected
                                             ? "border-blue-500 bg-blue-50/30 ring-4 ring-blue-500/5 shadow-lg"
-                                            : "border-slate-100 bg-white hover:border-blue-200 hover:shadow-xl hover:-translate-y-1"
+                                            : "border-slate-200/60/60 bg-white hover:border-blue-200 hover:shadow-xl hover:-translate-y-1"
                                     }`}
                                 >
                                     <MiniPreview template={template} />

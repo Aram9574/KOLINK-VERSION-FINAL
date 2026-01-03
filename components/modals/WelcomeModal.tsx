@@ -34,11 +34,11 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ user, onStartTour, onSkip }
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-500" />
 
             {/* Modal */}
-            <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 text-center border border-slate-100">
+            <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl p-8 animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 text-center border border-slate-200/60/60">
                 
                 {/* Decorative Icon Blob */}
-                <div className="mx-auto mb-6 w-20 h-20 bg-brand-50 rounded-2xl flex items-center justify-center relative">
-                     <div className="absolute inset-0 bg-brand-100/50 rounded-2xl blur-xl animate-pulse"></div>
+                <div className="mx-auto mb-6 w-20 h-20 bg-brand-50 rounded-xl flex items-center justify-center relative">
+                     <div className="absolute inset-0 bg-brand-100/50 rounded-xl blur-xl animate-pulse"></div>
                      <span className="text-4xl relative z-10">🚀</span>
                 </div>
 

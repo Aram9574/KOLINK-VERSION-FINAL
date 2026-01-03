@@ -1,7 +1,7 @@
 import React from 'react';
-import { PenTool, Cpu, Rocket, TrendingUp } from 'lucide-react';
-import { translations } from '../../translations';
-import { AppLanguage } from '../../types';
+import { PenTool as _PenTool, Cpu as _Cpu, Rocket as _Rocket, TrendingUp as _TrendingUp } from 'lucide-react';
+import { translations } from '../../translations.ts';
+import { AppLanguage } from '../../types.ts';
 
 interface HowItWorksSectionProps {
     language: AppLanguage;
@@ -11,7 +11,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ language }) => {
     const t = translations[language];
 
     return (
-        <section id="howitworks" className="py-32 bg-slate-50 relative overflow-hidden">
+        <section id="howitworks" className="py-32 bg-transparent relative overflow-hidden">
             {/* Background Decorations */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
                 <div className="absolute top-40 left-0 w-96 h-96 bg-brand-100/50 rounded-full blur-3xl mix-blend-multiply opacity-70 animate-blob"></div>
@@ -30,7 +30,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ language }) => {
 
                     {/* Step 1: Input */}
                     <div className="relative group">
-                        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl shadow-brand-900/5 hover:shadow-2xl hover:shadow-brand-900/10 hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
+                        <div className="card-premium p-8 rounded-3xl h-full flex flex-col group-hover:-translate-y-1 transition-transform duration-300">
                             {/* Visual Mockup: Input UI */}
                             <div className="h-48 bg-slate-50 rounded-2xl mb-8 flex items-center justify-center relative overflow-hidden border border-slate-100 group-hover:border-brand-100 transition-colors">
                                 <div className="absolute inset-x-6 top-10 bottom-0 bg-white rounded-t-xl border border-slate-200 shadow-sm p-4">
@@ -64,7 +64,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ language }) => {
 
                     {/* Step 2: Process */}
                     <div className="relative group">
-                        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl shadow-indigo-900/5 hover:shadow-2xl hover:shadow-indigo-900/10 hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
+                        <div className="card-premium p-8 rounded-3xl h-full flex flex-col group-hover:-translate-y-1 transition-transform duration-300">
                             {/* Visual Mockup: Framework Selection */}
                             <div className="h-48 bg-indigo-50/50 rounded-2xl mb-8 flex items-center justify-center relative overflow-hidden border border-indigo-100/50 group-hover:border-indigo-200 transition-colors">
                                 <div className="absolute inset-x-6 top-10 bottom-0 bg-white rounded-t-xl border border-slate-200 shadow-sm p-4">
@@ -104,7 +104,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ language }) => {
 
                     {/* Step 3: Result */}
                     <div className="relative group">
-                        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl shadow-green-900/5 hover:shadow-2xl hover:shadow-green-900/10 hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
+                        <div className="card-premium p-8 rounded-3xl h-full flex flex-col group-hover:-translate-y-1 transition-transform duration-300">
                             {/* Visual Mockup: Final Post */}
                             <div className="h-48 bg-green-50/30 rounded-2xl mb-8 flex items-center justify-center relative overflow-hidden border border-green-100/50 group-hover:border-green-200 transition-colors">
                                 <div className="absolute inset-x-8 top-8 bottom-0 bg-white rounded-t-xl border border-slate-200 shadow-sm p-4">

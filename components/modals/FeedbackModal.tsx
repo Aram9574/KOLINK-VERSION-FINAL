@@ -72,7 +72,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, language
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-            <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300 border border-white/20">
+            <div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300 border border-white/20">
 
                 {/* Header with Gradient */}
                 <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 p-8 text-white">
@@ -90,7 +90,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, language
                     <div className="absolute bottom-[-50%] right-[-10%] w-48 h-48 bg-indigo-500/30 rounded-full blur-3xl" />
 
                     <div className="relative z-10">
-                        <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4 border border-white/10 backdrop-blur-md">
+                        <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-4 border border-white/10 backdrop-blur-md">
                             <Sparkles className="w-6 h-6 text-brand-300" />
                         </div>
                         <h3 className="text-2xl font-bold tracking-tight">{t.title}</h3>
@@ -115,9 +115,9 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, language
                                 <button
                                     type="button"
                                     onClick={() => setType('bug')}
-                                    className={`group relative p-4 rounded-2xl border text-left transition-all duration-200 outline-none ${type === 'bug'
+                                    className={`group relative p-4 rounded-xl border text-left transition-all duration-200 outline-none ${type === 'bug'
                                         ? 'border-red-200 bg-red-50/50 ring-2 ring-red-100 ring-offset-1'
-                                        : 'border-slate-100 hover:border-slate-300 hover:bg-slate-50'
+                                        : 'border-slate-200/60/60 hover:border-slate-300 hover:bg-slate-50'
                                         }`}
                                 >
                                     <div className={`p-2.5 w-fit rounded-xl mb-3 transition-colors ${type === 'bug' ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-red-500 group-hover:shadow-sm'}`}>
@@ -130,9 +130,9 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, language
                                 <button
                                     type="button"
                                     onClick={() => setType('feature')}
-                                    className={`group relative p-4 rounded-2xl border text-left transition-all duration-200 outline-none ${type === 'feature'
+                                    className={`group relative p-4 rounded-xl border text-left transition-all duration-200 outline-none ${type === 'feature'
                                         ? 'border-amber-200 bg-amber-50/50 ring-2 ring-amber-100 ring-offset-1'
-                                        : 'border-slate-100 hover:border-slate-300 hover:bg-slate-50'
+                                        : 'border-slate-200/60/60 hover:border-slate-300 hover:bg-slate-50'
                                         }`}
                                 >
                                     <div className={`p-2.5 w-fit rounded-xl mb-3 transition-colors ${type === 'feature' ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-amber-500 group-hover:shadow-sm'}`}>
@@ -156,7 +156,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, language
                                         value={message}
                                         onChange={(e) => setMessage(e.target.value)}
                                         placeholder={t.placeholder}
-                                        className="w-full h-32 p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 resize-none text-slate-700 placeholder:text-slate-400 font-medium transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]"
+                                        className="w-full h-32 p-4 bg-slate-50 border border-slate-200/60 rounded-xl focus:outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 resize-none text-slate-700 placeholder:text-slate-400 font-medium transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]"
                                     />
                                 </div>
                             </div>
@@ -166,7 +166,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, language
                                 <button
                                     type="submit"
                                     disabled={isSubmitting || !message.trim()}
-                                    className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-brand-600 hover:shadow-lg hover:shadow-brand-500/25 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                                    className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-brand-600 hover:shadow-lg hover:shadow-brand-500/25 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                                 >
                                     {isSubmitting ? (
                                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

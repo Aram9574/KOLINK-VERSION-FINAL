@@ -119,7 +119,9 @@ export type AppTab =
   | "carousel"
   | "chat"
   | "editor"
-  | "audit";
+  | "voice-lab"
+  | "audit"
+  | "insight-responder";
 
 export interface AutoPilotConfig {
   enabled: boolean;
@@ -186,14 +188,52 @@ export interface TourStep {
   position?: "top" | "right" | "bottom" | "left";
 }
 
+export interface StylisticDNA {
+    tone: string;
+    sentence_structure: string;
+    hooks_dna: string[];
+    technical_terms: string[];
+    formatting_rules: string[];
+}
+
 export interface BrandVoice {
   id: string;
   user_id: string;
   name: string;
   description: string;
+  hookPatterns?: { category: string; pattern: string; example: string }[];
+  stylisticDNA?: StylisticDNA;
   isActive?: boolean;
   created_at?: string;
 }
+
+export interface AuditSection {
+  score: number;
+  feedback: string;
+  suggestion?: string;
+  improvements_per_job?: string[];
+  missing_critical_skills?: string[];
+}
+
+export interface AuditResult {
+  global_score: number;
+  industry_detected: string;
+  brand_consistency: string;
+  action_plan: string[];
+  sections_audit: {
+    headline: AuditSection;
+    about: AuditSection;
+    experience: AuditSection;
+    skills_languages: AuditSection;
+  };
+}
+export interface ExperienceItem {
+  company: string;
+  position: string;
+  analysis: string;
+  suggestions: string[];
+}
+
 export interface LinkedInAuditResult {
   score: number;
   summary: string;
@@ -207,12 +247,7 @@ export interface LinkedInAuditResult {
     suggested: string;
     missingKeywords: string[];
   };
-  experience: {
-    company: string;
-    position: string;
-    analysis: string;
-    suggestions: string[];
-  }[];
+  experience: ExperienceItem[];
   skills: {
     current: string[];
     missing: string[];

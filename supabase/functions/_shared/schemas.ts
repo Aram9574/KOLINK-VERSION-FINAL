@@ -1,15 +1,15 @@
 import { z } from "npm:zod@3.22.4";
 
 export const GenerationParamsSchema = z.object({
-  topic: z.string().min(3).max(500),
-  audience: z.string().min(3).max(200),
-  tone: z.string(),
-  framework: z.string(),
-  emojiDensity: z.string(),
-  length: z.string(),
-  creativityLevel: z.number().min(0).max(100),
-  hashtagCount: z.number().min(0).max(5),
-  includeCTA: z.boolean(),
+  topic: z.string().min(1).max(5000),
+  audience: z.string().max(200).optional().default("General Professional Audience"),
+  tone: z.string().optional(),
+  framework: z.string().optional(),
+  emojiDensity: z.string().optional(),
+  length: z.string().optional(),
+  creativityLevel: z.number().min(0).max(100).optional(),
+  hashtagCount: z.number().min(0).max(30).optional(),
+  includeCTA: z.boolean().optional(),
   outputLanguage: z.enum(["en", "es"]).optional(),
   brandVoiceId: z.string().optional(),
 });

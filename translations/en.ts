@@ -1,4 +1,4 @@
-import { EmojiDensity, PostLength, ViralFramework, ViralTone } from "../types";
+import { EmojiDensity, PostLength, ViralFramework, ViralTone } from "../types.ts";
 
 export const en = {
     nav: {
@@ -19,6 +19,11 @@ export const en = {
       titleLine2: "blank page.",
       subtitle:
         "Turn loose ideas into viral posts that connect. Your AI studio to dominate LinkedIn in seconds, not hours.",
+      rotatingWords: [
+        "on LinkedIn 10x faster",
+        "that builds authority",
+        "that converts followers",
+      ],
       ctaPrimary: "Start Creating for Free",
       ctaSecondary: "Watch Demo",
       generating: "Generating Viral Post...",
@@ -191,6 +196,38 @@ export const en = {
         "Finally, an AI that understands LinkedIn formatting. No more massive paragraphs.",
       t3:
         "Kolink saved me 10 hours of writing this week alone. Worth every penny.",
+    },
+    bento: {
+      postGenerator: {
+        title: "AI Post Generator",
+        desc: "Write viral content",
+        subDesc: "Turn loose ideas into optimized posts in seconds."
+      },
+      voiceCloning: {
+        title: "Voice Cloning",
+        desc: "Your essence, scaled",
+        subDesc: "Train AI on your past posts to write exactly like you, but 10x faster."
+      },
+      audit: {
+        title: "Profile Audit",
+        desc: "Analyze your impact",
+        subDesc: "Identify which parts of your profile are driving away potential clients."
+      },
+      carousel: {
+        title: "Carousel Designer",
+        desc: "Maximum retention",
+        subDesc: "Generate visual PDF documents that LinkedIn loves, without touching Canva."
+      },
+      scheduling: {
+        title: "Smart Scheduling",
+        desc: "Timing is everything",
+        subDesc: "Automatically post when your audience is most active."
+      },
+      analytics: {
+        title: "Viral Analytics",
+        desc: "Real growth",
+        subDesc: "Metrics that matter: conversions and reach, not just likes."
+      }
     },
     features: {
       title: "Everything you need to go viral",
@@ -450,6 +487,7 @@ export const en = {
         studio: "Studio",
         carousel: "Carousel Generator",
         ideas: "Idea Generator",
+        insightResponder: "Insight Responder",
         autopilot: "AutoPost",
         history: "History",
         settings: "Settings",
@@ -461,6 +499,39 @@ export const en = {
         logout: "Log Out",
         editor: "Post Editor",
         audit: "Profile Audit",
+        insight: {
+          title: "Insight Responder",
+          subtitle: "Turn screenshots into high-authority comments using",
+          uploadTitle: "Upload LinkedIn Post",
+          uploadDesc: "Drop a screenshot here or paste an image (Cmd+V).",
+          intentLabel: "My Intent (Optional)",
+          intentPlaceholder: "e.g. I want to respectfully disagree about...",
+          toneLabel: "Response Tone",
+          generate: "Generate Insights",
+          suggestions: "AI Suggestions",
+          analyzing: "Analyzing Visual Context...",
+          tones: {
+             technical: "Technical Authority",
+             supportive: "Supportive & Strategic",
+             contrarian: "Subtle Contrarian",
+             connector: "Networking Connector",
+             empathetic: "Empathetic Peer"
+          }
+        },
+        voiceLab: "Voice Lab",
+      },
+      voiceLab: {
+        title: "Voice Lab",
+        description: "Analyze your writing style and generate your unique voice DNA.",
+        scanProfile: "Scan Profile",
+        analyzeDNA: "Analyze DNA",
+        cloneVoice: "Clone Voice",
+        inputPlaceholder: "Paste your text here or select from history...",
+        analyzeButton: "Analyze Voice",
+        scanning: "Scanning...",
+        results: "Analysis Results",
+        saveVoice: "Save Voice",
+        voiceSaved: "Voice DNA Saved!",
       },
       audit: {
         title: "LinkedIn Profile Optimization",

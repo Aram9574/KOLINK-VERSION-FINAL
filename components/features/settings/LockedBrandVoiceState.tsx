@@ -42,12 +42,12 @@ const LockedBrandVoiceState: React.FC<LockedBrandVoiceStateProps> = ({ onUpgrade
                 {t.subtitle}
             </p>
 
-            <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 mb-6 max-w-sm w-full">
+            <div className="bg-slate-50 p-5 rounded-xl border border-slate-200/60/60 mb-6 max-w-sm w-full">
                 <ul className="space-y-3 text-left">
                     {t.features.map((feature, i) => (
                         <li key={i} className="flex items-start gap-2.5 text-slate-600 text-sm">
                             <div className="mt-0.5 min-w-4">
-                                <Check className="w-4 h-4 text-amber-500" strokeWidth={3} />
+                                <Check className="w-4 h-4 text-amber-500" strokeWidth={1.5} />
                             </div>
                             <span>{feature}</span>
                         </li>

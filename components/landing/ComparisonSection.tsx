@@ -1,18 +1,24 @@
 import React from 'react';
 import { Bot, X as XIcon, Sparkles, Check, CheckCircle2, TrendingUp, MoreHorizontal } from 'lucide-react';
-import { translations } from '../../translations';
-import { AppLanguage } from '../../types';
+import { translations } from '../../translations.ts';
+import { AppLanguage } from '../../types.ts';
+
+interface MockContent {
+    badPost: string;
+    goodPostHook: string;
+    goodPostBody: string;
+}
 
 interface ComparisonSectionProps {
     language: AppLanguage;
-    mockContent: any;
+    mockContent: MockContent;
 }
 
 const ComparisonSection: React.FC<ComparisonSectionProps> = ({ language, mockContent }) => {
     const t = translations[language];
 
     return (
-        <section className="py-32 bg-white overflow-hidden relative">
+        <section className="py-32 bg-transparent overflow-hidden relative">
             <div className="max-w-7xl mx-auto px-6 relative z-10">
                 <div className="text-center max-w-3xl mx-auto mb-20">
                     <h2 className="text-4xl md:text-5xl font-display font-bold text-slate-900 mb-6">{t.comparison.title}</h2>
@@ -27,7 +33,7 @@ const ComparisonSection: React.FC<ComparisonSectionProps> = ({ language, mockCon
                     </div>
 
                     {/* Generic AI Card */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 lg:p-10 flex flex-col relative overflow-hidden group">
+                    <div className="card-premium p-8 lg:p-10 flex flex-col relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-slate-200/50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
 
                         <div className="mb-8 relative z-10">
@@ -84,7 +90,7 @@ const ComparisonSection: React.FC<ComparisonSectionProps> = ({ language, mockCon
                     </div>
 
                     {/* Kolink Card - UPDATED: White background with gradient glow instead of dark theme */}
-                    <div className="bg-white border border-brand-100 rounded-3xl p-8 lg:p-10 flex flex-col relative overflow-hidden shadow-2xl shadow-brand-900/10 group ring-4 ring-brand-50">
+                    <div className="card-premium p-8 lg:p-10 flex flex-col relative overflow-hidden shadow-2xl shadow-brand-900/10 group ring-4 ring-brand-50">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-brand-100/50 to-indigo-100/50 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
                         <div className="mb-8 relative z-10">

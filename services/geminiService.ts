@@ -92,13 +92,17 @@ export const generatePostIdeas = async (user: UserProfile, language: AppLanguage
   }
 };
 
+import { StylisticDNA } from '../types';
+
 export interface BrandVoiceAnalysisResult {
   styleName: string;
   toneDescription: string;
   keywords?: string[];
+  hookPatterns?: { category: string; pattern: string; example: string }[];
+  stylisticDNA?: StylisticDNA;
 }
 
-export const analyzeBrandVoice = async (payload: { contentSamples: string[], language: string }): Promise<BrandVoiceAnalysisResult> => {
+export const analyzeBrandVoice = async (payload: { contentSamples: string[], language: string, imageBase64?: string }): Promise<BrandVoiceAnalysisResult> => {
   const { data, error } = await supabase.functions.invoke('analyze-brand-voice', {
     body: payload
   });
@@ -111,4 +115,22 @@ export const analyzeBrandVoice = async (payload: { contentSamples: string[], lan
   if (data.error) throw new Error(data.error);
 
   return data;
+};
+
+export const generateHooks = async (idea: string, brandVoiceId: string, language: string = 'es'): Promise<string[]> => {
+    const { data, error } = await supabase.functions.invoke('generate-hooks', {
+        body: { idea, brandVoiceId, language }
+    });
+
+    if (error) throw new Error(error.message);
+    return data.hooks;
+};
+
+export const generateInsightReply = async (payload: { imageBase64?: string, textContext?: string, userIntent?: string, tone?: string }): Promise<any[]> => {
+    const { data, error } = await supabase.functions.invoke('generate-insight-reply', {
+        body: payload
+    });
+
+    if (error) throw new Error(error.message);
+    return data.replies;
 };

@@ -25,7 +25,7 @@ const VoiceExamples: React.FC<VoiceExamplesProps> = ({ language, styleName }) =>
         : "We went silent for 6 months.\n\nBuilding. Breaking. Rebuilding.\n\nToday, it finally sees the light.\n\nIt's not just a 'product'. It's the solution I desperately needed 2 years ago.\n\nThe result? 👇";
 
     return (
-        <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 mt-6 animate-in fade-in slide-in-from-bottom-2">
+        <div className="bg-slate-50 rounded-xl p-5 border border-slate-200/60/60 mt-6 animate-in fade-in slide-in-from-bottom-2">
             <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
                 <Sparkles className="w-4 h-4 text-brand-500" />
                 {isSpanish ? 'Impacto de tu Voz' : 'Voice Impact Preview'}

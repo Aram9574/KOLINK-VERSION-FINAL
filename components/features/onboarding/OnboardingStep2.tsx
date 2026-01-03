@@ -25,7 +25,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ usageIntent, toggleUs
     return (
         <div className="animate-in fade-in slide-in-from-right-4 duration-500">
             <div className="text-center mb-8">
-                <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-amber-600 shadow-sm">
+                <div className="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-amber-600 shadow-sm">
                     <Target className="w-7 h-7" />
                 </div>
                 <h2 className="text-2xl font-display font-bold text-slate-900 mb-2">{t.title}</h2>
@@ -44,7 +44,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ usageIntent, toggleUs
                             className={`p-4 rounded-xl border text-left transition-all duration-200 relative group
                       ${isSelected
                                     ? 'bg-brand-50 border-brand-500 text-brand-700 ring-1 ring-brand-500 shadow-sm'
-                                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'}`}
+                                    : 'bg-white border-slate-200/60/60 text-slate-600 hover:bg-slate-50 hover:border-slate-300'}`}
                         >
                             {isSelected && (
                                 <div className="absolute top-3 right-3 w-5 h-5 bg-brand-500 rounded-full flex items-center justify-center animate-in zoom-in duration-200">

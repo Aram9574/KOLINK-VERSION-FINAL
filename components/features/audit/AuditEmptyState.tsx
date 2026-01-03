@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
+import { motion } from "framer-motion";
 import { useUser } from "../../../context/UserContext";
 import { translations } from "../../../translations";
-import { Linkedin, Search, FileUp, FileText, CheckCircle2, AlertCircle } from "lucide-react";
+import { Linkedin, Search, FileUp, FileText, CheckCircle2, AlertCircle, Bot, Sparkles } from "lucide-react";
 
 interface AuditEmptyStateProps {
     onStart: (file: File) => void;
@@ -58,17 +59,73 @@ const AuditEmptyState: React.FC<AuditEmptyStateProps> = ({ onStart, hasLatestAud
 
     return (
         <div className="flex flex-col items-center justify-center py-6 px-4">
-            <div className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-[40px] shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden">
+            <div className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-[40px] shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-200/60/60 dark:border-slate-700 overflow-hidden">
                 <div className="p-6 lg:p-8 space-y-6">
-                    {/* Visual Icon */}
-                    <div className="flex justify-center">
-                        <div className="relative">
-                            <div className="w-16 h-16 bg-brand-500/10 dark:bg-brand-500/20 rounded-[24px] flex items-center justify-center transform rotate-6 transition-transform hover:rotate-0 duration-500">
-                                <FileText className="w-8 h-8 text-brand-600 dark:text-brand-400" />
+                    {/* Minimalist AI CSS Illustration */}
+                    <div className="flex justify-center py-4">
+                        <div className="relative w-48 h-48 flex items-center justify-center">
+                            {/* Blurred Concentric Circles */}
+                            <motion.div 
+                                animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                className="absolute w-40 h-40 rounded-full bg-brand-500/10 blur-2xl"
+                            />
+                            <motion.div 
+                                animate={{ scale: [1.2, 1, 1.2], opacity: [0.1, 0.2, 0.1] }}
+                                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                                className="absolute w-32 h-32 rounded-full border border-brand-500/20"
+                            />
+                            
+                            {/* Floating Shimmer Lines */}
+                            <div className="absolute inset-0 overflow-hidden rounded-full">
+                                {[1, 2, 3].map((i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ x: "-100%" }}
+                                        animate={{ x: "200%" }}
+                                        transition={{ 
+                                            duration: 3, 
+                                            repeat: Infinity, 
+                                            delay: i * 0.8,
+                                            ease: "linear" 
+                                        }}
+                                        className="h-px w-32 bg-gradient-to-r from-transparent via-brand-500/40 to-transparent absolute"
+                                        style={{ top: `${20 + i * 25}%` }}
+                                    />
+                                ))}
                             </div>
-                            <div className="absolute -top-1.5 -right-1.5 w-8 h-8 bg-white dark:bg-slate-700 rounded-xl shadow-lg flex items-center justify-center transform -rotate-12 border border-slate-50 dark:border-slate-600">
-                                <Linkedin className="w-4 h-4 text-brand-500" />
+
+                            {/* Core AI Node */}
+                            <div className="relative z-10 w-20 h-20 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl flex items-center justify-center border border-slate-100 dark:border-slate-700">
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                                    className="absolute inset-0 opacity-20"
+                                >
+                                    <Sparkles className="w-full h-full p-4 text-brand-500" />
+                                </motion.div>
+                                <div className="relative bg-brand-500/10 p-3 rounded-xl">
+                                    <Bot className="w-8 h-8 text-brand-600 dark:text-brand-400" />
+                                </div>
                             </div>
+
+                            {/* Floating Metadata Blocks */}
+                            <motion.div 
+                                animate={{ y: [0, -10, 0] }}
+                                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                                className="absolute -top-4 -right-2 p-2 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-50 dark:border-slate-700 text-[8px] font-mono text-slate-400"
+                            >
+                                <div className="w-8 h-1 bg-emerald-500/20 rounded mb-1" />
+                                <div className="w-12 h-1 bg-slate-100 dark:bg-slate-700 rounded" />
+                            </motion.div>
+                            <motion.div 
+                                animate={{ y: [0, 10, 0] }}
+                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                                className="absolute -bottom-2 -left-4 p-2 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-50 dark:border-slate-700 text-[8px] font-mono text-slate-400"
+                            >
+                                <div className="w-10 h-1 bg-brand-500/30 rounded mb-1" />
+                                <div className="w-6 h-1 bg-slate-100 dark:bg-slate-700 rounded" />
+                            </motion.div>
                         </div>
                     </div>
 
@@ -90,7 +147,7 @@ const AuditEmptyState: React.FC<AuditEmptyStateProps> = ({ onStart, hasLatestAud
                                 ? "border-brand-500 bg-brand-50/50 dark:bg-brand-900/10 scale-[1.02]" 
                                 : file 
                                     ? "border-emerald-500/50 bg-emerald-50/30 dark:bg-emerald-900/5" 
-                                    : "border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-500/50"
+                                    : "border-slate-200/60/60 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-500/50"
                             }`}
                             onDragEnter={handleDrag}
                             onDragLeave={handleDrag}
@@ -108,7 +165,7 @@ const AuditEmptyState: React.FC<AuditEmptyStateProps> = ({ onStart, hasLatestAud
                             
                             {file ? (
                                 <div className="flex flex-col items-center animate-in zoom-in duration-300">
-                                    <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center mb-4">
+                                    <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center mb-4">
                                         <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
                                     </div>
                                     <p className="text-slate-900 dark:text-white font-bold">{file.name}</p>
@@ -116,7 +173,7 @@ const AuditEmptyState: React.FC<AuditEmptyStateProps> = ({ onStart, hasLatestAud
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center text-center">
-                                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-900/50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-900/50 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                         <FileUp className="w-8 h-8 text-slate-400 group-hover:text-brand-500 transition-colors" />
                                     </div>
                                     <p className="text-slate-700 dark:text-slate-300 font-semibold mb-1">
@@ -129,7 +186,7 @@ const AuditEmptyState: React.FC<AuditEmptyStateProps> = ({ onStart, hasLatestAud
                             )}
                         </div>
 
-                        <div className="flex items-start gap-3 p-4 bg-blue-50/50 dark:bg-blue-900/10 rounded-2xl border border-blue-100/50 dark:border-blue-900/20">
+                        <div className="flex items-start gap-3 p-4 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-100/50 dark:border-blue-900/20">
                             <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                             <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
                                 <strong>{language === "es" ? "Tip pro:" : "Pro tip:"}</strong> {t.pdfHint}

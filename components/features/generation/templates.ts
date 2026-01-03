@@ -30,7 +30,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         previewColor: "#f8fafc",
         styles: {
             container:
-                "bg-slate-50 text-slate-900 font-sans border border-slate-200",
+                "bg-slate-50 text-slate-900 font-sans border border-slate-200/60/60",
             title:
                 "text-5xl font-extrabold tracking-tight leading-tight text-slate-900",
             content: "text-2xl text-slate-700 leading-relaxed font-light mt-8",
@@ -207,10 +207,10 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
         previewColor: "#ffffff",
         styles: {
             container:
-                "bg-white text-slate-900 font-sans border border-slate-100",
+                "bg-white text-slate-900 font-sans border border-slate-200/60/60",
             title: "text-5xl font-extrabold text-slate-900 leading-tight",
             content:
-                "text-2xl text-slate-600 leading-relaxed mt-8 bg-slate-50 p-8 rounded-2xl border border-slate-100",
+                "text-2xl text-slate-600 leading-relaxed mt-8 bg-slate-50 p-8 rounded-xl border border-slate-200/60/60",
             footer:
                 "text-xs font-bold text-slate-400 uppercase tracking-widest",
             slideNumber:
@@ -293,7 +293,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
             footer:
                 "text-sm font-black uppercase tracking-widest text-white/40",
             slideNumber:
-                "bg-white text-indigo-900 w-20 h-20 flex items-center justify-center rounded-3xl font-black text-3xl rotate-12 shadow-xl",
+                "bg-white text-indigo-900 w-20 h-20 flex items-center justify-center rounded-xl font-black text-3xl rotate-12 shadow-xl",
             companyName: "font-black tracking-tighter text-2xl text-white",
             logoContainer: "mb-12 brightness-0 invert",
         },
@@ -315,7 +315,7 @@ export const CAROUSEL_TEMPLATES: CarouselTemplate[] = [
             title:
                 "text-5xl font-light tracking-tight text-slate-900 leading-[1.2]",
             content:
-                "text-2xl text-slate-500 leading-loose font-normal mt-12 bg-white p-12 rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-slate-100",
+                "text-2xl text-slate-500 leading-loose font-normal mt-12 bg-white p-12 rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-slate-200/60/60",
             footer:
                 "text-xs font-bold text-slate-300 uppercase tracking-widest",
             slideNumber: "text-slate-900 font-bold",

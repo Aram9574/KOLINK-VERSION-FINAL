@@ -14,8 +14,8 @@ const AuthVisuals: React.FC<AuthVisualsProps> = ({ language }) => {
 
             <div className="relative z-20 max-w-lg text-center">
                 <div className="mb-8 relative group w-full max-w-[420px] mx-auto perspective-1000">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                    <div className="relative bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 transform rotate-3 hover:rotate-0 transition-all duration-500">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                    <div className="relative bg-white rounded-xl p-6 shadow-2xl border border-slate-200/60/60 transform rotate-3 hover:rotate-0 transition-all duration-500">
                         {/* Header */}
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-brand-100">
@@ -56,7 +56,7 @@ const AuthVisuals: React.FC<AuthVisualsProps> = ({ language }) => {
                         </div>
 
                         {/* Engagement */}
-                        <div className="flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-slate-100">
+                        <div className="flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-slate-200/60/60">
                             <div className="flex items-center gap-1">
                                 <div className="flex -space-x-1">
                                     <div className="w-4 h-4 bg-blue-500 rounded-full border border-white flex items-center justify-center">👍</div>

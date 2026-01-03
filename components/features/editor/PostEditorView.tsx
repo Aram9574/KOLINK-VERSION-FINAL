@@ -33,7 +33,7 @@ import { usePosts } from "../../../context/PostContext.tsx";
 import { useUser } from "../../../context/UserContext.tsx";
 import { translations } from "../../../translations.ts";
 import { toast } from "sonner";
-import { type Post } from "../../../types.ts";
+import { type Post, type AppLanguage } from "../../../types.ts";
 import {
   clearUnicodeFormatting,
   convertToUnicode,
@@ -45,6 +45,8 @@ import {
   fetchSnippets,
   updatePost as updatePostInDb,
 } from "../../../services/postRepository.ts";
+import { motion } from "framer-motion";
+import { hapticFeedback } from "../../../lib/animations.ts";
 
 // Lazy load for performance
 // const LinkedInPreview = React.lazy(() => import("../generation/LinkedInPreview"));
@@ -58,7 +60,7 @@ const PostEditorView: React.FC = () => {
     updatePost: updatePostInContext,
     currentPost: contextCurrentPost,
   } = usePosts();
-  const t = translations[language].app.editor;
+  const t = translations[language as AppLanguage].app.editor;
   const [editorContent, setEditorContent] = useState("");
   const [currentPost, setCurrentPost] = useState<Post | null>(null);
   const [postTitle, setPostTitle] = useState("");
@@ -160,19 +162,19 @@ const PostEditorView: React.FC = () => {
 
     if (isRecent && isAtTip) {
       // Merge into current snapshot (typing)
-      setHistory((prev) => {
+      setHistory((prev: string[]) => {
         const newHistory = [...prev];
         newHistory[newHistory.length - 1] = editorContent;
         return newHistory;
       });
     } else {
       // Push new snapshot
-      setHistory((prev) => {
+      setHistory((prev: string[]) => {
         const newHistory = prev.slice(0, historyIndex + 1);
         newHistory.push(editorContent);
         return newHistory;
       });
-      setHistoryIndex((prev) => prev + 1);
+      setHistoryIndex((prev: number) => prev + 1);
     }
     lastCaptureTime.current = now;
   }, [editorContent]);
@@ -210,7 +212,7 @@ const PostEditorView: React.FC = () => {
 
     const snippet = await createSnippet(user.id, selectedEditorText.trim());
     if (snippet) {
-      setSnippets((prev) => [snippet, ...prev]);
+      setSnippets((prev: typeof snippets) => [snippet, ...prev]);
       setSelectedEditorText("");
       toast.success(
         language === "es" ? "Fragmento guardado" : "Snippet saved",
@@ -227,7 +229,7 @@ const PostEditorView: React.FC = () => {
   const handleDeleteSnippet = async (id: string) => {
     const success = await deleteSnippet(id);
     if (success) {
-      setSnippets((prev) => prev.filter((s) => s.id !== id));
+      setSnippets((prev: typeof snippets) => prev.filter((s) => s.id !== id));
       toast.success(
         language === "es" ? "Fragmento eliminado" : "Snippet deleted",
       );
@@ -249,7 +251,7 @@ const PostEditorView: React.FC = () => {
 
   const handleInjectSnippet = (snippet: typeof snippets[0]) => {
     injectText("\n\n" + snippet.text);
-    const updatedSnippets = snippets.map((s) =>
+    const updatedSnippets = snippets.map((s: typeof snippets[0]) =>
       s.id === snippet.id ? { ...s, lastUsed: Date.now() } : s
     );
     setSnippets(updatedSnippets);
@@ -1195,7 +1197,7 @@ const PostEditorView: React.FC = () => {
         });
 
         if (success) {
-          const updatedPost = {
+          const updatedPost: Post = {
             ...currentPost,
             content: editorContent,
             status: "draft",
@@ -1247,7 +1249,7 @@ const PostEditorView: React.FC = () => {
           throw new Error("Failed to create");
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving draft:", error);
       toast.error(
         language === "es"
@@ -1282,33 +1284,35 @@ const PostEditorView: React.FC = () => {
   return (
     <div className="flex h-full bg-white overflow-hidden select-none">
       {/* LEFT: Editor Column */}
-      <div className="flex-[1.5] flex flex-col min-w-0 border-r border-slate-200">
+      <div className="flex-[1.5] flex flex-col min-w-0 border-r border-slate-200/60/60">
         {/* 1. Header Row */}
-        <div className="h-14 border-b border-slate-100 flex items-center justify-between px-6 bg-white shrink-0">
+        <div className="h-14 border-b border-slate-200/60/60 flex items-center justify-between px-6 bg-white shrink-0">
           <input
             type="text"
             value={postTitle}
-            onChange={(e) => setPostTitle(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPostTitle(e.target.value)}
             placeholder={t.unsavedDraft}
             className="text-sm text-slate-700 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[300px] outline-none border-b border-transparent hover:border-slate-300 focus:border-brand-500 bg-transparent transition-all placeholder:text-slate-400"
           />
           <div className="flex items-center gap-4">
-            <button
+            <motion.button
               type="button"
               onClick={handleSave}
+              {...hapticFeedback}
               className="flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors"
             >
               <Save className="w-4 h-4" />
               <span className="hidden sm:inline">
                 {t.saveDraft}
               </span>
-            </button>
+            </motion.button>
             <div className="w-px h-4 bg-slate-200" />
             <div className="w-px h-4 bg-slate-200" />
             <div className="relative" ref={draftsMenuRef}>
-              <button
+              <motion.button
                 type="button"
                 onClick={() => setShowDraftsMenu(!showDraftsMenu)}
+                {...hapticFeedback}
                 className="flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors"
               >
                 <History className="w-4 h-4" />
@@ -1320,11 +1324,11 @@ const PostEditorView: React.FC = () => {
                     showDraftsMenu ? "rotate-180" : ""
                   }`}
                 />
-              </button>
+              </motion.button>
 
               {showDraftsMenu && (
-                <div className="absolute top-full right-0 mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-xl z-[50] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="p-3 border-b border-slate-100 bg-slate-50">
+                <div className="absolute top-full right-0 mt-2 w-72 bg-white border border-slate-200/60/60 rounded-xl shadow-xl z-[50] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="p-3 border-b border-slate-200/60/60 bg-slate-50">
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                       {t.drafts} ({drafts.length})
                     </h3>
@@ -1340,14 +1344,15 @@ const PostEditorView: React.FC = () => {
                         </div>
                       )
                       : (
-                        drafts.map((draft) => (
-                          <button
+                        drafts.map((draft: Post) => (
+                          <motion.button
                             type="button"
                             key={draft.id}
                             onClick={() =>
                               handleSelectDraft(
                                 draft,
                               )}
+                            {...hapticFeedback}
                             className="w-full text-left p-3 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 group"
                           >
                             <p className="font-medium text-slate-700 text-sm truncate group-hover:text-brand-600 transition-colors">
@@ -1382,7 +1387,7 @@ const PostEditorView: React.FC = () => {
                                 )}
                               </span>
                             </div>
-                          </button>
+                          </motion.button>
                         ))
                       )}
                   </div>
@@ -1393,11 +1398,12 @@ const PostEditorView: React.FC = () => {
         </div>
 
         {/* 2. Advanced Toolbar */}
-        <div className="h-12 border-b border-slate-100 flex items-center px-4 bg-white gap-0.5 shrink-0 overflow-x-auto no-scrollbar">
-          <button
+        <div className="h-12 border-b border-slate-200/60/60 flex items-center px-4 bg-white gap-0.5 shrink-0 overflow-x-auto no-scrollbar">
+          <motion.button
             type="button"
             onClick={handleUndo}
             disabled={historyIndex <= 0}
+            {...hapticFeedback}
             className={`p-2 rounded-lg ${
               historyIndex > 0
                 ? "text-slate-500 hover:bg-slate-50"
@@ -1406,11 +1412,12 @@ const PostEditorView: React.FC = () => {
             title="Undo"
           >
             <Undo className="w-4 h-4" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             onClick={handleRedo}
             disabled={historyIndex >= history.length - 1}
+            {...hapticFeedback}
             className={`p-2 rounded-lg ${
               historyIndex < history.length - 1
                 ? "text-slate-500 hover:bg-slate-50"
@@ -1419,125 +1426,139 @@ const PostEditorView: React.FC = () => {
             title="Redo"
           >
             <Redo className="w-4 h-4" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             onClick={handleClearEditor}
+            {...hapticFeedback}
             className="p-2 hover:bg-slate-50 rounded-lg text-slate-400"
             title="Clear All"
           >
             <Eraser className="w-4 h-4" />
-          </button>
+          </motion.button>
           <div className="w-px h-6 bg-slate-100 mx-2" />
 
-          <button
+          <motion.button
             type="button"
             onClick={() => handleFormat("bold")}
+            {...hapticFeedback}
             className="p-2 hover:bg-slate-50 rounded-lg text-brand-600 font-bold"
             title="Bold"
           >
             <BoldIcon className="w-4 h-4" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             onClick={() => handleFormat("italic")}
+            {...hapticFeedback}
             className="p-2 hover:bg-slate-50 rounded-lg text-brand-600 italic"
             title="Italic"
           >
             <ItalicIcon className="w-4 h-4" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             onClick={() => handleFormat("strike")}
+            {...hapticFeedback}
             className="p-2 hover:bg-slate-50 rounded-lg text-slate-400"
             title="Strikethrough"
           >
             <Strikethrough className="w-4 h-4" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             onClick={() => handleFormat("underline")}
+            {...hapticFeedback}
             className="p-2 hover:bg-slate-50 rounded-lg text-slate-400"
             title="Underline"
           >
             <Underline className="w-4 h-4" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             onClick={() => handleFormat("code")}
+            {...hapticFeedback}
             className="p-2 hover:bg-slate-50 rounded-lg text-slate-400"
             title="Code"
           >
             <Code className="w-4 h-4" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             onClick={handleClearFormatting}
+            {...hapticFeedback}
             className="p-2 hover:bg-slate-50 rounded-lg text-slate-300"
             title="Clear Formatting"
           >
             <Type className="w-4 h-4" />
-          </button>
+          </motion.button>
 
           <div className="w-px h-6 bg-slate-100 mx-2" />
-          <button
+          <motion.button
             type="button"
             onClick={() => injectText("• ")}
+            {...hapticFeedback}
             className="p-2 hover:bg-slate-50 rounded-lg text-slate-400"
           >
             <List className="w-4 h-4" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             onClick={() => injectText("1. ")}
+            {...hapticFeedback}
             className="p-2 hover:bg-slate-50 rounded-lg text-slate-400"
           >
             <ListOrdered className="w-4 h-4" />
-          </button>
+          </motion.button>
 
           <div className="w-px h-6 bg-slate-100 mx-2" />
-          <button
+          <motion.button
             type="button"
+            {...hapticFeedback}
             className="p-2 hover:bg-slate-50 rounded-lg text-slate-400"
           >
             <Zap className="w-4 h-4" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
+            {...hapticFeedback}
             className="p-2 hover:bg-slate-50 rounded-lg text-slate-400 rotate-45"
           >
             <Zap className="w-4 h-4 rotate-45" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
+            {...hapticFeedback}
             className="p-2 hover:bg-slate-50 rounded-lg text-slate-400 -rotate-45"
           >
             <Zap className="w-4 h-4 -rotate-45" />
-          </button>
+          </motion.button>
 
           <div className="w-px h-6 bg-slate-100 mx-2" />
           <div className="relative" ref={emojiPickerRef}>
-            <button
+            <motion.button
               type="button"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              {...hapticFeedback}
               className="p-2 hover:bg-slate-50 rounded-lg text-slate-400"
             >
               <Smile className="w-4 h-4" />
-            </button>
+            </motion.button>
             {showEmojiPicker && (
-              <div className="absolute top-full mt-2 left-0 bg-white border border-slate-200 rounded-2xl shadow-2xl p-3 z-[100] grid grid-cols-4 gap-2 w-56">
+              <div className="absolute top-full mt-2 left-0 bg-white border border-slate-200/60/60 rounded-xl shadow-2xl p-3 z-[100] grid grid-cols-4 gap-2 w-56">
                 {commonEmojis.map((emoji) => (
-                  <button
+                  <motion.button
                     type="button"
                     key={emoji}
                     onClick={() => {
                       injectText(emoji);
                       setShowEmojiPicker(false);
                     }}
+                    {...hapticFeedback}
                     className="text-xl p-2 hover:bg-slate-50 rounded-xl transition-colors"
                   >
                     {emoji}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             )}
@@ -1559,7 +1580,7 @@ const PostEditorView: React.FC = () => {
         </div>
 
         {/* 4. Bottom Metric Bar */}
-        <div className="h-16 border-t border-slate-100 flex items-center justify-between px-6 bg-white shrink-0">
+        <div className="h-16 border-t border-slate-200/60/60 flex items-center justify-between px-6 bg-white shrink-0">
           <div className="flex items-center gap-6">
             <div
               className="flex items-center gap-2 relative"
@@ -1568,10 +1589,11 @@ const PostEditorView: React.FC = () => {
               <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                 {t.grade}:
               </span>
-              <button
+              <motion.button
                 type="button"
                 onClick={() => setShowGradeInfo(!showGradeInfo)}
-                className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-[11px] font-bold transition-all active:scale-95 shadow-sm
+                {...hapticFeedback}
+                className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-[11px] font-bold transition-all shadow-sm
                                     ${
                   grade <= 5
                     ? "border-emerald-200 text-emerald-600 bg-emerald-50"
@@ -1584,10 +1606,10 @@ const PostEditorView: React.FC = () => {
                                 `}
               >
                 {grade}
-              </button>
+              </motion.button>
 
               {showGradeInfo && (
-                <div className="absolute bottom-full mb-4 left-0 w-[280px] bg-white border border-slate-200 rounded-2xl shadow-2xl p-4 z-[110] animate-in fade-in slide-in-from-bottom-2 duration-200 overflow-hidden">
+                <div className="absolute bottom-full mb-4 left-0 w-[280px] bg-white border border-slate-200/60/60 rounded-xl shadow-2xl p-4 z-[110] animate-in fade-in slide-in-from-bottom-2 duration-200 overflow-hidden">
                   <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-500" />
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center shrink-0">
@@ -1660,9 +1682,10 @@ const PostEditorView: React.FC = () => {
               )}
             </div>
             <div className="relative" ref={metricsMenuRef}>
-              <button
+              <motion.button
                 type="button"
                 onClick={() => setShowMetricsMenu(!showMetricsMenu)}
+                {...hapticFeedback}
                 className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-slate-50 rounded-lg transition-colors group"
               >
                 <span className="text-xs font-bold text-slate-400 group-hover:text-slate-600 uppercase tracking-widest">
@@ -1682,10 +1705,10 @@ const PostEditorView: React.FC = () => {
                     showMetricsMenu ? "rotate-180" : ""
                   }`}
                 />
-              </button>
+              </motion.button>
 
               {showMetricsMenu && (
-                <div className="absolute bottom-full mb-2 left-0 bg-white border border-slate-200 rounded-xl shadow-xl p-1 z-[100] min-w-[170px] animate-in fade-in slide-in-from-bottom-2 duration-200">
+                <div className="absolute bottom-full mb-2 left-0 bg-white border border-slate-200/60/60 rounded-xl shadow-xl p-1 z-[100] min-w-[170px] animate-in fade-in slide-in-from-bottom-2 duration-200">
                   {[
                     {
                       id: "characters",
@@ -1713,13 +1736,14 @@ const PostEditorView: React.FC = () => {
                       label: t.metrics.readingTime,
                     },
                   ].map((m) => (
-                    <button
+                    <motion.button
                       type="button"
                       key={m.id}
                       onClick={() => {
                         setSelectedMetric(m.id as typeof selectedMetric);
                         setShowMetricsMenu(false);
                       }}
+                      {...hapticFeedback}
                       className={`w-full text-left px-3 py-2 text-[11px] font-bold uppercase tracking-wide rounded-lg transition-colors flex items-center justify-between ${
                         selectedMetric === m.id
                           ? "bg-brand-50 text-brand-600"
@@ -1730,7 +1754,7 @@ const PostEditorView: React.FC = () => {
                       {selectedMetric === m.id && (
                         <div className="w-1.5 h-1.5 rounded-full bg-brand-500" />
                       )}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               )}
@@ -1739,15 +1763,16 @@ const PostEditorView: React.FC = () => {
             {/* Character Limit Warning */}
             {charCount > 3000 && (
               <div className="relative" ref={limitWarningRef}>
-                <button
+                <motion.button
                   type="button"
                   onClick={() =>
                     setShowLimitWarning(!showLimitWarning)}
+                  {...hapticFeedback}
                   className="flex items-center gap-2 px-3 py-1.5 bg-[#EE5D28] text-white rounded-full text-xs font-bold hover:bg-[#D64D1C] transition-colors shadow-sm animate-in fade-in zoom-in duration-300 transform scale-100 opacity-100"
                 >
                   <AlertTriangle className="w-3.5 h-3.5 fill-white stroke-white" />
                   <span>{charCount} / 3000</span>
-                </button>
+                </motion.button>
 
                 {showLimitWarning && (
                   <div className="absolute bottom-full mb-4 left-0 w-[420px] bg-white border border-[#E76236] border-l-8 rounded-lg shadow-2xl p-5 z-[120] animate-in fade-in slide-in-from-bottom-2 duration-200">
@@ -1790,14 +1815,15 @@ const PostEditorView: React.FC = () => {
             )}
           </div>
           <div className="flex items-center gap-4">
-            <button
+            <motion.button
               type="button"
               onClick={handlePublish}
-              className="px-6 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-bold hover:bg-brand-700 shadow-lg shadow-brand-500/10 active:scale-95 transition-all flex items-center gap-2"
+              {...hapticFeedback}
+              className="px-6 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-bold hover:bg-brand-700 shadow-lg shadow-brand-500/10 transition-all flex items-center gap-2"
             >
               {t.continueLinkedIn}
               <Zap className="w-4 h-4" />
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
@@ -1805,7 +1831,7 @@ const PostEditorView: React.FC = () => {
       {/* RIGHT: Tools & Preview Column */}
       <div className="flex-1 flex flex-col bg-slate-50/50 min-w-0">
         {/* 1. Tabs */}
-        <div className="flex items-center gap-8 px-8 h-14 border-b border-slate-100 bg-white shrink-0">
+        <div className="flex items-center gap-8 px-8 h-14 border-b border-slate-200/60/60 bg-white shrink-0">
           {[
             {
               id: "preview",
@@ -1828,10 +1854,11 @@ const PostEditorView: React.FC = () => {
               icon: Copy,
             },
           ].map((tab) => (
-            <button
+            <motion.button
               type="button"
               key={tab.id}
               onClick={() => setSidebarTab(tab.id as typeof sidebarTab)}
+              {...hapticFeedback}
               className={`flex items-center gap-2 h-full text-xs font-bold uppercase tracking-widest border-b-2 transition-all ${
                 sidebarTab === tab.id
                   ? "border-brand-500 text-brand-600"
@@ -1842,7 +1869,7 @@ const PostEditorView: React.FC = () => {
               <span className="hidden xl:inline">
                 {tab.label}
               </span>
-            </button>
+            </motion.button>
           ))}
         </div>
 
@@ -1851,10 +1878,11 @@ const PostEditorView: React.FC = () => {
           {sidebarTab === "preview" && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <div className="flex bg-white p-1 rounded-xl border border-slate-200">
-                  <button
+                <div className="flex bg-white p-1 rounded-xl border border-slate-200/60/60">
+                  <motion.button
                     type="button"
                     onClick={() => setPreviewMode("mobile")}
+                    {...hapticFeedback}
                     className={`p-1.5 rounded-lg transition-all ${
                       previewMode === "mobile"
                         ? "bg-brand-50 text-brand-600 shadow-sm"
@@ -1862,10 +1890,11 @@ const PostEditorView: React.FC = () => {
                     }`}
                   >
                     <Smartphone className="w-4 h-4" />
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     type="button"
                     onClick={() => setPreviewMode("desktop")}
+                    {...hapticFeedback}
                     className={`p-1.5 rounded-lg transition-all ${
                       previewMode === "desktop"
                         ? "bg-brand-50 text-brand-600 shadow-sm"
@@ -1873,17 +1902,18 @@ const PostEditorView: React.FC = () => {
                     }`}
                   >
                     <Monitor className="w-4 h-4" />
-                  </button>
+                  </motion.button>
                 </div>
                 <div className="flex items-center gap-4">
-                  <button
+                  <motion.button
                     type="button"
                     onClick={handleCopy}
+                    {...hapticFeedback}
                     className="flex items-center gap-2 text-xs font-bold text-brand-600 hover:text-brand-700 transition-colors"
                   >
                     <Copy className="w-4 h-4" />
                     {t.copyText}
-                  </button>
+                  </motion.button>
                 </div>
               </div>
 
@@ -1920,7 +1950,7 @@ const PostEditorView: React.FC = () => {
                     placeholder="Filtrar..."
                     value={hookSearch}
                     onChange={(e) => setHookSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
+                    className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200/60/60 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -1930,7 +1960,7 @@ const PostEditorView: React.FC = () => {
                   <select
                     value={selectedHookTag}
                     onChange={(e) => setSelectedHookTag(e.target.value)}
-                    className="bg-white border border-slate-200 rounded-xl text-sm px-3 py-2 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none min-w-[120px]"
+                    className="bg-white border border-slate-200/60/60 rounded-xl text-sm px-3 py-2 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none min-w-[120px]"
                   >
                     {allHookTags.map((tag) => (
                       <option key={tag} value={tag}>
@@ -1941,14 +1971,15 @@ const PostEditorView: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <button
+                <motion.button
                   type="button"
                   onClick={handleShuffleHooks}
-                  className="p-2.5 bg-white border border-slate-200 rounded-xl hover:text-brand-600 transition-colors shadow-sm"
+                  {...hapticFeedback}
+                  className="p-2.5 bg-white border border-slate-200/60/60 rounded-xl hover:text-brand-600 transition-colors shadow-sm"
                   title="Mezclar ganchos"
                 >
                   <RefreshCw className="w-4 h-4" />
-                </button>
+                </motion.button>
               </div>
 
               {/* Hook List */}
@@ -1960,14 +1991,15 @@ const PostEditorView: React.FC = () => {
                       0,
                       visibleHooksCount,
                     ).map((hook, i) => (
-                      <button
+                      <motion.button
                         type="button"
                         key={i}
                         onClick={() =>
                           injectText(
                             hook.text + "\n\n",
                           )}
-                        className="w-full text-left p-5 bg-white border border-slate-200 rounded-[22px] hover:border-brand-400 transition-all shadow-sm hover:shadow-md group relative overflow-hidden"
+                        {...hapticFeedback}
+                        className="w-full text-left p-5 bg-white border border-slate-200/60/60 rounded-[22px] hover:border-brand-400 transition-all shadow-sm hover:shadow-md group relative overflow-hidden"
                       >
                         <div className="flex flex-wrap gap-1.5 mb-3">
                           {hook.tags.map((tag) => (
@@ -1982,7 +2014,7 @@ const PostEditorView: React.FC = () => {
                         <p className="text-[14px] font-semibold text-slate-700 leading-relaxed">
                           {hook.text}
                         </p>
-                      </button>
+                      </motion.button>
                     ))
                   )
                   : (
@@ -1999,14 +2031,15 @@ const PostEditorView: React.FC = () => {
 
               {/* Load More */}
               {filteredHooks.length > visibleHooksCount && (
-                <button
+                <motion.button
                   type="button"
-                  onClick={() => setVisibleHooksCount((prev) => prev + 6)}
+                  onClick={() => setVisibleHooksCount((prev: number) => prev + 6)}
+                  {...hapticFeedback}
                   className="w-full py-4 flex items-center justify-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors"
                 >
                   <ArrowDown className="w-4 h-4" />
                   Cargar más ganchos
-                </button>
+                </motion.button>
               )}
             </div>
           )}
@@ -2022,7 +2055,7 @@ const PostEditorView: React.FC = () => {
                     placeholder="Filtrar cierres..."
                     value={endingSearch}
                     onChange={(e) => setEndingSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
+                    className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200/60/60 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -2035,7 +2068,7 @@ const PostEditorView: React.FC = () => {
                       setSelectedEndingTag(
                         e.target.value,
                       )}
-                    className="bg-white border border-slate-200 rounded-xl text-sm px-3 py-2 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none min-w-[120px]"
+                    className="bg-white border border-slate-200/60/60 rounded-xl text-sm px-3 py-2 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none min-w-[120px]"
                   >
                     {allEndingTags.map((tag) => (
                       <option key={tag} value={tag}>
@@ -2046,14 +2079,15 @@ const PostEditorView: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <button
+                <motion.button
                   type="button"
                   onClick={handleShuffleEndings}
-                  className="p-2.5 bg-white border border-slate-200 rounded-xl hover:text-brand-600 transition-colors shadow-sm"
+                  {...hapticFeedback}
+                  className="p-2.5 bg-white border border-slate-200/60/60 rounded-xl hover:text-brand-600 transition-colors shadow-sm"
                   title="Mezclar cierres"
                 >
                   <RefreshCw className="w-4 h-4" />
-                </button>
+                </motion.button>
               </div>
 
               {/* Ending List */}
@@ -2065,14 +2099,15 @@ const PostEditorView: React.FC = () => {
                       0,
                       visibleEndingsCount,
                     ).map((ending, i) => (
-                      <button
+                      <motion.button
                         type="button"
                         key={i}
                         onClick={() =>
                           injectText(
                             "\n\n" + ending.text,
                           )}
-                        className="w-full text-left p-5 bg-white border border-slate-200 rounded-[22px] hover:border-brand-400 transition-all shadow-sm hover:shadow-md group relative overflow-hidden"
+                        {...hapticFeedback}
+                        className="w-full text-left p-5 bg-white border border-slate-200/60/60 rounded-[22px] hover:border-brand-400 transition-all shadow-sm hover:shadow-md group relative overflow-hidden"
                       >
                         <div className="flex flex-wrap gap-1.5 mb-3">
                           {ending.tags.map((tag) => (
@@ -2087,7 +2122,7 @@ const PostEditorView: React.FC = () => {
                         <p className="text-[14px] font-semibold text-slate-700 leading-relaxed">
                           {ending.text}
                         </p>
-                      </button>
+                      </motion.button>
                     ))
                   )
                   : (
@@ -2104,14 +2139,15 @@ const PostEditorView: React.FC = () => {
 
               {/* Load More */}
               {filteredEndings.length > visibleEndingsCount && (
-                <button
+                <motion.button
                   type="button"
-                  onClick={() => setVisibleEndingsCount((prev) => prev + 6)}
+                  onClick={() => setVisibleEndingsCount((prev: number) => prev + 6)}
+                  {...hapticFeedback}
                   className="w-full py-4 flex items-center justify-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors"
                 >
                   <ArrowDown className="w-4 h-4" />
                   Cargar más cierres
-                </button>
+                </motion.button>
               )}
             </div>
           )}
@@ -2119,11 +2155,11 @@ const PostEditorView: React.FC = () => {
           {sidebarTab === "snippets" && (
             <div className="space-y-6">
               {/* Create Snippet Area */}
-              <div className="bg-slate-50 border border-slate-200 border-dashed rounded-[22px] p-5">
+              <div className="bg-slate-50 border border-slate-200/60/60 border-dashed rounded-[22px] p-5">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                   Crear nuevo fragmento
                 </p>
-                <div className="bg-white border border-slate-200 rounded-xl p-3 min-h-[80px] text-sm text-slate-600 mb-3 italic">
+                <div className="bg-white border border-slate-200/60/60 rounded-xl p-3 min-h-[80px] text-sm text-slate-600 mb-3 italic">
                   {selectedEditorText
                     ? selectedEditorText
                     : (
@@ -2132,15 +2168,16 @@ const PostEditorView: React.FC = () => {
                       </span>
                     )}
                 </div>
-                <button
+                <motion.button
                   type="button"
                   onClick={handleCreateSnippet}
                   disabled={!selectedEditorText}
-                  className="w-full py-2.5 bg-brand-600 disabled:bg-slate-200 text-white disabled:text-slate-400 rounded-xl text-sm font-bold transition-all shadow-sm disabled:shadow-none hover:shadow-md active:scale-95 flex items-center justify-center gap-2"
+                  {...hapticFeedback}
+                  className="w-full py-2.5 bg-brand-600 disabled:bg-slate-200 text-white disabled:text-slate-400 rounded-xl text-sm font-bold transition-all shadow-sm disabled:shadow-none hover:shadow-md flex items-center justify-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
                   Crear Fragmento
-                </button>
+                </motion.button>
               </div>
 
               {/* Search and Sort */}
@@ -2152,7 +2189,7 @@ const PostEditorView: React.FC = () => {
                     placeholder="Buscar mis fragmentos..."
                     value={snippetSearch}
                     onChange={(e) => setSnippetSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
+                    className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200/60/60 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -2165,7 +2202,7 @@ const PostEditorView: React.FC = () => {
                       setSnippetSort(
                         e.target.value as typeof snippetSort,
                       )}
-                    className="bg-white border border-slate-200 rounded-xl text-sm px-3 py-2 outline-none focus:border-brand-500 min-w-[100px]"
+                    className="bg-white border border-slate-200/60/60 rounded-xl text-sm px-3 py-2 outline-none focus:border-brand-500 min-w-[100px]"
                   >
                     <option value="newest">
                       Más recientes
@@ -2243,35 +2280,37 @@ const PostEditorView: React.FC = () => {
                           key={snippet.id}
                           className="group relative"
                         >
-                          <button
+                          <motion.button
                             type="button"
                             onClick={() =>
                               handleInjectSnippet(
                                 snippet,
                               )}
-                            className="w-full text-left p-5 bg-white border border-slate-200 rounded-[22px] hover:border-brand-400 transition-all shadow-sm hover:shadow-md pr-12"
+                            {...hapticFeedback}
+                            className="w-full text-left p-5 bg-white border border-slate-200/60/60 rounded-[22px] hover:border-brand-400 transition-all shadow-sm hover:shadow-md pr-12"
                           >
                             <p className="text-[14px] font-medium text-slate-700 leading-relaxed line-clamp-3">
                               {snippet.text}
                             </p>
-                          </button>
-                          <button
+                          </motion.button>
+                          <motion.button
                             type="button"
                             onClick={() =>
                               handleDeleteSnippet(
                                 snippet.id,
                               )}
+                            {...hapticFeedback}
                             className="absolute top-1/2 -translate-y-1/2 right-4 p-2 bg-slate-50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
                             title="Eliminar fragmento"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </button>
+                          </motion.button>
                         </div>
                       ))
                   )
                   : (
                     <div className="text-center py-12 px-4">
-                      <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                      <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-4 border border-slate-200/60/60">
                         <Sparkles className="w-8 h-8 text-slate-300" />
                       </div>
                       <h4 className="text-slate-900 font-bold mb-2">

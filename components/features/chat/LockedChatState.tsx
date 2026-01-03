@@ -52,7 +52,7 @@ const LockedChatState: React.FC<LockedChatStateProps> = ({ onUpgrade }) => {
                 {t.subtitle}
             </p>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8 max-w-md w-full">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200/60/60 mb-8 max-w-md w-full">
                 <ul className="space-y-4 text-left">
                     {t.features.map((feature, i) => (
                         <li
@@ -62,7 +62,7 @@ const LockedChatState: React.FC<LockedChatStateProps> = ({ onUpgrade }) => {
                             <div className="mt-0.5 min-w-5">
                                 <Check
                                     className="w-5 h-5 text-brand-500"
-                                    strokeWidth={3}
+                                    strokeWidth={1.5}
                                 />
                             </div>
                             <span>{feature}</span>

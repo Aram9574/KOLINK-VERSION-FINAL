@@ -46,7 +46,7 @@ const AuditStatusTracker: React.FC = () => {
 
     return (
         <div className="flex flex-col items-center justify-center py-12 px-4">
-            <div className="w-full max-w-xl bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-700 overflow-hidden">
+            <div className="w-full max-w-xl bg-white dark:bg-slate-800 rounded-xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200/60/60 dark:border-slate-700 overflow-hidden">
                 {/* Progress Bar Top */}
                 <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-900 overflow-hidden">
                     <div 
@@ -57,7 +57,7 @@ const AuditStatusTracker: React.FC = () => {
 
                 <div className="p-8 lg:p-12 space-y-8">
                     <div className="text-center space-y-2">
-                        <div className="inline-flex items-center justify-center p-3 bg-brand-50 dark:bg-brand-900/20 rounded-2xl mb-4">
+                        <div className="inline-flex items-center justify-center p-3 bg-brand-50 dark:bg-brand-900/20 rounded-xl mb-4">
                             <Loader2 className="w-8 h-8 text-brand-600 dark:text-brand-400 animate-spin" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -78,7 +78,7 @@ const AuditStatusTracker: React.FC = () => {
                             return (
                                 <div 
                                     key={idx} 
-                                    className={`flex items-center gap-4 p-4 rounded-2xl transition-all duration-500 border-2 ${
+                                    className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-500 border-2 ${
                                         isActive 
                                         ? "bg-brand-50/50 dark:bg-brand-900/10 border-brand-200 dark:border-brand-900/30 scale-[1.02]" 
                                         : isCompleted 

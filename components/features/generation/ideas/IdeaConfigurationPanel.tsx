@@ -94,7 +94,7 @@ const IdeaConfigurationPanel: React.FC<IdeaConfigurationPanelProps> = ({
     };
 
     return (
-        <div className="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all duration-300">
+        <div className="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md border-b border-slate-200/60/60 shadow-sm transition-all duration-300">
             <div className="max-w-5xl mx-auto px-4 md:px-8 py-4">
                 {/* Header Top Row */}
                 <div className="flex items-center justify-between">
@@ -142,7 +142,7 @@ const IdeaConfigurationPanel: React.FC<IdeaConfigurationPanelProps> = ({
 
                 {/* Expanded Configuration Panel */}
                 <div className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] ${isExpanded ? 'max-h-[800px] opacity-100 mt-6' : 'max-h-0 opacity-0 mt-0'}`}>
-                    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm max-h-[70vh] overflow-y-auto">
+                    <div className="bg-white rounded-xl border border-slate-200/60/60 p-5 shadow-sm max-h-[70vh] overflow-y-auto">
                         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                             <Sliders className="w-3.5 h-3.5" />
                             {t.configTitle}
@@ -160,7 +160,7 @@ const IdeaConfigurationPanel: React.FC<IdeaConfigurationPanelProps> = ({
                                     <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
                                     <input
                                         type="text"
-                                        className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-sm font-medium transition-all"
+                                        className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200/60/60 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-sm font-medium transition-all"
                                         value={niche}
                                         onChange={(e) => setNiche(e.target.value)}
                                         placeholder={t.nichePlaceholder}
@@ -176,7 +176,7 @@ const IdeaConfigurationPanel: React.FC<IdeaConfigurationPanelProps> = ({
                                 <div className="relative group">
                                     <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
                                     <select
-                                        className="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-sm font-medium appearance-none cursor-pointer"
+                                        className="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200/60/60 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-sm font-medium appearance-none cursor-pointer"
                                         value={style}
                                         onChange={(e) => setStyle(e.target.value as any)}
                                     >
@@ -200,7 +200,7 @@ const IdeaConfigurationPanel: React.FC<IdeaConfigurationPanelProps> = ({
                                 <div className="relative group">
                                     <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
                                     <select
-                                        className="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-sm font-medium appearance-none cursor-pointer"
+                                        className="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200/60/60 rounded-lg focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none text-sm font-medium appearance-none cursor-pointer"
                                         value={source}
                                         onChange={(e) => setSource(e.target.value as any)}
                                     >
@@ -232,7 +232,7 @@ const IdeaConfigurationPanel: React.FC<IdeaConfigurationPanelProps> = ({
                         </div>
 
                         {/* NEW SECTION: Context Sources */}
-                        <div className="border-t border-slate-100 pt-5">
+                        <div className="border-t border-slate-200/60/60 pt-5">
                             <div className="flex items-center justify-between mb-3">
                                 <label className="text-xs font-bold text-slate-700 flex items-center gap-2">
                                     {t.contextLabel}
@@ -242,10 +242,10 @@ const IdeaConfigurationPanel: React.FC<IdeaConfigurationPanelProps> = ({
 
                             {/* Action Buttons */}
                             <div className="flex flex-wrap gap-2 mb-4">
-                                <button onClick={() => setShowLinkInput(!showLinkInput)} className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-white hover:border-amber-400 hover:text-amber-600 transition-all flex items-center gap-1.5">
+                                <button onClick={() => setShowLinkInput(!showLinkInput)} className="px-3 py-1.5 bg-slate-50 border border-slate-200/60/60 rounded-lg text-xs font-bold text-slate-600 hover:bg-white hover:border-amber-400 hover:text-amber-600 transition-all flex items-center gap-1.5">
                                     <LinkIcon className="w-3.5 h-3.5" /> {t.addLink}
                                 </button>
-                                <button onClick={() => fileInputRef.current?.click()} className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-white hover:border-amber-400 hover:text-amber-600 transition-all flex items-center gap-1.5">
+                                <button onClick={() => fileInputRef.current?.click()} className="px-3 py-1.5 bg-slate-50 border border-slate-200/60/60 rounded-lg text-xs font-bold text-slate-600 hover:bg-white hover:border-amber-400 hover:text-amber-600 transition-all flex items-center gap-1.5">
                                     <ImageIcon className="w-3.5 h-3.5" /> {t.addImage}
                                 </button>
                                 <input
@@ -255,10 +255,10 @@ const IdeaConfigurationPanel: React.FC<IdeaConfigurationPanelProps> = ({
                                     accept="image/*"
                                     onChange={handleFileUpload}
                                 />
-                                <button onClick={handleDriveClick} className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-white hover:border-blue-400 hover:text-blue-600 transition-all flex items-center gap-1.5">
+                                <button onClick={handleDriveClick} className="px-3 py-1.5 bg-slate-50 border border-slate-200/60/60 rounded-lg text-xs font-bold text-slate-600 hover:bg-white hover:border-blue-400 hover:text-blue-600 transition-all flex items-center gap-1.5">
                                     <Cloud className="w-3.5 h-3.5" /> {t.addDrive}
                                 </button>
-                                <button onClick={() => setShowTextInput(!showTextInput)} className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-white hover:border-amber-400 hover:text-amber-600 transition-all flex items-center gap-1.5">
+                                <button onClick={() => setShowTextInput(!showTextInput)} className="px-3 py-1.5 bg-slate-50 border border-slate-200/60/60 rounded-lg text-xs font-bold text-slate-600 hover:bg-white hover:border-amber-400 hover:text-amber-600 transition-all flex items-center gap-1.5">
                                     <FileText className="w-3.5 h-3.5" /> {t.addText}
                                 </button>
                             </div>
@@ -271,7 +271,7 @@ const IdeaConfigurationPanel: React.FC<IdeaConfigurationPanelProps> = ({
                                         value={tempLink}
                                         onChange={(e) => setTempLink(e.target.value)}
                                         placeholder={t.linkPlaceholder}
-                                        className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                                        className="flex-1 px-3 py-2 bg-white border border-slate-200/60/60 rounded-lg text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
                                         autoFocus
                                     />
                                     <button onClick={handleAddLink} className="px-3 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-slate-800"><Plus className="w-4 h-4" /></button>
@@ -283,7 +283,7 @@ const IdeaConfigurationPanel: React.FC<IdeaConfigurationPanelProps> = ({
                                         value={tempText}
                                         onChange={(e) => setTempText(e.target.value)}
                                         placeholder={t.pastePlaceholder}
-                                        className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none h-16 resize-none"
+                                        className="flex-1 px-3 py-2 bg-white border border-slate-200/60/60 rounded-lg text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none h-16 resize-none"
                                         autoFocus
                                     />
                                     <button onClick={handleAddText} className="px-3 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-slate-800 h-16"><Plus className="w-4 h-4" /></button>
@@ -310,7 +310,7 @@ const IdeaConfigurationPanel: React.FC<IdeaConfigurationPanelProps> = ({
 
                                             <button
                                                 onClick={() => removeContextItem(ctx.id)}
-                                                className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-white border border-slate-200 rounded-full text-slate-400 hover:text-red-500 hover:border-red-200 flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-all"
+                                                className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-white border border-slate-200/60/60 rounded-full text-slate-400 hover:text-red-500 hover:border-red-200 flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-all"
                                             >
                                                 <X className="w-2.5 h-2.5" />
                                             </button>
@@ -320,7 +320,7 @@ const IdeaConfigurationPanel: React.FC<IdeaConfigurationPanelProps> = ({
                             )}
                         </div>
 
-                        <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
+                        <div className="mt-6 pt-4 border-t border-slate-200/60/60 flex justify-end">
                             <button
                                 onClick={onGenerate}
                                 disabled={loading}

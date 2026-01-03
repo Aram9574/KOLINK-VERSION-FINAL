@@ -36,7 +36,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
                 if (e.target === e.currentTarget) onClose();
             }}
         >
-            <div className={`bg-white rounded-3xl shadow-2xl w-full ${maxWidth} overflow-hidden relative animate-in fade-in zoom-in duration-200 my-8`}>
+            <div className={`bg-white rounded-xl shadow-2xl w-full ${maxWidth} overflow-hidden relative animate-in fade-in zoom-in duration-200 my-8`}>
                 {showCloseButton && (
                     <button
                         onClick={onClose}

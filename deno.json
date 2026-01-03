@@ -5,6 +5,34 @@
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
     "stripe": "https://esm.sh/stripe@14.25.0?target=deno",
     "@google/generative-ai": "npm:@google/generative-ai@^0.22.0",
-    "zod": "npm:zod@3.22.4"
+    "zod": "npm:zod@3.22.4",
+    "react": "npm:react@^19.2.0",
+    "react/jsx-runtime": "npm:react@^19.2.0/jsx-runtime",
+    "react-dom": "npm:react-dom@^19.2.0",
+    "@/": "./"
+  },
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+  },
+  "lint": {
+    "exclude": [
+      "node_modules/",
+      "dist/",
+      "build/",
+      "components/",
+      "hooks/",
+      "context/",
+      "utils/",
+      "translations/",
+      "lib/",
+      "assets/",
+      "android/",
+      "ios/"
+    ],
+    "rules": {
+      "exclude": ["no-window", "no-sloppy-imports"]
+    }
   }
 }

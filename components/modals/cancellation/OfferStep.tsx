@@ -45,7 +45,7 @@ const OfferStep: React.FC<OfferStepProps> = ({ language, planPrice, discountType
             </div>
 
             {/* Premium Offer Card */}
-            <div className="bg-white border text-left border-amber-100 rounded-2xl p-6 shadow-xl shadow-amber-900/5 relative overflow-hidden group hover:border-amber-200 transition-colors">
+            <div className="bg-white border text-left border-amber-100 rounded-xl p-6 shadow-xl shadow-amber-900/5 relative overflow-hidden group hover:border-amber-200 transition-colors">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl opacity-50"></div>
 
                 <div className="relative z-10 flex items-center justify-between mb-6">

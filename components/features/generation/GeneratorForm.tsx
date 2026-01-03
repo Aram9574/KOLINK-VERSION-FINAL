@@ -125,12 +125,14 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
     return (
         <div
             id="tour-generator"
-            className="bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]"
+            className="bg-white border border-border rounded-xl p-6 shadow-sm transition-all hover:shadow-brand-500/5 group relative overflow-hidden"
         >
+            {/* Bento Corner Light */}
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-brand-500/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-display font-bold text-slate-900 flex items-center gap-2">
                     <div className="p-1.5 bg-brand-100 rounded-lg">
-                        <Zap className="w-5 h-5 text-brand-600" />
+                        <Zap strokeWidth={1.5} className="w-5 h-5 text-brand-600" />
                     </div>
                     {t.title}
                 </h2>
@@ -170,7 +172,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                         {t.topicLabel}
                     </label>
                     <textarea
-                        className="w-full p-4 bg-white border border-slate-300 rounded-2xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all text-slate-900 placeholder-slate-400 resize-none h-28 text-base lg:text-sm font-medium shadow-sm hover:border-brand-300"
+                        className="w-full h-28 resize-none"
                         placeholder={t.topicPlaceholder}
                         value={params.topic}
                         onChange={(e) =>
@@ -198,7 +200,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                         onClick={() => setIsStrategyOpen(!isStrategyOpen)}
                         className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider w-full hover:text-slate-600 transition-colors group cursor-pointer"
                     >
-                        <AlignLeft className="w-4 h-4" />
+                        <AlignLeft strokeWidth={1.5} className="w-4 h-4" />
                         {language === "es"
                             ? "ESTRATEGIA DE CONTENIDO"
                             : "CONTENT STRATEGY"}
@@ -400,7 +402,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                         className={`w-full h-[42px] px-3 rounded-xl border flex items-center justify-between transition-all duration-200 group ${
                                             params.generateCarousel
                                                 ? "bg-blue-50 border-blue-200"
-                                                : "bg-white border-slate-200 hover:border-blue-300"
+                                                : "bg-white border-slate-200/60/60 hover:border-blue-300"
                                         }`}
                                     >
                                         <span
@@ -447,7 +449,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                         onClick={() => setIsDetailsOpen(!isDetailsOpen)}
                         className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider w-full hover:text-slate-600 transition-colors group cursor-pointer"
                     >
-                        <Sliders className="w-4 h-4" />
+                        <Sliders strokeWidth={1.5} className="w-4 h-4" />
                         {language === "es"
                             ? "DETALLES & AJUSTES"
                             : "DETAILS & SETTINGS"}
@@ -480,11 +482,11 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                 </label>
                                 <div className="relative">
                                     <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                                        <Target className="w-4 h-4" />
+                                        <Target strokeWidth={1.5} className="w-4 h-4" />
                                     </div>
                                     <input
                                         type="text"
-                                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-300 placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-base lg:text-sm font-medium transition-all text-slate-900 shadow-sm hover:border-brand-300"
+                                        className="w-full pl-10"
                                         placeholder={t.audiencePlaceholder}
                                         value={params.audience}
                                         onChange={(e) =>
@@ -619,7 +621,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
 
                 {/* Loading State Overlay/Progress */}
                 {isGenerating && (
-                    <div className="mt-4 pt-4 border-t border-slate-100 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="mt-4 pt-4 border-t border-slate-200/60/60 animate-in fade-in slide-in-from-top-4 duration-500">
                         <LoadingProgress
                             steps={language === "es"
                                 ? [

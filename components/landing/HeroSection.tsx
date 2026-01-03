@@ -1,41 +1,15 @@
 import React from "react";
-import {
-    Bot,
-    ChevronDown,
-    Fingerprint,
-    History,
-    LayoutGrid,
-    Lightbulb,
-    MessageCircle,
-    Play,
-    Repeat,
-    Send,
-    Settings as SettingsIcon,
-    Sparkles,
-    Star,
-    ThumbsUp,
-    TrendingUp,
-    Wand2,
-} from "lucide-react";
-import { APP_DOMAIN } from "../../constants";
-import { translations } from "../../translations";
-import { AppLanguage, UserProfile } from "../../types";
-import LogoCarousel from "./LogoCarousel";
+
+import { translations } from "../../translations.ts";
+import { AppLanguage } from "../../types.ts";
+import LogoCarousel from "./LogoCarousel.tsx";
 
 interface HeroSectionProps {
     language: AppLanguage;
-    user?: UserProfile;
-    mockContent: any;
-    scrollToSection: (
-        e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
-        id: string,
-    ) => void;
 }
 
-const HeroSection: React.FC<HeroSectionProps> = (
-    { language, user, mockContent, scrollToSection },
-) => {
-    const t = translations[language];
+const HeroSection = ({ language }: HeroSectionProps) => {
+    const t = translations[language as AppLanguage];
 
     return (
         <section className="pt-14 pb-8 lg:pt-20 lg:pb-12 px-6 relative">

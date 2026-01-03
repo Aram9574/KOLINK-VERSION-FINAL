@@ -62,7 +62,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ user, language, onS
     };
 
     return (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <div className="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
             <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
                 <div className="p-2 bg-red-50 rounded-lg">
                     <Shield className="w-5 h-5 text-red-600" />
@@ -73,32 +73,32 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ user, language, onS
             <div className="space-y-6">
                 <div className="grid gap-4">
                     {/* Email Display */}
-                    <div className="flex items-center justify-between p-4 border border-slate-100 rounded-xl bg-slate-50/50">
+                    <div className="flex items-center justify-between p-4 border border-slate-200/60 rounded-xl bg-slate-50/50">
                         <div>
                             <p className="font-bold text-sm text-slate-900">Email</p>
                             <p className="text-xs text-slate-500">
                                 {language === 'es' ? 'Dirección asociada a tu cuenta' : 'Address associated with your account'}
                             </p>
                         </div>
-                        <div className="text-sm font-medium text-slate-700 bg-white px-3 py-1.5 rounded-lg border border-slate-200">
+                        <div className="text-sm font-medium text-slate-700 bg-white px-3 py-1.5 rounded-lg border border-slate-200/60">
                             {user.email || 'No email found'}
                         </div>
                     </div>
                 </div>
 
                 {/* Change Password Section */}
-                <div className="border-t border-slate-100 pt-6">
+                <div className="border-t border-slate-200/60 pt-6">
                     <h3 className="text-sm font-bold text-slate-900 mb-4">Contraseña</h3>
                     {!showChangePassword ? (
                         <button
                             onClick={() => setShowChangePassword(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-100 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200/60 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-100 transition-colors"
                         >
-                            <Lock className="w-4 h-4" />
+                            <Lock strokeWidth={1.5} className="w-4 h-4" />
                             Cambiar Contraseña
                         </button>
                     ) : (
-                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4 animate-in fade-in slide-in-from-top-2">
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-4 animate-in fade-in slide-in-from-top-2">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold text-slate-500">Nueva Contraseña</label>
@@ -109,7 +109,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ user, language, onS
                                             setNewPassword(e.target.value);
                                             setPasswordError('');
                                         }}
-                                        className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none"
+                                        className="w-full p-2.5 bg-white border border-slate-200/60 rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none"
                                         placeholder="••••••••"
                                     />
                                 </div>
@@ -122,7 +122,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ user, language, onS
                                             setConfirmPassword(e.target.value);
                                             setPasswordError('');
                                         }}
-                                        className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none"
+                                        className="w-full p-2.5 bg-white border border-slate-200/60 rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none"
                                         placeholder="••••••••"
                                     />
                                 </div>

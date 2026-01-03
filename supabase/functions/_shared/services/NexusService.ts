@@ -20,26 +20,52 @@ export class NexusService extends BaseAIService {
   async generateExpertResponse(
     query: string,
     context: string,
-    language: string = "es"
+    language: string = "es",
+    imageBase64?: string,
+    mode: "advisor" | "ghostwriter" = "advisor"
   ) {
     const isSpanish = language === "es";
+    
+    let roleDescription = "";
+    if (mode === "ghostwriter") {
+        roleDescription = isSpanish 
+            ? "ROLE: Eres un Ghostwriter experto. Tu objetivo es REDACTAR posts de LinkedIn listos para publicar, con el tono del usuario."
+            : "ROLE: You are an expert Ghostwriter. Your goal is to WRITE LinkedIn posts ready to publish, matching the user's tone.";
+    } else {
+        roleDescription = isSpanish
+            ? "ROLE: Eres Nexus, un estratega de élite en LinkedIn. Tu objetivo es dar consejos tácticos y accionables."
+            : "ROLE: You are Nexus, an elite LinkedIn strategist. Your goal is to provide tactical and actionable advice.";
+    }
+
     const prompt = `
-      You are the "KOLINK Expert".
+      You are the "KOLINK Expert" (Nexus).
+      MODE: ${mode.toUpperCase()}
       KNOWLEDGE (RAG): ${context || "No context."}
       USER QUERY: "${query}"
       LANGUAGE: ${isSpanish ? "Spanish" : "English"}
+      
+      ${roleDescription}
     `;
 
     return await this.retryWithBackoff(async () => {
       const model = this.genAI.getGenerativeModel({
-        model: this.model,
-        systemInstruction: isSpanish
-          ? "Eres un experto en crecimiento orgánico en LinkedIn."
-          : "You are an expert in LinkedIn organic growth.",
+        model: "gemini-1.5-flash", // Force Flash for multimodal
+        systemInstruction: roleDescription,
       });
 
+      const parts: any[] = [{ text: prompt }];
+      
+      if (imageBase64) {
+        parts.push({
+            inlineData: {
+                mimeType: "image/png",
+                data: imageBase64.split(',')[1] || imageBase64
+            }
+        });
+      }
+
       const response = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        contents: [{ role: "user", parts: parts }],
       });
 
       return response.response.text().replace(/\*\*/g, "");

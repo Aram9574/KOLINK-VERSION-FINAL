@@ -1,4 +1,4 @@
-import { serve } from "std/http/server";
+import { serve } from "std/http/server.ts";
 import { createClient } from "@supabase/supabase-js";
 import { NexusService } from "../_shared/services/NexusService.ts";
 import { corsHeaders } from "../_shared/cors.ts";
@@ -26,8 +26,8 @@ serve(async (req: Request) => {
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !user) throw new Error("UNAUTHORIZED");
 
-    const { query } = await req.json();
-    if (!query) throw new Error("QUERY_REQUIRED");
+    const { query, imageBase64, mode } = await req.json();
+    if (!query && !imageBase64) throw new Error("QUERY_REQUIRED");
 
     const nexusService = new NexusService(Deno.env.get("GEMINI_API_KEY") ?? "");
     const supabaseAdmin = createClient(
@@ -35,34 +35,36 @@ serve(async (req: Request) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
-    // 2. RAG: Search Vector Knowledge Base
-    console.log("[Nexus] Searching knowledge base for:", query);
+    // 2. RAG: Search Vector Knowledge Base (only if text query exists)
+    let context = "";
+    if (query) {
+        console.log("[Nexus] Searching knowledge base for:", query);
+        const queryEmbedding = await nexusService.createEmbedding(query);
+        const { data: matches, error: matchError } = await supabaseAdmin.rpc(
+        "match_linkedin_knowledge",
+        {
+            query_embedding: queryEmbedding,
+            match_threshold: 0.5,
+            match_count: 3,
+        },
+        );
 
-    // a. Create embedding for the query using the specialized service
-    const queryEmbedding = await nexusService.createEmbedding(query);
-
-    // b. Match in Supabase
-    const { data: matches, error: matchError } = await supabaseAdmin.rpc(
-      "match_linkedin_knowledge",
-      {
-        query_embedding: queryEmbedding,
-        match_threshold: 0.5,
-        match_count: 3,
-      },
-    );
-
-    if (matchError) {
-      console.error("[Nexus] Error matching knowledge:", matchError);
+        if (matchError) console.error("[Nexus] Error matching knowledge:", matchError);
+        context = matches?.map((m: KnowledgeMatch) => m.content).join("\n\n") || "";
     }
-
-    const context = matches?.map((m: KnowledgeMatch) => m.content).join("\n\n") || "";
 
     // 3. User Language
     const { data: profile } = await supabaseAdmin.from("profiles").select("language").eq("id", user.id).single();
     const language = profile?.language || "es";
 
-    // 4. Generate Expert Response using the specialized service
-    const responseText = await nexusService.generateExpertResponse(query, context, language);
+    // 4. Generate Expert Response
+    const responseText = await nexusService.generateExpertResponse(
+        query || "Analyzing image...", 
+        context, 
+        language, 
+        imageBase64,
+        mode || "advisor"
+    );
 
     return new Response(
       JSON.stringify({ response: responseText }),

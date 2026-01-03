@@ -117,7 +117,8 @@ const BrandVoiceManager: React.FC<BrandVoiceManagerProps> = ({ userId, language 
             </div>
 
             {isFormOpen ? (
-                <div className="bg-white border boundary-slate-200 rounded-xl p-6 space-y-4 animate-in fade-in slide-in-from-top-2">
+                <div className="relative bg-white/80 backdrop-blur-xl border border-slate-200 rounded-xl p-6 space-y-4 animate-in fade-in slide-in-from-top-2 shadow-sm overflow-hidden">
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
                     <div className="flex justify-between items-center mb-2">
                         <h4 className="font-bold text-slate-800">
                             {editingVoice ? (language === 'es' ? 'Editar Voz' : 'Edit Voice') : (language === 'es' ? 'Crear Nueva Voz' : 'Create New Voice')}
@@ -150,7 +151,7 @@ const BrandVoiceManager: React.FC<BrandVoiceManagerProps> = ({ userId, language 
                                     value={formName}
                                     onChange={(e) => setFormName(e.target.value)}
                                     placeholder="e.g. Professional, Casual, LinkedIn Guru..."
-                                    className="w-full rounded-lg bg-white border-slate-300 focus:ring-brand-500 focus:border-brand-500 shadow-sm"
+                                    className="w-full rounded-xl bg-slate-50/50 border border-slate-200 focus:ring-2 focus:ring-primary/10 focus:border-primary shadow-sm outline-none transition-all"
                                 />
                             </div>
 
@@ -162,7 +163,7 @@ const BrandVoiceManager: React.FC<BrandVoiceManagerProps> = ({ userId, language 
                                     value={formDescription}
                                     onChange={(e) => setFormDescription(e.target.value)}
                                     placeholder="Describe how this voice sounds. Be specific about sentence structure, vocabulary, and emotion."
-                                    className="w-full h-32 rounded-lg bg-white border-slate-300 focus:ring-brand-500 focus:border-brand-500 text-sm shadow-sm"
+                                    className="w-full h-32 rounded-xl bg-slate-50/50 border border-slate-200 focus:ring-2 focus:ring-primary/10 focus:border-primary text-sm shadow-sm outline-none transition-all"
                                 />
                                 <p className="text-xs text-slate-500 mt-1">
                                     {language === 'es'
@@ -211,7 +212,7 @@ const BrandVoiceManager: React.FC<BrandVoiceManagerProps> = ({ userId, language 
                         </div>
                     ) : (
                         voices.map(voice => (
-                            <div key={voice.id} className={`group relative bg-white border rounded-xl p-4 transition-all ${voice.isActive ? 'border-brand-500 ring-1 ring-brand-500 shadow-sm' : 'border-slate-200 hover:border-brand-300'}`}>
+                            <div key={voice.id} className={`group relative bg-white/60 backdrop-blur-md border rounded-xl p-4 transition-all duration-300 ${voice.isActive ? 'border-brand-500 shadow-ai-hover ring-1 ring-brand-500/20' : 'border-slate-200/50 hover:border-brand-500/30 hover:shadow-ai'}`}>
                                 <div className="flex justify-between items-start">
                                     <div className="flex items-start gap-3">
                                         <button
@@ -224,7 +225,7 @@ const BrandVoiceManager: React.FC<BrandVoiceManagerProps> = ({ userId, language 
                                         <div>
                                             <h4 className="font-bold text-slate-900 flex items-center gap-2">
                                                 {voice.name}
-                                                {voice.isActive && <span className="text-[10px] bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full uppercase tracking-wide">Active</span>}
+                                                {voice.isActive && <span className="text-[10px] bg-brand-50/80 text-brand-700 px-2 py-0.5 rounded-full border border-brand-200/50 backdrop-blur-sm shadow-sm uppercase tracking-wide">Active</span>}
                                             </h4>
                                             <p className="text-sm text-slate-500 line-clamp-2 mt-1">{voice.description}</p>
                                         </div>

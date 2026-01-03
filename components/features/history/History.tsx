@@ -42,7 +42,7 @@ const History: React.FC<HistoryProps> = ({ posts, onSelect, onDelete, selectedId
             className={`group relative p-4 rounded-xl border cursor-pointer transition-all duration-200 hover:shadow-md
                 ${selectedId === post.id
                 ? 'bg-white border-brand-500 ring-1 ring-brand-500 shadow-sm'
-                : 'bg-white border-slate-200 hover:border-brand-300'
+                : 'bg-white border-slate-200/60/60 hover:border-brand-300'
               }`}
           >
             <div className="flex justify-between items-start mb-2">

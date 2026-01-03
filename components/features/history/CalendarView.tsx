@@ -32,9 +32,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({ posts, language, onSelectPo
     const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in duration-500">
+        <div className="bg-white rounded-xl border border-slate-200/60/60 shadow-sm overflow-hidden animate-in fade-in duration-500">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-slate-100">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200/60/60">
                 <h2 className="text-xl font-bold text-slate-900 capitalize">
                     {format(currentDate, 'MMMM yyyy', { locale })}
                 </h2>
@@ -55,7 +55,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ posts, language, onSelectPo
             </div>
 
             {/* Grid Header */}
-            <div className="grid grid-cols-7 border-b border-slate-100 bg-slate-50">
+            <div className="grid grid-cols-7 border-b border-slate-200/60/60 bg-slate-50">
                 {weekDays.map(day => (
                     <div key={day} className="py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">
                         {day}
@@ -99,7 +99,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ posts, language, onSelectPo
                                     <button
                                         key={post.id}
                                         onClick={() => onSelectPost(post)}
-                                        className="w-full text-left p-2 rounded-lg bg-slate-50 hover:bg-brand-50 hover:text-brand-700 text-slate-600 text-xs transition-all group border border-slate-100 hover:border-brand-200 shadow-sm"
+                                        className="w-full text-left p-2 rounded-lg bg-slate-50 hover:bg-brand-50 hover:text-brand-700 text-slate-600 text-xs transition-all group border border-slate-200/60/60 hover:border-brand-200 shadow-sm"
                                     >
                                         <div className="flex items-center gap-1.5 mb-1">
                                             <div className={`w-1.5 h-1.5 rounded-full ${post.viralScore && post.viralScore > 80 ? 'bg-green-500' : 'bg-slate-300'}`} />

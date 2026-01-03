@@ -39,7 +39,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md relative overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-md relative overflow-hidden animate-in zoom-in-95 duration-200">
                 <button 
                     onClick={onClose}
                     className="absolute top-4 right-4 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 transition-colors"
@@ -65,7 +65,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose }) => {
                             {t.yourLink}
                         </label>
                         <div className="flex gap-2">
-                            <div className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 font-mono truncate">
+                            <div className="flex-1 bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-3 text-sm text-slate-600 font-mono truncate">
                                 {referralLink}
                             </div>
                             <button

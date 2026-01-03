@@ -41,10 +41,10 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ isOpen, onClose, onConfir
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
 
                 {/* Header */}
-                <div className="p-6 border-b border-slate-100 flex justify-between items-start">
+                <div className="p-6 border-b border-slate-200/60/60 flex justify-between items-start">
                     <div>
                         <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                             <Calendar className="w-5 h-5 text-brand-600" />
@@ -70,7 +70,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ isOpen, onClose, onConfir
                                 min={minDate}
                                 value={selectedDate}
                                 onChange={(e) => setSelectedDate(e.target.value)}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all pl-10"
+                                className="w-full px-4 py-2 border border-slate-200/60 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all pl-10"
                             />
                             <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
                         </div>
@@ -83,7 +83,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ isOpen, onClose, onConfir
                                 type="time"
                                 value={selectedTime}
                                 onChange={(e) => setSelectedTime(e.target.value)}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all pl-10"
+                                className="w-full px-4 py-2 border border-slate-200/60 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all pl-10"
                             />
                             <Clock className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
                         </div>
@@ -95,7 +95,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({ isOpen, onClose, onConfir
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                <div className="p-6 bg-slate-50 border-t border-slate-200/60/60 flex justify-end gap-3">
                     <button
                         onClick={onClose}
                         className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-200 rounded-lg transition-colors"

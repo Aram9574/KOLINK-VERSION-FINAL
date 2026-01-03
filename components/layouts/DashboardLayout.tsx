@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { useUser } from "../../context/UserContext";
-import { usePosts } from "../../context/PostContext";
-import Sidebar from "../features/dashboard/Sidebar";
-import DashboardHeader from "../features/dashboard/DashboardHeader";
-import MobileBottomNav from "./MobileBottomNav";
-import { AppTab, Post } from "../../types";
+import { useUser } from "../../context/UserContext.tsx";
+import { usePosts } from "../../context/PostContext.tsx";
+import Sidebar from "../features/dashboard/Sidebar.tsx";
+import DashboardHeader from "../features/dashboard/DashboardHeader.tsx";
+import MobileBottomNav from "./MobileBottomNav.tsx";
+import { AppTab, Post } from "../../types.ts";
+import SmartCursor from "../ui/SmartCursor.tsx";
+import { InfiniteGrid } from "../ui/infinite-grid-integration.tsx";
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -45,18 +47,41 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         onReferral,
     };
 
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+        const saved = localStorage.getItem("kolink_sidebar_collapsed");
+        return saved === "true";
+    });
+
+    const toggleSidebar = () => {
+        const newState = !isSidebarCollapsed;
+        setIsSidebarCollapsed(newState);
+        localStorage.setItem("kolink_sidebar_collapsed", String(newState));
+    };
+
     return (
-        <div className="flex flex-col lg:block bg-slate-50 font-sans relative selection:bg-brand-200 selection:text-brand-900 h-dvh overflow-hidden pr-safe pl-safe">
+        <InfiniteGrid gridOpacity={0.3} className="bg-slate-50 relative selection:bg-brand-200 selection:text-brand-900 h-dvh overflow-hidden pr-safe pl-safe">
+            <div className="absolute inset-0 opacity-40 pointer-events-none z-0">
+                {/* Overriding InfiniteGrid default opacity if needed via extra layer or just trusting className */}
+            </div>
+            <SmartCursor />
             <div className="flex h-full lg:h-screen overflow-hidden">
                 {/* Sidebar */}
-                <div className="hidden lg:block w-72 bg-white border-r border-slate-200 z-50 shadow-none relative">
+                <div 
+                    className={`hidden lg:block transition-all duration-300 ease-in-out ${
+                        isSidebarCollapsed ? "w-20" : "w-72"
+                    } border-r-[0.5px] border-slate-200/60 z-50 shadow-none relative`}
+                >
                     <div className="h-full flex flex-col">
-                        <Sidebar {...sidebarProps} />
+                        <Sidebar 
+                            {...sidebarProps} 
+                            isCollapsed={isSidebarCollapsed} 
+                            onToggleCollapse={toggleSidebar} 
+                        />
                     </div>
                 </div>
 
                 {/* Main Content Area */}
-                <main className="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-50">
+                <main className="flex-1 flex flex-col h-full overflow-hidden relative bg-transparent">
                     <div className="hidden lg:block">
                         <DashboardHeader
                             user={user}
@@ -67,8 +92,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                     </div>
 
                     {/* Content Body */}
-                    <div className="flex-1 overflow-hidden relative">
-                        {children}
+                    <div className="flex-1 overflow-hidden relative p-4 lg:p-8">
+                        <div className="h-full w-full max-w-[1600px] mx-auto">
+                            {children}
+                        </div>
                     </div>
                 </main>
 
@@ -77,7 +104,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                     setActiveTab={setActiveTab}
                 />
             </div>
-        </div>
+        </InfiniteGrid>
     );
 };
 

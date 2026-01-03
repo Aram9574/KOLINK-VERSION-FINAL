@@ -19,7 +19,7 @@ const IdeaResults: React.FC<IdeaResultsProps> = ({ language, ideas, loading, onS
             <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 flex-1 w-full">
                 <div className="grid md:grid-cols-2 gap-4 animate-in fade-in duration-500">
                     {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="h-40 bg-white rounded-2xl border border-slate-200 shadow-sm animate-pulse flex flex-col justify-center p-6 space-y-4 relative overflow-hidden">
+                        <div key={i} className="h-40 bg-white rounded-xl border border-slate-200/60/60 shadow-sm animate-pulse flex flex-col justify-center p-6 space-y-4 relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-20 h-20 bg-slate-100 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                             <div className="h-4 bg-slate-200 rounded w-3/4"></div>
                             <div className="h-3 bg-slate-100 rounded w-full"></div>
@@ -41,7 +41,7 @@ const IdeaResults: React.FC<IdeaResultsProps> = ({ language, ideas, loading, onS
                     {ideas.ideas.map((idea, idx) => (
                         <div
                             key={idx}
-                            className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-amber-400 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300 group flex flex-col justify-between relative overflow-hidden"
+                            className="bg-white p-6 rounded-xl border border-slate-200/60/60 hover:border-amber-400 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300 group flex flex-col justify-between relative overflow-hidden"
                         >
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-50 to-transparent rounded-bl-full opacity-50 group-hover:opacity-100 transition-opacity"></div>
 
@@ -57,7 +57,7 @@ const IdeaResults: React.FC<IdeaResultsProps> = ({ language, ideas, loading, onS
                             </div>
                             <button
                                 onClick={() => onSelectIdea(idea)}
-                                className="w-full py-3.5 bg-slate-50 text-slate-600 font-bold rounded-xl border border-slate-200 group-hover:bg-amber-500 group-hover:text-white group-hover:border-amber-500 transition-all flex items-center justify-center gap-2 shadow-sm"
+                                className="w-full py-3.5 bg-slate-50 text-slate-600 font-bold rounded-xl border border-slate-200/60/60 group-hover:bg-amber-500 group-hover:text-white group-hover:border-amber-500 transition-all flex items-center justify-center gap-2 shadow-sm"
                             >
                                 {t.useThis}
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -68,7 +68,7 @@ const IdeaResults: React.FC<IdeaResultsProps> = ({ language, ideas, loading, onS
 
                 {/* Grounding Sources - Only show if available */}
                 {ideas.sources && ideas.sources.length > 0 && (
-                    <div className="bg-slate-50/50 rounded-2xl p-6 border border-slate-200/60 shadow-sm relative overflow-hidden">
+                    <div className="bg-slate-50/50 rounded-xl p-6 border border-slate-200/60/60 shadow-sm relative overflow-hidden">
 
                         <div className="flex items-center gap-2 mb-4 relative z-10">
                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
@@ -87,7 +87,7 @@ const IdeaResults: React.FC<IdeaResultsProps> = ({ language, ideas, loading, onS
                                     href={source.uri}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="group flex flex-col p-4 bg-white border border-slate-200 rounded-xl hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all h-full"
+                                    className="group flex flex-col p-4 bg-white border border-slate-200/60/60 rounded-xl hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/5 transition-all h-full"
                                 >
                                     <span className="text-xs font-bold text-slate-900 mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
                                         {source.title}

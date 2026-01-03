@@ -1,8 +1,8 @@
 import React from 'react';
 import { PenLine, Users, LineChart, FileText, X as XIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { translations } from '../../translations';
-import { AppLanguage } from '../../types';
+import { translations } from '../../translations.ts';
+import { AppLanguage } from '../../types.ts';
 
 interface RoiSectionProps {
     language: AppLanguage;
@@ -12,14 +12,14 @@ const RoiSection: React.FC<RoiSectionProps> = ({ language }) => {
     const t = translations[language];
 
     return (
-        <section className="py-24 bg-white relative overflow-hidden">
+        <section className="py-24 bg-transparent relative overflow-hidden">
             <div className="max-w-3xl mx-auto px-6">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-4">{t.roi.title}</h2>
                     <p className="text-slate-500 text-lg">{t.roi.subtitle}</p>
                 </div>
 
-                <div className="bg-slate-50 rounded-3xl p-2 border border-slate-200 shadow-xl">
+                <div className="card-premium p-2 shadow-xl">
                     <div className="bg-white rounded-[1.2rem] overflow-hidden">
                         {/* Expensive Items List */}
                         <div className="divide-y divide-slate-100">

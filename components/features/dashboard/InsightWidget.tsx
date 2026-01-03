@@ -104,19 +104,19 @@ const InsightWidget: React.FC<InsightWidgetProps> = ({ language }) => {
                     isOpen ? 'translate-x-0' : 'translate-x-full'
                 }`}
             >
-                <div className="h-full w-96 max-w-[90vw] bg-white shadow-2xl border-l border-slate-200 flex flex-col relative">
+                <div className="h-full w-96 max-w-[90vw] bg-white/90 backdrop-blur-xl shadow-2xl border-l border-slate-200/60 flex flex-col relative">
                     
                     {/* Drawer Header */}
-                    <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <div className="p-6 border-b border-slate-200 flex justify-between items-center bg-white">
                         <div className="flex items-center gap-3">
-                             <div className="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center shadow-brand-500/20 shadow-lg">
+                             <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-200">
                                 <Sparkles className="w-5 h-5 fill-current" />
                              </div>
                              <div>
-                                <h3 className="font-bold text-slate-900 text-base">
+                                <h3 className="font-bold text-slate-900 text-base tracking-tight">
                                     {language === 'es' ? 'Manual de Viralidad' : 'Virality Playbook'}
                                 </h3>
-                                <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">
+                                <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">
                                     {language === 'es' ? 'ESTRATEGIAS PROBADAS' : 'PROVEN STRATEGIES'}
                                 </p>
                              </div>
@@ -130,7 +130,7 @@ const InsightWidget: React.FC<InsightWidgetProps> = ({ language }) => {
                     </div>
 
                     {/* Drawer Content - Scrollable List */}
-                    <div className="flex-1 overflow-y-auto bg-slate-50/50 p-4 space-y-4">
+                    <div className="flex-1 overflow-y-auto bg-slate-50/30 p-4 space-y-4">
                         
                         <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 pl-1">
                             {language === 'es' ? 'Reglas de Oro' : 'Golden Rules'}
@@ -138,19 +138,18 @@ const InsightWidget: React.FC<InsightWidgetProps> = ({ language }) => {
 
                         {currentTipsContent.map((tip, index) => {
                             const icon = TIP_ICONS[index % TIP_ICONS.length];
-                            const color = TIP_COLORS[index % TIP_COLORS.length];
                             
                             return (
-                                <div key={index} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-brand-200 transition-all group">
-                                    <div className="flex gap-3">
-                                        <div className={`mt-0.5 min-w-[32px] w-8 h-8 rounded-lg ${color} bg-opacity-10 text-${color.replace('bg-', '')}-600 flex items-center justify-center`}>
+                                <div key={index} className="bg-white/40 backdrop-blur-md border border-slate-200/50 rounded-xl p-4 shadow-ai hover:shadow-ai-hover transition-all duration-300 group hover:-translate-y-1">
+                                    <div className="flex gap-4">
+                                        <div className={`mt-0.5 min-w-[36px] w-9 h-9 rounded-xl bg-slate-50 text-slate-600 border border-slate-100 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary/20 transition-all`}>
                                             {icon}
                                         </div>
                                         <div>
-                                            <h4 className={`font-bold text-slate-800 text-sm mb-1 group-hover:text-${color.replace('bg-', '')}-600 transition-colors`}>
+                                            <h4 className={`font-bold text-slate-900 text-sm mb-1 tracking-tight group-hover:text-primary transition-colors`}>
                                                 {tip.title}
                                             </h4>
-                                            <p className="text-slate-600 text-xs leading-relaxed">
+                                            <p className="text-slate-500 text-xs leading-relaxed font-medium">
                                                 {tip.desc}
                                             </p>
                                         </div>
@@ -180,18 +179,17 @@ const InsightWidget: React.FC<InsightWidgetProps> = ({ language }) => {
                             className="absolute -left-12 transition-all duration-75 ease-out"
                             style={{ top: `${buttonTop}px` }}
                          >
-                             <button
-                                onMouseDown={handleMouseDown}
-                                onClick={(e) => {
-                                    // If we were dragging, don't toggle
-                                    if (!isDragging.current) setIsOpen(true);
-                                }}
-                                className="w-12 h-12 bg-white rounded-l-xl shadow-[0_4px_20px_-5px_rgba(0,0,0,0.1)] border-y border-l border-slate-100 flex items-center justify-center hover:bg-slate-50 text-brand-600 hover:text-brand-700 hover:w-14 transition-all duration-200 group relative cursor-ns-resize active:cursor-grabbing"
-                             >
-                                <div className="absolute right-0 top-0 bottom-0 w-1 bg-white"></div>
-                                <Lightbulb className="w-6 h-6 fill-brand-100" />
-                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-bounce shadow-sm" />
-                             </button>
+                              <button
+                                 onMouseDown={handleMouseDown}
+                                 onClick={(e) => {
+                                     if (!isDragging.current) setIsOpen(true);
+                                 }}
+                                 className="w-12 h-12 bg-white rounded-l-xl shadow-lg border-y border-l border-slate-200 flex items-center justify-center hover:bg-slate-50 text-slate-900 hover:text-primary transition-all duration-200 group relative cursor-ns-resize active:cursor-grabbing"
+                              >
+                                 <div className="absolute right-0 top-0 bottom-0 w-1 bg-white"></div>
+                                 <Sparkles className="w-5 h-5 fill-slate-100 group-hover:fill-primary/20 transition-all" />
+                                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-600 rounded-full border-2 border-white animate-pulse shadow-sm" />
+                              </button>
                          </div>
                     )}
                 </div>

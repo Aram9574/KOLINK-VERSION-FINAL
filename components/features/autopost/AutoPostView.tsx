@@ -377,7 +377,7 @@ const AutoPostView: React.FC<AutoPostViewProps> = (
 
                                 <button
                                     onClick={onUpgrade}
-                                    className="group relative w-full md:w-auto px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-slate-900/20 transition-all hover:-translate-y-1 flex items-center justify-center gap-3"
+                                    className="group relative w-full md:w-auto px-8 py-4 bg-slate-900 text-white font-bold rounded-xl shadow-xl hover:shadow-2xl hover:shadow-slate-900/20 transition-all hover:-translate-y-1 flex items-center justify-center gap-3"
                                 >
                                     <span>
                                         {language === "es"
@@ -410,7 +410,7 @@ const AutoPostView: React.FC<AutoPostViewProps> = (
                                 ].map((item, i) => (
                                     <div
                                         key={i}
-                                        className="flex gap-4 p-5 bg-white/50 rounded-2xl border border-white/40 shadow-sm transition-transform hover:scale-[1.02]"
+                                        className="flex gap-4 p-5 bg-white/50 rounded-xl border border-white/40 shadow-sm transition-transform hover:scale-[1.02]"
                                     >
                                         <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
                                             {item.icon}
@@ -460,7 +460,7 @@ const AutoPostView: React.FC<AutoPostViewProps> = (
                         </p>
                     </div>
 
-                    <div className="hidden lg:flex items-center gap-4 bg-white/70 backdrop-blur-md px-6 py-4 rounded-2xl border border-white shadow-sm ring-1 ring-slate-200/5">
+                    <div className="hidden lg:flex items-center gap-4 bg-white/70 backdrop-blur-md px-6 py-4 rounded-xl border border-white shadow-sm ring-1 ring-slate-200/5">
                         <div className="text-right">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">
                                 {t.stats.systemHealth}
@@ -515,7 +515,7 @@ const AutoPostView: React.FC<AutoPostViewProps> = (
                     {/* Configuration Sidebar */}
                     <div className="lg:col-span-4 sticky top-8 space-y-6">
                         {/* Insight Bubble */}
-                        <div className="relative overflow-hidden bg-white rounded-3xl p-6 text-slate-900 border border-slate-200 shadow-sm group">
+                        <div className="relative overflow-hidden bg-white rounded-xl p-6 text-slate-900 border border-slate-200/60/60 shadow-sm group">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl -translate-y-12 translate-x-12 group-hover:bg-sky-500/20 transition-colors">
                             </div>
                             <div className="relative z-10 space-y-4">

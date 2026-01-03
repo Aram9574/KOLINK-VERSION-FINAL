@@ -187,7 +187,9 @@ export const fetchBrandVoices = async (userId: string): Promise<BrandVoice[]> =>
     // Map snake_case to camelCase
     return (data || []).map((v: any) => ({
         ...v,
-        isActive: v.is_active
+        isActive: v.is_active,
+        hookPatterns: v.hook_patterns,
+        stylisticDNA: v.stylistic_dna
     }));
 };
 
@@ -207,14 +209,20 @@ export const setBrandVoiceActive = async (userId: string, voiceId: string): Prom
     if (error) throw error;
 };
 
-export const createBrandVoice = async (userId: string, name: string, description: string): Promise<any> => {
+export const createBrandVoice = async (userId: string, name: string, description: string, hookPatterns?: any[], stylisticDNA?: any): Promise<any> => {
     const { data, error } = await supabase
         .from('brand_voices')
-        .insert([{ user_id: userId, name, description }])
+        .insert([{ user_id: userId, name, description, hook_patterns: hookPatterns, stylistic_dna: stylisticDNA }])
         .select()
         .single();
     if (error) throw error;
-    return data;
+    // Map response immediately for UI use
+    return {
+        ...data,
+        isActive: data.is_active,
+        hookPatterns: data.hook_patterns,
+        stylisticDNA: data.stylistic_dna
+    };
 };
 
 export const updateBrandVoice = async (id: string, updates: { name?: string; description?: string }): Promise<any> => {

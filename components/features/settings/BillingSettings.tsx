@@ -27,7 +27,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpg
     const progressPercent = isUnlimited ? 100 : Math.min(100, (user.credits / effectiveMax) * 100);
 
     return (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm overflow-hidden relative">
+        <div className="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm overflow-hidden relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
             <div className="flex items-center justify-between mb-6 relative z-10">
@@ -37,14 +37,14 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpg
                     </div>
                     {t.billingTitle}
                 </h2>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${user.planTier !== 'free' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-50 text-slate-600 border-slate-200'}`}>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${user.planTier !== 'free' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-50 text-slate-600 border-slate-200/60'}`}>
                     {currentPlan.name} Plan
                 </span>
             </div>
 
             <div className="max-w-2xl mx-auto mb-8 relative z-10">
                 {/* Current Plan Card */}
-                <div className="bg-slate-50/80 rounded-xl p-6 border border-slate-200 flex flex-col justify-between">
+                <div className="bg-slate-50/80 rounded-xl p-6 border border-slate-200/60 flex flex-col justify-between">
                     <div>
                         <p className="text-xs font-bold uppercase text-slate-400 tracking-wider mb-1">{t.currentUsage}</p>
                         <div className="flex items-baseline gap-2 mb-3">
@@ -74,7 +74,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpg
 
                     <div className="mt-6 pt-4 border-t border-slate-200/60 flex flex-col gap-2">
                         <button onClick={onUpgrade} className="text-sm font-bold text-brand-600 hover:text-brand-700 hover:underline flex items-center gap-1">
-                            {t.manageSub} <ChevronRight className="w-4 h-4" />
+                            {t.manageSub} <ChevronRight strokeWidth={1.5} className="w-4 h-4" />
                         </button>
 
                         {user.planTier !== 'free' && !user.cancelAtPeriodEnd && (

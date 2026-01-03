@@ -1,7 +1,7 @@
 import React from "react";
-import { AlertTriangle, Check, Sparkles, Trophy, X } from "lucide-react";
-import { translations } from "../../translations";
-import { AppLanguage } from "../../types";
+import { AlertTriangle, Check, Trophy, X } from "lucide-react";
+import { translations } from "../../translations.ts";
+import { AppLanguage } from "../../types.ts";
 
 interface StrategicComparisonProps {
     language: AppLanguage;
@@ -32,7 +32,7 @@ const StrategicComparison: React.FC<StrategicComparisonProps> = (
     ];
 
     return (
-        <section id="comparison" className="py-24 bg-slate-50 overflow-hidden">
+        <section id="comparison" className="py-24 bg-transparent overflow-hidden">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 mb-6 tracking-tight">
@@ -43,7 +43,7 @@ const StrategicComparison: React.FC<StrategicComparisonProps> = (
                     </p>
                 </div>
 
-                <div className="bg-white rounded-[32px] shadow-2xl shadow-slate-200/50 border border-slate-200/60 overflow-hidden">
+                <div className="card-premium rounded-[32px] overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
@@ -80,7 +80,7 @@ const StrategicComparison: React.FC<StrategicComparisonProps> = (
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {t.rows.map((row: any, idx: number) => (
+                                {t.rows.map((row: { name: string; values: { kolink: string; taplio: string; supergrow: string; authored: string } }, idx: number) => (
                                     <tr
                                         key={idx}
                                         className="group hover:bg-slate-50/50 transition-colors"

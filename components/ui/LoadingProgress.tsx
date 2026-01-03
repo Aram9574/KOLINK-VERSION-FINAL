@@ -56,7 +56,7 @@ const LoadingProgress: React.FC<LoadingProgressProps> = ({
             <div className="flex flex-col items-center gap-3">
                 <div className="relative">
                     <div className="absolute -inset-4 bg-brand-500/10 rounded-full blur-xl animate-pulse" />
-                    <div className="relative flex items-center justify-center w-12 h-12 bg-white rounded-2xl shadow-sm border border-brand-100">
+                    <div className="relative flex items-center justify-center w-12 h-12 bg-white rounded-xl shadow-sm border border-brand-100">
                         <div className="animate-spin rounded-full h-6 w-6 border-2 border-brand-500 border-t-transparent" />
                         <Sparkles className="absolute w-3 h-3 text-brand-500 animate-pulse" />
                     </div>

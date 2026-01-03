@@ -35,7 +35,7 @@ const HistoryFilter: React.FC<HistoryFilterProps> = ({
                     placeholder={t.searchPlaceholder}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full sm:w-64 pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium shadow-sm transition-all"
+                    className="w-full sm:w-64 pl-10 pr-4 py-2.5 bg-white border border-slate-200/60/60 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium shadow-sm transition-all"
                 />
             </div>
 
@@ -47,7 +47,7 @@ const HistoryFilter: React.FC<HistoryFilterProps> = ({
                 <select
                     value={selectedTone}
                     onChange={(e) => setSelectedTone(e.target.value)}
-                    className="w-full sm:w-48 pl-10 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium shadow-sm appearance-none cursor-pointer hover:border-brand-300 transition-all"
+                    className="w-full sm:w-48 pl-10 pr-8 py-2.5 bg-white border border-slate-200/60/60 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium shadow-sm appearance-none cursor-pointer hover:border-brand-300 transition-all"
                 >
                     <option value="all">{t.filterAll}</option>
                     {TONES.map((tone) => (
@@ -66,7 +66,7 @@ const HistoryFilter: React.FC<HistoryFilterProps> = ({
                 <select
                     value={selectedFramework}
                     onChange={(e) => setSelectedFramework(e.target.value)}
-                    className="w-full sm:w-48 pl-10 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium shadow-sm appearance-none cursor-pointer hover:border-brand-300 transition-all"
+                    className="w-full sm:w-48 pl-10 pr-8 py-2.5 bg-white border border-slate-200/60/60 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium shadow-sm appearance-none cursor-pointer hover:border-brand-300 transition-all"
                 >
                     <option value="all">{t.filterAllFrameworks}</option>
                     {FRAMEWORKS.map((fw) => (

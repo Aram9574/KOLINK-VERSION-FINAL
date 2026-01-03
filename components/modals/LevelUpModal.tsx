@@ -36,7 +36,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = (
 
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden text-center p-8 animate-in zoom-in-95 slide-in-from-bottom-10 duration-500">
+            <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden text-center p-8 animate-in zoom-in-95 slide-in-from-bottom-10 duration-500">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors"
@@ -51,7 +51,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = (
                 <div className="relative z-10">
                     {data.leveledUp && (
                         <div className="mb-6">
-                            <div className="mx-auto w-20 h-20 bg-gradient-to-tr from-brand-400 to-indigo-600 rounded-2xl rotate-3 shadow-lg shadow-brand-500/40 flex items-center justify-center mb-4 animate-bounce">
+                            <div className="mx-auto w-20 h-20 bg-gradient-to-tr from-brand-400 to-indigo-600 rounded-xl rotate-3 shadow-lg shadow-brand-500/40 flex items-center justify-center mb-4 animate-bounce">
                                 <Star className="w-10 h-10 text-white fill-white" />
                             </div>
                             <h2 className="text-3xl font-display font-bold text-slate-900 mb-1">
@@ -80,7 +80,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = (
                                 {unlockedBadges.map((badge) => (
                                     <div
                                         key={badge.id}
-                                        className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex items-center gap-3 text-left"
+                                        className="bg-slate-50 border border-slate-200/60/60 rounded-xl p-3 flex items-center gap-3 text-left"
                                     >
                                         <div className="p-2 bg-amber-100 rounded-lg text-amber-600">
                                             <Zap className="w-4 h-4 fill-current" />

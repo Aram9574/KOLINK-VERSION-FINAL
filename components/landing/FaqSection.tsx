@@ -19,7 +19,7 @@ const FaqSection: React.FC<FaqSectionProps> = ({ language }) => {
     ];
 
     return (
-        <section id="faq" className="py-32 bg-slate-50 border-t border-slate-200">
+        <section id="faq" className="py-32 bg-transparent border-t border-slate-200">
             <div className="max-w-3xl mx-auto px-6">
                 <h2 className="text-4xl font-display font-bold text-slate-900 mb-12 text-center">{t.faq.title}</h2>
                 <div className="space-y-4">

@@ -16,7 +16,7 @@ const GamificationWidget: React.FC<GamificationWidgetProps> = ({ user }) => {
   const percent = Math.min(100, Math.max(0, (xpProgress / xpNeeded) * 100));
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 text-slate-900 dark:text-white relative overflow-hidden group border border-slate-100 dark:border-slate-800 shadow-sm shadow-slate-200/50">
+    <div className="bg-white dark:bg-slate-900 rounded-xl p-4 text-slate-900 dark:text-white relative overflow-hidden group border border-slate-200/60/60 dark:border-slate-800 shadow-sm shadow-slate-200/50">
       {/* Ambient Glow */}
       <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-500/5 dark:bg-indigo-500/20 blur-2xl rounded-full pointer-events-none">
       </div>
@@ -47,7 +47,7 @@ const GamificationWidget: React.FC<GamificationWidgetProps> = ({ user }) => {
           </span>
           <span>Lvl {nextLevel}</span>
         </div>
-        <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/50 dark:border-slate-700/50">
+        <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/60/50 dark:border-slate-700/50">
           <div
             className="h-full bg-gradient-to-r from-brand-500 to-indigo-500 shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all duration-1000 ease-out"
             style={{ width: `${percent}%` }}

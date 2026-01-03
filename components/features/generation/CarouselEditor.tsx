@@ -432,7 +432,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
     };
 
     const FormatToolbar = () => (
-        <div className="flex items-center gap-1 mb-2 p-1 bg-slate-50 rounded-lg border border-slate-100">
+        <div className="flex items-center gap-1 mb-2 p-1 bg-slate-50 rounded-lg border border-slate-200/60/60">
             <button
                 onClick={() => handleFormat("bold")}
                 className="p-1.5 hover:bg-white hover:shadow-sm rounded text-slate-600 transition-all"
@@ -827,7 +827,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
     return (
         <div className="bg-slate-50 flex flex-col font-sans text-slate-900 h-[calc(100vh-100px)] lg:h-[calc(100vh-64px)]">
             {/* Header / Navigation */}
-            <header className="flex items-center justify-between px-8 py-3 bg-white border-b border-slate-200 shrink-0">
+            <header className="flex items-center justify-between px-8 py-3 bg-white border-b border-slate-200/60/60 shrink-0">
                 <nav className="flex space-x-8 mx-auto">
                     <TabItem
                         icon={<Sparkles size={18} />}
@@ -911,7 +911,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                 </section>
 
                 {/* Right Section: Content Edit Form */}
-                <section className="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 p-10 overflow-y-auto custom-scrollbar">
+                <section className="flex-1 bg-white rounded-xl shadow-sm border border-slate-200/60/60 p-10 overflow-y-auto custom-scrollbar">
                     <h2 className="text-2xl font-bold mb-8 border-b-2 border-slate-900 w-fit pb-1 capitalize">
                         {activeTab === "content"
                             ? "Editar contenido"
@@ -932,7 +932,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                         Fuente de información
                                     </label>
                                     <textarea
-                                        className="w-full p-4 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 min-h-[200px] resize-y"
+                                        className="w-full p-4 border border-slate-200/60/60 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 min-h-[200px] resize-y"
                                         placeholder="Ingresa el texto, tema o idea para tu carrusel..."
                                         value={generationConfig.sourceText}
                                         onChange={(e) =>
@@ -949,7 +949,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                             Tono
                                         </label>
                                         <select
-                                            className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                                            className="w-full p-3 border border-slate-200/60/60 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
                                             value={generationConfig.tone}
                                             onChange={(e) =>
                                                 setGenerationConfig({
@@ -978,7 +978,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                         </label>
                                         <input
                                             type="text"
-                                            className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                                            className="w-full p-3 border border-slate-200/60/60 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
                                             placeholder="Ej: CEOs, Estudiantes..."
                                             value={generationConfig.audience}
                                             onChange={(e) =>
@@ -1034,7 +1034,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                         <FormatToolbar />}
                                 </div>
                                 <textarea
-                                    className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-lg leading-tight resize-none min-h-[100px]"
+                                    className="w-full p-4 border border-slate-200/60/60 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-lg leading-tight resize-none min-h-[100px]"
                                     value={currentSlide?.title || ""}
                                     onChange={(e) =>
                                         updateSlide(
@@ -1077,7 +1077,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                         <FormatToolbar />}
                                 </div>
                                 <textarea
-                                    className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-slate-600 leading-relaxed resize-none min-h-[120px]"
+                                    className="w-full p-4 border border-slate-200/60/60 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-slate-600 leading-relaxed resize-none min-h-[120px]"
                                     value={currentSlide?.content || ""}
                                     onChange={(e) =>
                                         updateSlide(
@@ -1118,7 +1118,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                         Fuente del Título
                                     </label>
                                     <select
-                                        className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                                        className="w-full p-3 border border-slate-200/60/60 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
                                         value={settings.titleFont}
                                         onChange={(e) =>
                                             setSettings({
@@ -1151,7 +1151,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                         Peso
                                     </label>
                                     <select
-                                        className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                                        className="w-full p-3 border border-slate-200/60/60 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
                                         value={settings.titleWeight}
                                         onChange={(e) =>
                                             setSettings({
@@ -1173,7 +1173,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                     </label>
                                     <input
                                         type="number"
-                                        className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                                        className="w-full p-3 border border-slate-200/60/60 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
                                         value={settings.titleFontSize}
                                         onChange={(e) => {
                                             const val = parseInt(
@@ -1197,7 +1197,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                         Fuente del Texto
                                     </label>
                                     <select
-                                        className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                                        className="w-full p-3 border border-slate-200/60/60 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
                                         value={settings.bodyFont}
                                         onChange={(e) =>
                                             setSettings({
@@ -1230,7 +1230,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                         Peso
                                     </label>
                                     <select
-                                        className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                                        className="w-full p-3 border border-slate-200/60/60 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
                                         value={settings.bodyWeight}
                                         onChange={(e) =>
                                             setSettings({
@@ -1250,7 +1250,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                     </label>
                                     <input
                                         type="number"
-                                        className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                                        className="w-full p-3 border border-slate-200/60/60 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
                                         value={settings.bodyFontSize}
                                         onChange={(e) => {
                                             const val = parseInt(
@@ -1268,7 +1268,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                 </div>
                             </div>
 
-                            <hr className="border-slate-100" />
+                            <hr className="border-slate-200/60/60" />
 
                             {/* Toggles */}
                             <div className="space-y-4">
@@ -1335,7 +1335,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                                     ...settings,
                                                     authorName: e.target.value,
                                                 })}
-                                            className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                                            className="w-full p-3 border border-slate-200/60/60 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
                                             placeholder="Tu nombre"
                                         />
                                     )}
@@ -1378,7 +1378,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                                     linkedinHandle:
                                                         e.target.value,
                                                 })}
-                                            className="w-full p-3 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                                            className="w-full p-3 border border-slate-200/60/60 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
                                             placeholder="@tu-usuario"
                                         />
                                     )}
@@ -1423,7 +1423,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                     className={`text-left group relative flex flex-col rounded-xl border-2 transition-all hover:shadow-md ${
                                         selectedTemplateId === t.id
                                             ? "border-indigo-600 ring-2 ring-indigo-100/50"
-                                            : "border-slate-200 hover:border-indigo-300"
+                                            : "border-slate-200/60/60 hover:border-indigo-300"
                                     }`}
                                 >
                                     <div
@@ -1464,7 +1464,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
             </main>
 
             {/* Footer: Slide Thumbnails & Actions */}
-            <footer className="h-40 bg-white border-t border-slate-200 p-4 flex items-center justify-between shrink-0">
+            <footer className="h-40 bg-white border-t border-slate-200/60/60 p-4 flex items-center justify-between shrink-0">
                 <div className="flex gap-4 overflow-x-auto pb-2 h-full items-center custom-scrollbar px-2 flex-1">
                     {data.slides.map((slide, idx) => {
                         const baseWidth = aspectRatio === "16/9" ? 1920 : 1080;
@@ -1532,7 +1532,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                             });
                             setCurrentSlideIndex(data.slides.length);
                         }}
-                        className="w-24 h-full border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center text-slate-300 hover:text-indigo-500 hover:border-indigo-500 hover:bg-indigo-50 transition-all flex-shrink-0"
+                        className="w-24 h-full border-2 border-dashed border-slate-200/60/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-indigo-500 hover:border-indigo-500 hover:bg-indigo-50 transition-all flex-shrink-0"
                     >
                         <Plus size={24} />
                     </button>
@@ -1552,7 +1552,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                             onClick={() =>
                                 setShowDownloadMenu(!showDownloadMenu)}
                             disabled={isExporting}
-                            className="flex items-center gap-2 px-6 py-2 bg-white text-slate-700 font-bold rounded-lg border border-slate-200 hover:bg-slate-50 shadow-sm active:scale-95 transition-all disabled:opacity-50"
+                            className="flex items-center gap-2 px-6 py-2 bg-white text-slate-700 font-bold rounded-lg border border-slate-200/60/60 hover:bg-slate-50 shadow-sm active:scale-95 transition-all disabled:opacity-50"
                         >
                             <Download size={18} /> Descargar
                         </button>
@@ -1563,7 +1563,7 @@ export const CarouselEditor: React.FC<CarouselEditorProps> = (
                                     className="fixed inset-0 z-[60]"
                                     onClick={() => setShowDownloadMenu(false)}
                                 />
-                                <div className="absolute bottom-full mb-3 right-0 w-64 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-slate-100 overflow-hidden z-[70] animate-in fade-in slide-in-from-bottom-4 duration-200">
+                                <div className="absolute bottom-full mb-3 right-0 w-64 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-slate-200/60/60 overflow-hidden z-[70] animate-in fade-in slide-in-from-bottom-4 duration-200">
                                     <div className="p-2 space-y-1">
                                         <button
                                             onClick={async () => {
@@ -1740,7 +1740,7 @@ const SlideThumbnail = (
         className={`relative w-24 h-full rounded-lg border-2 flex-shrink-0 flex flex-col justify-center overflow-hidden transition-all cursor-pointer group ${
             active
                 ? "border-indigo-600 ring-2 ring-indigo-100"
-                : "border-slate-100"
+                : "border-slate-200/60/60"
         }`}
     >
         {isHidden && (
@@ -1773,7 +1773,7 @@ const SlideThumbnail = (
                 </div>
             )}
 
-        <div className="absolute bottom-0 left-0 right-0 bg-white/90 p-1 text-[8px] font-bold text-center text-indigo-900 truncate border-t border-slate-100 z-20">
+        <div className="absolute bottom-0 left-0 right-0 bg-white/90 p-1 text-[8px] font-bold text-center text-indigo-900 truncate border-t border-slate-200/60/60 z-20">
             {index + 1}
         </div>
     </div>

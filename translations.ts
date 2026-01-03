@@ -1,4 +1,6 @@
-import { en } from "./translations/en";
-import { es } from "./translations/es";
+import { AppLanguage } from "./types.ts";
+import { en } from "./translations/en.ts";
+import { es } from "./translations/es.ts";
 
-export const translations = { en, es };
+export type TranslationType = typeof en;
+export const translations: Record<AppLanguage, TranslationType> = { en, es };

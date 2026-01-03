@@ -130,7 +130,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
 
     return (
         <BaseModal isOpen={isOpen} onClose={onClose} maxWidth="max-w-xl">
-            <div className="bg-white rounded-3xl overflow-hidden">
+            <div className="bg-white rounded-xl overflow-hidden">
                 <div className="p-1">
                     {renderStep()}
                 </div>

@@ -75,7 +75,7 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                     placeholder={t.searchPlaceholder}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium shadow-sm transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200/60 rounded-xl focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none text-sm font-medium shadow-sm transition-all"
                 />
             </div>
 
@@ -132,7 +132,7 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
             </div>
 
             {/* Filters */}
-            <div className="space-y-4 pt-4 border-t border-slate-100">
+            <div className="space-y-4 pt-4 border-t border-slate-200/60">
                 <h3 className="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider">
                     {t.filtersTitle}
                 </h3>
@@ -145,7 +145,7 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                         <select
                             value={selectedTone}
                             onChange={(e) => setSelectedTone(e.target.value)}
-                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition-colors"
+                            className="w-full px-3 py-2 bg-white border border-slate-200/60 rounded-lg text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition-colors"
                         >
                             <option value="all">{t.filterAll}</option>
                             {TONES.map((tone) => (
@@ -165,7 +165,7 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                             value={selectedFramework}
                             onChange={(e) =>
                                 setSelectedFramework(e.target.value)}
-                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition-colors"
+                            className="w-full px-3 py-2 bg-white border border-slate-200/60 rounded-lg text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition-colors"
                         >
                             <option value="all">
                                 {t.filterAllFrameworks}

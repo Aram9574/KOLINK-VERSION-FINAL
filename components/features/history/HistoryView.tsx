@@ -145,7 +145,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
     if (!user?.isPremium) {
         return (
             <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-50/50">
-                <div className="bg-white rounded-3xl p-12 text-center max-w-lg shadow-xl border border-slate-100">
+                <div className="bg-white rounded-xl p-12 text-center max-w-lg shadow-xl border border-slate-200/60">
                     <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <FolderOpen className="w-10 h-10 text-indigo-500" />
                     </div>
@@ -177,7 +177,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
             {/* Sidebar (Desktop: Always visible, Mobile: Collapsible) */}
             <div
                 className={`
-                w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-slate-200 
+                w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-slate-200/60 
                 flex-col md:flex 
                 ${showMobileFilters ? "flex" : "hidden"}
                 md:h-full overflow-y-auto transition-all duration-300
@@ -189,7 +189,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                         onClick={() => setShowMobileFilters(false)}
                         className="md:hidden absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600"
                     >
-                        <X className="w-5 h-5" />
+                        <X strokeWidth={1.5} className="w-5 h-5" />
                     </button>
                     <LibrarySidebar
                         searchTerm={searchQuery}
@@ -233,14 +233,14 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                         <button
                             onClick={() =>
                                 setShowMobileFilters(!showMobileFilters)}
-                            className="md:hidden p-2 bg-white border border-slate-200 rounded-lg text-slate-600 shadow-sm"
+                            className="md:hidden p-2 bg-white border border-slate-200/60 rounded-lg text-slate-600 shadow-sm"
                         >
-                            <Filter className="w-5 h-5" />
+                            <Filter strokeWidth={1.5} className="w-5 h-5" />
                         </button>
                     </div>
 
                     {/* View Switcher */}
-                    <div className="flex bg-white p-1 rounded-lg border border-slate-200 shadow-sm self-start md:self-auto">
+                    <div className="flex bg-white p-1 rounded-lg border border-slate-200/60 shadow-sm self-start md:self-auto">
                         <button
                             onClick={() => setViewMode("list")}
                             className={`p-2 rounded-md transition-all ${
@@ -250,7 +250,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                             }`}
                             title="List View"
                         >
-                            <ListIcon className="w-4 h-4" />
+                            <ListIcon strokeWidth={1.5} className="w-4 h-4" />
                         </button>
                         <button
                             onClick={() => setViewMode("calendar")}
@@ -261,7 +261,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                             }`}
                             title="Calendar View"
                         >
-                            <CalendarIcon className="w-4 h-4" />
+                            <CalendarIcon strokeWidth={1.5} className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
@@ -284,7 +284,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                                 {/* Padding bottom for scroll space */}
                                 {filteredPosts.length === 0
                                     ? (
-                                        <div className="flex flex-col items-center justify-center h-[400px] border-2 border-dashed border-slate-200 rounded-3xl text-center">
+                                        <div className="flex flex-col items-center justify-center h-[400px] border-2 border-dashed border-slate-200/60 rounded-xl text-center">
                                             <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
                                                 <FolderOpen className="w-8 h-8 text-slate-400" />
                                             </div>
@@ -325,7 +325,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                                                 <div className="mt-8 flex justify-center">
                                                     <button
                                                         onClick={loadMorePosts}
-                                                        className="px-6 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium"
+                                                        className="px-6 py-2 bg-white border border-slate-200/60 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium"
                                                     >
                                                         {language === "es"
                                                             ? "Cargar más"

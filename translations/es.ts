@@ -1,4 +1,4 @@
-import { EmojiDensity, PostLength, ViralFramework, ViralTone } from "../types";
+import { EmojiDensity, PostLength, ViralFramework, ViralTone } from "../types.ts";
 
 export const es = {
     nav: {
@@ -65,10 +65,17 @@ export const es = {
     },
     hero: {
       badge: "#1 Herramienta de IA para LinkedIn",
-      titleLine1: "Crea contenido de autoridad",
-      titleLine2: "en LinkedIn 10x más rápido.",
+      titleLine1: "Convierte tus ideas en",
+      titleLine2: "",
       subtitle:
-        "Convierte ideas sueltas en posts virales que conectan. Tu estudio de IA para dominar LinkedIn en segundos, no horas.",
+        "Domina LinkedIn en segundos, no horas.",
+      rotatingWords: [
+        "posts virales",
+        "carruseles visuales",
+        "perfiles optimizados",
+        "voces clonadas",
+        "alcance masivo",
+      ],
       ctaPrimary: "Generar mi primer post ahora",
       ctaSecondary: "Ver Demo",
       generating: "Generando Post Viral...",
@@ -138,7 +145,7 @@ export const es = {
       authoredUp: "AuthoredUp",
       rows: [
         {
-          name: "Precio Base",
+          name: "Precio",
           values: {
             kolink: "€19/mes",
             taplio: "$65/mes",
@@ -156,7 +163,7 @@ export const es = {
           },
         },
         {
-          name: "Modelos LLM Pro (GPT-4o/Claude 3.5)",
+          name: "Modelos IA SOTA",
           values: {
             kolink: "✅ Incluido",
             taplio: "⚠️ (Limitado)",
@@ -165,7 +172,7 @@ export const es = {
           },
         },
         {
-          name: "Pre-visualización Real-time",
+          name: "Edita en Tiempo Real",
           values: {
             kolink: "✅",
             taplio: "✅",
@@ -217,7 +224,7 @@ export const es = {
         "Kolink reemplaza todo tu stack de crecimiento en LinkedIn por una fracción del costo.",
       item1Title: "Ghostwriter Profesional",
       item1Desc: "Reemplaza: Contratar freelancers caros (€0.50/palabra)",
-      item1Price: "€2,000/mes",
+      item1Price: "€1,000/mes",
       item2Title: "Coach de Crecimiento LinkedIn",
       item2Desc: "Reemplaza: Llamadas de estrategia y calendarios",
       item2Price: "€500/mes",
@@ -228,7 +235,7 @@ export const es = {
       item4Desc: "Reemplaza: Comprar PDFs estáticos de ganchos",
       item4Price: "€99/mes",
       totalLabel: "Lo que gastarías normalmente:",
-      totalPrice: "€2,648/mes",
+      totalPrice: "€1,648/mes",
       kolinkLabel: "Todo esto incluido al unirte a Kolink.",
       kolinkPlan: "Plan Creador Pro:",
       kolinkPrice: "€19/mes",
@@ -243,6 +250,38 @@ export const es = {
         "Por fin, una IA que entiende el formato de LinkedIn. Adiós a los párrafos gigantes.",
       t3:
         "Kolink me ahorró 10 horas de escritura esta semana. Vale cada centavo.",
+    },
+    bento: {
+      postGenerator: {
+        title: "Generador de Posts con IA",
+        desc: "Escribe contenido viral",
+        subDesc: "Convierte ideas sueltas en posts optimizados en segundos."
+      },
+      voiceCloning: {
+        title: "Clonación de Voz",
+        desc: "Tu esencia, escalada",
+        subDesc: "Entrena a la IA con tus posts antiguos para que escriba exactamente como tú, pero 10x más rápido."
+      },
+      audit: {
+        title: "Auditoría de Perfil",
+        desc: "Analiza tu impacto",
+        subDesc: "Identifica qué partes de tu perfil están espantando a tus clientes potenciales."
+      },
+      carousel: {
+        title: "Diseñador de Carruseles",
+        desc: "Retención máxima",
+        subDesc: "Genera documentos PDF visuales que LinkedIn ama, sin tocar Canva."
+      },
+      scheduling: {
+        title: "Programación Inteligente",
+        desc: "El mejor momento",
+        subDesc: "Publica automáticamente cuando tu audiencia está más activa."
+      },
+      analytics: {
+        title: "Analítica Viral",
+        desc: "Crecimiento real",
+        subDesc: "Métricas que importan: conversiones y alcance, no solo likes."
+      }
     },
     features: {
       title: "Todo lo que necesitas para ser viral",
@@ -328,30 +367,30 @@ export const es = {
       footer: "Pago seguro vía Stripe. Cancela cuando quieras.",
       plans: {
         free: {
-          name: "Plan Inicial",
+          name: "Gratis",
           description: "Para probar el poder de la IA",
           features: [
             "10 Créditos de Prueba",
-            "Generador de Ideas Básico",
+            "Generador de Posts Básico",
             "3 Tonos Predefinidos",
-            "Acceso a Comunidad",
+            "Publica en LinkedIn",
             "Sin Tarjeta de Crédito",
           ],
         },
         pro: {
-          name: "Creador Pro",
+          name: "Creador",
           description: "Automatiza tu marca personal",
           features: [
             "Todo lo del Plan Inicial, más:",
             "Créditos IA ILIMITADOS",
-            "Generador de Ideas ILIMITADO",
-            "Autopilot (Programación)",
-            "Análisis de Voz de Marca",
-            "Soporte Prioritario",
+            "Generador de Posts ILIMITADO",
+            "AutoPost ILIMITADO",
+            "Auditoría de Perfil",
+            "Generador de Carrusel",
           ],
         },
         viral: {
-          name: "Dios Viral",
+          name: "Profesional",
           description: "Para escalar sin límites",
           features: [
             "Todo lo del Creador Pro, más:",
@@ -513,6 +552,7 @@ export const es = {
         studio: "Estudio",
         carousel: "Generador de Carrusel",
         ideas: "Generador de Ideas",
+        insightResponder: "Respuesta Inteligente",
         autopilot: "AutoPost",
         history: "Historial",
         settings: "Ajustes",
@@ -525,7 +565,40 @@ export const es = {
         logout: "Cerrar Sesión",
         editor: "Editor de Posts",
         audit: "Auditoría de Perfil",
+        insight: {
+          title: "Respuesta Inteligente",
+          subtitle: "Convierte capturas en comentarios de alta autoridad usando",
+          uploadTitle: "Subir Post de LinkedIn",
+          uploadDesc: "Arrastra una captura aquí o pega una imagen (Cmd+V).",
+          intentLabel: "Mi Intención (Opcional)",
+          intentPlaceholder: "ej. Quiero discrepar respetuosamente sobre...",
+          toneLabel: "Tono de Respuesta",
+          generate: "Generar Insights",
+          suggestions: "Sugerencias de IA",
+          analyzing: "Analizando Contexto Visual...",
+          tones: {
+             technical: "Autoridad Técnica",
+             supportive: "Apoyo Estratégico",
+             contrarian: "Contrarian Sutil",
+             connector: "Networking Connector",
+             empathetic: "Par Empático"
+          }
+        },
+        voiceLab: "Laboratorio de Voz",
       },
+    voiceLab: {
+        title: "Laboratorio de Voz",
+        description: "Analiza tu estilo de escritura y genera tu ADN de voz único.",
+        scanProfile: "Escanear Perfil",
+        analyzeDNA: "Analizar ADN",
+        cloneVoice: "Clonar Voz",
+        inputPlaceholder: "Pega tu texto aquí o selecciona del historial...",
+        analyzeButton: "Analizar Voz",
+        scanning: "Escaneando...",
+        results: "Resultados del Análisis",
+        saveVoice: "Guardar Voz",
+        voiceSaved: "¡ADN de Voz Guardado!",
+    },
       audit: {
         title: "Optimización de Perfil LinkedIn",
         subtitle: "Analiza tu presencia digital con nuestro motor de IA. Detectamos brechas de contenido y optimizamos tu visibilidad para reclutadores.",

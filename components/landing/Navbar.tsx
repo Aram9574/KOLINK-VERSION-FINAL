@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { APP_DOMAIN } from "../../constants";
-import { translations } from "../../translations";
-import { AppLanguage, UserProfile } from "../../types";
+import { APP_DOMAIN } from "../../constants.ts";
+import { translations } from "../../translations.ts";
+import { AppLanguage, UserProfile } from "../../types.ts";
 
 interface NavbarProps {
     language: AppLanguage;
@@ -19,7 +19,7 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = (
     { language, setLanguage, user, activeSection, scrollToSection },
 ) => {
-    const t = translations[language];
+    const t = translations[language as AppLanguage];
 
     const getNavLinkClass = (id: string) => {
         const isActive = activeSection === id;
@@ -31,7 +31,7 @@ const Navbar: React.FC<NavbarProps> = (
     };
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl border-b border-slate-200/60 supports-[backdrop-filter]:bg-white/60 transition-all duration-300">
+        <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-slate-200/60 transition-all duration-300">
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 <div
                     className="flex items-center gap-2 font-display font-bold text-2xl text-slate-900 tracking-tight cursor-pointer group"
@@ -110,7 +110,7 @@ const Navbar: React.FC<NavbarProps> = (
                         ? (
                             <Link
                                 to="/dashboard"
-                                className="group bg-brand-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 hover:-translate-y-0.5 flex items-center gap-2 active:scale-95 text-sm"
+                                className="group bg-brand-600 text-white px-6 py-2.5 rounded-full font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 hover:shadow-soft-glow hover:-translate-y-0.5 flex items-center gap-2 active:scale-95 text-sm"
                             >
                                 {language === "es"
                                     ? "Ir al Dashboard"
@@ -121,7 +121,7 @@ const Navbar: React.FC<NavbarProps> = (
                         : (
                             <Link
                                 to="/login"
-                                className="group bg-brand-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 hover:-translate-y-0.5 flex items-center gap-2 active:scale-95 text-sm"
+                                className="group bg-brand-600 text-white px-6 py-2.5 rounded-full font-bold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 hover:shadow-soft-glow hover:-translate-y-0.5 flex items-center gap-2 active:scale-95 text-sm"
                             >
                                 {t.nav.login}
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

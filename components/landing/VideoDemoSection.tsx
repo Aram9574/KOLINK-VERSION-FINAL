@@ -46,7 +46,7 @@ const VideoDemoSection: React.FC<VideoDemoSectionProps> = ({ language }) => {
     }, [hasPlayed]);
 
     return (
-        <section id="demo" className="pt-8 pb-24 bg-white relative overflow-hidden">
+        <section id="demo" className="pt-8 pb-24 bg-transparent relative overflow-hidden">
              {/* Subtle background decoration to blend with Light theme */}
             <div className="absolute top-0 left-0 w-full h-full bg-slate-50/50 -skew-y-3 transform origin-top-left z-0" />
             
@@ -63,8 +63,8 @@ const VideoDemoSection: React.FC<VideoDemoSectionProps> = ({ language }) => {
                     </p>
                 </div>
 
-                {/* Video Container - Light styled */}
-                <div className="relative max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-white group ring-1 ring-slate-900/5">
+                {/* Video Container - SOTA Premium Grid Style */}
+                <div className="relative max-w-5xl mx-auto rounded-xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 group ring-1 ring-slate-900/5">
                    {/* Window controls decoration */}
                    <div className="h-8 bg-slate-50 border-b border-slate-200 flex items-center px-4 gap-2 z-20 relative">
                         <div className="w-3 h-3 rounded-full bg-red-400/80 shadow-sm" />

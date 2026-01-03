@@ -8,9 +8,10 @@ interface ConfirmStepProps {
     isLoading: boolean;
     onClose: () => void;
     onConfirm: () => void;
+    userCreatedAt?: string;
 }
 
-const ConfirmStep: React.FC<ConfirmStepProps> = ({ language, isLoading, onClose, onConfirm }) => {
+const ConfirmStep: React.FC<ConfirmStepProps> = ({ language, isLoading, onClose, onConfirm, userCreatedAt }) => {
     const t = translations[language].app.cancellation;
 
     return (
@@ -27,7 +28,7 @@ const ConfirmStep: React.FC<ConfirmStepProps> = ({ language, isLoading, onClose,
                 </div>
             </div>
 
-            <div className="bg-slate-50/50 p-6 rounded-2xl text-left space-y-4 border border-slate-100">
+            <div className="bg-slate-50/50 p-6 rounded-xl text-left space-y-4 border border-slate-200/60/60">
                 <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 font-display">Lo que perderás</h4>
                 <div className="flex items-start gap-3 text-sm text-slate-700">
                     <div className="mt-0.5 p-0.5 bg-slate-200 rounded-full shrink-0 text-slate-600">
@@ -57,7 +58,7 @@ const ConfirmStep: React.FC<ConfirmStepProps> = ({ language, isLoading, onClose,
                 <button
                     onClick={onConfirm}
                     disabled={isLoading}
-                    className="w-full py-3 bg-white text-slate-400 font-bold rounded-xl border border-slate-100 hover:text-red-600 hover:border-red-100 hover:bg-red-50 transition-all disabled:opacity-50 text-sm"
+                    className="w-full py-3 bg-white text-slate-400 font-bold rounded-xl border border-slate-200/60/60 hover:text-red-600 hover:border-red-100 hover:bg-red-50 transition-all disabled:opacity-50 text-sm"
                 >
                     {isLoading ? t.confirm.canceling : t.confirm.confirmBtn}
                 </button>

@@ -1,9 +1,9 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from "std/http/server.ts";
+import { createClient } from "@supabase/supabase-js";
 import { AuditService } from "../_shared/services/AuditService.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -30,7 +30,7 @@ serve(async (req) => {
     const result = await auditService.analyzeLinkedInProfile({ 
       full_name: "User", 
       summary: pdfText 
-    } as any, language);
+    }, language);
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

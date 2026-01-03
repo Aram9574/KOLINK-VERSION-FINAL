@@ -242,7 +242,7 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
   return (
     <div className="flex flex-col h-full animate-in fade-in duration-500">
       {/* Mobile-Only Header Toggle (Visible only on small screens) */}
-      <div className="lg:hidden flex bg-slate-100 p-1 rounded-lg border border-slate-200 w-full mb-4">
+      <div className="lg:hidden flex bg-slate-100 p-1 rounded-lg border border-slate-200/60/60 w-full mb-4">
         <button
           onClick={() => setActiveView("editor")}
           className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-bold transition-all ${

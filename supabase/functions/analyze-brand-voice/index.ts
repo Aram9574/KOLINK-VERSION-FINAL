@@ -22,14 +22,14 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !user) throw new Error("Unauthorized");
 
-    const { contentSamples, language = "en" } = await req.json();
+    const { contentSamples, language = "en", imageBase64 } = await req.json();
 
     if (!contentSamples || !Array.isArray(contentSamples) || contentSamples.length === 0) {
       throw new Error("Missing content samples");
     }
 
     const auditService = new AuditService(Deno.env.get("GEMINI_API_KEY") ?? "");
-    const result = await auditService.analyzeVoice(contentSamples, language);
+    const result = await auditService.analyzeVoice(contentSamples, language, imageBase64);
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

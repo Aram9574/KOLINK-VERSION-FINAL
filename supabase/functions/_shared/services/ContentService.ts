@@ -1,4 +1,4 @@
-import { SchemaType, Tool, Schema } from "@google/generative-ai";
+import { SchemaType, Tool, Schema } from "npm:@google/generative-ai@^0.21.0";
 import { BaseAIService } from "./BaseAIService.ts";
 import { 
   getEmojiInstructions, 

@@ -120,7 +120,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ userId, language })
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors text-slate-600 hover:text-brand-600 shadow-sm"
+                className="relative w-9 h-9 rounded-full bg-white border border-slate-200/60/60 flex items-center justify-center hover:bg-slate-50 transition-colors text-slate-600 hover:text-brand-600 shadow-sm"
                 title={language === 'es' ? 'Notificaciones' : 'Notifications'}
             >
                 <Bell className="w-5 h-5" />
@@ -132,8 +132,8 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ userId, language })
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-                    <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+                <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-slate-200/60/60 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="bg-slate-50 px-4 py-3 border-b border-slate-200/60/60 flex items-center justify-between">
                         <h3 className="font-bold text-slate-800 text-sm">
                             {language === 'es' ? 'Notificaciones' : 'Notifications'}
                         </h3>

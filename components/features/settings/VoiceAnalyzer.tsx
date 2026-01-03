@@ -68,13 +68,13 @@ const VoiceAnalyzer: React.FC<VoiceAnalyzerProps> = ({ language, onAnalysisCompl
     };
 
     return (
-        <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+        <div className="bg-slate-50 rounded-xl p-4 border border-slate-200/60/60">
             <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <Wand2 className="w-5 h-5 text-brand-600" />
                 {language === 'es' ? 'Analizador de Voz con IA' : 'AI Voice Analyzer'}
             </h3>
 
-            <div className="flex gap-2 mb-4 bg-white p-1 rounded-lg border border-slate-200 w-fit">
+            <div className="flex gap-2 mb-4 bg-white p-1 rounded-lg border border-slate-200/60/60 w-fit">
                 <button
                     onClick={() => setMode('history')}
                     className={`px-3 py-1.5 text-sm rounded-md transition-all flex items-center gap-2 ${mode === 'history' ? 'bg-brand-50 text-brand-700 font-medium' : 'text-slate-500 hover:text-slate-700'}`}
@@ -111,7 +111,7 @@ const VoiceAnalyzer: React.FC<VoiceAnalyzerProps> = ({ language, onAnalysisCompl
                                     <div
                                         key={post.id}
                                         onClick={() => togglePostSelection(post.id)}
-                                        className={`p-3 rounded-lg border cursor-pointer transition-all text-sm ${isSelected ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-500' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                                        className={`p-3 rounded-lg border cursor-pointer transition-all text-sm ${isSelected ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-500' : 'border-slate-200/60/60 bg-white hover:border-slate-300'}`}
                                     >
                                         <div className="line-clamp-2 text-slate-700">{post.content}</div>
                                         <div className="flex justify-between items-center mt-2 text-xs text-slate-400">

@@ -108,7 +108,7 @@ const ProductTour: React.FC<ProductTourProps> = ({ steps, onComplete, onStepChan
 
       {/* 2. Central Modal Card */}
       <div className="relative z-50 w-full max-w-md mx-4 perspective-1000">
-        <div className="bg-white rounded-3xl p-8 shadow-2xl border border-slate-100 transform transition-all duration-500 animate-in zoom-in-95 slide-in-from-bottom-8">
+        <div className="bg-white rounded-xl p-8 shadow-2xl border border-slate-200/60/60 transform transition-all duration-500 animate-in zoom-in-95 slide-in-from-bottom-8">
 
           {/* Header: Progress & Skip */}
           <div className="flex items-center justify-between mb-6">
@@ -131,7 +131,7 @@ const ProductTour: React.FC<ProductTourProps> = ({ steps, onComplete, onStepChan
 
           {/* Content */}
           <div className="mb-8 text-center sm:text-left">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 mb-4 shadow-sm">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-50 text-brand-600 mb-4 shadow-sm">
               {/* Dynamic Icon based on step index could go here, using simplified logic for now */}
               <span className="font-display font-bold text-xl">{currentStepIndex + 1}</span>
             </div>

@@ -1,21 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { translations } from "../../translations";
-import { AppLanguage, UserProfile } from "../../types";
-import Navbar from "./Navbar";
-import HeroSection from "./HeroSection";
-import ToolsSection from "./ToolsSection";
-import HowItWorksSection from "./HowItWorksSection";
-import ComparisonSection from "./ComparisonSection";
-import StrategicComparison from "./StrategicComparison";
-import RoiSection from "./RoiSection";
-import PricingSection from "./PricingSection";
-import FaqSection from "./FaqSection";
-import Footer from "./Footer";
-import { useUser } from "../../context/UserContext";
-import LogoCarousel from "./LogoCarousel";
-import VideoDemoSection from "./VideoDemoSection";
+import Navbar from "./Navbar.tsx";
+import { Hero as AnimatedHero } from "../ui/animated-hero.tsx";
+import { FeaturesBento } from './FeaturesBento.tsx';
+import HowItWorksSection from "./HowItWorksSection.tsx";
+import ComparisonSection from "./ComparisonSection.tsx";
+import StrategicComparison from "./StrategicComparison.tsx";
+import RoiSection from "./RoiSection.tsx";
+import PricingSection from "./PricingSection.tsx";
+import FaqSection from "./FaqSection.tsx";
+import Footer from "./Footer.tsx";
+import { useUser } from "../../context/UserContext.tsx";
+import LogoCarousel from "./LogoCarousel.tsx";
+import TestimonialsSection from "../ui/testimonial-v2.tsx";
+import { InfiniteGrid } from "../ui/infinite-grid-integration.tsx";
+import VideoDemoSection from "./VideoDemoSection.tsx";
+import { motion } from "framer-motion";
+import SmartCursor from "../ui/SmartCursor.tsx";
+
+const SectionReveal = ({ children, id }: { children: React.ReactNode; id?: string }) => (
+    <motion.div
+        id={id}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+    >
+        {children}
+    </motion.div>
+);
 
 const LandingPage: React.FC = () => {
     const { user, language, setLanguage } = useUser();
@@ -130,6 +144,7 @@ const LandingPage: React.FC = () => {
                 "tools",
                 "how-it-works",
                 "comparison",
+                "testimonials",
                 "pricing",
                 "faq",
             ];
@@ -150,58 +165,86 @@ const LandingPage: React.FC = () => {
             }
         };
 
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+        globalThis.addEventListener("scroll", handleScroll);
+        return () => globalThis.removeEventListener("scroll", handleScroll);
     }, []);
 
     return (
-        <div className="bg-white font-sans selection:bg-brand-200 selection:text-brand-900">
-            <Helmet>
-                <title>Kolink - Viral LinkedIn Studio</title>
-                <meta
-                    name="description"
-                    content="Crea posts virales en segundos con IA. La herramienta definitiva para crecer en LinkedIn."
-                />
-            </Helmet>
+            <InfiniteGrid className="font-sans selection:bg-brand-200 selection:text-brand-900">
+             <div className="relative z-10">
+                <Helmet>
+                    <title>Kolink - Viral LinkedIn Studio</title>
+                    <meta
+                        name="description"
+                        content="Crea posts virales en segundos con IA. La herramienta definitiva para crecer en LinkedIn."
+                    />
+                </Helmet>
 
-            <Navbar
-                language={language}
-                setLanguage={setLanguage}
-                user={user}
-                activeSection={activeSection}
-                scrollToSection={scrollToSection}
-            />
-
-            <main className="pt-20">
-                <HeroSection
+                <Navbar
                     language={language}
+                    setLanguage={setLanguage}
                     user={user}
-                    mockContent={mockContent}
+                    activeSection={activeSection}
                     scrollToSection={scrollToSection}
                 />
 
-                <VideoDemoSection language={language} />
+                <SmartCursor />
 
-                <ToolsSection language={language} />
+                <main className="pt-20">
+                    <SectionReveal id="hero">
+                        <AnimatedHero language={language} />
+                    </SectionReveal>
+                    
+                    <SectionReveal>
+                        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 mt-10 relative z-10">
+                            <LogoCarousel language={language} />
+                        </div>
+                    </SectionReveal>
 
-                <HowItWorksSection language={language} />
+                    <SectionReveal id="demo">
+                        <VideoDemoSection language={language} />
+                    </SectionReveal>
 
-                <ComparisonSection
-                    language={language}
-                    mockContent={mockContent}
-                />
+                    <SectionReveal id="tools">
+                         <FeaturesBento language={language} />
+                    </SectionReveal>
 
-                <StrategicComparison language={language} />
+                    <SectionReveal id="howitworks">
+                        <HowItWorksSection language={language} />
+                    </SectionReveal>
 
-                <RoiSection language={language} />
+                    <SectionReveal id="comparison">
+                        <ComparisonSection
+                            language={language}
+                            mockContent={mockContent}
+                        />
+                    </SectionReveal>
 
-                <PricingSection language={language} />
+                    <SectionReveal>
+                        <StrategicComparison language={language} />
+                    </SectionReveal>
 
-                <FaqSection language={language} />
-            </main>
+                    <SectionReveal>
+                        <RoiSection language={language} />
+                    </SectionReveal>
 
-            <Footer language={language} scrollToSection={scrollToSection} />
-        </div>
+                    <SectionReveal id="results">
+                        <TestimonialsSection />
+                    </SectionReveal>
+
+                    <SectionReveal id="pricing">
+                        <PricingSection language={language} />
+                    </SectionReveal>
+
+                    <SectionReveal id="faq">
+                        <FaqSection language={language} />
+                    </SectionReveal>
+                </main>
+
+                <Footer language={language} scrollToSection={scrollToSection} />
+             </div>
+            </InfiniteGrid>
+
     );
 };
 

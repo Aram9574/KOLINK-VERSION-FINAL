@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Skeleton from "../../ui/Skeleton";
 import { AppLanguage, UserProfile, ViralAnalysis } from "../../../types";
 import { useNavigate } from "react-router-dom";
 import {
@@ -138,19 +140,22 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
 
     if (isLoading) {
         return (
-            <div className="bg-white border border-slate-200 rounded-lg shadow-sm w-full max-w-xl mx-auto p-4 animate-pulse">
-                <div className="flex space-x-3 mb-4">
-                    <div className="rounded-full bg-slate-200 h-12 w-12"></div>
-                    <div className="flex-1 space-y-2 py-1">
-                        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                        <div className="h-3 bg-slate-200 rounded w-1/2"></div>
+            <div className="bg-slate-50/50 border border-slate-200 rounded-2xl shadow-sm w-full max-w-xl mx-auto p-6 animate-pulse">
+                <div className="flex space-x-4 mb-6">
+                    <Skeleton className="rounded-full h-12 w-12 bg-slate-200" />
+                    <div className="flex-1 space-y-3 py-1">
+                        <Skeleton className="h-4 w-3/4 bg-slate-200 rounded-lg" />
+                        <Skeleton className="h-3 w-1/2 bg-slate-200 rounded-lg" />
                     </div>
                 </div>
-                <div className="space-y-3">
-                    <div className="h-3 bg-slate-200 rounded"></div>
-                    <div className="h-3 bg-slate-200 rounded"></div>
-                    <div className="h-3 bg-slate-200 rounded"></div>
-                    <div className="h-3 bg-slate-200 rounded w-5/6"></div>
+                <div className="space-y-4">
+                    <Skeleton className="h-4 w-full bg-slate-200 rounded-lg" />
+                    <Skeleton className="h-4 w-full bg-slate-200 rounded-lg transition-all duration-700 delay-100" />
+                    <Skeleton className="h-4 w-5/6 bg-slate-200 rounded-lg transition-all duration-700 delay-200" />
+                    <div className="pt-4 flex gap-2">
+                        <Skeleton className="h-8 w-24 bg-slate-200 rounded-full" />
+                        <Skeleton className="h-8 w-24 bg-slate-200 rounded-full" />
+                    </div>
                 </div>
             </div>
         );
@@ -162,7 +167,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
         <div className="space-y-4 w-full max-w-xl mx-auto">
             {/* VIRAL SCORECARD (NEW) */}
             {viralScore !== undefined && (
-                <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm animate-in slide-in-from-top-4 duration-500">
+                <div className="bg-white border border-slate-200/60/60 rounded-xl overflow-hidden shadow-sm animate-in slide-in-from-top-4 duration-500">
                     <div
                         className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors"
                         onClick={() => setShowAudit(!showAudit)}
@@ -229,7 +234,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
 
                     {/* Detailed Breakdown */}
                     {showAudit && viralAnalysis && (
-                        <div className="px-4 pb-4 border-t border-slate-100 bg-slate-50/50">
+                        <div className="px-4 pb-4 border-t border-slate-200/60/60 bg-slate-50/50">
                             <div className="grid grid-cols-3 gap-2 mt-4 mb-4">
                                 <ScoreBar
                                     label={t.hook}
@@ -265,10 +270,10 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
 
             <div
                 id="tour-preview"
-                className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden transition-all duration-500 ease-in-out relative group"
+                className="bg-white border border-slate-200/60/60 rounded-xl shadow-sm overflow-hidden transition-all duration-500 ease-in-out relative group"
             >
                 {/* Control Toolbar - Matching Reference Design */}
-                <div className="bg-slate-50/30 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+                <div className="bg-slate-50/30 border-b border-slate-200/60/60 px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="flex space-x-1.5">
                             <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F57]">
@@ -310,7 +315,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
                                 <div className="flex items-center gap-1.5 animate-in zoom-in-95 duration-200">
                                     <button
                                         onClick={handleCancel}
-                                        className="px-3 h-9 rounded-lg text-[11px] font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 active:scale-95 transition-all shadow-sm"
+                                        className="px-3 h-9 rounded-lg text-[11px] font-bold text-slate-600 bg-white border border-slate-200/60/60 hover:bg-slate-50 active:scale-95 transition-all shadow-sm"
                                     >
                                         {t.cancel}
                                     </button>
@@ -331,7 +336,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
                                                 onEdit
                                                     ? onEdit()
                                                     : setIsEditing(true)}
-                                            className="px-3 h-9 rounded-lg bg-white border border-slate-200 text-blue-600 text-[11px] font-bold hover:border-blue-300 hover:bg-blue-50/30 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-1.5"
+                                            className="px-3 h-9 rounded-lg bg-white border border-slate-200/60/60 text-blue-600 text-[11px] font-bold hover:border-blue-300 hover:bg-blue-50/30 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-1.5"
                                         >
                                             <PenSquare className="w-3.5 h-3.5" />
                                             {t.edit}
@@ -339,7 +344,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
                                     )}
                                     <button
                                         onClick={() => setIsScheduling(true)}
-                                        className="px-3 h-9 rounded-lg bg-white border border-slate-200 text-slate-700 text-[11px] font-bold hover:border-slate-300 hover:bg-slate-50 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-1.5"
+                                        className="px-3 h-9 rounded-lg bg-white border border-slate-200/60/60 text-slate-700 text-[11px] font-bold hover:border-slate-300 hover:bg-slate-50 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-1.5"
                                     >
                                         <Clock className="w-3.5 h-3.5" />
                                         {language === "es"
@@ -360,7 +365,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
                                 <img
                                     src={getAvatarUrl(user)}
                                     alt={user?.name || "User"}
-                                    className="w-12 h-12 rounded-full object-cover border border-slate-100"
+                                    className="w-12 h-12 rounded-full object-cover border border-slate-200/60/60"
                                 />
                                 {user.isPremium && (
                                     <div className="absolute -bottom-1 -right-1 bg-amber-400 border-2 border-white w-4 h-4 rounded-full flex items-center justify-center">
@@ -418,8 +423,10 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
                             </div>
                         )
                         : (
-                            <div className={`text-[14px] text-slate-900 whitespace-pre-wrap leading-normal font-normal break-words ${!displayContent ? 'text-slate-400' : ''}`}>
-                                {displayContent || `Tu perfil de LinkedIn es un desierto.
+                            <div 
+                                className={`text-[14px] text-slate-900 leading-normal font-normal break-words ${!displayContent ? 'text-slate-400' : ''}`}
+                            >
+                                {(displayContent || `Tu perfil de LinkedIn es un desierto.
 
 Tienes años de experiencia, pero nadie lo nota. Pierdes clientes y alianzas solo porque no te comunicas.
 
@@ -431,7 +438,26 @@ El contenido de calidad es el puente entre tu talento y tu próximo contrato. �
 
 ¿Qué oportunidad perdiste por no contar lo que sabes?
 
-#LinkedIn #MarcaPersonal #Estrategia`}
+#LinkedIn #MarcaPersonal #Estrategia`).split('\n\n').map((para, idx) => (
+                                    <motion.div
+                                        key={`${displayContent}-${idx}`}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ 
+                                            duration: 0.5, 
+                                            delay: idx * 0.1, 
+                                            ease: [0.16, 1, 0.3, 1] 
+                                        }}
+                                        className="mb-4 last:mb-0"
+                                    >
+                                        {para.split('\n').map((line, lineIdx) => (
+                                            <React.Fragment key={lineIdx}>
+                                                {line}
+                                                {lineIdx < para.split('\n').length - 1 && <br />}
+                                            </React.Fragment>
+                                        ))}
+                                    </motion.div>
+                                ))}
                                 {!isExpanded && needsSeeMore && (
                                     <button
                                         onClick={() => setIsExpanded(true)}
@@ -445,7 +471,7 @@ El contenido de calidad es el puente entre tu talento y tu próximo contrato. �
                 </div>
 
                 {/* Engagement Metrics */}
-                <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <div className="px-4 py-2 border-b border-slate-200/60/60 flex items-center justify-between text-xs text-slate-500">
                     <div className="flex items-center gap-1 group cursor-pointer">
                         <div className="flex -space-x-1">
                             <div className="w-4 h-4 rounded-full bg-[#1485BD] flex items-center justify-center z-10 ring-1 ring-white">

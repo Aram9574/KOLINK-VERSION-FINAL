@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "npm:@google/generative-ai@^0.21.0";
 
 export class BaseAIService {
   protected genAI: GoogleGenerativeAI;

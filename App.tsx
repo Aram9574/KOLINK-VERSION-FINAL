@@ -41,6 +41,7 @@ const TermsOfService = lazy(() =>
 );
 const CookiesPage = lazy(() => import("./components/landing/CookiesPage"));
 const AuthCallback = lazy(() => import("./components/features/auth/AuthCallback"));
+const InfiniteGridDemo = lazy(() => import("./demo"));
 
 const App: React.FC = () => {
     const { user, language, loading } = useUser();
@@ -120,6 +121,9 @@ const App: React.FC = () => {
                     path="/auth/callback"
                     element={<AuthCallback />}
                 />
+                
+                {/* Demo Routes */}
+                <Route path="/grid-demo" element={<InfiniteGridDemo />} />
 
                 {/* Protected Routes */}
                 <Route

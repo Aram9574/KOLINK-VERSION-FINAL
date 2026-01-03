@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { Capacitor } from "@capacitor/core";
 import { useUser } from "../../../context/UserContext";
 import { PostProvider, usePosts } from "../../../context/PostContext";
@@ -30,7 +30,8 @@ import { Gift } from "lucide-react";
 import { toast } from "sonner";
 import { AppTab, Post, UserProfile } from "../../../types";
 import { translations } from "../../../translations";
-import { Suspense } from "react";
+import { ActionFunctionArgs } from "react-router-dom";
+import Skeleton from "../../ui/Skeleton";
 
 // Lazy load PostGenerator to reduce initial Dashboard bundle size
 const PostCreator = React.lazy(() => import("../generation/PostGenerator"));
@@ -41,6 +42,12 @@ const LinkedInExpertChat = React.lazy(() =>
 const PostEditorView = React.lazy(() => import("../editor/PostEditorView"));
 const LinkedInAuditView = React.lazy(() =>
     import("../audit/LinkedInAuditView.tsx")
+);
+const VoiceLabView = React.lazy(() =>
+    import("../voice-lab/VoiceLabView")
+);
+const InsightResponderView = React.lazy(() =>
+    import("../insight-responder/InsightResponderView")
 );
 
 const DashboardContent: React.FC = () => {
@@ -80,7 +87,17 @@ const DashboardContent: React.FC = () => {
     const setActiveTab = (tab: AppTab) => {
         setActiveTabRaw(tab);
         localStorage.setItem("kolink_active_tab", tab);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+
+    // Listen for tab switch events from child components
+    useEffect(() => {
+        const handleTabSwitch = (e: CustomEvent) => {
+            if (e.detail) setActiveTab(e.detail);
+        };
+        window.addEventListener('kolink-switch-tab', handleTabSwitch as EventListener);
+        return () => window.removeEventListener('kolink-switch-tab', handleTabSwitch as EventListener);
+    }, []);
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [showCreditDeduction, setShowCreditDeduction] = useState(false);
@@ -168,7 +185,7 @@ const DashboardContent: React.FC = () => {
         >
             <div
                 className={`h-full ${
-                    ["history", "editor", "chat", "carousel", "audit"].includes(
+                    ["history", "editor", "chat", "carousel", "audit", "voice-lab"].includes(
                             activeTab,
                         )
                         ? "overflow-hidden"
@@ -177,7 +194,7 @@ const DashboardContent: React.FC = () => {
             >
                 <div
                     className={`${
-                        ["history", "editor", "chat", "carousel", "audit"].includes(
+                        ["history", "editor", "chat", "carousel", "audit", "voice-lab"].includes(
                                 activeTab,
                             )
                             ? "h-full w-full flex flex-col"
@@ -320,7 +337,7 @@ const DashboardContent: React.FC = () => {
                     )}
 
                     {activeTab === "chat" && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col items-center justify-center p-4 lg:p-8">
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">
                             {user.planTier === "free"
                                 ? (
                                     <LockedChatState
@@ -370,6 +387,48 @@ const DashboardContent: React.FC = () => {
                                         />
                                     )
                                     : <LinkedInAuditView />}
+                            </Suspense>
+                        </div>
+                    )}
+
+                    {activeTab === "voice-lab" && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">
+                            <Suspense
+                                fallback={
+                                    <div className="flex-1 flex items-center justify-center">
+                                        <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                                    </div>
+                                }
+                            >
+                                <VoiceLabView />
+                            </Suspense>
+                        </div>
+                    )}
+
+                    {activeTab === "insight-responder" && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">
+                            <Suspense
+                                fallback={
+                                    <div className="flex-1 flex items-center justify-center">
+                                        <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                                    </div>
+                                }
+                            >
+                                <InsightResponderView />
+                            </Suspense>
+                        </div>
+                    )}
+
+                    {activeTab === "insight-responder" && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">
+                            <Suspense
+                                fallback={
+                                    <div className="flex-1 flex items-center justify-center">
+                                        <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                                    </div>
+                                }
+                            >
+                                <InsightResponderView />
                             </Suspense>
                         </div>
                     )}

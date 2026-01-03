@@ -138,7 +138,7 @@ const LoginPage: React.FC = () => {
                             : "Reset Password - Kolink"}
                     </title>
                 </Helmet>
-                <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 animate-in fade-in zoom-in duration-300">
+                <div className="max-w-md w-full bg-white rounded-xl shadow-xl p-8 animate-in fade-in zoom-in duration-300">
                     <button
                         onClick={() => setIsForgotPasswordMode(false)}
                         className="flex items-center text-slate-500 hover:text-slate-800 transition-colors mb-6 text-sm font-medium"
@@ -283,7 +283,7 @@ const LoginPage: React.FC = () => {
 
                     <div className="relative mb-8">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-slate-200">
+                            <div className="w-full border-t border-slate-200/60/60">
                             </div>
                         </div>
                         <div className="relative flex justify-center text-sm">

@@ -31,14 +31,16 @@ const AutoPostStatus: React.FC<AutoPostStatusProps> = ({
 
     return (
         <div
-            className={`relative rounded-[2.5rem] p-8 border transition-all duration-700 overflow-hidden shadow-2xl group
+            className={`relative rounded-xl p-8 border transition-all duration-700 overflow-hidden group
             ${
                 isEnabled
-                    ? "bg-white border-sky-100 text-slate-900 ring-4 ring-sky-500/5"
-                    : "bg-white/70 backdrop-blur-xl border-white/40 text-slate-500"
+                    ? "bg-white border-brand-500/30 text-slate-900 shadow-soft-glow"
+                    : "bg-card border-border text-slate-500"
             }
         `}
         >
+            {/* Bento Corner Light */}
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-brand-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             {/* Background Animations for Active State */}
             {isEnabled && (
                 <>
@@ -78,11 +80,12 @@ const AutoPostStatus: React.FC<AutoPostStatusProps> = ({
                                 ${
                                     isEnabled
                                         ? "translate-x-12 bg-green-500 border-green-400"
-                                        : "translate-x-0 bg-white border-slate-200"
+                                        : "translate-x-0 bg-white border-slate-200/60/60"
                                 }
                             `}
                             >
                                 <Power
+                                    strokeWidth={1.5}
                                     className={`w-4 h-4 transition-colors ${
                                         isEnabled
                                             ? "text-white"
@@ -105,9 +108,10 @@ const AutoPostStatus: React.FC<AutoPostStatusProps> = ({
                     <div className="space-y-1">
                         <div className="flex items-center gap-2">
                             <Activity
+                                strokeWidth={1.5}
                                 className={`w-4 h-4 ${
                                     isEnabled
-                                        ? "text-sky-400"
+                                        ? "text-brand-500"
                                         : "text-slate-300"
                                 }`}
                             />
@@ -129,7 +133,7 @@ const AutoPostStatus: React.FC<AutoPostStatusProps> = ({
                 <div className="flex flex-col gap-6 md:items-end">
                     <div className="space-y-1 text-center md:text-right">
                         <div className="flex items-center gap-2 mb-1 justify-center md:justify-end">
-                            <Timer className="w-3.5 h-3.5 opacity-40" />
+                            <Timer strokeWidth={1.5} className="w-3.5 h-3.5 opacity-40" />
                             <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">
                                 {t.statusCard.nextRun}
                             </p>
@@ -150,7 +154,7 @@ const AutoPostStatus: React.FC<AutoPostStatusProps> = ({
 
                     <div className="space-y-1 text-center md:text-right">
                         <div className="flex items-center gap-2 mb-1 justify-center md:justify-end">
-                            <HistoryIcon className="w-3.5 h-3.5 opacity-40" />
+                            <HistoryIcon strokeWidth={1.5} className="w-3.5 h-3.5 opacity-40" />
                             <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">
                                 {t.statusCard.lastRun}
                             </p>

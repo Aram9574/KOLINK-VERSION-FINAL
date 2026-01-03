@@ -49,7 +49,7 @@ const BugReporter: React.FC<BugReporterProps> = ({ language }) => {
     <div className="fixed bottom-6 right-6 z-[9000] flex flex-col items-end pointer-events-none">
 
       {/* The Form Modal */}
-      <div className={`pointer-events-auto mb-4 w-80 bg-white/90 backdrop-blur-xl border border-slate-200/50 rounded-2xl shadow-2xl transform transition-all duration-300 origin-bottom-right overflow-hidden
+      <div className={`pointer-events-auto mb-4 w-80 bg-white/90 backdrop-blur-xl border border-slate-200/60/50 rounded-xl shadow-2xl transform transition-all duration-300 origin-bottom-right overflow-hidden
         ${isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4 pointer-events-none h-0'}
       `}>
         {isSuccess ? (
@@ -78,7 +78,7 @@ const BugReporter: React.FC<BugReporterProps> = ({ language }) => {
             <p className="text-xs text-slate-500 mb-3">{t.subtitle}</p>
 
             <textarea
-              className="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none resize-none placeholder-slate-400 mb-4"
+              className="w-full h-24 p-3 bg-slate-50 border border-slate-200/60/60 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none resize-none placeholder-slate-400 mb-4"
               placeholder={t.placeholder}
               value={report}
               onChange={(e) => setReport(e.target.value)}

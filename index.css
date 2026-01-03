@@ -1,9 +1,39 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", sans-serif;
-  --font-display: "Plus Jakarta Sans", sans-serif;
+  /* Typography */
+  --font-sans: "Geist", "Inter", system-ui, sans-serif;
+  --font-display: "Geist", "Inter", system-ui, sans-serif;
 
+  /* SOTA Semantic Colors (Standardized on Slate) */
+  --color-primary: #2563eb;
+  --color-primary-foreground: #ffffff;
+  
+  --color-secondary: #f1f5f9; /* Slate 100 */
+  --color-secondary-foreground: #0f172a; /* Slate 900 */
+
+  --color-accent: #3b82f6; 
+  --color-accent-foreground: #ffffff;
+
+  /* Surfaces */
+  --color-background: #ffffff;
+  --color-foreground: #020617; /* Slate 950 */
+  --color-card: #f8fafc; /* Slate 50 Surface */
+  --color-card-foreground: #020617;
+  --color-muted: #f8fafc;
+  --color-muted-foreground: #64748b; /* Slate 500 */
+  
+  /* Borders - Standardized Fine */
+  --color-border: #e2e8f0; /* Slate 200 */
+  --color-input: #e2e8f0;
+  
+  /* Shapes - Strict SOTA */
+  --radius-xl: 12px;
+  --radius-2xl: 12px; /* Force 12px as standard */
+  --radius-3xl: 12px; /* Force 12px as standard */
+  --radius-full: 9999px;
+  
+  /* Brand Palette - Unified SOTA */
   --color-brand-50: #eff6ff;
   --color-brand-100: #dbeafe;
   --color-brand-200: #bfdbfe;
@@ -15,82 +45,121 @@
   --color-brand-800: #1e40af;
   --color-brand-900: #1e3a8a;
   --color-brand-950: #172554;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-ai: 0 0 20px rgba(37, 99, 235, 0.1);
+  --shadow-soft-glow: 0 4px 20px -2px rgba(37, 99, 235, 0.08);
 
-  --color-linkedin-brand: #0a66c2;
+  /* Typography Extras */
+  --tracking-tightest: -0.02em;
 }
 
-/* Safe Area Utilities */
-@utility pb-safe {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-@utility pt-safe {
-  padding-top: env(safe-area-inset-top);
-}
-
-@utility pl-safe {
-  padding-left: env(safe-area-inset-left);
-}
-
-@utility pr-safe {
-  padding-right: env(safe-area-inset-right);
-}
-
-@utility h-dvh {
-  height: 100dvh;
-}
-
-@utility min-h-dvh {
-  min-height: 100dvh;
-}
-
+/* Global Styles & Variables */
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --radius: 0.75rem; /* 12px Standard */
+}
+
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+  font-family: var(--font-sans);
+  font-weight: 700;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Offset for sticky header */
+}
+
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
-  margin: 0;
-  min-width: 320px;
+  @apply bg-background text-foreground font-sans antialiased;
   min-height: 100vh;
 }
 
+input, textarea, select {
+  @apply px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:ring-offset-2 outline-none transition-all text-slate-900 placeholder-slate-400 text-sm font-medium shadow-sm hover:border-slate-300;
+}
+
+/* Utility Classes for Components */
+
+/* AI Glass Card */
+@utility card-ai {
+  @apply bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl shadow-card hover:shadow-ai transition-all duration-300;
+}
+
+/* Primary AI Button */
+@utility btn-ai-primary {
+  @apply bg-brand-600 text-white rounded-full px-6 py-3 font-semibold hover:bg-brand-700 hover:shadow-ai hover:-translate-y-0.5 transition-all duration-300 active:translate-y-0 shadow-lg shadow-brand-600/20;
+}
+
+/* Secondary AI Button */
+@utility btn-ai-secondary {
+  @apply bg-white text-slate-700 border border-slate-200 rounded-full px-6 py-3 font-medium hover:bg-slate-50 hover:border-slate-300 transition-all duration-200;
+}
+
+/* Animations */
 @keyframes scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-scroll {
-  animation: scroll 40s linear infinite;
-}
-
-.animate-scroll:hover {
-  animation-play-state: paused;
-}
-@keyframes loading-bar {
-  0% {
-    transform: translateX(-100%);
-  }
-  50% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
   100% {
-    background-position: 200% 0;
+    transform: translateX(100%);
   }
 }
 
-.animate-loading-bar {
-  animation: loading-bar 2s ease-in-out infinite;
+@keyframes shine {
+  0% { transform: translateX(-100%) skewX(-15deg); }
+  50% { transform: translateX(100%) skewX(-15deg); }
+  100% { transform: translateX(100%) skewX(-15deg); }
+}
+
+@utility animate-shine {
+  animation: shine 3s infinite;
+}
+
+@utility animate-scroll {
+  animation: scroll 40s linear infinite;
+}
+
+@utility hover-pause {
+  &:hover {
+    animation-play-state: paused;
+  }
+}
+
+/* Safe Area Utilities */
+@utility pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+@utility pt-safe { padding-top: env(safe-area-inset-top); }
+@utility pl-safe { padding-left: env(safe-area-inset-left); }
+@utility pr-safe { padding-right: env(safe-area-inset-right); }
+@utility h-dvh { height: 100dvh; }
+@utility min-h-dvh { min-height: 100dvh; }
+
+/* Premium Glass Card (Bento Style) */
+@utility card-premium {
+  @apply bg-card backdrop-blur-md border border-border rounded-xl shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-300;
+}
+
+@utility glass-surface {
+  @apply bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-xl transition-all duration-300;
+}
+
+@utility soft-glow-blue {
+  @apply shadow-[0_0_20px_-5px_rgba(59,130,246,0.15)] border-brand-500/30;
+}
+
+@utility card-premium-hover {
+  @apply hover:-translate-y-1 hover:border-primary/50 hover:shadow-soft-glow;
+}
+
+@utility glass {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-sm;
 }
