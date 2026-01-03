@@ -40,42 +40,41 @@ serve(async (req) => {
 
     // 3. Gemini Setup
     const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY")!);
-    // Using 1.5 Flash until 2.0 is fully generally available/stable in this SDK context, or assuming 1.5 Flash is the "Multimodal Workhorse"
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); 
+    // Upgrade to 2.0 Flash Exp for speed
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" }); 
 
     // 4. Construct Prompt
     const systemPrompt = `
-      Actúa como un Estratega de Marca Personal y Experto en el Sector Detectado.
+      Actúa como un Estratega de Networking de Alto Nivel.
+      Analiza la captura del post y genera 3 respuestas estratégicas:
 
-      Tu misión: Analizar la captura de pantalla de un post de LinkedIn y generar 3 variantes de respuesta que aporten valor real, evitando clichés como 'Gracias por compartir'.
+      1. Análisis Profundo: Aporta un dato técnico o perspectiva médica/tech que nadie más haya visto.
+      2. Puente Estratégico: Conecta el post con una tendencia macro del sector.
+      3. Catalizador Experto: Haz una pregunta desafiante que genere debate con el autor.
 
-      Instrucciones Multimodales:
-
-      Detección de Tesis: Identifica el argumento principal del autor original y su sentimiento.
-
-      Inyección de Autoridad: Integra el ADN de marca del usuario (brand_voice) y sus temas clave (intent_input) para que la respuesta suene propia.
-
-      Generación de Variantes:
-      - Deep Dive: Añade un dato técnico o una perspectiva médica/tecnológica profunda.
-      - The Bridge: Conecta el post con una tendencia macro del sector.
-      - The Catalyst: Haz una pregunta desafiante pero respetuosa que incite al autor a responderte.
+      Reglas: 
+      - Prohibido decir 'Buen post'. 
+      - Empieza directamente con el valor. 
+      - Máximo 60 palabras.
+      
+      Output: JSON Array con type, content y score.
 
       OUTPUT OBLIGATORIO (JSON Strict):
       [
         {
-          "type": "Deep Dive",
+          "type": "Análisis Profundo",
           "content": "...",
           "score": 95,
-          "reasoning": "por qué esto te posiciona..."
+          "reasoning": "..."
         },
         {
-          "type": "The Bridge",
+          "type": "Puente Estratégico",
           "content": "...",
           "score": 88,
           "reasoning": "..."
         },
         {
-          "type": "The Catalyst",
+          "type": "Catalizador Experto",
           "content": "...",
           "score": 92,
           "reasoning": "..."
@@ -85,13 +84,8 @@ serve(async (req) => {
       CONTEXT:
       - User Intent: ${userIntent || "Aportar valor estratégico"}
       - Desired Tone: ${tone || "Autoridad Profesional"}
+      - LANGUAGE: STRICTLY SPANISH (Output must be in Spanish)
       ${brandContext}
-
-      RULES:
-      - NO "Great post!", "Thanks for sharing!". 
-      - Start directly with value.
-      - Keep it under 60 words per reply.
-      - RESPONSE MUST BE A VALID JSON ARRAY.
     `;
 
     const parts: Part[] = [{ text: systemPrompt }];

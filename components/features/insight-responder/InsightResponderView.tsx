@@ -13,6 +13,7 @@ const InsightResponderView: React.FC = () => {
     const { user, language } = useUser();
     const t = translations[language as AppLanguage].app.sidebar.insight;
 
+    const [dragActive, setDragActive] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [intent, setIntent] = useState('');
@@ -24,7 +25,7 @@ const InsightResponderView: React.FC = () => {
     const [activeReply, setActiveReply] = useState<any | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
-
+    
     // Paste Handler
     React.useEffect(() => {
         const handlePaste = (e: ClipboardEvent) => {
@@ -36,7 +37,7 @@ const InsightResponderView: React.FC = () => {
                     const blob = item.getAsFile();
                     if (blob) {
                         handleImageSelect(blob);
-                        toast.success("Image pasted from clipboard!");
+                        toast.success("¡Imagen pegada del portapapeles!");
                     }
                 }
             }
@@ -48,7 +49,7 @@ const InsightResponderView: React.FC = () => {
 
     const handleImageSelect = (file: File) => {
         if (file.size > 5 * 1024 * 1024) {
-            toast.error("Image too large. Max 5MB.");
+            toast.error("Imagen muy pesada. Máx 5MB.");
             return;
         }
         setImageFile(file);
@@ -59,9 +60,28 @@ const InsightResponderView: React.FC = () => {
         reader.readAsDataURL(file);
     };
 
+    const handleDrag = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === "dragenter" || e.type === "dragover") {
+            setDragActive(true);
+        } else if (e.type === "dragleave") {
+            setDragActive(false);
+        }
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleImageSelect(e.dataTransfer.files[0]);
+        }
+    };
+
     const handleGenerate = async () => {
         if (!imageFile && !intent.trim()) {
-            toast.error("Please provide an image or describes your intent.");
+            toast.error("Por favor sube una imagen o describe tu intención.");
             return;
         }
 
@@ -72,9 +92,7 @@ const InsightResponderView: React.FC = () => {
         try {
             const payload: any = {
                 userIntent: intent,
-                tone, // Backend will see localized string, but prompt handles generic instructions well. 
-                      // Ideally map back to English for consistent backend prompting if needed, 
-                      // but Gemini is multilingual.
+                tone, 
                 textContext: !imageFile ? intent : undefined // Fallback if no image
             };
 
@@ -87,11 +105,11 @@ const InsightResponderView: React.FC = () => {
             if (results && results.length > 0) {
                 setReplies(results);
                 setActiveReply(results[0]); // Default to first
-                toast.success("Insights generated successfully!");
+                toast.success("¡Insights generados con éxito!");
             }
         } catch (error) {
             console.error(error);
-            toast.error("Failed to generate insights. Please try again.");
+            toast.error("Error al generar insights. Inténtalo de nuevo.");
         } finally {
             setIsGenerating(false);
         }
@@ -121,7 +139,7 @@ const InsightResponderView: React.FC = () => {
                         {t.title}
                     </h1>
                     <p className="text-slate-500 text-sm mt-1">
-                        {t.subtitle} {user.brandVoice ? <span className="font-semibold text-indigo-600">{user.brandVoice}</span> : 'your unique voice'}.
+                        {t.subtitle} {user.brandVoice ? <span className="font-semibold text-indigo-600">{user.brandVoice}</span> : 'tu voz única'}.
                     </p>
                 </div>
             </div>
@@ -135,8 +153,12 @@ const InsightResponderView: React.FC = () => {
                         {/* Dropzone */}
                         <div 
                             onClick={() => fileInputRef.current?.click()}
+                            onDragEnter={handleDrag}
+                            onDragLeave={handleDrag}
+                            onDragOver={handleDrag}
+                            onDrop={handleDrop}
                             className={`relative bg-white rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden group min-h-[300px] flex flex-col items-center justify-center
-                                ${imagePreview ? 'border-indigo-200' : 'border-slate-300 hover:border-indigo-400 hover:bg-slate-50/50'}
+                                ${imagePreview ? 'border-indigo-200' : dragActive ? 'border-indigo-500 bg-indigo-50/50' : 'border-slate-300 hover:border-indigo-400 hover:bg-slate-50/50'}
                             `}
                         >
                              {/* Laser Scan Animation */}
@@ -168,7 +190,7 @@ const InsightResponderView: React.FC = () => {
                                     </button>
                                 </>
                              ) : (
-                                 <div className="text-center p-8">
+                                 <div className="text-center p-8 pointer-events-none">
                                     <div className="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
                                         <ScanLine className="w-8 h-8" />
                                     </div>
@@ -178,8 +200,13 @@ const InsightResponderView: React.FC = () => {
                                     </p>
                                     <div className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full">
                                         <ImageIcon className="w-3 h-3" />
-                                        Supports PNG, JPG, WebP
+                                        Soporta PNG, JPG, WebP
                                     </div>
+                                    {dragActive && (
+                                        <div className="absolute inset-0 bg-indigo-500/10 flex items-center justify-center rounded-2xl">
+                                            <p className="font-bold text-indigo-600">¡Suelta la imagen aquí!</p>
+                                        </div>
+                                    )}
                                  </div>
                              )}
                         </div>
@@ -224,12 +251,12 @@ const InsightResponderView: React.FC = () => {
                                 {isGenerating ? (
                                     <>
                                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        {t.analyzing || "Scanning..."}
+                                        {t.analyzing || "Analizando..."}
                                     </>
                                 ) : (
                                     <>
                                         <Sparkles className="w-4 h-4" />
-                                        {t.generate || "Generate Insights"}
+                                        {t.generate || "Generar Insights"}
                                     </>
                                 )}
                             </button>
@@ -241,10 +268,10 @@ const InsightResponderView: React.FC = () => {
                          <div className="flex items-center justify-between">
                             <h3 className="font-bold text-slate-900 flex items-center gap-2">
                                 {t.suggestions}
-                                {replies.length > 0 && <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full">{replies.length} options</span>}
+                                {replies.length > 0 && <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full">{replies.length} opciones</span>}
                             </h3>
                             <div className="flex items-center gap-2">
-                                <span className="text-xs font-medium text-slate-400">Powered by</span>
+                                <span className="text-xs font-medium text-slate-400">Impulsado por</span>
                                 <span className="text-xs font-bold px-2 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 text-indigo-700 border border-indigo-100 rounded-lg flex items-center gap-1">
                                     <Sparkles className="w-3 h-3" />
                                     Gemini 2.0 Flash
@@ -256,7 +283,7 @@ const InsightResponderView: React.FC = () => {
                              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <ReplyVariants 
                                     variants={replies} 
-                                    onCopy={(content) => toast.success("Copied to clipboard")}
+                                    onCopy={(content) => toast.success("¡Copiado al portapapeles!")}
                                 />
                                 {activeReply && (
                                     <div className="pt-4 border-t border-slate-200">
@@ -270,9 +297,9 @@ const InsightResponderView: React.FC = () => {
                                 <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center mb-3">
                                     <MessageCircle className="w-6 h-6 text-slate-300" />
                                 </div>
-                                <h4 className="text-sm font-bold text-slate-900 mb-1">No Insights Yet</h4>
+                                <h4 className="text-sm font-bold text-slate-900 mb-1">Sin Insights aún</h4>
                                 <p className="text-slate-500 text-xs max-w-sm">
-                                    Upload a post screenshot to generate high-authority reply options.
+                                    Sube una captura de un post para generar opciones de respuesta de alta autoridad.
                                 </p>
                              </div>
                          )}

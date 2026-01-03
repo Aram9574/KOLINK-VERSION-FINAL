@@ -4,7 +4,7 @@ import { useUser } from "../../../context/UserContext";
 import { PostProvider, usePosts } from "../../../context/PostContext";
 import { useSubscription } from "../../../hooks/useSubscription";
 import { usePostGeneration } from "../../../hooks/usePostGeneration";
-import { useAutoPilot } from "../../../hooks/useAutoPilot";
+
 import { useUserSync } from "../../../hooks/useUserSync";
 import { useLocation } from "react-router-dom";
 
@@ -12,13 +12,13 @@ import DashboardLayout from "../../layouts/DashboardLayout";
 import HistoryView from "../history/HistoryView";
 import SettingsView from "../settings/SettingsView";
 
-import AutoPostView from "../autopost/AutoPostView";
+
 import UpgradeModal from "../../modals/UpgradeModal";
 import CancellationModal from "../../modals/CancellationModal";
 import LevelUpModal from "../../modals/LevelUpModal";
 import { updateUserProfile } from "../../../services/userRepository";
 
-import LockedAutoPostState from "../autopost/LockedAutoPostState";
+
 import LockedHistoryState from "../history/LockedHistoryState";
 import LockedCarouselState from "../generation/LockedCarouselState";
 import LockedChatState from "../chat/LockedChatState";
@@ -49,6 +49,7 @@ const VoiceLabView = React.lazy(() =>
 const InsightResponderView = React.lazy(() =>
     import("../insight-responder/InsightResponderView")
 );
+const AutoPostStudio = React.lazy(() => import("../autopost/AutoPostStudio.tsx"));
 
 const DashboardContent: React.FC = () => {
     const { user, refreshUser, setUser, language, setLanguage } = useUser();
@@ -185,7 +186,7 @@ const DashboardContent: React.FC = () => {
         >
             <div
                 className={`h-full ${
-                    ["history", "editor", "chat", "carousel", "audit", "voice-lab"].includes(
+                    ["history", "editor", "chat", "carousel", "voice-lab"].includes(
                             activeTab,
                         )
                         ? "overflow-hidden"
@@ -194,7 +195,7 @@ const DashboardContent: React.FC = () => {
             >
                 <div
                     className={`${
-                        ["history", "editor", "chat", "carousel", "audit", "voice-lab"].includes(
+                        ["history", "editor", "chat", "carousel", "voice-lab"].includes(
                                 activeTab,
                             )
                             ? "h-full w-full flex flex-col"
@@ -271,27 +272,21 @@ const DashboardContent: React.FC = () => {
                         </div>
                     )}
 
+
+
                     {activeTab === "autopilot" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            {user.planTier === "free"
-                                ? (
-                                    <LockedAutoPostState
-                                        onUpgrade={() =>
-                                            setShowUpgradeModal(true)}
-                                    />
-                                )
-                                : (
-                                    <AutoPostView
-                                        user={user}
-                                        language={language}
-                                        onViewPost={(post) => {
-                                            setCurrentPost(post);
-                                            setActiveTab("create");
-                                        }}
-                                        onUpgrade={() =>
-                                            setShowUpgradeModal(true)}
-                                    />
-                                )}
+                             <Suspense fallback={<div className="p-8 text-center text-slate-400">Loading Command Center...</div>}>
+                                <AutoPostStudio
+                                    user={user}
+                                    language={language}
+                                    onViewPost={(post) => {
+                                        setCurrentPost(post);
+                                        setActiveTab("create");
+                                    }}
+                                    onUpgrade={() => setShowUpgradeModal(true)}
+                                />
+                             </Suspense>
                         </div>
                     )}
 
@@ -419,19 +414,7 @@ const DashboardContent: React.FC = () => {
                         </div>
                     )}
 
-                    {activeTab === "insight-responder" && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">
-                            <Suspense
-                                fallback={
-                                    <div className="flex-1 flex items-center justify-center">
-                                        <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
-                                    </div>
-                                }
-                            >
-                                <InsightResponderView />
-                            </Suspense>
-                        </div>
-                    )}
+
                 </div>
             </div>
 

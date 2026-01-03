@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "npm:@google/generative-ai@^0.21.0";
 
 export class BaseAIService {
   protected genAI: GoogleGenerativeAI;
-  protected model = "gemini-3-flash-preview";
+  protected model = "gemini-2.0-flash-exp";
 
   constructor(geminiApiKey: string) {
     if (!geminiApiKey) {

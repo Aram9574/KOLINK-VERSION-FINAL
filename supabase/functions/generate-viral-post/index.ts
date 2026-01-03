@@ -1,7 +1,7 @@
 // No import needed for Deno.serve in modern Deno/Supabase environments.
 
-import { createClient } from "npm:@supabase/supabase-js@2";
-import { z } from "npm:zod@3.22.4";
+import { createClient } from "@supabase/supabase-js";
+import { z } from "zod";
 import { CreditService } from "../_shared/services/CreditService.ts";
 import { ContentService as AIService, GenerationParams } from "../_shared/services/ContentService.ts";
 import { PostRepository } from "../_shared/services/PostRepository.ts";
@@ -121,30 +121,34 @@ Deno.serve(async (req: Request) => {
     }
 
     // 3. Prepare Params
-    let brandVoiceDescription = profile.brand_voice || "";
+    let brandVoiceDescription = "";
 
+    // A. Explicit Override via Params
     if (safeParams.brandVoiceId) {
-      // Validate UUID format to prevent database errors
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      
-      if (!uuidRegex.test(safeParams.brandVoiceId)) {
-        console.warn("Invalid Brand Voice ID format:", safeParams.brandVoiceId);
-        // Fallback to default, do not query DB
-      } else {
-        console.log("Fetching specific Brand Voice ID:", safeParams.brandVoiceId);
-        const { data: bVoice, error: bvError } = await supabaseAdmin
+      if (uuidRegex.test(safeParams.brandVoiceId)) {
+        const { data: bVoice } = await supabaseAdmin
           .from("brand_voices")
           .select("description")
           .eq("id", safeParams.brandVoiceId)
-          .eq("user_id", user.id) // Ensure ownership
+          .eq("user_id", user.id)
           .single();
-
-        if (bVoice && !bvError) {
-          brandVoiceDescription = bVoice.description;
-        } else {
-          console.warn("Brand Voice not found or access denied:", bvError);
-        }
+        if (bVoice) brandVoiceDescription = bVoice.description;
       }
+    } 
+    // B. Default to Active Voice from Profile
+    else if (profile.active_voice_id) {
+         const { data: activeVoice } = await supabaseAdmin
+          .from("brand_voices")
+          .select("description")
+          .eq("id", profile.active_voice_id)
+          .single();
+         if (activeVoice) brandVoiceDescription = activeVoice.description;
+    }
+
+    // C. Final Fallback
+    if (!brandVoiceDescription) {
+        brandVoiceDescription = "Professional and engaging";
     }
 
     const userContext = {

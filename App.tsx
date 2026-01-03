@@ -32,7 +32,7 @@ const CancellationModal = lazy(() =>
 // Or wait, I haven't moved it yet. I will leave it as is or move it now?
 // I will move it now to avoid breaking.
 const AutoPostView = lazy(() =>
-    import("./components/features/autopost/AutoPostView")
+    import("./components/features/autopost/AutoPostStudio")
 );
 
 const PrivacyPolicy = lazy(() => import("./components/landing/PrivacyPolicy"));

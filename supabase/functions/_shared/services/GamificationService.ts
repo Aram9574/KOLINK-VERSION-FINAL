@@ -1,4 +1,4 @@
-import { SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export interface GamificationResult {
   newXP: number;
@@ -14,11 +14,11 @@ export class GamificationService {
   /**
    * Calculates XP, Levels, and Streaks based on user activity.
    */
-  async processGamification(
-    profile: any,
-    params: any,
+  processGamification(
+    profile: { last_post_date?: string | null; current_streak?: number | null; xp?: number | null; level?: number | null },
+    params: { creativityLevel: number; hashtagCount: number },
     postCount: number,
-  ): Promise<GamificationResult> {
+  ): GamificationResult {
     let xpGain = 10; // Base XP for generating a post
     const now = new Date();
     const lastPostDate = profile.last_post_date

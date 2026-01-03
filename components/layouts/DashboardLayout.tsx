@@ -59,7 +59,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     };
 
     return (
-        <InfiniteGrid gridOpacity={0.3} className="bg-slate-50 relative selection:bg-brand-200 selection:text-brand-900 h-dvh overflow-hidden pr-safe pl-safe">
+        <div className="bg-slate-50 relative selection:bg-brand-200 selection:text-brand-900 h-dvh overflow-hidden pr-safe pl-safe">
             <div className="absolute inset-0 opacity-40 pointer-events-none z-0">
                 {/* Overriding InfiniteGrid default opacity if needed via extra layer or just trusting className */}
             </div>
@@ -104,7 +104,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                     setActiveTab={setActiveTab}
                 />
             </div>
-        </InfiniteGrid>
+        </div>
     );
 };
 

@@ -235,24 +235,33 @@ export interface ExperienceItem {
 }
 
 export interface LinkedInAuditResult {
-  score: number;
+  overall_score: number;
+  visual_score: number;
+  authority_metrics: {
+      headline_impact: number;
+      keyword_density: number;
+      storytelling_power: number;
+      recruiter_clarity: number;
+  };
   summary: string;
-  headline: {
-    current: string;
-    suggested: string;
-    analysis: string;
+  results: {
+    headline: { score: number; feedback: string; suggested: string };
+    about: { score: number; feedback: string; suggested: string };
+    experience: { score: number; feedback: string; suggested: string };
   };
-  about: {
-    analysis: string;
-    suggested: string;
-    missingKeywords: string[];
+  source_type?: "hybrid" | "pdf" | "visual";
+  // The raw extracted data for visualization
+  processed_data?: {
+      name?: string;
+      headline?: string;
+      about?: string;
+      company?: string;
+      location?: string;
+      skills?: string[];
+      experiences?: { company: string; position: string; duration: string; description: string }[];
+      education?: string[];
   };
-  experience: ExperienceItem[];
-  skills: {
-    current: string[];
-    missing: string[];
-    analysis: string;
-  };
+  debug_trace?: string[];
 }
 
 export interface LinkedInAudit {
@@ -263,3 +272,19 @@ export interface LinkedInAudit {
   created_at: string;
 }
 
+
+export interface LinkedInProfileData {
+  full_name?: string;
+  name?: string;
+  profile_url?: string | null;
+  headline?: string;
+  summary?: string;
+  about?: string;
+  occupation?: string;
+  company?: string;
+  location?: string;
+  experiences?: { company: string; position: string; duration: string; description: string }[];
+  skills?: string[];
+  education?: string[];
+  scraped_data?: Record<string, unknown>;
+}

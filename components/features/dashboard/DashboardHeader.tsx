@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-    AlertTriangle,
-    Clock,
-    Lightbulb,
+    Sparkles,
     MessageSquare,
-    Monitor,
-    Smartphone,
-    TrendingUp,
-    Zap,
+    LogOut,
+    Settings,
+    User,
+    ChevronDown,
+    Bell,
+    CreditCard
 } from "lucide-react";
 import { AppLanguage, UserProfile } from "../../../types.ts";
 import FeedbackModal from "../../modals/FeedbackModal.tsx";
 import { getAvatarUrl } from "../../../utils.ts";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { hapticFeedback } from "../../../lib/animations.ts";
 
 import NotificationBell from "../notifications/NotificationBell.tsx";
@@ -24,77 +24,128 @@ interface DashboardHeaderProps {
     activeTab: string;
 }
 
-const DashboardHeader = (
-    { user, language, setLanguage, activeTab }: DashboardHeaderProps,
-) => {
+const getBreadcrumb = (tab: string) => {
+    switch (tab) {
+        case "create": return { parent: "Estudio", child: "Compositor" };
+        case "history": return { parent: "Estudio", child: "Historial" };
+        case "ideas": return { parent: "Estudio", child: "Generador" };
+        case "carousel": return { parent: "Estudio", child: "Carrusel" };
+        case "autopilot": return { parent: "Estudio", child: "AutoPilot" };
+        case "voice-lab": return { parent: "Inteligencia", child: "Laboratorio de Voz" };
+        case "audit": return { parent: "Inteligencia", child: "Auditoría de Perfil" };
+        case "insight-responder": return { parent: "Inteligencia", child: "Asistente de Respuesta" };
+        case "chat": return { parent: "Inteligencia", child: "Chat Experto" };
+        case "settings": return { parent: "Cuenta", child: "Ajustes" };
+        default: return { parent: "App", child: "Dashboard" };
+    }
+};
+
+const DashboardHeader = ({ user, language, setLanguage, activeTab }: DashboardHeaderProps) => {
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    
+    const breadcrumb = getBreadcrumb(activeTab);
 
     return (
         <>
-            <header className="hidden lg:flex items-center justify-between px-8 py-5 bg-white border-b border-slate-200/60/60 shadow-sm z-10">
-                <div className="flex items-center gap-4">
-                    <h1 className="text-2xl font-display font-bold text-slate-900">
-                        {activeTab === "create" &&
-                            (language === "es" ? "Estudio" : "Studio")}
-                        {activeTab === "history" &&
-                            (language === "es" ? "Historial" : "History")}
-                        {activeTab === "settings" &&
-                            (language === "es" ? "Ajustes" : "Settings")}
-                        {activeTab === "ideas" && (language === "es"
-                            ? "Generador de Ideas"
-                            : "Idea Generator")}
-                        {activeTab === "autopilot" && "AutoPilot"}
-                        {activeTab === "carousel" &&
-                            (language === "es"
-                                ? "Generador de Carrusel"
-                                : "Carousel Generator")}
-                    </h1>
-                </div>
-
-                <div className="flex items-center gap-6">
+            <header className="sticky top-0 z-50 w-full h-16 bg-white/80 backdrop-blur-md border-b border-slate-200/50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+                    
+                    {/* LEFT: Context / Breadcrumb */}
                     <div className="flex items-center gap-3">
-                        <NotificationBell
-                            userId={user.id}
-                            language={language}
-                        />
+                        <div className="flex items-center text-sm">
+                            <span className="text-slate-500 font-medium">{breadcrumb.parent}</span>
+                            <span className="mx-2 text-slate-300">/</span>
+                            <span className="text-slate-900 font-semibold">{breadcrumb.child}</span>
+                        </div>
+                    </div>
 
+                    {/* RIGHT: Command Actions */}
+                    <div className="flex items-center gap-3 md:gap-4">
+                        
+                        {/* Suggestions / Feedback Button */}
                         <motion.button
                             onClick={() => setIsFeedbackOpen(true)}
                             {...hapticFeedback}
-                            className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-100 hover:border-violet-200 text-violet-700 rounded-full text-xs font-bold transition-all hover:shadow-sm hover:from-violet-100 hover:to-indigo-100 mr-2 group"
+                            className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-white border border-slate-200 hover:border-slate-300 text-slate-600 rounded-lg text-xs font-medium transition-all group hover:shadow-sm hover:ring-1 hover:ring-slate-100"
                         >
-                            <MessageSquare className="w-3.5 h-3.5 text-violet-600 group-hover:scale-110 transition-transform" />
-                            {language === "es" ? "Sugerencias" : "Feedback"}
+                            <Sparkles className="w-3.5 h-3.5 text-brand-600 group-hover:text-brand-500 transition-colors" />
+                            <span>Sugerencias</span>
                         </motion.button>
 
-                        <motion.button
-                            onClick={() =>
-                                setLanguage(language === "en" ? "es" : "en")}
-                            {...hapticFeedback}
-                            className="w-9 h-9 rounded-full bg-white border border-slate-200/60/60 flex items-center justify-center hover:bg-slate-50 transition-colors text-sm shadow-sm"
-                            title="Switch Language"
-                        >
-                            {language === "en" ? "🇺🇸" : "🇪🇸"}
-                        </motion.button>
-                        <div className="flex items-center gap-3 pl-3 border-l border-slate-200/60/60">
-                            <div className="text-right hidden md:block">
-                                <div className="text-sm font-bold text-slate-900">
-                                    {user.name || "User"}
-                                </div>
-                                <div className="text-xs text-slate-500">
-                                    {user.email}
-                                </div>
-                            </div>
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 p-0.5 shadow-md">
-                                <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
+                        <div className="h-6 w-px bg-slate-200 mx-1 hidden md:block" />
+
+                        {/* Language Selector Removed as per strict Spanish requirement */}
+
+                        {/* Notifications */}
+                        <div className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors">
+                             <NotificationBell userId={user.id} language={language} />
+                        </div>
+
+                        {/* Profile Dropdown */}
+                        <div className="relative ml-1">
+                            <motion.button
+                                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                className="flex items-center gap-2 p-1 rounded-full hover:bg-slate-100 transition-colors group"
+                            >
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 p-[1px] shadow-sm group-hover:shadow-md transition-all">
                                     <img
                                         src={getAvatarUrl(user)}
-                                        alt="Profile"
-                                        className="w-full h-full object-cover"
+                                        alt="User"
+                                        className="w-full h-full rounded-full object-cover bg-white"
                                     />
                                 </div>
-                            </div>
+                            </motion.button>
+
+                            <AnimatePresence>
+                                {isProfileOpen && (
+                                    <>
+                                        {/* Backdrop to close */}
+                                        <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)} />
+                                        
+                                        {/* Dropdown Menu */}
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="absolute right-0 top-full mt-2 w-56 bg-white/90 backdrop-blur-xl rounded-xl border border-slate-200/50 shadow-xl shadow-slate-200/20 z-50 overflow-hidden"
+                                        >
+                                            <div className="p-3 border-b border-slate-100">
+                                                <p className="text-sm font-semibold text-slate-900 truncate">{user.name}</p>
+                                                <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                                            </div>
+                                            
+                                            <div className="p-1">
+                                                <button className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                                                    <User size={16} strokeWidth={1.5} />
+                                                    <span>Perfil</span>
+                                                </button>
+                                                <button className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                                                    <CreditCard size={16} strokeWidth={1.5} />
+                                                    <span>Suscripción</span>
+                                                </button>
+                                                <button className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                                                    <Settings size={16} strokeWidth={1.5} />
+                                                    <span>Ajustes</span>
+                                                </button>
+                                            </div>
+
+                                            <div className="p-1 border-t border-slate-100">
+                                                <button 
+                                                    onClick={() => window.location.reload()} // Simple logout sim
+                                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                                >
+                                                    <LogOut size={16} strokeWidth={1.5} />
+                                                    <span>Cerrar Sesión</span>
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    </>
+                                )}
+                            </AnimatePresence>
                         </div>
+
                     </div>
                 </div>
             </header>

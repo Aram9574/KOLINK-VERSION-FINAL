@@ -47,14 +47,14 @@ const ReplyVariants: React.FC<ReplyVariantsProps> = ({ variants, onCopy }) => {
     };
 
     const getIcon = (type: string) => {
-        if (type.includes('Deep') || type.includes('Data')) return <Zap className="w-4 h-4 text-purple-600" />;
-        if (type.includes('Question') || type.includes('Engagement')) return <MessageSquare className="w-4 h-4 text-blue-600" />;
+        if (type.includes('Análisis') || type.includes('Profundo')) return <Zap className="w-4 h-4 text-purple-600" />;
+        if (type.includes('Catalizador') || type.includes('Experto')) return <MessageSquare className="w-4 h-4 text-blue-600" />;
         return <Link2 className="w-4 h-4 text-emerald-600" />;
     };
 
     const getColors = (type: string) => {
-        if (type.includes('Deep') || type.includes('Data')) return "bg-purple-50 border-purple-100 text-purple-900";
-        if (type.includes('Question') || type.includes('Engagement')) return "bg-blue-50 border-blue-100 text-blue-900";
+        if (type.includes('Análisis') || type.includes('Profundo')) return "bg-purple-50 border-purple-100 text-purple-900";
+        if (type.includes('Catalizador') || type.includes('Experto')) return "bg-blue-50 border-blue-100 text-blue-900";
         return "bg-emerald-50 border-emerald-100 text-emerald-900";
     };
 
@@ -81,7 +81,7 @@ const ReplyVariants: React.FC<ReplyVariantsProps> = ({ variants, onCopy }) => {
                              <button
                                 onClick={() => handleSaveSnippet(variant.content)}
                                 className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                                title="Save as Snippet"
+                                title="Guardar como Snippet"
                             >
                                 <Bookmark className="w-3.5 h-3.5" />
                             </button>
@@ -98,22 +98,17 @@ const ReplyVariants: React.FC<ReplyVariantsProps> = ({ variants, onCopy }) => {
                     </p>
 
                     <div className="mt-auto space-y-3 relative z-10">
+
+
                          <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-100">
                             <p className="text-[10px] text-slate-500 leading-tight">
-                                <span className="font-bold text-slate-700 block mb-0.5">Why this works:</span> 
+                                <span className="font-bold text-slate-700 block mb-0.5">Por qué funciona:</span> 
                                 {variant.reasoning}
                             </p>
                         </div>
 
                         <div className="flex gap-2 pt-1">
-                            <p className="text-[10px] text-slate-500 leading-tight">
-                                <span className="font-bold text-slate-700 block mb-0.5">Why this works:</span> 
-                                {variant.reasoning}
-                            </p>
-                        </div>
-
-                        <div className="flex gap-2 pt-1">
-                             <button 
+                            <button 
                                 onClick={() => {
                                     navigator.clipboard.writeText(variant.content);
                                     onCopy(variant.content);
@@ -121,14 +116,14 @@ const ReplyVariants: React.FC<ReplyVariantsProps> = ({ variants, onCopy }) => {
                                 className="flex-1 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-50 hover:text-indigo-600 transition-colors flex items-center justify-center gap-2"
                             >
                                 <Copy className="w-3.5 h-3.5" />
-                                Copy
+                                Copiar
                             </button>
                              <button 
                                 onClick={() => handleSendToEditor(variant.content)}
                                 className="flex-1 py-2 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors flex items-center justify-center gap-2"
                             >
                                 <Edit3 className="w-3.5 h-3.5" />
-                                Edit
+                                Editar
                             </button>
                         </div>
                     </div>

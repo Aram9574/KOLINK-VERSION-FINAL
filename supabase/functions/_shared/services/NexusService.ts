@@ -26,30 +26,36 @@ export class NexusService extends BaseAIService {
   ) {
     const isSpanish = language === "es";
     
+    // NEW SOTA SYSTEM PROMPT
     let roleDescription = "";
     if (mode === "ghostwriter") {
-        roleDescription = isSpanish 
-            ? "ROLE: Eres un Ghostwriter experto. Tu objetivo es REDACTAR posts de LinkedIn listos para publicar, con el tono del usuario."
-            : "ROLE: You are an expert Ghostwriter. Your goal is to WRITE LinkedIn posts ready to publish, matching the user's tone.";
+        roleDescription = "Eres un Ghostwriter experto. Tu objetivo es REDACTAR posts de LinkedIn listos para publicar, con el tono del usuario.";
     } else {
-        roleDescription = isSpanish
-            ? "ROLE: Eres Nexus, un estratega de élite en LinkedIn. Tu objetivo es dar consejos tácticos y accionables."
-            : "ROLE: You are Nexus, an elite LinkedIn strategist. Your goal is to provide tactical and actionable advice.";
+        roleDescription = "Eres Nexus, el asistente experto de KOLINK. Tienes acceso a una base de conocimientos estratégicos sobre LinkedIn (RAG).";
     }
 
     const prompt = `
-      You are the "KOLINK Expert" (Nexus).
+      You are Nexus (KOLINK Expert).
+      
       MODE: ${mode.toUpperCase()}
-      KNOWLEDGE (RAG): ${context || "No context."}
+      
+      INSTRUCTIONS:
+      ${mode === "advisor" ? 
+        "Modo Advisor: Da consejos tácticos, accionables y directos. Prohibido el relleno. Sé preciso, profesional y técnico." : 
+        "Modo Ghostwriter: Redacta contenido listo para publicar usando el ADN del usuario."}
+      
+      Regla de Oro: Prohibido el uso de Markdown excesivo (**) o encabezados si no son estructuralmente necesarios. Mantén el texto limpio.
+      
+      KNOWLEDGE (RAG): 
+      ${context || "No context provided."}
+      
       USER QUERY: "${query}"
       LANGUAGE: ${isSpanish ? "Spanish" : "English"}
-      
-      ${roleDescription}
     `;
 
     return await this.retryWithBackoff(async () => {
       const model = this.genAI.getGenerativeModel({
-        model: "gemini-1.5-flash", // Force Flash for multimodal
+        model: this.model, // Uses default gemini-2.0-flash-exp
         systemInstruction: roleDescription,
       });
 
@@ -68,6 +74,7 @@ export class NexusService extends BaseAIService {
         contents: [{ role: "user", parts: parts }],
       });
 
+      // Simple cleanup of bold markers if explicitly requested to be super clean
       return response.response.text().replace(/\*\*/g, "");
     });
   }

@@ -16,28 +16,31 @@ export interface LinkedInPDFData {
 }
 
 export interface LinkedInAuditResult {
-  score: number;
+  overall_score: number;
+  visual_score: number;
+  authority_metrics: {
+    headline_impact: number;
+    keyword_density: number;
+    storytelling_power: number;
+    recruiter_clarity: number;
+  };
   summary: string;
-  headline: {
-    current: string;
-    suggested: string;
-    analysis: string;
-  };
-  about: {
-    analysis: string;
-    suggested: string;
-    missingKeywords: string[];
-  };
-  experience: Array<{
-    company: string;
-    position: string;
-    analysis: string;
-    suggestions: string[];
-  }>;
-  skills: {
-    current: string[];
-    missing: string[];
-    analysis: string;
+  results: {
+    headline: {
+      score: number;
+      feedback: string;
+      suggested: string;
+    };
+    about: {
+      score: number;
+      feedback: string;
+      suggested: string;
+    };
+    experience: {
+      score: number;
+      feedback: string;
+      suggested: string;
+    };
   };
 }
 
@@ -59,4 +62,20 @@ export interface Profile {
   level?: number;
   current_streak?: number;
   last_post_date?: string;
+}
+
+export interface LinkedInProfileData {
+  full_name?: string;
+  name?: string;
+  profile_url?: string | null;
+  headline?: string;
+  summary?: string;
+  about?: string;
+  occupation?: string;
+  company?: string;
+  location?: string;
+  experiences?: { company: string; position: string; duration: string; description: string }[];
+  skills?: string[];
+  education?: string[];
+  scraped_data?: Record<string, unknown>;
 }

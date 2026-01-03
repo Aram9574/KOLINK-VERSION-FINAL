@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai@^0.1.0";
+import { serve } from "std/http/server.ts";
+import { createClient } from "@supabase/supabase-js";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { corsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
@@ -27,7 +27,8 @@ serve(async (req) => {
     if (!voice) throw new Error("Voice not found");
 
     const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY")!);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Upgrade to 2.0 Flash Exp
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
     // Construct DNA Context
     let dnaContext = "";
@@ -44,21 +45,20 @@ serve(async (req) => {
     }
 
     const prompt = `
-        ACT as a Viral Marketing Expert and Ghostwriter.
-        Based on the User's Idea and the specific Brand Voice DNA, generate 5 viral hooks (opening lines) for a LinkedIn post.
+        Eres un Experto en Psicología de la Atención y Ghostwriter Viral. Basado en la idea [USER IDEA], genera 5 ganchos (opening lines) que detengan el scroll.
+        
+        INSTRUCCIONES:
+        1. Debes usar estrictamente los patrones de hook detectados en el ADN de marca del usuario.
+        2. Si el ADN usa preguntas, usa preguntas. Si usa estadísticas, inventa un placeholder.
+        3. Output: JSON array de exactamente 5 strings.
         
         BRAND VOICE DNA:
         ${dnaContext}
 
         USER IDEA: "${idea}"
-
         LANGUAGE: ${language}
-
-        INSTRUCTIONS:
-        1. Strictly adhere to the "HOOK PATTERNS" from the DNA.
-        2. If the DNA uses questions, use questions. If it uses statistics, invent a placeholder statistic.
-        3. Output exactly 5 distinct options.
-        4. Return ONLY a JSON array of strings. Example: ["Hook 1", "Hook 2"]
+        
+        OUTPUT FORMAT: ["Hook 1", "Hook 2", ...] (JSON Strict Array)
     `;
 
     const result = await model.generateContent({
