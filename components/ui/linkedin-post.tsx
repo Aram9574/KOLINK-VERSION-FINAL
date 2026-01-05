@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ThumbsUp, MessageCircle, Share2, Send } from "lucide-react";
+import { ThumbsUp, MessageCircle, Share2, Send, TrendingUp } from "lucide-react";
 
 interface LinkedInPostProps {
   name: string;
@@ -8,7 +8,12 @@ interface LinkedInPostProps {
   content: string;
   date?: string;
   likes?: number;
+  comments?: number;
   className?: string;
+  metrics?: {
+    value: string;
+    label: string;
+  };
 }
 
 export const LinkedInPost = ({
@@ -18,15 +23,24 @@ export const LinkedInPost = ({
   content,
   date = "1w",
   likes = 42,
+  comments = 12,
   className,
+  metrics,
 }: LinkedInPostProps) => {
   return (
     <div
       className={cn(
-        "flex flex-col card-premium overflow-hidden",
+        "flex flex-col card-premium overflow-hidden relative",
         className
       )}
     >
+        {metrics && (
+            <div className="absolute top-4 right-4 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-[10px] font-bold border border-emerald-100 flex items-center gap-1.5 shadow-sm z-10 animate-in fade-in slide-in-from-right-4 duration-700">
+                <TrendingUp size={12} />
+                <span>{metrics.value}</span>
+            </div>
+        )}
+
       {/* Header */}
       <div className="p-4 flex items-start gap-3">
         <img
@@ -36,14 +50,11 @@ export const LinkedInPost = ({
         />
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate pr-20">
               {name}
             </h3>
-            <span className="text-xs text-slate-400 font-medium flex-shrink-0 ml-2">
-              • {date}
-            </span>
           </div>
-          <p className="text-xs text-slate-500 truncate">{role}</p>
+          <p className="text-xs text-slate-500 truncate max-w-[180px]">{role}</p>
           <div className="flex items-center gap-1 mt-0.5">
             <span className="text-[10px] text-slate-400 flex items-center gap-0.5">
                🌐 Public
@@ -72,7 +83,7 @@ export const LinkedInPost = ({
             </div>
             <span className="text-xs text-slate-500">{likes}</span>
         </div>
-        <span className="text-xs text-slate-500">2 comments</span>
+        <span className="text-xs text-slate-500">{comments} comments</span>
       </div>
 
       {/* Actions */}
