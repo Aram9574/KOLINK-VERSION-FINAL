@@ -20,40 +20,29 @@ interface SocialLoginButtonsProps {
 
 const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({ language, isLoading, onSocialLogin }) => {
     return (
-        <div className="space-y-3 mb-8">
+        <div className="space-y-4 mb-8">
 
             <div className="relative group">
-                <div className="absolute -top-5 -right-4 z-20 pointer-events-none select-none">
-                    <div className="relative flex items-center justify-center transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                        {/* Glow effect */}
-                        <div className="absolute inset-0 bg-blue-500 rounded-lg blur-md opacity-25 animate-pulse"></div>
-
-                        {/* Main Badge */}
-                        <div className="relative bg-slate-900 border border-indigo-500/30 text-white px-3 py-1.5 rounded-lg shadow-xl shadow-indigo-500/20 flex items-center gap-2">
-                            {/* Animated border gradient */}
-                            <div className="absolute inset-0 rounded-lg overflow-hidden">
-                                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
-                            </div>
-
-                            <span className="text-sm shadow-sm">🚀</span>
-                            <span className="text-[10px] font-bold bg-gradient-to-r from-indigo-200 to-white bg-clip-text text-transparent uppercase tracking-wider">
-                                {language === 'es' ? 'RECOMENDADO' : 'RECOMMENDED'}
-                            </span>
-                        </div>
-
-                        {/* Speech bubble tail */}
-                        <div className="absolute -bottom-1 left-4 w-2 h-2 bg-slate-900 border-b border-r border-indigo-500/30 rotate-45"></div>
-                    </div>
+               {/* "Recommended" Badge - Cleaned up */}
+                <div className="absolute -top-3 right-0 z-20 pointer-events-none">
+                     <span className="bg-gradient-to-r from-brand-600 to-indigo-600 text-[9px] font-bold text-white px-2 py-0.5 rounded-full shadow-sm uppercase tracking-wider">
+                        {language === 'es' ? 'Recomendado' : 'Recommended'}
+                    </span>
                 </div>
+                
                 <button
                     onClick={() => onSocialLogin('linkedin_oidc')}
                     disabled={isLoading}
-                    className="w-full flex items-center justify-center gap-3 bg-[#0A66C2] hover:bg-[#004182] text-white font-medium py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70"
+                    className="w-full flex items-center justify-center gap-3 bg-[#0077b5] hover:bg-[#006097] text-white font-medium py-3 rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70 group"
                 >
                     <Linkedin className="w-5 h-5 fill-current" />
-                    {language === 'es' ? 'Continuar con LinkedIn' : 'Continue with LinkedIn'}
+                    <span>{language === 'es' ? 'Continuar con LinkedIn' : 'Continue with LinkedIn'}</span>
                 </button>
             </div>
+            
+             <div className="relative flex justify-center text-xs text-slate-400 font-medium">
+                  <span className="px-2 bg-white">{language === 'es' ? 'La opción preferida por profesionales' : 'Preferred by professionals'}</span>
+             </div>
         </div>
     );
 };

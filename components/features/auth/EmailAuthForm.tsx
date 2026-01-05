@@ -126,7 +126,7 @@ const EmailAuthForm: React.FC<EmailAuthFormProps> = ({
                 <button
                     type="submit"
                     disabled={isLoading || (!isLoginMode && !acceptedPolicy)}
-                    className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-all transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20"
+                    className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition-all transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-xl shadow-slate-900/10 hover:shadow-slate-900/20"
                 >
                     {isLoading
                         ? (
@@ -137,7 +137,7 @@ const EmailAuthForm: React.FC<EmailAuthFormProps> = ({
                                 {isLoginMode
                                     ? (
                                         <>
-                                            <LogIn className="w-5 h-5" />
+                                            <LogIn className="w-4 h-4" />
                                             {language === "es"
                                                 ? "Iniciar Sesión"
                                                 : "Sign In"}
@@ -145,7 +145,7 @@ const EmailAuthForm: React.FC<EmailAuthFormProps> = ({
                                     )
                                     : (
                                         <>
-                                            <UserPlus className="w-5 h-5" />
+                                            <UserPlus className="w-4 h-4" />
                                             {language === "es"
                                                 ? "Crear Cuenta"
                                                 : "Create Account"}

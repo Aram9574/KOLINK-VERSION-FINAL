@@ -246,32 +246,33 @@ const LoginPage: React.FC = () => {
                     )}
 
                     {/* Header */}
-                    <div className="mb-10">
+                    <div className="mb-12">
                         <Link
                             to="/"
-                            className="inline-flex items-center gap-2 font-display font-bold text-2xl text-slate-900 mb-8 hover:opacity-80 transition-opacity"
+                            className="inline-flex items-center gap-2 font-display font-bold text-xl text-slate-900 mb-10 hover:opacity-80 transition-opacity"
                         >
-                            <div className="w-8 h-8 bg-gradient-to-tr from-brand-600 to-indigo-500 rounded-lg flex items-center justify-center text-white text-sm shadow-md">
+                            <div className="w-8 h-8 bg-gradient-to-tr from-brand-600 to-indigo-600 rounded-lg flex items-center justify-center text-white text-sm shadow-md shadow-brand-500/20">
                                 K
                             </div>
-                            Kolink
+                            <span className="tracking-tight">Kolink</span>
                         </Link>
-                        <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-3 tracking-tight">
+                        
+                        <h1 className="text-3xl lg:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
                             {isLoginMode
                                 ? (language === "es"
                                     ? "Bienvenido de nuevo"
                                     : "Welcome back")
                                 : (language === "es"
-                                    ? "Comienza gratis"
+                                    ? "Empieza gratis"
                                     : "Get started for free")}
                         </h1>
                         <p className="text-slate-500 text-lg">
                             {isLoginMode
                                 ? (language === "es"
-                                    ? "Ingresa a tu estudio viral."
-                                    : "Enter your viral studio.")
+                                    ? "Ingresa a tu workspace de creación."
+                                    : "Enter your creation workspace.")
                                 : (language === "es"
-                                    ? "Únete a los creadores top 1%."
+                                    ? "Únete a los creadores del 1%."
                                     : "Join the top 1% creators.")}
                         </p>
                     </div>
@@ -291,7 +292,7 @@ const LoginPage: React.FC = () => {
 
                     <div className="relative mb-8">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-slate-200/60/60">
+                            <div className="w-full border-t border-slate-200">
                             </div>
                         </div>
                         <div className="relative flex justify-center text-sm">

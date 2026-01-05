@@ -7,90 +7,87 @@ interface AuthVisualsProps {
 
 const AuthVisuals: React.FC<AuthVisualsProps> = ({ language }) => {
     return (
-        <div className="hidden lg:flex flex-1 bg-slate-900 relative overflow-hidden items-center justify-center p-12">
-            <div className="absolute inset-0 bg-gradient-to-br from-brand-900/50 to-indigo-900/50 z-10" />
-            <div className="absolute -top-24 -right-24 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-700" />
+        <div className="hidden lg:flex flex-1 bg-[#0B1120] relative overflow-hidden items-center justify-center p-16">
+            {/* Background Effects */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-500/30 rounded-full blur-[128px] -translate-y-1/2 translate-x-1/2 animate-pulse" />
+            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[128px] translate-y-1/2 -translate-x-1/2" />
 
-            <div className="relative z-20 max-w-lg text-center">
-                <div className="mb-8 relative group w-full max-w-[420px] mx-auto perspective-1000">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                    <div className="relative bg-white rounded-xl p-6 shadow-2xl border border-slate-200/60/60 transform rotate-3 hover:rotate-0 transition-all duration-500">
-                        {/* Header */}
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-brand-100">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" alt="Profile" className="w-full h-full object-cover" />
-                            </div>
-                            <div className="text-left">
-                                <div className="text-slate-900 font-bold text-sm flex items-center gap-1">
-                                    Alex Rivera <span className="text-slate-400 font-normal">• 1st</span>
+            <div className="relative z-10 w-full max-w-xl">
+                {/* Main Visual */}
+                <div className="relative mb-12 group perspective-1000">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+                    <div className="relative bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl transform transition-transform duration-500 hover:scale-[1.02] hover:-rotate-1">
+                        
+                        {/* Abstract AI UI */}
+                        <div className="space-y-6">
+                            {/* Header */}
+                            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-indigo-500 flex items-center justify-center text-white font-bold">
+                                        AI
+                                    </div>
+                                    <div>
+                                        <div className="text-white font-medium text-sm">Kolink Engine v4</div>
+                                        <div className="text-slate-400 text-xs">Viral Architecture Optimized</div>
+                                    </div>
                                 </div>
-                                <div className="text-slate-500 text-xs">Founder @ Kolink • 1h • 🌐</div>
-                            </div>
-                            <div className="ml-auto text-brand-600 font-semibold text-sm flex items-center gap-1">
-                                + Follow
-                            </div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="text-left space-y-3 mb-4">
-                            <p className="text-slate-800 text-sm leading-relaxed">
-                                Deja de mirar una página en blanco. 🛑
-                            </p>
-                            <p className="text-slate-600 text-sm leading-relaxed">
-                                La mayoría pierde 10 horas/semana pensando qué escribir.
-                                <br />
-                                Mientras tanto, el top 1% usa frameworks.
-                            </p>
-                            <p className="text-slate-800 text-sm font-medium">
-                                El Framework PAS para viralidad:
-                            </p>
-                            <ul className="text-sm space-y-1">
-                                <li className="text-slate-600"><span className="mr-1">❌</span> <span className="font-semibold text-slate-800">Problema:</span> El bloqueo mata el impulso.</li>
-                                <li className="text-slate-600"><span className="mr-1">🔥</span> <span className="font-semibold text-slate-800">Agitación:</span> La inconsistencia mata el alcance.</li>
-                                <li className="text-slate-600"><span className="mr-1">✅</span> <span className="font-semibold text-slate-800">Solución:</span> Usa estructuras probadas.</li>
-                            </ul>
-                            <div className="text-brand-600 text-xs font-semibold pt-1">
-                                #GrowthHacking #LinkedInTips #AI
-                            </div>
-                        </div>
-
-                        {/* Engagement */}
-                        <div className="flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-slate-200/60/60">
-                            <div className="flex items-center gap-1">
-                                <div className="flex -space-x-1">
-                                    <div className="w-4 h-4 bg-blue-500 rounded-full border border-white flex items-center justify-center">👍</div>
-                                    <div className="w-4 h-4 bg-red-500 rounded-full border border-white flex items-center justify-center">❤️</div>
-                                    <div className="w-4 h-4 bg-green-500 rounded-full border border-white flex items-center justify-center">👏</div>
+                                <div className="flex gap-1.5">
+                                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/20 border border-red-500/50" />
+                                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/20 border border-yellow-500/50" />
+                                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/20 border border-green-500/50" />
                                 </div>
-                                <span className="text-slate-600 font-medium ml-1">1,243</span>
                             </div>
-                            <div className="text-slate-500">
-                                89 comments • 12 reposts
-                            </div>
-                        </div>
 
-                        {/* Floating Success Notification */}
-                        <div className="absolute -right-12 top-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl p-3 flex items-center gap-3 animate-in slide-in-from-right-8 duration-700 delay-500 border border-emerald-100">
-                            <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+                            {/* Analyzing Animation */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between text-xs text-slate-400 uppercase tracking-widest font-semibold">
+                                    <span>{language === 'es' ? 'Analizando Tendencias' : 'Analyzing Trends'}</span>
+                                    <span className="text-brand-400">98%</span>
+                                </div>
+                                <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                    <div className="h-full w-[98%] bg-gradient-to-r from-brand-500 to-indigo-400 rounded-full animate-[shimmer_2s_infinite]" />
+                                </div>
                             </div>
-                            <div className="text-left">
-                                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Alcance Potencial</div>
-                                <div className="text-emerald-600 font-bold text-sm">Alto Impacto 🚀</div>
+
+                            {/* Generated Content Blurb */}
+                            <div className="bg-white/5 rounded-xl p-4 border border-white/5 space-y-3">
+                                <div className="flex gap-2">
+                                    <div className="w-16 h-2 bg-slate-700 rounded-full" />
+                                    <div className="w-8 h-2 bg-slate-800 rounded-full" />
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="w-full h-2 bg-slate-700/50 rounded-full" />
+                                    <div className="w-[90%] h-2 bg-slate-700/50 rounded-full" />
+                                    <div className="w-[75%] h-2 bg-slate-700/50 rounded-full" />
+                                </div>
                             </div>
+
+                            {/* Floating Badge */}
+                            <div className="absolute -right-6 top-20 bg-white shadow-xl rounded-lg p-3 flex items-center gap-3 animate-in slide-in-from-left-4 fade-in duration-1000 delay-300 border border-slate-100">
+                                <div className="p-2 bg-emerald-50 rounded-md text-emerald-600">
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                </div>
+                                <div>
+                                    <div className="text-[10px] text-slate-400 font-bold uppercase">Engagement</div>
+                                    <div className="text-slate-900 font-bold text-sm">+340% Boost</div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
 
-                <h2 className="text-3xl font-bold text-white mb-4">
-                    {language === 'es' ? 'Domina LinkedIn con IA' : 'Master LinkedIn with AI'}
-                </h2>
-                <p className="text-slate-400 text-lg leading-relaxed">
-                    {language === 'es'
-                        ? 'Únete a miles de creadores que usan Kolink para generar contenido viral, programar posts y crecer su audiencia en piloto automático.'
-                        : 'Join thousands of creators using Kolink to generate viral content, schedule posts, and grow their audience on autopilot.'}
-                </p>
+                <div className="text-center">
+                    <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4 tracking-tight">
+                        {language === 'es' ? 'Tu ventaja injusta.' : 'Your unfair advantage.'}
+                    </h2>
+                    <p className="text-slate-400 text-lg leading-relaxed max-w-md mx-auto">
+                        {language === 'es'
+                            ? 'El sistema impulsado por IA que convierte a profesionales en líderes de opinión.'
+                            : 'The AI-powered system that turns professionals into thought leaders.'}
+                    </p>
+                </div>
             </div>
         </div>
     );
