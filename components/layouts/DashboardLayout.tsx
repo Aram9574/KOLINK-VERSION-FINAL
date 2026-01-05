@@ -93,8 +93,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                     </div>
 
                     {/* Content Body */}
-                    <div className="flex-1 overflow-hidden relative p-4 lg:p-8">
-                        <div className="h-full w-full max-w-[1600px] mx-auto">
+                    <div className={`flex-1 overflow-hidden relative ${activeTab === 'create' ? 'p-0' : 'p-4 lg:p-8'}`}>
+                        <div className="h-full w-full mx-auto">
                             {children}
                         </div>
                     </div>

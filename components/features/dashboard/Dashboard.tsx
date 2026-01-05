@@ -32,7 +32,7 @@ import { AppTab, Post, UserProfile } from "../../../types";
 import { translations } from "../../../translations";
 import { ActionFunctionArgs } from "react-router-dom";
 import Skeleton from "../../ui/Skeleton";
-import { UserDNACard } from "./UserDNACard";
+
 
 // Lazy load PostGenerator to reduce initial Dashboard bundle size
 const PostCreator = React.lazy(() => import("../generation/PostGenerator"));
@@ -187,7 +187,7 @@ const DashboardContent: React.FC = () => {
         >
             <div
                 className={`h-full ${
-                    ["history", "editor", "chat", "carousel", "voice-lab"].includes(
+                    ["create", "history", "editor", "chat", "carousel", "voice-lab"].includes(
                             activeTab,
                         )
                         ? "overflow-hidden"
@@ -196,7 +196,7 @@ const DashboardContent: React.FC = () => {
             >
                 <div
                     className={`${
-                        ["history", "editor", "chat", "carousel", "voice-lab"].includes(
+                        ["create", "history", "editor", "chat", "carousel", "voice-lab"].includes(
                                 activeTab,
                             )
                             ? "h-full w-full flex flex-col"
@@ -208,54 +208,34 @@ const DashboardContent: React.FC = () => {
                             id="viral-engine-view"
                             className="animate-in fade-in slide-in-from-bottom-4 duration-500"
                         >
-                            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                                <div className="lg:col-span-3">
-                                    <Suspense
-                                        fallback={
-                                            <div className="flex justify-center items-center h-64">
-                                                <div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-500 border-t-transparent">
-                                                </div>
+                            <div className="w-full">
+                                <Suspense
+                                    fallback={
+                                        <div className="flex justify-center items-center h-64">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-500 border-t-transparent">
                                             </div>
-                                        }
-                                    >
-                                        <PostCreator
-                                            onGenerate={(params) =>
-                                                generatePost(params)}
-                                            isGenerating={isGenerating}
-                                            credits={user.credits}
-                                            language={user.language || "en"}
-                                            showCreditDeduction={showCreditDeduction}
-                                            initialParams={currentPost?.params}
-                                            initialTopic={currentPost?.params?.topic}
-                                            onGoToCarousel={(content) => {
-                                                setCarouselDraftContent(content);
-                                                setActiveTab("carousel");
-                                            }}
-                                            onEdit={(post) => {
-                                                setCurrentPost(post);
-                                                setActiveTab("editor");
-                                            }}
-                                        />
-                                    </Suspense>
-                                </div>
-                                <div className="lg:col-span-1 space-y-6">
-                                    <UserDNACard dna={user.behavioral_dna} />
-                                    
-                                    {/* Quick Tips or Stats could go here later */}
-                                    <div className="p-5 bg-brand-600 rounded-2xl text-white shadow-soft-glow-brand relative overflow-hidden group">
-                                        <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                                            <Gift className="w-24 h-24" />
                                         </div>
-                                        <h4 className="font-bold text-sm mb-1">Invita a un amigo</h4>
-                                        <p className="text-[10px] opacity-80 mb-3">Obtén 50 créditos gratis por cada referido exitoso.</p>
-                                        <button 
-                                            onClick={() => setShowReferralModal(true)}
-                                            className="w-full py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-xl text-[10px] font-bold uppercase tracking-wider transition-colors"
-                                        >
-                                            Compartir enlace
-                                        </button>
-                                    </div>
-                                </div>
+                                    }
+                                >
+                                    <PostCreator
+                                        onGenerate={(params) =>
+                                            generatePost(params)}
+                                        isGenerating={isGenerating}
+                                        credits={user.credits}
+                                        language={user.language || "en"}
+                                        showCreditDeduction={showCreditDeduction}
+                                        initialParams={currentPost?.params}
+                                        initialTopic={currentPost?.params?.topic}
+                                        onGoToCarousel={(content) => {
+                                            setCarouselDraftContent(content);
+                                            setActiveTab("carousel");
+                                        }}
+                                        onEdit={(post) => {
+                                            setCurrentPost(post);
+                                            setActiveTab("editor");
+                                        }}
+                                    />
+                                </Suspense>
                             </div>
                         </div>
                     )}

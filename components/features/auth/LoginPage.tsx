@@ -102,8 +102,16 @@ const LoginPage: React.FC = () => {
                 toast.success("Cuenta creada. Por favor verifica tu correo.");
                 setIsLoading(false);
             }
+            setIsLoading(false);
         } catch (error: any) {
-            toast.error(error.message || "Error de autenticación");
+            console.error("Login Error:", error);
+            let msg = error.message || "Error de autenticación";
+            if (msg.includes("Failed to fetch")) {
+                msg = language === "es" 
+                    ? "Error de conexión. Verifica tu internet o si tienes un AdBlocker activo." 
+                    : "Connection error. Check your internet or AdBlocker.";
+            }
+            toast.error(msg);
             setIsLoading(false);
         }
     };

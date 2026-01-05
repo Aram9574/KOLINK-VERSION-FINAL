@@ -18,10 +18,12 @@ import {
     Plus,
     Repeat,
     Send,
-    Sparkles, // Added for the button
+    Sparkles,
     ThumbsUp,
     TrendingUp,
     Zap,
+    Image as ImageIcon,
+    X
 } from "lucide-react";
 import { translations } from "../../../translations";
 import { supabase } from "../../../services/supabaseClient";
@@ -77,23 +79,8 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
         setEditContent(content || "");
     }, [content]);
 
-    // Function to handle "See more" logic roughly
-    const truncatedContent = useMemo(() => {
-        if (!content) return "";
-        const lines = content.split("\n");
-        if (lines.length > 5) {
-            return lines.slice(0, 3).join("\n") + "...";
-        }
-        if (content.length > 210) {
-            return content.slice(0, 210) + "...";
-        }
-        return content;
-    }, [content]);
-
-    const displayContent = isExpanded ? (content || "") : truncatedContent;
-    const safeContent = content || "";
-    const needsSeeMore = safeContent.length > 210 ||
-        safeContent.split("\n").length > 5;
+    // Simplified content handling - always expanded
+    const displayContent = content || "";
 
     const handleSave = () => {
         if (onUpdate) {
@@ -132,418 +119,139 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
         return "text-red-600 bg-red-50 border-red-200";
     };
 
-    const getScoreGradient = (score: number) => {
-        if (score >= 80) return "from-green-400 to-green-600";
-        if (score >= 50) return "from-amber-400 to-amber-600";
-        return "from-red-400 to-red-600";
-    };
-
     if (isLoading) {
         return (
-            <div className="bg-slate-50/50 border border-slate-200 rounded-2xl shadow-sm w-full max-w-xl mx-auto p-6 animate-pulse">
-                <div className="flex space-x-4 mb-6">
-                    <Skeleton className="rounded-full h-12 w-12 bg-slate-200" />
-                    <div className="flex-1 space-y-3 py-1">
-                        <Skeleton className="h-4 w-3/4 bg-slate-200 rounded-lg" />
-                        <Skeleton className="h-3 w-1/2 bg-slate-200 rounded-lg" />
+            <div className="bg-white w-full max-w-xl mx-auto p-4 animate-pulse">
+                <div className="flex space-x-3 mb-4">
+                    <Skeleton className="rounded-full h-12 w-12 bg-slate-100" />
+                    <div className="flex-1 space-y-2 py-1">
+                        <Skeleton className="h-4 w-1/2 bg-slate-100 rounded" />
+                        <Skeleton className="h-3 w-1/3 bg-slate-100 rounded" />
                     </div>
                 </div>
-                <div className="space-y-4">
-                    <Skeleton className="h-4 w-full bg-slate-200 rounded-lg" />
-                    <Skeleton className="h-4 w-full bg-slate-200 rounded-lg transition-all duration-700 delay-100" />
-                    <Skeleton className="h-4 w-5/6 bg-slate-200 rounded-lg transition-all duration-700 delay-200" />
-                    <div className="pt-4 flex gap-2">
-                        <Skeleton className="h-8 w-24 bg-slate-200 rounded-full" />
-                        <Skeleton className="h-8 w-24 bg-slate-200 rounded-full" />
-                    </div>
+                <div className="space-y-3">
+                    <Skeleton className="h-4 w-full bg-slate-100 rounded" />
+                    <Skeleton className="h-4 w-full bg-slate-100 rounded" />
+                    <Skeleton className="h-4 w-3/4 bg-slate-100 rounded" />
                 </div>
             </div>
         );
     }
 
-    // if (!content) block removed to show empty preview structure
-
     return (
-        <div className="space-y-4 w-full max-w-xl mx-auto">
-            {/* VIRAL SCORECARD (NEW) */}
-            {viralScore !== undefined && (
-                <div className="bg-white border border-slate-200/60/60 rounded-xl overflow-hidden shadow-sm animate-in slide-in-from-top-4 duration-500">
-                    <div
-                        className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors"
-                        onClick={() => setShowAudit(!showAudit)}
-                    >
-                        <div className="flex items-center gap-4">
-                            <div className="relative w-14 h-14 flex items-center justify-center">
-                                {/* Circular Progress SVG */}
-                                <svg className="w-full h-full transform -rotate-90">
-                                    <circle
-                                        cx="28"
-                                        cy="28"
-                                        r="24"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                        fill="transparent"
-                                        className="text-slate-100"
-                                    />
-                                    <circle
-                                        cx="28"
-                                        cy="28"
-                                        r="24"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                        fill="transparent"
-                                        className={`${
-                                            getScoreColor(viralScore).split(
-                                                " ",
-                                            )[0]
-                                        }`}
-                                        strokeDasharray={150.79}
-                                        strokeDashoffset={150.79 -
-                                            (150.79 * viralScore) / 100}
-                                        strokeLinecap="round"
-                                    />
-                                </svg>
-                                <span
-                                    className={`absolute text-sm font-bold ${
-                                        getScoreColor(viralScore).split(" ")[0]
-                                    }`}
-                                >
-                                    {viralScore}
-                                </span>
-                            </div>
-                            <div>
-                                <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                                    {t.viralPotential}
-                                    {viralScore > 80 && (
-                                        <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full uppercase font-bold tracking-wide">
-                                            {t.high}
-                                        </span>
-                                    )}
-                                </h4>
-                                <p className="text-xs text-slate-500">
-                                    {t.aiEstimate}
-                                </p>
-                            </div>
+        <div className="w-full bg-slate-100/50 pb-20"> {/* Wrapper with slight bg for contrast if needed, padding for scrolling */}
+            
+
+
+
+            {/* NATIVE FEED ITEM CONTAINER */}
+            <div className="bg-white w-full border-t border-b border-slate-200 mb-2">
+                
+                {/* 1. Header (Author) */}
+                <div className="px-4 pt-3 flex items-start gap-3">
+                     <img
+                        src={getAvatarUrl(user)}
+                        alt={user?.name}
+                        className="w-12 h-12 rounded-full object-cover border border-slate-100"
+                    />
+                    <div className="flex-1 min-w-0 pt-1">
+                        <div className="flex items-center gap-1">
+                            <span className="text-sm font-semibold text-slate-900 truncate decoration-1 hover:underline cursor-pointer">
+                                {user.name}
+                            </span>
+                            <span className="text-slate-400 text-xs">• 1st</span>
                         </div>
-                        <div className="p-2 rounded-full hover:bg-slate-200 transition-colors text-slate-400">
-                            {showAudit
-                                ? <ChevronUp className="w-4 h-4" />
-                                : <ChevronDown className="w-4 h-4" />}
+                        <p className="text-xs text-slate-500 truncate">{user.headline}</p>
+                        <div className="flex items-center gap-1 mt-0.5">
+                            <span className="text-[11px] text-slate-400">2h • </span>
+                            <Globe className="w-3 h-3 text-slate-400" />
                         </div>
                     </div>
+                     <button className="text-brand-600 font-semibold text-sm flex items-center gap-1 hover:bg-brand-50 rounded px-2 py-1 -mr-2 transition-colors">
+                        <Plus className="w-4 h-4" />
+                        Follow
+                     </button>
+                </div>
 
-                    {/* Detailed Breakdown */}
-                    {showAudit && viralAnalysis && (
-                        <div className="px-4 pb-4 border-t border-slate-200/60/60 bg-slate-50/50">
-                            <div className="grid grid-cols-3 gap-2 mt-4 mb-4">
-                                <ScoreBar
-                                    label={t.hook}
-                                    score={viralAnalysis.hookScore}
-                                />
-                                <ScoreBar
-                                    label={t.readability}
-                                    score={viralAnalysis.readabilityScore}
-                                />
-                                <ScoreBar
-                                    label={t.value}
-                                    score={viralAnalysis.valueScore}
-                                />
+                {/* 2. Content */}
+                <div className="px-4 py-3 text-[14px] leading-[1.4] text-slate-900 whitespace-pre-wrap font-normal">
+                    {isEditing ? (
+                        <div className="relative">
+                            <textarea
+                                value={editContent}
+                                onChange={(e) => setEditContent(e.target.value)}
+                                className="w-full min-h-[150px] p-2 border-2 border-brand-500 rounded-lg focus:outline-none bg-white text-slate-900"
+                                autoFocus
+                            />
+                            <div className="absolute bottom-2 right-2 flex gap-2">
+                                <button onClick={handleCancel} className="bg-white shadow text-slate-600 px-3 py-1 rounded-full text-xs font-bold border">Cancel</button>
+                                <button onClick={handleSave} className="bg-brand-600 shadow text-white px-3 py-1 rounded-full text-xs font-bold">Done</button>
                             </div>
-
-                            <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 flex gap-3 items-start">
-                                <div className="p-1.5 bg-amber-100 rounded-md text-amber-600 mt-0.5">
-                                    <Zap className="w-3.5 h-3.5 fill-current" />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-bold uppercase text-amber-700 mb-0.5">
-                                        {t.proTip}
-                                    </p>
-                                    <p className="text-xs text-amber-900 leading-relaxed font-medium">
-                                        {viralAnalysis.proTip || viralAnalysis.feedback}
-                                    </p>
-                                </div>
-                            </div>
+                        </div>
+                    ) : (
+                        <div>
+                             <span dir="ltr">{displayContent || "Start writing to see your preview..."}</span>
                         </div>
                     )}
                 </div>
-            )}
 
-            <div
-                id="tour-preview"
-                className="bg-white border border-slate-200/60/60 rounded-xl shadow-sm overflow-hidden transition-all duration-500 ease-in-out relative group"
-            >
-                {/* Control Toolbar - Matching Reference Design */}
-                <div className="bg-slate-50/30 border-b border-slate-200/60/60 px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="flex space-x-1.5">
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F57]">
-                            </div>
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#FEBC2E]">
-                            </div>
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#28C840]">
-                            </div>
-                        </div>
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-2">
-                            PREVIEW
-                        </span>
-                    </div>
+                {/* 3. Media Placeholder (Optional, implied if none) */}
+                {/* If we had images, they would go here. For now, text only. */}
 
-                    <div className="flex items-center gap-1.5">
-                        {/* Convert to Carousel Button - Premium Feature */}
-                        {!isEditing && onConvertToCarousel && (
-                            <button
-                                onClick={onConvertToCarousel}
-                                className="px-3 h-9 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[11px] font-bold hover:shadow-lg hover:scale-105 active:scale-95 transition-all shadow-md flex items-center justify-center gap-1.5 whitespace-nowrap"
-                                title="Transform this post into a viral carousel"
-                            >
-                                <Sparkles className="w-3.5 h-3.5" />
-                                <span className="hidden md:inline">
-                                    {language === "es"
-                                        ? "Convertir a Carrusel"
-                                        : "Convert to Carousel"}
-                                </span>
-                                <span className="md:hidden">
-                                    {language === "es"
-                                        ? "Carrusel"
-                                        : "Carousel"}
-                                </span>
-                            </button>
-                        )}
-
-                        {isEditing
-                            ? (
-                                <div className="flex items-center gap-1.5 animate-in zoom-in-95 duration-200">
-                                    <button
-                                        onClick={handleCancel}
-                                        className="px-3 h-9 rounded-lg text-[11px] font-bold text-slate-600 bg-white border border-slate-200/60/60 hover:bg-slate-50 active:scale-95 transition-all shadow-sm"
-                                    >
-                                        {t.cancel}
-                                    </button>
-                                    <button
-                                        onClick={handleSave}
-                                        className="px-3 h-9 rounded-lg bg-brand-600 text-white text-[11px] font-bold hover:bg-brand-700 active:scale-95 transition-all shadow-md flex items-center justify-center gap-1.5"
-                                    >
-                                        <Check className="w-3.5 h-3.5" />
-                                        {t.save}
-                                    </button>
-                                </div>
-                            )
-                            : (
-                                <div className="flex items-center gap-1.5">
-                                    {showEditButton && (
-                                        <button
-                                            onClick={() =>
-                                                onEdit
-                                                    ? onEdit()
-                                                    : setIsEditing(true)}
-                                            className="px-3 h-9 rounded-lg bg-white border border-slate-200/60/60 text-blue-600 text-[11px] font-bold hover:border-blue-300 hover:bg-blue-50/30 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-1.5"
-                                        >
-                                            <PenSquare className="w-3.5 h-3.5" />
-                                            {t.edit}
-                                        </button>
-                                    )}
-                                    <button
-                                        onClick={() => setIsScheduling(true)}
-                                        className="px-3 h-9 rounded-lg bg-white border border-slate-200/60/60 text-slate-700 text-[11px] font-bold hover:border-slate-300 hover:bg-slate-50 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-1.5"
-                                    >
-                                        <Clock className="w-3.5 h-3.5" />
-                                        {language === "es"
-                                            ? "Programar"
-                                            : "Schedule"}
-                                    </button>
-                                    {/* Removed the top Publish button as per instructions */}
-                                </div>
-                            )}
-                    </div>
-                </div>
-
-                {/* Post Header */}
-                <div className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                        <div className="flex space-x-3">
-                            <div className="relative">
-                                <img
-                                    src={getAvatarUrl(user)}
-                                    alt={user?.name || "User"}
-                                    className="w-12 h-12 rounded-full object-cover border border-slate-200/60/60"
-                                />
-                                {user.isPremium && (
-                                    <div className="absolute -bottom-1 -right-1 bg-amber-400 border-2 border-white w-4 h-4 rounded-full flex items-center justify-center">
-                                        <div className="w-2 h-2 bg-white rounded-full">
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="flex flex-col justify-center">
-                                <div className="flex items-center gap-1">
-                                    <span className="font-bold text-slate-900 text-sm hover:text-blue-600 hover:underline cursor-pointer">
-                                        {user.name}
-                                    </span>
-                                    <span className="text-slate-500 text-xs">
-                                        • 1st
-                                    </span>
-                                </div>
-                                <p className="text-xs text-slate-500 line-clamp-1 max-w-[200px] sm:max-w-xs">
-                                    {user.headline}
-                                </p>
-                                <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-                                    <span>1h</span>
-                                    <span>•</span>
-                                    <Globe className="w-3 h-3 text-slate-500" />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <button className="text-brand-600 font-bold text-sm hover:bg-blue-50 px-3 py-1 rounded-full transition-colors flex items-center gap-1">
-                                <Plus className="w-4 h-4" />
-                                {t.follow}
-                            </button>
-                            <button className="text-slate-500 hover:bg-slate-100 p-2 rounded-full transition-colors">
-                                <MoreHorizontal className="w-5 h-5" />
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Post Body */}
-                    {isEditing
-                        ? (
-                            <div className="relative">
-                                <textarea
-                                    value={editContent}
-                                    onChange={(e) =>
-                                        setEditContent(e.target.value)}
-                                    className="w-full min-h-[250px] text-[14px] text-slate-900 leading-normal font-normal border-2 border-brand-300 rounded-lg p-3 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 outline-none resize-y bg-white transition-all"
-                                    autoFocus
-                                    placeholder="Type your post content here..."
-                                />
-                                <div className="absolute bottom-3 right-3 text-xs text-slate-400 font-medium bg-white/80 px-2 py-1 rounded backdrop-blur-sm pointer-events-none">
-                                    {editContent.length} chars
-                                </div>
-                            </div>
-                        )
-                        : (
-                            <div 
-                                className={`text-[14px] text-slate-900 leading-normal font-normal break-words ${!displayContent ? 'text-slate-400' : ''}`}
-                            >
-                                {(displayContent || `Tu perfil de LinkedIn es un desierto.
-
-Tienes años de experiencia, pero nadie lo nota. Pierdes clientes y alianzas solo porque no te comunicas.
-
-El silencio te está costando dinero.
-
-No necesitas ser un influencer. Solo necesitas ser visible.
-
-El contenido de calidad es el puente entre tu talento y tu próximo contrato. 🤝
-
-¿Qué oportunidad perdiste por no contar lo que sabes?
-
-#LinkedIn #MarcaPersonal #Estrategia`).split('\n\n').map((para, idx) => (
-                                    <motion.div
-                                        key={`${displayContent}-${idx}`}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ 
-                                            duration: 0.5, 
-                                            delay: idx * 0.1, 
-                                            ease: [0.16, 1, 0.3, 1] 
-                                        }}
-                                        className="mb-4 last:mb-0"
-                                    >
-                                        {para.split('\n').map((line, lineIdx) => (
-                                            <React.Fragment key={lineIdx}>
-                                                {line}
-                                                {lineIdx < para.split('\n').length - 1 && <br />}
-                                            </React.Fragment>
-                                        ))}
-                                    </motion.div>
-                                ))}
-                                {!isExpanded && needsSeeMore && (
-                                    <button
-                                        onClick={() => setIsExpanded(true)}
-                                        className="text-slate-500 hover:text-brand-600 hover:underline ml-1 font-medium cursor-pointer"
-                                    >
-                                        {t.seeMore}
-                                    </button>
-                                )}
-                            </div>
-                        )}
-                </div>
-
-                {/* Engagement Metrics */}
-                <div className="px-4 py-2 border-b border-slate-200/60/60 flex items-center justify-between text-xs text-slate-500">
-                    <div className="flex items-center gap-1 group cursor-pointer">
+                {/* 4. Engagement Counts */}
+                <div className="px-4 flex items-center justify-between py-2 border-b border-slate-100/80">
+                    {/* Reactions */}
+                    <div className="flex items-center gap-1">
                         <div className="flex -space-x-1">
-                            <div className="w-4 h-4 rounded-full bg-[#1485BD] flex items-center justify-center z-10 ring-1 ring-white">
-                                <ThumbsUp className="w-2.5 h-2.5 text-white fill-white" />
-                            </div>
-                            <div className="w-4 h-4 rounded-full bg-[#D14836] flex items-center justify-center ring-1 ring-white">
-                                <span className="text-[8px] text-white">
-                                    ❤️
-                                </span>
-                            </div>
-                            <div className="w-4 h-4 rounded-full bg-[#6DAE4F] flex items-center justify-center ring-1 ring-white">
-                                <span className="text-[8px] text-white">
-                                    👏
-                                </span>
-                            </div>
+                             <img src="https://static.licdn.com/aero-v1/sc/h/8ekq8gho1ruaf8i7f86vd1ftt" alt="Like" className="w-4 h-4 z-20" />
+                             <img src="https://static.licdn.com/aero-v1/sc/h/cpho5fghnpbn55ccy2dk94of9" alt="Clap" className="w-4 h-4 z-10" />
+                             <img src="https://static.licdn.com/aero-v1/sc/h/b1dl5jk88euc7e9ri50xy5qo8" alt="Heart" className="w-4 h-4 z-0" />
                         </div>
-                        <span className="hover:text-blue-600 hover:underline ml-1 group-hover:text-blue-600">
-                            1,243
-                        </span>
+                        <span className="text-[11px] text-slate-500 hover:text-blue-600 hover:underline cursor-pointer ml-1">458</span>
                     </div>
-                    <div className="flex gap-2">
-                        <span className="hover:text-blue-600 hover:underline cursor-pointer">
-                            89 comments
-                        </span>
-                        <span>•</span>
-                        <span className="hover:text-blue-600 hover:underline cursor-pointer">
-                            12 reposts
-                        </span>
+                    {/* Comments/Reposts */}
+                    <div className="text-[11px] text-slate-500 hover:text-blue-600 hover:underline cursor-pointer">
+                        42 comments • 6 reposts
                     </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="px-2 py-1 flex items-center justify-between">
-                    <ActionButton
-                        icon={<ThumbsUp className="w-5 h-5 stroke-[1.5]" />}
-                        label="Like"
-                    />
-                    <ActionButton
-                        icon={
-                            <MessageCircle className="w-5 h-5 stroke-[1.5]" />
-                        }
-                        label="Comment"
-                    />
-                    {!isMobilePreview && (
-                        <ActionButton
-                            icon={<Repeat className="w-5 h-5 stroke-[1.5]" />}
-                            label="Repost"
-                        />
-                    )}
-                    <button
-                        onClick={handlePublish}
-                        disabled={isPublishing}
-                        className="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-full bg-[#0077b5] text-white font-bold text-xs hover:bg-[#006097] transition-all duration-200 active:scale-95 shadow-sm shadow-blue-500/20 disabled:opacity-70 disabled:cursor-wait ml-auto"
-                    >
-                        {isPublishing
-                            ? (
-                                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            )
-                            : (
-                                <div className="bg-white p-0.5 rounded-[2px]">
-                                    <Linkedin className="w-3 h-3 text-[#0077b5] fill-[#0077b5]" />
-                                </div>
-                            )}
-                        <span className="uppercase tracking-wide">
-                            {isPublishing
-                                ? (language === "es"
-                                    ? "Publicando..."
-                                    : "Publishing...")
-                                : (language === "es" ? "COMPARTIR" : "SHARE")}
-                        </span>
-                    </button>
+                {/* 5. Action Buttons (Native Mobile Row) */}
+                <div className="px-2 flex items-center justify-between py-1">
+                     <NativeActionButton 
+                        icon={<ThumbsUp className="w-5 h-5 -scale-x-100" />} 
+                        label="Like" 
+                     />
+                     <NativeActionButton 
+                        icon={<MessageCircle className="w-5 h-5" />} 
+                        label="Comment" 
+                     />
+                     <NativeActionButton 
+                        icon={<Repeat className="w-5 h-5" />} 
+                        label="Repost" 
+                     />
+                     <NativeActionButton 
+                        icon={<Send className="w-5 h-5 -rotate-45 translate-y-[-2px] translate-x-[2px]" />} 
+                        label="Send" 
+                     />
                 </div>
+            </div>
+
+            {/* FLOATING ACTION BUTTON FOR PUBLISHING / ADMIN */}
+            <div className="sticky bottom-4 left-0 right-0 flex justify-center gap-3 px-4 z-20">
+                <button 
+                    onClick={() => onEdit && onEdit()} 
+                    className="bg-white text-slate-600 shadow-lg border border-slate-200 px-4 py-2.5 rounded-full flex items-center gap-2 text-xs font-bold hover:scale-105 active:scale-95 transition-all"
+                >
+                    <PenSquare className="w-4 h-4" />
+                    Edit
+                </button>
+                <button 
+                    onClick={handlePublish}
+                    className="bg-[#0a66c2] text-white shadow-lg shadow-blue-900/20 px-6 py-2.5 rounded-full flex items-center gap-2 text-xs font-bold hover:scale-105 active:scale-95 transition-all"
+                >
+                    <Send className="w-4 h-4" />
+                    {language === "es" ? "Publicar en LinkedIn" : "Post to LinkedIn"}
+                </button>
             </div>
 
             <ScheduleModal
@@ -552,17 +260,22 @@ El contenido de calidad es el puente entre tu talento y tu próximo contrato. �
                 onConfirm={(date) => {
                     if (onSchedule) onSchedule(date);
                     setIsScheduling(false);
-                    toast.success(
-                        language === "es"
-                            ? "Publicación programada"
-                            : "Post scheduled",
-                    );
+                    toast.success(t.scheduled);
                 }}
                 language={language}
             />
         </div>
     );
 };
+
+const NativeActionButton = ({ icon, label }: { icon: React.ReactNode, label: string }) => (
+    <button className="flex flex-col items-center justify-center py-2 px-1 flex-1 active:bg-slate-100 rounded-lg transition-colors group">
+         <div className="text-slate-500 group-hover:text-slate-700 transition-colors">
+            {icon}
+         </div>
+         <span className="text-[10px] font-medium text-slate-500 mt-0.5 group-hover:text-slate-700">{label}</span>
+    </button>
+);
 
 const ScoreBar: React.FC<{ label: string; score: number }> = (
     { label, score },
@@ -591,32 +304,5 @@ const ScoreBar: React.FC<{ label: string; score: number }> = (
         </div>
     );
 };
-
-const ActionButton: React.FC<
-    {
-        icon: React.ReactNode;
-        label: string;
-        onClick?: () => void;
-        className?: string;
-    }
-> = (
-    { icon, label, onClick, className = "" },
-) => (
-    <button
-        onClick={onClick}
-        className={`flex items-center justify-center gap-2 px-2 sm:px-4 py-3.5 rounded-lg hover:bg-slate-100 flex-1 text-slate-500 font-semibold text-sm transition-all duration-200 group active:scale-95 active:bg-slate-200 ${className}`}
-    >
-        <span
-            className={`group-hover:scale-110 transition-transform duration-200 ${
-                className ? "" : "group-hover:text-slate-700"
-            }`}
-        >
-            {icon}
-        </span>
-        <span className="hidden sm:inline group-hover:text-slate-700">
-            {label}
-        </span>
-    </button>
-);
 
 export default LinkedInPreview;
