@@ -518,7 +518,6 @@ export const en = {
              empathetic: "Empathetic Peer"
           }
         },
-        voiceLab: "Voice Lab",
       },
       voiceLab: {
         title: "Voice Lab",

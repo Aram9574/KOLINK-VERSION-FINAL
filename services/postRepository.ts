@@ -62,8 +62,13 @@ export const updatePost = async (
     if (updates.isFavorite !== undefined) {
         dbUpdates.is_favorite = updates.isFavorite;
     }
+    if (updates.isAutoPilot !== undefined) {
+        dbUpdates.is_auto_pilot = updates.isAutoPilot;
+    }
     if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
     if (updates.status !== undefined) dbUpdates.status = updates.status;
+    if (updates.viralScore !== undefined) dbUpdates.viral_score = updates.viralScore;
+    if (updates.viralAnalysis !== undefined) dbUpdates.viral_analysis = updates.viralAnalysis;
     if (updates.scheduledDate !== undefined) {
         dbUpdates.scheduled_date = new Date(updates.scheduledDate)
             .toISOString();
@@ -87,10 +92,11 @@ export const createPost = async (post: any): Promise<any | null> => {
         user_id: post.userId,
         content: post.content,
         params: post.params,
-        viral_score: post.likes || 0,
+        viral_score: post.viralScore !== undefined ? post.viralScore : (post.likes || 0),
         viral_analysis: post.viralAnalysis,
         tags: post.tags || [],
         is_favorite: post.isFavorite || false,
+        is_auto_pilot: post.isAutoPilot || false,
         status: post.status || "published",
         created_at: new Date().toISOString(),
     };
@@ -180,4 +186,41 @@ export const deleteSnippet = async (snippetId: string): Promise<boolean> => {
         return false;
     }
     return true;
+};
+
+export const fetchHooks = async (): Promise<any[]> => {
+    const { data, error } = await supabase
+        .from("hooks")
+        .select("*")
+        .order("category", { ascending: true });
+
+    if (error) {
+        console.error("Error fetching hooks:", error);
+        return [];
+    }
+    
+    return (data || []).map((h: any) => ({
+        id: h.id,
+        category: h.category,
+        value: h.content, 
+        label: h.category + " - " + h.content.substring(0, 20) + "..."
+    }));
+};
+
+export const fetchClosures = async (): Promise<any[]> => {
+    const { data, error } = await supabase
+        .from("closures")
+        .select("*")
+        .order("category", { ascending: true });
+
+    if (error) {
+        console.error("Error fetching closures:", error);
+        return [];
+    }
+
+    return (data || []).map((c: any) => ({
+        id: c.id,
+        category: c.category,
+        value: c.content
+    }));
 };

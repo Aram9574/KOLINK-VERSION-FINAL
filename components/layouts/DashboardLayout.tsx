@@ -88,6 +88,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                             language={language}
                             setLanguage={setLanguage}
                             activeTab={activeTab}
+                            setActiveTab={setActiveTab}
                         />
                     </div>
 

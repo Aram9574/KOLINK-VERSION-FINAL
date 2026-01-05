@@ -1,4 +1,3 @@
-import { serve } from "std/http/server";
 import { createClient } from "@supabase/supabase-js";
 import { AIService } from "../_shared/AIService.ts";
 import { LinkedInPDFData } from "../_shared/types.ts";
@@ -8,7 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });

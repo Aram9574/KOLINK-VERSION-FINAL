@@ -1,6 +1,8 @@
 import { BaseAIService } from "./BaseAIService.ts";
 import { Schema, SchemaType, Part } from "@google/generative-ai";
 import { LinkedInAuditResult, LinkedInPDFData, LinkedInProfileData } from "../types.ts";
+import { AuditBrain } from "../prompts/AuditBrain.ts";
+import { VoiceBrain } from "../prompts/VoiceBrain.ts";
 import pdf from "pdf-parse";
 import { Buffer } from "node:buffer";
 
@@ -11,7 +13,12 @@ export class AuditService extends BaseAIService {
   async extractLinkedInPDF(pdfBase64: string): Promise<LinkedInPDFData> {
     const prompt = `
       Extract professional info from this LinkedIn PDF into JSON.
-      CRITICAL: You MUST extract the LinkedIn Profile URL (e.g. linkedin.com/in/username). Look for it in the 'Contact' section, header, or footer. If you find a public profile ID (e.g. 'aram-zakzuk-123'), construct the full URL.
+      
+      CRITICAL IDENTITY RULES:
+      1. **Primary Profile Only**: Extract the info of the person whose profile this is (usually the name in the header). IGNORE people mentioned in recommendations or shares.
+      2. **LinkedIn URL**: You MUST find the LinkedIn Profile URL (e.g. linkedin.com/in/username). It is usually in the 'Contact' section, header, or footer. 
+      3. **URL Construction**: If you find a public profile slug (e.g. 'aram-zakzuk'), absolute construction is REQUIRED: "https://www.linkedin.com/in/aram-zakzuk".
+      4. **Verification**: Cross-reference the name with the URL slug to ensure they match.
       
       JSON Structure:
       {
@@ -164,7 +171,7 @@ export class AuditService extends BaseAIService {
   ): Promise<LinkedInAuditResult> {
     
     // NEW SOTA SYSTEM PROMPT (Strict Spanish)
-    const systemPrompt = "Actúa como un Consultor Senior de Marca Personal y Estratega de LinkedIn (Top Voice). Tu misión es realizar una auditoría EXHAUSTIVA, IMPLACABLE pero CONSTRUCTIVA. No seas superficial. Analiza cada coma, cada brecha de autoridad y cada oportunidad perdida.";
+    const systemPrompt = AuditBrain.system_instruction;
 
     let prompt = `
       CONTEXT: Analyzing a LinkedIn Profile using specific Hybrid Data (PDF Extraction + Live Scraping).
@@ -186,20 +193,16 @@ export class AuditService extends BaseAIService {
 
       REQUIRED OUTPUT (JSON):
       {
-        "overall_score": (number 0-100),
-        "visual_score": (number 0-100),
-        "authority_metrics": {
-            "headline_impact": (number 0-100),
-            "keyword_density": (number 0-100),
-            "storytelling_power": (number 0-100),
-            "recruiter_clarity": (number 0-100)
+        "authority_score": (number 0-100),
+        "brutal_diagnosis": "Un párrafo honesto y directo que resuma el estado actual.",
+        "quick_wins": ["3 acciones que el usuario puede hacer en menos de 5 minutos."],
+        "strategic_roadmap": {
+          "headline": "Propuesta de nuevo titular de alto impacto.",
+          "about": "Estructura recomendada para el About (primeras 3 frases cruciales).",
+          "experience": "Ejemplo de cómo redactar un logro pasado."
         },
-        "summary": "Deep strategic diagnosis of the profile...",
-        "results": {
-            "headline": { "score": 0-100, "feedback": "Detailed critique...", "suggested": "Optimized Headline Example..." },
-            "about": { "score": 0-100, "feedback": "Detailed critique...", "suggested": "Optimized About Section Hook (First 3-4 lines)..." },
-            "experience": { "score": 0-100, "feedback": "Detailed critique...", "suggested": "Optimized Experience Bullet Points (Metric-driven)..." }
-        }
+        "visual_critique": "Análisis de la coherencia visual y banner.",
+        "technical_seo_keywords": ["Lista de keywords para las que el perfil debería posicionar."]
       }
     `;
 
@@ -226,59 +229,33 @@ export class AuditService extends BaseAIService {
       const response = await model.generateContent({
         contents: [{ role: "user", parts: parts }],
         generationConfig: {
-          temperature: 0.3, // Slightly higher for more creative/longer feedback
+          temperature: 0.3,
           responseMimeType: "application/json",
           responseSchema: {
             type: SchemaType.OBJECT,
             properties: {
-              overall_score: { type: SchemaType.NUMBER },
-              visual_score: { type: SchemaType.NUMBER },
-              authority_metrics: {
-                  type: SchemaType.OBJECT,
-                  properties: {
-                      headline_impact: { type: SchemaType.NUMBER },
-                      keyword_density: { type: SchemaType.NUMBER },
-                      storytelling_power: { type: SchemaType.NUMBER },
-                      recruiter_clarity: { type: SchemaType.NUMBER }
-                  },
-                  required: ["headline_impact", "keyword_density", "storytelling_power", "recruiter_clarity"]
+              authority_score: { type: SchemaType.NUMBER },
+              brutal_diagnosis: { type: SchemaType.STRING },
+              quick_wins: { 
+                type: SchemaType.ARRAY, 
+                items: { type: SchemaType.STRING } 
               },
-              summary: { type: SchemaType.STRING },
-              results: {
+              strategic_roadmap: {
                 type: SchemaType.OBJECT,
                 properties: {
-                  headline: {
-                    type: SchemaType.OBJECT,
-                    properties: {
-                      score: { type: SchemaType.NUMBER },
-                      feedback: { type: SchemaType.STRING },
-                      suggested: { type: SchemaType.STRING }
-                    },
-                    required: ["score", "feedback", "suggested"]
-                  },
-                  about: {
-                    type: SchemaType.OBJECT,
-                    properties: {
-                      score: { type: SchemaType.NUMBER },
-                      feedback: { type: SchemaType.STRING },
-                      suggested: { type: SchemaType.STRING }
-                    },
-                    required: ["score", "feedback", "suggested"]
-                  },
-                  experience: {
-                    type: SchemaType.OBJECT,
-                    properties: {
-                      score: { type: SchemaType.NUMBER },
-                      feedback: { type: SchemaType.STRING },
-                      suggested: { type: SchemaType.STRING }
-                    },
-                    required: ["score", "feedback", "suggested"]
-                  }
+                  headline: { type: SchemaType.STRING },
+                  about: { type: SchemaType.STRING },
+                  experience: { type: SchemaType.STRING }
                 },
                 required: ["headline", "about", "experience"]
+              },
+              visual_critique: { type: SchemaType.STRING },
+              technical_seo_keywords: { 
+                type: SchemaType.ARRAY, 
+                items: { type: SchemaType.STRING } 
               }
             },
-            required: ["overall_score", "visual_score", "authority_metrics", "summary", "results"]
+            required: ["authority_score", "brutal_diagnosis", "quick_wins", "strategic_roadmap", "visual_critique", "technical_seo_keywords"]
           } as Schema,
         },
       });
@@ -293,12 +270,6 @@ export class AuditService extends BaseAIService {
     const samples = contentSamples.join("\n---\n");
     // NEW SOTA PROMPT FOR VOICE
     let prompt = `
-        Eres un Ingeniero de Análisis Lingüístico y Ghostwriter de Élite. Procesa los siguientes textos para extraer el ADN estilístico del autor:
-
-        1. Estructura: Identifica el uso de oraciones cortas vs. explicaciones técnicas profundas.
-        2. Patrones de Hook: Detecta si abre con preguntas, datos médicos/tech o historias personales.
-        3. Vocabulario: Lista los términos de autoridad más frecuentes (ej: 'escalabilidad', 'preventiva').
-        4. Formato: Analiza el uso de emojis, negritas y espacios.
 
         Samples to analyze:
         ${samples}
@@ -314,7 +285,7 @@ export class AuditService extends BaseAIService {
     return await this.retryWithBackoff(async () => {
       const model = this.genAI.getGenerativeModel({
         model: this.model, // Uses gemini-2.0-flash-exp
-        systemInstruction: "You are a specialized Ghostwriter AI.",
+        systemInstruction: VoiceBrain.system_instruction,
       });
 
       const parts: Part[] = [{ text: prompt }];
@@ -330,32 +301,42 @@ export class AuditService extends BaseAIService {
       const response = await model.generateContent({
         contents: [{ role: "user", parts: parts }],
         generationConfig: {
-          temperature: 0.4,
+          temperature: 0.2, 
           responseMimeType: "application/json",
           responseSchema: {
             type: SchemaType.OBJECT,
             properties: {
-              name: { type: SchemaType.STRING, description: "Style Name (e.g. 'Tech Visionary')" },
-              description: { type: SchemaType.STRING, description: "Brief description of the voice" },
-              keywords: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
-              stylisticDNA: {
+              voice_name: { type: SchemaType.STRING },
+              stylistic_dna: {
                 type: SchemaType.OBJECT,
                 properties: {
-                   tone: { type: SchemaType.STRING },
-                   sentence_structure: { type: SchemaType.STRING },
-                   hooks_dna: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
-                   technical_terms: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
-                   formatting_rules: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
+                  rhythm_score: { type: SchemaType.STRING },
+                  vocabulary_profile: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                  forbidden_patterns: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                  punctuation_logic: { type: SchemaType.STRING },
+                  emotional_anchors: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                  formatting_rules: { type: SchemaType.STRING }
                 },
-                required: ["tone", "sentence_structure", "hooks_dna", "technical_terms", "formatting_rules"]
-              }
+                required: ["rhythm_score", "vocabulary_profile", "forbidden_patterns", "punctuation_logic", "emotional_anchors", "formatting_rules"]
+              },
+              strategic_intent_discovery: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  primary_goal: { type: SchemaType.STRING },
+                  trigger_used: { type: SchemaType.STRING },
+                  content_pillar: { type: SchemaType.STRING }
+                },
+                required: ["primary_goal", "trigger_used", "content_pillar"]
+              },
+              mimicry_instructions: { type: SchemaType.STRING },
+              cloned_sample: { type: SchemaType.STRING }
             },
-            required: ["name", "description", "keywords", "stylisticDNA"],
+            required: ["voice_name", "stylistic_dna", "strategic_intent_discovery", "mimicry_instructions", "cloned_sample"]
           } as Schema,
         },
       });
 
-      return JSON.parse(response.response.text());
+      return this.extractJson(response.response.text());
     });
   }
 }

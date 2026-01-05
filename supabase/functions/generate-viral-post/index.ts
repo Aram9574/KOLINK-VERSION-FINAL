@@ -1,13 +1,14 @@
 // No import needed for Deno.serve in modern Deno/Supabase environments.
 
 import { createClient } from "@supabase/supabase-js";
-import { z } from "zod";
+import { z } from "npm:zod";
 import { CreditService } from "../_shared/services/CreditService.ts";
 import { ContentService as AIService, GenerationParams } from "../_shared/services/ContentService.ts";
-import { PostRepository } from "../_shared/services/PostRepository.ts";
+import { PostRepository, GeneratedPost } from "../_shared/services/PostRepository.ts";
 import { GamificationService } from "../_shared/services/GamificationService.ts";
 import { sanitizeInput } from "../_shared/validation.ts";
 import { GenerationParamsSchema } from "../_shared/schemas.ts";
+import { BehaviorService } from "../_shared/services/BehaviorService.ts";
 
 import { corsHeaders } from "../_shared/cors.ts";
 
@@ -21,19 +22,36 @@ Deno.serve(async (req: Request) => {
 
   try {
     // 1. Setup & Auth
+    const authHeader = req.headers.get("Authorization");
+    console.log("[DEBUG] Auth Header Present:", !!authHeader);
+    if (authHeader) console.log("[DEBUG] Auth Header Start:", authHeader.substring(0, 15) + "...");
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_ANON_KEY") ?? "",
       {
         global: {
-          headers: { Authorization: req.headers.get("Authorization")! },
+          headers: { Authorization: authHeader! },
         },
       },
     );
 
     const { data: { user }, error: authError } = await supabaseClient.auth
       .getUser();
-    if (authError || !user) throw new Error("Unauthorized");
+    
+    console.log("[DEBUG] getUser Result:", { user_id: user?.id, error: authError?.message });
+
+    if (authError || !user) {
+      console.error("Unauthorized Access logic triggered");
+      // Return 401 explicit response to see it in network tab if possible
+       return new Response(
+          JSON.stringify({ error: "Unauthorized", details: authError?.message || "No user found" }),
+          {
+            status: 401,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+    }
 
     const { params } = await req.json();
 
@@ -53,6 +71,8 @@ Deno.serve(async (req: Request) => {
         includeCTA: parsed.includeCTA,
         outputLanguage: parsed.outputLanguage,
         brandVoiceId: parsed.brandVoiceId,
+        hookStyle: parsed.hookStyle,
+        generateCarousel: parsed.generateCarousel,
       } as GenerationParams;
     } catch (zodError: unknown) {
       if (zodError instanceof z.ZodError) {
@@ -81,6 +101,11 @@ Deno.serve(async (req: Request) => {
     const aiService = new AIService(Deno.env.get("GEMINI_API_KEY") ?? "");
     const postRepository = new PostRepository(supabaseAdmin);
     const gamificationService = new GamificationService(supabaseAdmin);
+    const behaviorService = new BehaviorService(
+        Deno.env.get("GEMINI_API_KEY") ?? "",
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
 
     // 2. Check Credits, Rate Limit & Fetch Context
     console.log("Fetching profile for User ID:", user.id);
@@ -156,15 +181,37 @@ Deno.serve(async (req: Request) => {
       company_name: sanitizeInput(profile.company_name || ""),
       industry: sanitizeInput(profile.industry || ""),
       headline: sanitizeInput(profile.headline || ""),
-      xp: profile.xp || 0,
+      xp: profile.xp_points || 0,
       language: profile.language,
+      behavioral_dna: profile.behavioral_dna ? JSON.stringify(profile.behavioral_dna) : "",
     };
 
+    // Define expected AI response structure
+    interface GeneratedPostContent {
+        post_content: string;
+        auditor_report: {
+            viral_score: number;
+            hook_strength: string;
+            hook_score: number;
+            readability_score: number;
+            value_score: number;
+            pro_tip: string;
+            retention_estimate: string;
+            flags_triggered: string[];
+        };
+        strategy_reasoning: string;
+        meta: {
+            suggested_hashtags: string[];
+            character_count: number;
+        };
+    }
+
     // 4. Generate Content
-    const generatedContent = await aiService.generatePost(
+    const rawGeneratedContent = await aiService.generatePost(
       safeParams,
       userContext,
     );
+    const generatedContent = rawGeneratedContent as GeneratedPost;
 
     // 5. Save Post
     const insertedPost = await postRepository.savePost(
@@ -172,6 +219,14 @@ Deno.serve(async (req: Request) => {
       generatedContent,
       params,
     );
+
+    // 5.5 Track Behavior (Fire and forget)
+    behaviorService.trackEvent(user.id, "post_generated", { 
+        topic: safeParams.topic, 
+        tone: safeParams.tone, 
+        framework: safeParams.framework,
+        isPremium 
+    }).catch(e => console.error("Behavior tracking error:", e));
 
     // 6. Validated Gamification Update
     // Get total post count
@@ -201,10 +256,10 @@ Deno.serve(async (req: Request) => {
     await supabaseAdmin
       .from("profiles")
       .update({
-        xp: gamificationResults.newXP,
+        xp_points: gamificationResults.newXP,
         level: gamificationResults.newLevel,
         current_streak: gamificationResults.newStreak,
-        last_post_date: insertedPost?.created_at || new Date().toISOString(),
+        last_post_at: insertedPost?.created_at || new Date().toISOString(),
         unlocked_achievements: allAchievements,
       })
       .eq("id", user.id);
@@ -218,13 +273,19 @@ Deno.serve(async (req: Request) => {
       JSON.stringify({
         id: insertedPost?.id,
         postContent: generatedContent.post_content,
-        viralScore: generatedContent.overall_viral_score,
+        viralScore: generatedContent.auditor_report.viral_score,
         viralAnalysis: {
-          hookScore: generatedContent.hook_score,
-          readabilityScore: generatedContent.readability_score,
-          valueScore: generatedContent.value_score,
-          feedback: generatedContent.feedback,
+          hookStrength: generatedContent.auditor_report.hook_strength,
+          hookScore: generatedContent.auditor_report.hook_score,
+          readabilityScore: generatedContent.auditor_report.readability_score,
+          valueScore: generatedContent.auditor_report.value_score,
+          proTip: generatedContent.auditor_report.pro_tip,
+          feedback: generatedContent.auditor_report.pro_tip, // DUPLICATE TO FIX DESYNC
+          retentionEstimate: generatedContent.auditor_report.retention_estimate,
+          flagsTriggered: generatedContent.auditor_report.flags_triggered,
+          strategyReasoning: generatedContent.strategy_reasoning,
         },
+        meta: generatedContent.meta,
         gamification: {
           newXP: gamificationResults.newXP,
           newLevel: gamificationResults.newLevel,
@@ -245,7 +306,7 @@ Deno.serve(async (req: Request) => {
         details: "Handled exception in generate-viral-post",
       }),
       {
-        status: 200,
+        status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );

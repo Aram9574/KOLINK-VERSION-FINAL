@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserProfile, AppLanguage } from '../../../types';
 import { translations } from '../../../translations';
-import { Shield, Lock } from 'lucide-react';
+import { Shield, Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../../services/supabaseClient';
 import { toast } from 'sonner';
 
@@ -18,142 +18,155 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ user, language, onS
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [isSavingPassword, setIsSavingPassword] = useState(false);
+    const [showPass, setShowPass] = useState(false);
 
     const t = translations[language].app.settings;
+    
     const handleChangePassword = async () => {
         if (newPassword !== confirmPassword) {
-            setPasswordError("Las contraseñas no coinciden");
+            setPasswordError(language === 'es' ? "Las contraseñas no coinciden" : "Passwords do not match");
             return;
         }
         if (newPassword.length < 6) {
-            setPasswordError("La contraseña debe tener al menos 6 caracteres");
+            setPasswordError(language === 'es' ? "La contraseña debe tener al menos 6 caracteres" : "Password must be at least 6 characters");
             return;
         }
 
         setIsSavingPassword(true);
         try {
-            // 1. Verify session is active before update
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             if (sessionError || !session) {
-                throw new Error("Tu sesión ha expirado. Por favor inicia sesión nuevamente.");
+                throw new Error(language === 'es' ? "Tu sesión ha expirado. Por favor inicia sesión nuevamente." : "Your session has expired. Please log in again.");
             }
 
-            // 2. Attempt Update
             const { data, error } = await supabase.auth.updateUser({ password: newPassword });
-            console.log("Update User Result:", data, error);
 
             if (error) throw error;
 
             if (data.user && data.user.aud === 'authenticated') {
-                toast.success("Contraseña actualizada exitosamente");
-                // Optional: Clear form
+                toast.success(language === 'es' ? "Contraseña actualizada exitosamente" : "Password updated successfully");
                 setShowChangePassword(false);
                 setNewPassword('');
                 setConfirmPassword('');
             } else {
-                toast.info("Revisa tu correo para confirmar el cambio.");
+                toast.info(language === 'es' ? "Revisa tu correo para confirmar el cambio." : "Check your email to confirm the change.");
             }
         } catch (error: any) {
-            console.error("Password change error:", error);
-            toast.error(error.message || "Error al actualizar contraseña");
+            toast.error(error.message || "Error");
         } finally {
             setIsSavingPassword(false);
         }
     };
 
     return (
-        <div className="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                <div className="p-2 bg-red-50 rounded-lg">
-                    <Shield className="w-5 h-5 text-red-600" />
+        <div className="space-y-10">
+            {/* Account Credentials */}
+            <section className="space-y-6">
+                <div className="flex items-center gap-2 mb-4">
+                    <div className="w-1.5 h-6 bg-slate-900 rounded-full"></div>
+                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">{language === 'es' ? 'Credenciales de Acceso' : 'Access Credentials'}</h3>
                 </div>
-                {language === 'es' ? 'Credenciales' : 'Credentials'}
-            </h2>
 
-            <div className="space-y-6">
-                <div className="grid gap-4">
-                    {/* Email Display */}
-                    <div className="flex items-center justify-between p-4 border border-slate-200/60 rounded-xl bg-slate-50/50">
-                        <div>
-                            <p className="font-bold text-sm text-slate-900">Email</p>
-                            <p className="text-xs text-slate-500">
-                                {language === 'es' ? 'Dirección asociada a tu cuenta' : 'Address associated with your account'}
-                            </p>
+                <div className="bg-slate-50/50 border border-slate-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 transition-colors hover:bg-white">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-white rounded-xl border border-slate-100 shadow-sm text-slate-400">
+                            <Mail size={20} />
                         </div>
-                        <div className="text-sm font-medium text-slate-700 bg-white px-3 py-1.5 rounded-lg border border-slate-200/60">
-                            {user.email || 'No email found'}
+                        <div className="space-y-0.5">
+                            <p className="text-xs font-bold text-slate-500 uppercase tracking-tighter">Email</p>
+                            <p className="font-bold text-slate-900">{user.email || 'No email found'}</p>
                         </div>
                     </div>
                 </div>
+            </section>
 
-                {/* Change Password Section */}
-                <div className="border-t border-slate-200/60 pt-6">
-                    <h3 className="text-sm font-bold text-slate-900 mb-4">Contraseña</h3>
-                    {!showChangePassword ? (
+            {/* Password Management */}
+            <section className="pt-8 border-t border-slate-100 space-y-6">
+                <div className="flex items-center gap-2 mb-4">
+                    <div className="w-1.5 h-6 bg-rose-500 rounded-full"></div>
+                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">{language === 'es' ? 'Seguridad y Privacidad' : 'Security & Privacy'}</h3>
+                </div>
+
+                {!showChangePassword ? (
+                    <div className="bg-white border border-slate-200 rounded-2xl p-6 flex items-center justify-between hover:shadow-md transition-all group">
+                        <div className="space-y-1">
+                            <p className="font-bold text-slate-900">{language === 'es' ? 'Contraseña' : 'Password'}</p>
+                            <p className="text-xs text-slate-500">{language === 'es' ? 'Actualiza tu contraseña periódicamente por seguridad.' : 'Update your password periodically for security.'}</p>
+                        </div>
                         <button
                             onClick={() => setShowChangePassword(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200/60 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-100 transition-colors"
+                            className="px-6 py-2.5 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-all flex items-center gap-2"
                         >
-                            <Lock strokeWidth={1.5} className="w-4 h-4" />
-                            Cambiar Contraseña
+                            <Lock size={14} />
+                            {language === 'es' ? 'Cambiar Contraseña' : 'Change Password'}
                         </button>
-                    ) : (
-                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-4 animate-in fade-in slide-in-from-top-2">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500">Nueva Contraseña</label>
+                    </div>
+                ) : (
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-6 animate-in fade-in zoom-in-95 duration-300">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-slate-500 ml-1">{language === 'es' ? 'Nueva Contraseña' : 'New Password'}</label>
+                                <div className="relative">
                                     <input
-                                        type="password"
+                                        type={showPass ? "text" : "password"}
                                         value={newPassword}
                                         onChange={(e) => {
                                             setNewPassword(e.target.value);
                                             setPasswordError('');
                                         }}
-                                        className="w-full p-2.5 bg-white border border-slate-200/60 rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none"
+                                        className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 outline-none transition-all"
                                         placeholder="••••••••"
                                     />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500">Confirmar Contraseña</label>
-                                    <input
-                                        type="password"
-                                        value={confirmPassword}
-                                        onChange={(e) => {
-                                            setConfirmPassword(e.target.value);
-                                            setPasswordError('');
-                                        }}
-                                        className="w-full p-2.5 bg-white border border-slate-200/60 rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none"
-                                        placeholder="••••••••"
-                                    />
+                                    <button 
+                                        onClick={() => setShowPass(!showPass)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                    >
+                                        {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </button>
                                 </div>
                             </div>
-                            {passwordError && <p className="text-xs text-red-500 font-medium">{passwordError}</p>}
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={handleChangePassword}
-                                    disabled={isSavingPassword || !newPassword || !confirmPassword}
-                                    className="px-4 py-2 bg-brand-600 text-white text-sm font-bold rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors"
-                                >
-                                    {isSavingPassword ? 'Guardando...' : 'Actualizar Contraseña'}
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setShowChangePassword(false);
-                                        setNewPassword('');
-                                        setConfirmPassword('');
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-slate-500 ml-1">{language === 'es' ? 'Confirmar Contraseña' : 'Confirm Password'}</label>
+                                <input
+                                    type={showPass ? "text" : "password"}
+                                    value={confirmPassword}
+                                    onChange={(e) => {
+                                        setConfirmPassword(e.target.value);
                                         setPasswordError('');
                                     }}
-                                    className="px-4 py-2 text-slate-500 text-sm font-medium hover:text-slate-700"
-                                >
-                                    Cancelar
-                                </button>
+                                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 outline-none transition-all"
+                                    placeholder="••••••••"
+                                />
                             </div>
                         </div>
-                    )}
-                </div>
-
-
-            </div>
+                        
+                        {passwordError && (
+                            <p className="text-xs text-rose-500 font-bold bg-rose-50 p-3 rounded-lg border border-rose-100">{passwordError}</p>
+                        )}
+                        
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={handleChangePassword}
+                                disabled={isSavingPassword || !newPassword || !confirmPassword}
+                                className="px-6 py-2.5 bg-rose-600 text-white text-xs font-bold rounded-xl hover:bg-rose-700 disabled:opacity-50 transition-all shadow-lg shadow-rose-200"
+                            >
+                                {isSavingPassword ? (language === 'es' ? 'Guardando...' : 'Saving...') : (language === 'es' ? 'Actualizar Contraseña' : 'Update Password')}
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowChangePassword(false);
+                                    setNewPassword('');
+                                    setConfirmPassword('');
+                                    setPasswordError('');
+                                }}
+                                className="px-6 py-2.5 text-slate-500 text-xs font-bold hover:text-slate-700 transition-all"
+                            >
+                                {language === 'es' ? 'Cancelar' : 'Cancel'}
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </section>
         </div>
     );
 };

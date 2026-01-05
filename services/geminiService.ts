@@ -25,6 +25,10 @@ export interface GeneratedPostResult {
 
 export const generateViralPost = async (params: GenerationParams, user: UserProfile): Promise<GeneratedPostResult> => {
   // Llamada segura al backend (Supabase Edge Function)
+  const session = await supabase.auth.getSession();
+  console.log("[DEBUG CLIENT] Target Function URL:", `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-viral-post`);
+  console.log("[DEBUG CLIENT] Token being sent:", session.data.session?.access_token?.substring(0, 15) + "...");
+  
   const { data, error } = await supabase.functions.invoke('generate-viral-post', {
     body: { params }
   });
@@ -114,7 +118,13 @@ export const analyzeBrandVoice = async (payload: { contentSamples: string[], lan
 
   if (data.error) throw new Error(data.error);
 
-  return data;
+  // Map SOTA fields to internal interface if needed, or return as is if types are updated
+  return {
+    ...data,
+    styleName: data.voice_name || data.styleName,
+    toneDescription: data.mimicry_instructions || data.toneDescription,
+    stylisticDNA: data.stylistic_dna || data.stylisticDNA
+  };
 };
 
 export const generateHooks = async (idea: string, brandVoiceId: string, language: string = 'es'): Promise<string[]> => {
@@ -133,4 +143,13 @@ export const generateInsightReply = async (payload: { imageBase64?: string, text
 
     if (error) throw new Error(error.message);
     return data.replies;
+};
+
+export const cloneVoice = async (payload: { text_samples?: string[], url?: string, voice_name?: string }): Promise<any> => {
+    const { data, error } = await supabase.functions.invoke('clone-voice', {
+        body: payload
+    });
+
+    if (error) throw new Error(error.message);
+    return data;
 };

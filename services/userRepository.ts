@@ -1,26 +1,39 @@
 import { supabase } from './supabaseClient';
 import { UserProfile } from '../types';
+import { fetchActiveSubscription } from './subscriptionRepository';
 
 export const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
     try {
         console.log(`Fetching profile for ${userId}...`);
 
-        const fetchPromise = supabase
+        const fetchProfilePromise = supabase
             .from('profiles')
             .select('*')
             .eq('id', userId)
             .single();
 
+        const fetchSubPromise = fetchActiveSubscription(userId);
+
         const timeoutPromise = new Promise<{ data: null, error: any }>((_, reject) =>
             setTimeout(() => reject(new Error('Profile fetch timeout')), 5000)
         );
 
-        const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
+        const [profileResult, subscription] = await Promise.all([
+            Promise.race([fetchProfilePromise, timeoutPromise]) as any,
+            fetchSubPromise
+        ]);
+
+        const { data, error } = profileResult;
 
         if (error) {
             console.error('Error fetching profile:', error);
             return null;
         }
+
+        // Determine effective plan tier from subscription table (source of truth)
+        // If no active subscription found, fallback to database plan_tier
+        const effectivePlanTier = subscription?.plan_type || data.plan_tier || 'free';
+        const isPremium = effectivePlanTier === 'pro' || effectivePlanTier === 'viral';
 
         return {
             ...data,
@@ -32,18 +45,24 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
             position: data.position,
             brandVoice: data.brand_voice,
             companyName: data.company_name,
-            planTier: data.plan_tier,
-            cancelAtPeriodEnd: data.cancel_at_period_end,
+            
+            // Subscription overrides
+            planTier: effectivePlanTier,
+            subscriptionId: subscription?.id,
+            cancelAtPeriodEnd: subscription?.status === 'canceled' || data.cancel_at_period_end, // Check both
+            stripeCustomerId: subscription?.stripe_customer_id || data.stripe_customer_id,
+            nextBillingDate: subscription?.reset_date ? new Date(subscription.reset_date).getTime() : undefined,
+
             twoFactorEnabled: data.two_factor_enabled,
             securityNotifications: data.security_notifications,
             hasOnboarded: data.has_onboarded,
-            xp: data.xp || 0,
+            xp: data.xp_points || 0,
             level: data.level || 1,
             currentStreak: data.current_streak || 0,
-            lastPostDate: data.last_post_date ? new Date(data.last_post_date).getTime() : undefined,
+            lastPostDate: data.last_post_at ? new Date(data.last_post_at).getTime() : undefined,
             unlockedAchievements: data.unlocked_achievements || [],
             autoPilot: data.auto_pilot || { enabled: false, topics: [], frequency: 'daily' },
-            isPremium: data.plan_tier === 'pro' || data.plan_tier === 'viral',
+            isPremium: isPremium,
         } as unknown as UserProfile;
     } catch (err) {
         console.error("Exception in fetchUserProfile:", err);
@@ -91,7 +110,7 @@ export const updateUserProfile = async (userId: string, updates: Partial<UserPro
         delete dbUpdates.currentStreak;
     }
     if (updates.lastPostDate !== undefined) {
-        dbUpdates.last_post_date = new Date(updates.lastPostDate).toISOString();
+        dbUpdates.last_post_at = new Date(updates.lastPostDate).toISOString();
         delete dbUpdates.lastPostDate;
     }
     if (updates.unlockedAchievements !== undefined) {
@@ -212,7 +231,13 @@ export const setBrandVoiceActive = async (userId: string, voiceId: string): Prom
 export const createBrandVoice = async (userId: string, name: string, description: string, hookPatterns?: any[], stylisticDNA?: any): Promise<any> => {
     const { data, error } = await supabase
         .from('brand_voices')
-        .insert([{ user_id: userId, name, description, hook_patterns: hookPatterns, stylistic_dna: stylisticDNA }])
+        .insert([{ 
+            user_id: userId, 
+            name, 
+            description, 
+            hook_patterns: hookPatterns || [], 
+            stylistic_dna: stylisticDNA || {} 
+        }])
         .select()
         .single();
     if (error) throw error;

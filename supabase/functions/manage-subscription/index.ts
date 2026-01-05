@@ -1,13 +1,14 @@
-import { serve } from "std/http/server"
+// No import needed for Deno.serve in modern Deno/Supabase environments.
 import { createClient } from "@supabase/supabase-js"
 import { BillingService } from "../_shared/services/BillingService.ts"
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
     }

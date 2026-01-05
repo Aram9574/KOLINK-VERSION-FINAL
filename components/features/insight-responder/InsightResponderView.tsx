@@ -8,10 +8,24 @@ import ReplyVariants from './ReplyVariants';
 import ValueMeter from './ValueMeter';
 import { translations } from '../../../translations';
 import { AppLanguage } from '../../../types';
+import { useCredits } from '../../../hooks/useCredits';
+
+import PremiumLockOverlay from "../../ui/PremiumLockOverlay";
 
 const InsightResponderView: React.FC = () => {
     const { user, language } = useUser();
     const t = translations[language as AppLanguage].app.sidebar.insight;
+    const { checkCredits } = useCredits();
+
+    if (!user.isPremium) {
+        return (
+            <PremiumLockOverlay 
+                title={t.title}
+                description={t.subtitle}
+                icon={<MessageCircle className="w-8 h-8" />}
+            />
+        );
+    }
 
     const [dragActive, setDragActive] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -84,6 +98,9 @@ const InsightResponderView: React.FC = () => {
             toast.error("Por favor sube una imagen o describe tu intención.");
             return;
         }
+
+        // Credit Check (Cost: 1)
+        if (!checkCredits(1)) return;
 
         setIsGenerating(true);
         setReplies([]);

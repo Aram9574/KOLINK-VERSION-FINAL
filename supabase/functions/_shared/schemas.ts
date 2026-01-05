@@ -12,6 +12,8 @@ export const GenerationParamsSchema = z.object({
   includeCTA: z.boolean().optional(),
   outputLanguage: z.enum(["en", "es"]).optional(),
   brandVoiceId: z.string().optional(),
+  hookStyle: z.string().optional(),
+  generateCarousel: z.boolean().optional(),
 });
 
 export const VariationParamsSchema = z.object({

@@ -190,35 +190,32 @@ You have two simultaneous roles:
     Write from this perspective. Use the authority that comes with this role.
     `,
     main_prompt: `
-    Draft a viral LinkedIn post based on the following specifications:
-
-    **USER PREFERENCES (STRICTLY FOLLOW THESE):**
+    ### PHASE 1: INTENT DISCOVERY & STRATEGY
+    Analyze the user input. If parameters are missing or vague, identify the most viral "Strategic Intent" based on the architecture of virality.
+    
+    **CONTEXT & PREFERENCES:**
     - **Topic:** {{topic}}
     - **Target Audience:** {{audience}}
     {{voice_instruction}}
     - **Creativity Level:** {{creativity_level}}%
-    - **Emoji Density:** {{emoji_density}} (See rules below)
-    - **Post Length:** {{length}} (See rules below)
-    - **Hashtags:** {{hashtag_instruction}}
-    - **Call to Action:** {{cta_instruction}}
+    - **Visual Style:** {{emoji_density}} / {{length}}
     
     {{author_persona}}
-
     {{viral_example}}
 
-    **INSTRUCTION:** 
-    1. **Analyze the Reference Example:** Notice the sentence length, the spacing, the hook style, and the psychological trigger.
-    2. **Blend the Factors:** You must write a post that uses the **Structure** of the Reference Example, but written in the **Voice** of the User Profile, targeting the specific **Audience**, and strictly adhering to the **User Preferences** (Length, Emojis, etc.).
-    3. **Confluence:** The final result must feel like a perfect intersection of these elements. Not a generic template, but a bespoke piece of content.
-
-    **RULES & CONSTRAINTS:**
+    ### PHASE 2: CONTENT ARCHITECTURE
+    Write a LinkedIn post that blends the specific **Voice** of the user with the **Psychological Trigger** most effective for this topic. 
+    
+    **CONSTRAINTS:**
     {{framework_rules}}
     {{length_rules}}
     {{emoji_rules}}
     {{cta_instruction_detail}}
     {{lang_instruction}}
-
-    **CRITICAL:** Format the output as a JSON object containing the 'post_content', 'overall_viral_score' (0-100), 'hook_score' (0-100), 'readability_score' (0-100), 'value_score' (0-100), and 'feedback' (short tip to improve).
+    {{hook_instruction}}
+    {{carousel_instruction}}
+    
+    **CRITICAL:** Prioritize "Human Rhythm" and "Visual Breathing Room" over generic listicles.
     `,
   },
 };

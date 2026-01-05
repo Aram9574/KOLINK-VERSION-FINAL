@@ -1,13 +1,12 @@
-import { serve } from "std/http/server.ts";
-import { GoogleGenerativeAI, Part } from "@google/generative-ai";
 import { createClient } from "@supabase/supabase-js";
+import { EngagementService } from "../_shared/services/EngagementService.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -34,90 +33,68 @@ serve(async (req) => {
       .limit(1);
 
     const brandVoice = voices?.[0];
-    const brandContext = brandVoice 
-        ? `\n\nUSER BRAND VOICE DNA:\n${JSON.stringify(brandVoice.stylisticDNA || brandVoice.description)}` 
-        : "";
 
-    // 3. Gemini Setup
-    const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY")!);
-    // Upgrade to 2.0 Flash Exp for speed
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" }); 
+    // 3. User Language
+    const { data: profile } = await supabaseClient.from("profiles").select("language").eq("id", user.id).single();
+    const language = profile?.language || "es";
+    console.log(`[insight-reply] User language: ${language}`);
 
-    // 4. Construct Prompt
-    const systemPrompt = `
-      Actúa como un Estratega de Networking de Alto Nivel.
-      Analiza la captura del post y genera 3 respuestas estratégicas:
 
-      1. Análisis Profundo: Aporta un dato técnico o perspectiva médica/tech que nadie más haya visto.
-      2. Puente Estratégico: Conecta el post con una tendencia macro del sector.
-      3. Catalizador Experto: Haz una pregunta desafiante que genere debate con el autor.
+    // Define expected return type based on Brain schema
+    interface InsightReplyItem {
+        type: string;
+        content: string;
+        score: number;
+        reasoning: string;
+        expected_outcome: string;
+    }
 
-      Reglas: 
-      - Prohibido decir 'Buen post'. 
-      - Empieza directamente con el valor. 
-      - Máximo 60 palabras.
-      
-      Output: JSON Array con type, content y score.
-
-      OUTPUT OBLIGATORIO (JSON Strict):
-      [
-        {
-          "type": "Análisis Profundo",
-          "content": "...",
-          "score": 95,
-          "reasoning": "..."
-        },
-        {
-          "type": "Puente Estratégico",
-          "content": "...",
-          "score": 88,
-          "reasoning": "..."
-        },
-        {
-          "type": "Catalizador Experto",
-          "content": "...",
-          "score": 92,
-          "reasoning": "..."
-        }
-      ]
-
-      CONTEXT:
-      - User Intent: ${userIntent || "Aportar valor estratégico"}
-      - Desired Tone: ${tone || "Autoridad Profesional"}
-      - LANGUAGE: STRICTLY SPANISH (Output must be in Spanish)
-      ${brandContext}
-    `;
-
-    const parts: Part[] = [{ text: systemPrompt }];
+    interface InsightResponse {
+        suggested_replies: InsightReplyItem[];
+    }
     
-    if (textContext) {
-        parts.push({ text: `\n\nPOST TEXT:\n${textContext}` });
-    }
+    // 4. Engagement Service (Modular Brain)
+    console.log("[insight-reply] Step 4: Initializing Engagement Service and generating reply.");
+    const engagementService = new EngagementService(Deno.env.get("GEMINI_API_KEY")!);
+    
+    const result = await engagementService.generateInsightReply({
+      textContext,
+      imageBase64,
+      userIntent,
+      tone,
+      brandVoiceData: brandVoice,
+      language: language
+    }) as unknown as InsightResponse;
+    console.log("[insight-reply] Reply generated successfully.");
 
-    if (imageBase64) {
-        // Base64 image handling
-         parts.push({
-            inlineData: {
-                mimeType: "image/png", 
-                data: imageBase64.split(',')[1] || imageBase64
-            }
-        });
-    }
+    // 5. Save to Database (New Feature)
+    const { error: dbError } = await supabaseClient
+      .from("insight_responses")
+      .insert({
+        user_id: user.id,
+        original_post_url: textContext.substring(0, 200) + "...", // Truncate as a rough "source" ref if no URL provided
+        user_intent: userIntent,
+        tone: tone,
+        // Safe access to content property
+        generated_response: result.suggested_replies?.[0]?.content || "", 
+        original_post_image_url: imageBase64 ? "image_provided" : null
+      });
 
-    const result = await model.generateContent({
-        contents: [{ role: "user", parts: parts }],
-        generationConfig: { responseMimeType: "application/json" }
-    });
+    if (dbError) console.error("[insight-reply] DB Save Error:", dbError.message);
 
-    const replies = JSON.parse(result.response.text());
-
-    return new Response(JSON.stringify({ replies }), {
+    return new Response(JSON.stringify({ replies: result.suggested_replies }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    const err = error as Error;
+    console.error("[insight-reply] CRITICAL ERROR:", err.message);
+    console.error(err.stack);
+    return new Response(JSON.stringify({ 
+        error: err.message || "Unknown error",
+        stack: err.stack,
+        details: "Check function logs for more info"
+    }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

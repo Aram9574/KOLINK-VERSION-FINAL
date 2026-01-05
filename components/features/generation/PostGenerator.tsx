@@ -35,6 +35,7 @@ import {
 
 import GeneratorForm from "./GeneratorForm";
 import LinkedInPreview from "./LinkedInPreview";
+import { useCredits } from "../../../hooks/useCredits";
 
 // Helper to pick random from array, excluding the 'random' option itself if present
 const pickRandom = <T extends { value: string }>(options: T[]): string => {
@@ -130,7 +131,12 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
   const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
   const [activeView, setActiveView] = useState<"editor" | "preview">("editor"); // For mobile only
 
+  const { checkCredits } = useCredits();
+
   const handleGenerate = () => {
+    // Credit Check (Cost: 1)
+    if (!checkCredits(1)) return;
+
     try {
       const isFreeUser = user?.planTier === "free";
 

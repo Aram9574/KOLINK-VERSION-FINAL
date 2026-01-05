@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { UserProfile, AppLanguage } from '../../../types';
 import { translations } from '../../../translations';
-import { User, Building2, Briefcase } from 'lucide-react';
+import { User, Building2, Briefcase, Camera } from 'lucide-react';
 import Tooltip from '../../ui/Tooltip';
 import { getAvatarUrl } from '../../../utils';
+import { motion } from 'framer-motion';
 
 interface ProfileSettingsProps {
     user: UserProfile;
@@ -21,95 +22,72 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
     const t = translations[language].app.settings;
 
     return (
-        <div className="space-y-6">
-            {/* General Preferences */}
-            <div className="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
-                <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                    <div className="p-2 bg-blue-50 rounded-lg">
-                        <User className="w-5 h-5 text-blue-600" />
+        <div className="space-y-10">
+            {/* Profile Avatar Section */}
+            <section className="flex flex-col md:flex-row items-center gap-8 pb-8 border-b border-slate-100">
+                <div className="relative group">
+                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 p-1 shadow-md group-hover:shadow-lg transition-all">
+                        <img 
+                            src={getAvatarUrl(user)} 
+                            alt={user.name} 
+                            className="w-full h-full rounded-full object-cover bg-white" 
+                        />
                     </div>
-                    {t.generalPrefs}
-                </h2>
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border border-slate-200/60 rounded-xl hover:border-slate-200/60 transition-colors bg-slate-50/30">
-                        <div>
-                            <p className="font-bold text-sm text-slate-900 flex items-center gap-2">
-                                {t.languageLabel}
-                                <Tooltip>{t.languageTooltip}</Tooltip>
-                            </p>
-                            <p className="text-xs text-slate-500">{t.languageDesc}</p>
-                        </div>
-                        <div className="flex bg-white rounded-lg p-1 border border-slate-200/60 shadow-sm">
-                            <button
-                                onClick={() => setLanguage('en')}
-                                className={`px-3 py-1.5 rounded-md text-sm font-bold transition-all ${language === 'en' ? 'bg-slate-100 text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-                            >
-                                🇺🇸 English
-                            </button>
-                            <button
-                                onClick={() => setLanguage('es')}
-                                className={`px-3 py-1.5 rounded-md text-sm font-bold transition-all ${language === 'es' ? 'bg-slate-100 text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-                            >
-                                🇪🇸 Español
-                            </button>
-                        </div>
-                    </div>
+                    <button className="absolute bottom-0 right-0 p-2 bg-white rounded-full border border-slate-200 shadow-sm hover:shadow-md hover:bg-slate-50 transition-all text-slate-600">
+                        <Camera size={16} strokeWidth={2} />
+                    </button>
                 </div>
-            </div>
+                
+                <div className="text-center md:text-left space-y-2">
+                    <h3 className="text-base font-bold text-slate-900">{t.uploadPhoto}</h3>
+                    <p className="text-sm text-slate-500 max-w-xs">{language === 'es' ? 'Una foto profesional ayuda a que tu contenido resuene más.' : 'A professional photo helps your content resonate more.'}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider italic">Recomendado: 400x400 px • JPG/PNG/WebP</p>
+                </div>
+            </section>
 
-            {/* Profile Section */}
-            <div className="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm">
-                <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                    <div className="p-2 bg-indigo-50 rounded-lg">
-                        <User className="w-5 h-5 text-indigo-600" />
+            {/* General Information Form */}
+            <section className="space-y-6">
+                <div className="flex items-center gap-2 mb-4">
+                    <div className="w-1.5 h-6 bg-brand-500 rounded-full"></div>
+                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">{language === 'es' ? 'Información General' : 'General Information'}</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 ml-1">{t.fullName}</label>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => {
+                                setName(e.target.value);
+                                onSave({ name: e.target.value });
+                            }}
+                            className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none transition-all hover:bg-white"
+                            placeholder="John Doe"
+                        />
                     </div>
-                    {t.profileTitle}
-                </h2>
-                <div className="grid gap-6 max-w-2xl">
-                    <div className="flex items-center gap-4">
-                        <img src={getAvatarUrl(user)} alt={user.name} className="w-20 h-20 rounded-full object-cover border-4 border-slate-50 shadow-sm" />
-                        <div className="space-y-2">
-                            <button className="text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200/60 hover:bg-slate-100 px-4 py-2 rounded-lg transition-colors">
-                                {t.uploadPhoto}
-                            </button>
-                            <p className="text-xs text-slate-400">Recommended: 400x400 px</p>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">{t.fullName}</label>
-                            <input
-                                type="text"
-                                value={name}
-                                onChange={(e) => {
-                                    setName(e.target.value);
-                                    onSave({ name: e.target.value });
-                                }}
-                                className="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm hover:border-indigo-400"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">{t.jobTitle}</label>
-                            <input
-                                type="text"
-                                value={headline}
-                                onChange={(e) => {
-                                    setHeadline(e.target.value);
-                                    onSave({ headline: e.target.value });
-                                }}
-                                className="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm hover:border-indigo-400"
-                            />
-                        </div>
+                    
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 ml-1">{t.jobTitle}</label>
+                        <input
+                            type="text"
+                            value={headline}
+                            onChange={(e) => {
+                                setHeadline(e.target.value);
+                                onSave({ headline: e.target.value });
+                            }}
+                            className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none transition-all hover:bg-white"
+                            placeholder="CEO at Awesome Co."
+                        />
                     </div>
 
-                    {/* Company Info */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
-                                <Building2 strokeWidth={1.5} className="w-3.5 h-3.5" />
-                                {t.companyLabel}
-                                <Tooltip>{t.companyTooltip}</Tooltip>
-                            </label>
+                    <div className="space-y-2 text-balance">
+                        <label className="text-xs font-bold text-slate-500 ml-1 flex items-center gap-1.5">
+                            {t.companyLabel}
+                            <Tooltip>{t.companyTooltip}</Tooltip>
+                        </label>
+                        <div className="relative">
+                            <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                             <input
                                 type="text"
                                 value={companyName}
@@ -117,16 +95,19 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
                                     setCompanyName(e.target.value);
                                     onSave({ companyName: e.target.value });
                                 }}
-                                placeholder="e.g. Kolink Inc."
-                                className="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm hover:border-indigo-400"
+                                className="w-full pl-11 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none transition-all hover:bg-white"
+                                placeholder="Kolink Inc."
                             />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
-                                <Briefcase strokeWidth={1.5} className="w-3.5 h-3.5" />
-                                {t.industryLabel}
-                                <Tooltip>{t.industryTooltip}</Tooltip>
-                            </label>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 ml-1 flex items-center gap-1.5">
+                            {t.industryLabel}
+                            <Tooltip>{t.industryTooltip}</Tooltip>
+                        </label>
+                        <div className="relative">
+                            <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                             <input
                                 type="text"
                                 value={industry}
@@ -134,13 +115,46 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
                                     setIndustry(e.target.value);
                                     onSave({ industry: e.target.value });
                                 }}
-                                placeholder="e.g. SaaS, Fintech, Marketing"
-                                className="w-full p-3 bg-white border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm hover:border-indigo-400"
+                                className="w-full pl-11 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none transition-all hover:bg-white"
+                                placeholder="SaaS, FinTech..."
                             />
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
+
+            {/* Application Preferences */}
+            <section className="pt-8 border-t border-slate-100 space-y-6">
+                <div className="flex items-center gap-2 mb-4">
+                    <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">{t.generalPrefs}</h3>
+                </div>
+
+                <div className="bg-slate-50/50 border border-slate-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 transition-colors hover:bg-white">
+                    <div className="space-y-1">
+                        <p className="font-bold text-slate-900 flex items-center gap-2">
+                            {t.languageLabel}
+                            <Tooltip>{t.languageTooltip}</Tooltip>
+                        </p>
+                        <p className="text-xs text-slate-500">{t.languageDesc}</p>
+                    </div>
+                    
+                    <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner w-full md:w-auto">
+                        <button
+                            onClick={() => setLanguage('en')}
+                            className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${language === 'en' ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/50' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                            🇺🇸 English
+                        </button>
+                        <button
+                            onClick={() => setLanguage('es')}
+                            className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${language === 'es' ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/50' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                            🇪🇸 Español
+                        </button>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 };

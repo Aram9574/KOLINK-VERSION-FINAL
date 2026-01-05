@@ -11,6 +11,7 @@ import {
   Minimize2,
   Maximize2,
   X,
+  Fingerprint,
 } from "lucide-react";
 import Skeleton from "../../ui/Skeleton";
 import { useUser } from "../../../context/UserContext.tsx";
@@ -25,71 +26,49 @@ interface Message {
   image?: string; // Base64 or URL
 }
 
+import { useCredits } from "../../../hooks/useCredits.ts";
+import PremiumLockOverlay from "../../ui/PremiumLockOverlay";
+
 const LinkedInExpertChat: React.FC = () => {
   const { user, language } = useUser();
+  const { checkCredits } = useCredits(); // Use Hook
+
+  // --- 1. State ---
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: language === "es"
-        ? "Soy Nexus, tu Estratega de LinkedIn. Analizo tu perfil, audito tus posts y optimizo tu marca personal. ¿Por dónde empezamos hoy?"
-        : "I am Nexus, your LinkedIn Strategist. I analyze your profile, audit your posts, and optimize your personal brand. Where shall we start today?",
+      content:
+        language === "es"
+          ? "¡Hola! Soy Nexus, tu estratega personal de LinkedIn. ¿En qué puedo ayudarte hoy?"
+          : "Hello! I'm Nexus, your personal LinkedIn strategist. How can I help you today?",
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isGhostwriter, setIsGhostwriter] = useState(false);
   const [showContextSidebar, setShowContextSidebar] = useState(true);
-  
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // --- 2. Refs ---
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // --- 3. Effects ---
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isLoading, imagePreview]);
-
-  // Persistence: Load messages on mount
-  useEffect(() => {
-    const savedMessages = localStorage.getItem("kolink_nexus_chat_history");
-    if (savedMessages) {
-      try {
-        const parsed = JSON.parse(savedMessages);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setMessages(parsed);
-        }
-      } catch (e) {
-        console.error("Error loading chat history:", e);
-      }
-    }
-  }, []);
-
-  // Persistence: Save messages on change
-  useEffect(() => {
-    if (messages.length > 1) { 
-      // Avoid saving very large base64 images to localstorage if possible, or limit history
-      // For now, we save everything but standard quota limits might apply.
-      try {
-          localStorage.setItem("kolink_nexus_chat_history", JSON.stringify(messages.slice(-50))); // Keep last 50
-      } catch (e) {
-          console.error("Storage quota exceeded", e);
-      }
-    }
   }, [messages]);
 
+  // --- 4. Helpers ---
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error(language === "es" ? "Imagen demasiado grande (max 5MB)" : "Image too large (max 5MB)");
-        return;
-      }
+    const file = e.target.files?.[0];
+    if (file) {
       setImageFile(file);
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        setImagePreview(ev.target?.result as string);
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -101,17 +80,35 @@ const LinkedInExpertChat: React.FC = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const getErrorMessage = (code: string, lang: string) => {
-    const messages: Record<string, { es: string; en: string }> = {
-      UNAUTHORIZED: { es: "No autorizado.", en: "Unauthorized." },
-      QUERY_REQUIRED: { es: "Escribe una consulta.", en: "Please enter a query." },
-      UNKNOWN_ERROR: { es: "Error de conexión.", en: "Connection error." },
-    };
-    return messages[code]?.[lang as "es" | "en"] || messages.UNKNOWN_ERROR[lang as "es" | "en"];
+  const getErrorMessage = (error: string, lang: string) => {
+    if (error.includes("insufficient_credits")) {
+      return lang === "es"
+        ? "No tienes suficientes créditos para esta consulta."
+        : "You don't have enough credits for this query.";
+    }
+    return lang === "es"
+      ? "Lo siento, hubo un error procesando tu consulta."
+      : "I'm sorry, there was an error processing your query.";
   };
+
+  // --- 5. Gatekeeping ---
+  if (!user.isPremium) {
+    return (
+      <PremiumLockOverlay 
+        title="Nexus AI Assistant"
+        description={language === "es" 
+          ? "Tu estratega personal de LinkedIn. Nexus conoce tu estilo, conoce el algoritmo y te ayuda a redactar posts de alta autoridad en segundos." 
+          : "Your personal LinkedIn strategist. Nexus knows your style, knows the algorithm, and helps you write high-authority posts in seconds."}
+        icon={<BrainCircuit className="w-8 h-8" />}
+      />
+    );
+  }
 
   const handleSend = async () => {
     if ((!input.trim() && !imageFile) || isLoading) return;
+    
+    // Credit Check (Block if < 1)
+    if (!checkCredits(1)) return;
 
     const userMessage = input.trim();
     const currentImage = imagePreview;
@@ -138,6 +135,9 @@ const LinkedInExpertChat: React.FC = () => {
           payload.imageBase64 = currentImage; // Send base64 to backend
       }
 
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("NO_SESSION");
+
       const { data, error } = await supabase.functions.invoke(
         "expert-chat",
         { body: payload }
@@ -147,8 +147,15 @@ const LinkedInExpertChat: React.FC = () => {
 
       setMessages((prev) => [...prev, {
         role: "assistant",
-        content: data.response,
+        content: typeof data.response === 'string' ? data.response : JSON.stringify(data),
       }]);
+      
+      if (data.strategic_insight) {
+          toast.info(data.strategic_insight, { 
+              duration: 5000,
+              icon: "🧠" 
+          });
+      }
     } catch (error: any) {
       console.error("Error in chat:", error);
       const msg = error.message || "UNKNOWN_ERROR";
@@ -201,7 +208,7 @@ const LinkedInExpertChat: React.FC = () => {
                         </div>
                     </div>
 
-                     <div className="space-y-2">
+                    <div className="space-y-2">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Mode</label>
                         <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200/50">
                             <span className="text-xs font-medium text-slate-600">Ghostwriter</span>
@@ -216,6 +223,21 @@ const LinkedInExpertChat: React.FC = () => {
                             </button>
                         </div>
                     </div>
+
+                    {user?.behavioral_dna && (
+                        <div className="pt-4 border-t border-slate-100">
+                             <div className="flex items-center gap-2 mb-2">
+                                <Fingerprint className="w-3.5 h-3.5 text-brand-600" />
+                                <span className="text-[10px] font-bold text-slate-800 uppercase tracking-widest">DNA Activo</span>
+                             </div>
+                             <div className="p-3 bg-brand-50/40 rounded-xl border border-brand-100/50">
+                                 <p className="text-[10px] text-brand-800 font-bold mb-1">Nexus te conoce:</p>
+                                 <p className="text-[10px] text-slate-500 italic leading-relaxed">
+                                     "{user.behavioral_dna.archetype}" • Mimetizando tu voz {user.behavioral_dna.dominant_tone.toLowerCase()}.
+                                 </p>
+                             </div>
+                        </div>
+                    )}
                 </div>
             </motion.div>
         )}
@@ -363,7 +385,7 @@ const LinkedInExpertChat: React.FC = () => {
             <div className="text-center mt-3">
                  <p className="text-[10px] text-slate-400 font-medium flex items-center justify-center gap-1.5">
                     <Sparkles className="w-3 h-3 text-amber-400" />
-                    <span>Nexus AI Strategic Engine (Gemini 2.0 Flash)</span>
+                    <span>Nexus AI Strategic Engine (Gemini 3 Flash - SOTA)</span>
                  </p>
             </div>
         </div>

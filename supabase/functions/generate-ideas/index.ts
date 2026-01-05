@@ -1,9 +1,8 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "@supabase/supabase-js";
 import { corsHeaders } from "../_shared/cors.ts";
 import { ContentService } from "../_shared/services/ContentService.ts";
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -25,7 +24,6 @@ serve(async (req: Request) => {
     const { topic } = await req.json();
     if (!topic) throw new Error("Topic is required");
 
-    // Fetch user language
     const { data: profile } = await supabaseClient
       .from("profiles")
       .select("language")
@@ -34,11 +32,13 @@ serve(async (req: Request) => {
     
     const language = profile?.language || "es";
 
-    // Use the specialized ContentService microservice
     const contentService = new ContentService(Deno.env.get("GEMINI_API_KEY") || "");
     const result = await contentService.generateIdeas(topic, language);
 
-    return new Response(JSON.stringify(result), {
+    return new Response(JSON.stringify({ 
+      ideas: result.ideas,
+      count: result.ideas.length 
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: unknown) {

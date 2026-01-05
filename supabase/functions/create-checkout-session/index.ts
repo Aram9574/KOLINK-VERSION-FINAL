@@ -1,4 +1,4 @@
-import { serve } from "std/http/server";
+// No import needed for Deno.serve in modern Deno/Supabase environments.
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 
@@ -11,7 +11,7 @@ const corsHeaders = {
 
 console.log("Create Checkout Session Function Initialized");
 
-serve(async (req) => {
+Deno.serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -49,11 +49,17 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: "Unauthorized", details: authError?.message }),
         {
-          status: 200,
+          status: 401, // 401 is more appropriate
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         },
       );
     }
+
+    // Initialize Admin Client for DB operations (Bypass RLS)
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    );
 
     // 3. Parse Request
     let body;
@@ -63,7 +69,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: "Invalid JSON body" }),
         {
-          status: 200,
+          status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         },
       );
@@ -74,14 +80,15 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: "Missing priceId" }),
         {
-          status: 200,
+          status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         },
       );
     }
 
     // 4. Get/Create Customer
-    const { data: profile } = await supabaseClient
+    // Use Admin client to read/write sensitive fields like stripe_customer_id
+    const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("stripe_customer_id, email")
       .eq("id", user.id)
@@ -96,13 +103,13 @@ serve(async (req) => {
         metadata: { supabase_uid: user.id },
       });
       customerId = customer.id;
-      await supabaseClient
+      
+      await supabaseAdmin
         .from("profiles")
         .update({ stripe_customer_id: customerId })
         .eq("id", user.id);
     }
 
-    // 5. Create Session
     // 5. Create Session
     console.log(
       "Creating session for customer:",
@@ -112,8 +119,6 @@ serve(async (req) => {
     );
     let session;
     try {
-      // Use origin from request if available, otherwise fallback to production
-      // This supports localhost testing and production
       // Use origin from request if available, otherwise fallback to production
       // This supports localhost testing and production
       const origin = req.headers.get("origin") || req.headers.get("referer") ||
@@ -151,7 +156,7 @@ serve(async (req) => {
         customerId = customer.id;
 
         // Update profile with new customer ID
-        await supabaseClient
+        await supabaseAdmin
           .from("profiles")
           .update({ stripe_customer_id: customerId })
           .eq("id", user.id);
@@ -193,7 +198,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ error: error.message || "An unknown error occurred" }),
       {
-        status: 200,
+        status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );

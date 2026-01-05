@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { UserProfile, AppLanguage } from '../../../types';
 import { translations } from '../../../translations';
-import { CreditCard, ChevronRight } from 'lucide-react';
+import { CreditCard, ChevronRight, Zap, Target } from 'lucide-react';
 import { PLANS } from '../../../constants';
 import CancellationModal from '../../modals/CancellationModal';
+import { motion } from 'framer-motion';
 
 interface BillingSettingsProps {
     user: UserProfile;
@@ -27,87 +28,116 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpg
     const progressPercent = isUnlimited ? 100 : Math.min(100, (user.credits / effectiveMax) * 100);
 
     return (
-        <div className="bg-white border border-slate-200/60 rounded-xl p-6 shadow-sm overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-
-            <div className="flex items-center justify-between mb-6 relative z-10">
-                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <div className="p-2 bg-amber-50 rounded-lg">
-                        <CreditCard className="w-5 h-5 text-amber-600" />
-                    </div>
-                    {t.billingTitle}
-                </h2>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${user.planTier !== 'free' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-50 text-slate-600 border-slate-200/60'}`}>
-                    {currentPlan.name} Plan
-                </span>
-            </div>
-
-            <div className="max-w-2xl mx-auto mb-8 relative z-10">
+        <div className="space-y-8">
+            {/* Header section removed - handled by parent */}
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Current Plan Card */}
-                <div className="bg-slate-50/80 rounded-xl p-6 border border-slate-200/60 flex flex-col justify-between">
-                    <div>
-                        <p className="text-xs font-bold uppercase text-slate-400 tracking-wider mb-1">{t.currentUsage}</p>
-                        <div className="flex items-baseline gap-2 mb-3">
-                            <span className="text-3xl font-display font-bold text-slate-900">
-                                {user.isPremium ? (language === 'es' ? 'Ilimitados' : 'Unlimited') : user.credits}
-                            </span>
-                            {!user.isPremium && (
-                                <span className="text-sm font-medium text-slate-400">/ {effectiveMax} credits</span>
-                            )}
-                        </div>
-                        <div className="w-full bg-slate-200 rounded-full h-2 mb-2 overflow-hidden">
-                            <div
-                                className={`h-2 rounded-full transition-all duration-500 ease-out ${user.isPremium
-                                        ? 'bg-gradient-to-r from-amber-400 to-amber-600 w-full animate-pulse'
-                                        : 'bg-gradient-to-r from-brand-500 to-indigo-500'
-                                    }`}
-                                style={{ width: user.isPremium ? '100%' : `${progressPercent}%` }}
-                            ></div>
-                        </div>
-                        <p className="text-xs text-slate-500">
-                            {user.isPremium
-                                ? (language === 'es' ? 'Tienes el poder absoluto. Crea sin límites.' : 'You have absolute power. Create without limits.')
-                                : `Resets on ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}`
-                            }
+                <section className="bg-slate-50/50 border border-slate-200 rounded-2xl p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">{language === 'es' ? 'Plan Actual' : 'Current Plan'}</h3>
+                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border shadow-sm ${user.planTier !== 'free' ? 'bg-amber-100/50 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                            {currentPlan.name}
+                        </span>
+                    </div>
+                    
+                    <div className="space-y-1">
+                        <p className="text-2xl font-display font-bold text-slate-900">{isUnlimited ? (language === 'es' ? 'Ilimitado' : 'Unlimited') : `${user.credits} Créditos`}</p>
+                        <p className="text-sm text-slate-500 font-medium">
+                            {isUnlimited 
+                                ? (language === 'es' ? 'Sin restricciones de creación.' : 'No creation restrictions.') 
+                                : `Disponibles para este ciclo.`}
                         </p>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-slate-200/60 flex flex-col gap-2">
-                        <button onClick={onUpgrade} className="text-sm font-bold text-brand-600 hover:text-brand-700 hover:underline flex items-center gap-1">
-                            {t.manageSub} <ChevronRight strokeWidth={1.5} className="w-4 h-4" />
+                    <div className="pt-4">
+                        <button 
+                            onClick={onUpgrade} 
+                            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:shadow-sm transition-all group"
+                        >
+                            <span>{t.manageSub}</span>
+                            <ChevronRight size={14} className="text-slate-400 group-hover:translate-x-0.5 transition-transform" />
                         </button>
+                    </div>
+                </section>
 
+                {/* Usage Stats Card */}
+                <section className="bg-slate-50/50 border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm group hover:bg-white transition-colors">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">{t.currentUsage}</h3>
+                        <Target size={16} className="text-slate-300" />
+                    </div>
+
+                    <div className="space-y-3">
+                        <div className="flex items-end justify-between text-sm font-bold">
+                            <span className="text-slate-900">{progressPercent.toFixed(0)}%</span>
+                            <span className="text-slate-400 font-medium">{isUnlimited ? '∞' : effectiveMax} {language === 'es' ? 'Total' : 'Total'}</span>
+                        </div>
+                        <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progressPercent}%` }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className={`h-full rounded-full ${isUnlimited
+                                        ? 'bg-gradient-to-r from-amber-400 to-orange-500 animate-pulse'
+                                        : 'bg-gradient-to-r from-brand-500 to-indigo-500'
+                                    }`}
+                            ></motion.div>
+                        </div>
+                    </div>
+
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider text-right italic">
+                        {isUnlimited 
+                            ? (language === 'es' ? 'Poder absoluto activado' : 'Absolute power activated') 
+                            : `Reseteo: ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}`
+                        }
+                    </p>
+                </section>
+            </div>
+
+            {/* Cancellation / Invoices Section */}
+            <section className="pt-6 space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                    <div className="w-1.5 h-6 bg-rose-500 rounded-full"></div>
+                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">{language === 'es' ? 'Gestión de Cuenta' : 'Account Management'}</h3>
+                </div>
+
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 transition-all hover:shadow-md">
+                    <div className="space-y-1">
+                        <p className="font-bold text-slate-900">{language === 'es' ? 'Suscripción' : 'Subscription'}</p>
+                        <p className="text-xs text-slate-500">{language === 'es' ? 'Gestiona tus facturas y el estado de tu suscripción.' : 'Manage your invoices and subscription status.'}</p>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 w-full md:w-auto">
                         {user.planTier !== 'free' && !user.cancelAtPeriodEnd && (
                             <button
                                 onClick={() => setShowCancelModal(true)}
-                                className="text-xs font-medium text-slate-400 hover:text-red-500 hover:underline flex items-center gap-1 w-fit transition-colors"
+                                className="flex-1 md:flex-none px-6 py-2.5 text-xs font-bold text-rose-500 bg-rose-50 border border-rose-100 rounded-xl hover:bg-rose-100 transition-all shadow-sm"
                             >
-                                Cancelar Suscripción
+                                {language === 'es' ? 'Cancelar Suscripción' : 'Cancel Subscription'}
                             </button>
                         )}
 
                         {user.cancelAtPeriodEnd && (
-                            <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded w-fit">
-                                Cancels at period end
-                            </span>
+                            <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 border border-amber-100 rounded-xl text-xs font-bold animate-pulse">
+                                <Zap size={14} className="fill-current" />
+                                <span>{language === 'es' ? 'Cancela al final del periodo' : 'Cancels at period end'}</span>
+                            </div>
                         )}
                     </div>
                 </div>
-
-
-            </div>
+            </section>
 
             <CancellationModal
                 isOpen={showCancelModal}
                 onClose={() => setShowCancelModal(false)}
                 userEmail={user.email || ''}
-                userCreatedAt={user.created_at}
+                userId={user.id}
                 subscriptionId={user.subscriptionId}
                 language={language}
                 planPrice={PLANS.find(p => p.id === user.planTier)?.price || 0}
                 onCancelSuccess={() => {
-                    // Refresh user profile or show success message
-                    onSave({ cancelAtPeriodEnd: true }); // Optimistic update
+                    onSave({ cancelAtPeriodEnd: true });
                 }}
             />
         </div>

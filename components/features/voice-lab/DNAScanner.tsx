@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { History, FileText, Check, Loader2, Scan, Save, Fingerprint, Sparkles, AlertCircle, Upload, FileUp, Cpu } from 'lucide-react';
 import { UserProfile, Post } from '../../../types';
-import { analyzeBrandVoice, BrandVoiceAnalysisResult } from '../../../services/geminiService';
+import { analyzeBrandVoice, BrandVoiceAnalysisResult, cloneVoice } from '../../../services/geminiService';
 import { toast } from 'sonner';
 
 interface DNAScannerProps {
@@ -93,13 +93,23 @@ const DNAScanner: React.FC<DNAScannerProps> = ({ user, posts, onSave, isSaving }
             // Cinematic delay for effect
             await new Promise(r => setTimeout(r, 2500)); 
 
-            const result = await analyzeBrandVoice({
-                contentSamples: samples,
-                language: user.language || 'en',
-                imageBase64
+            const result = await cloneVoice({
+                text_samples: scannerMode === 'history' || scannerMode === 'manual' ? samples : undefined,
+                url: undefined, // Add URL logic if needed
+                voice_name: scannerMode === 'manual' ? "Manual Voice" : "Analyzed Voice"
             });
 
-            setAnalysisResult(result);
+            // Normalize result to match UI expectation if keys differ
+            // VoiceBrain returns specific keys, ensure mapping if needed.
+            // VoiceBrain result: { voice_name, stylistic_dna, mimicry_instructions }
+            
+            setAnalysisResult({
+                 styleName: result.voice_name,
+                 toneDescription: result.mimicry_instructions,
+                 stylisticDNA: result.stylistic_dna,
+                 // Map patterns if present in DNA or default
+                 hookPatterns: result.stylistic_dna?.hook_patterns || []
+            });
         } catch (error) {
             console.error(error);
             toast.error("Analysis failed. Please try again.");
@@ -152,17 +162,19 @@ const DNAScanner: React.FC<DNAScannerProps> = ({ user, posts, onSave, isSaving }
                                     </p>
                                 </div>
 
-                                {/* Deep Stylistic DNA */}
+                                 {/* Deep Stylistic DNA */}
                                 {analysisResult.stylisticDNA && (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="bg-indigo-50/50 border border-indigo-100 p-4 rounded-xl">
-                                             <label className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-2 block">Sentence Structure</label>
-                                             <p className="text-indigo-900 text-sm font-medium">{analysisResult.stylisticDNA.sentence_structure}</p>
+                                             <label className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-2 block">Rhythm & Authority</label>
+                                             <p className="text-indigo-900 text-sm font-medium">
+                                                {analysisResult.stylisticDNA.rhythm} - {analysisResult.stylisticDNA.authority_level}
+                                             </p>
                                         </div>
                                          <div className="bg-purple-50/50 border border-purple-100 p-4 rounded-xl">
-                                             <label className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-2 block">Technical Depth</label>
+                                             <label className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-2 block">Vocabulary DNA</label>
                                               <div className="flex flex-wrap gap-1">
-                                                {analysisResult.stylisticDNA.technical_terms?.map((term, i) => (
+                                                {analysisResult.stylisticDNA.vocabulary_profile?.map((term, i) => (
                                                     <span key={i} className="px-2 py-0.5 bg-white text-purple-700 text-[10px] font-bold rounded-md border border-purple-100 shadow-sm">
                                                         {term}
                                                     </span>

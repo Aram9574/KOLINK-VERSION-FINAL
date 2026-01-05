@@ -84,13 +84,27 @@ const SuggestionCard = ({ title, score, feedback, suggested, onAction }: { title
     </motion.div>
 );
 
+import PremiumLockOverlay from "../../ui/PremiumLockOverlay";
+
 const LinkedInAuditView: React.FC = () => {
-    const { user } = useUser();
+    const { user, language } = useUser();
     
     // Status: idle -> scanning (procesando) -> results (resultados)
     const [status, setStatus] = useState<"idle" | "scanning" | "results">("idle");
     const [auditData, setAuditData] = useState<LinkedInAuditResult | null>(null);
     const [dragActive, setDragActive] = useState(false);
+
+    if (!user.isPremium) {
+        return (
+            <PremiumLockOverlay 
+                title={language === 'es' ? 'Simulador Estratégico' : 'Strategic Simulator'}
+                description={language === 'es' 
+                    ? 'Auditoría algorítmica de tu perfil de LinkedIn. Sube tu PDF para un análisis profundo o una captura para evaluación visual.' 
+                    : 'Algorithmic audit of your LinkedIn profile. Upload your PDF for a deep analysis or a capture for visual evaluation.'}
+                icon={<Scan className="w-8 h-8" />}
+            />
+        );
+    }
 
     // --- Actions ---
 
@@ -247,10 +261,10 @@ const LinkedInAuditView: React.FC = () => {
                          >
                             {/* 1. Bento Grid High Level Metrics (MOVED TO TOP) */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <MetricCard label="Impacto del Titular" value={auditData.authority_metrics?.headline_impact ?? 0} icon={TrendingUp} colorClass="from-blue-500 to-cyan-500" />
-                                <MetricCard label="Densidad Técnica" value={auditData.authority_metrics?.keyword_density ?? 0} icon={BookOpen} colorClass="from-violet-500 to-purple-500" />
-                                <MetricCard label="Storytelling" value={auditData.authority_metrics?.storytelling_power ?? 0} icon={Users} colorClass="from-amber-400 to-orange-500" />
-                                <MetricCard label="Psicología Visual" value={auditData.visual_score ?? 0} icon={UserCircle} colorClass="from-emerald-400 to-teal-500" />
+                                <MetricCard label="Impacto Global" value={auditData.authority_score ?? 0} icon={TrendingUp} colorClass="from-blue-500 to-cyan-500" />
+                                <MetricCard label="Calidad Visual" value={auditData.visual_score ?? 0} icon={UserCircle} colorClass="from-violet-500 to-purple-500" />
+                                <MetricCard label="Palabras Clave" value={auditData.technical_seo_keywords?.length * 10 || 70} icon={BookOpen} colorClass="from-amber-400 to-orange-500" />
+                                <MetricCard label="Quick Wins" value={auditData.quick_wins?.length * 20 || 60} icon={Zap} colorClass="from-emerald-400 to-teal-500" />
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -321,7 +335,7 @@ const LinkedInAuditView: React.FC = () => {
                                         <div className="flex justify-between items-start mb-6">
                                             <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                                                 <Sparkles className="text-brand-400" /> 
-                                                Diagnóstico Estratégico
+                                                Diagnóstico Brutal
                                             </h2>
                                             
                                             {/* Source Badge */}
@@ -338,42 +352,51 @@ const LinkedInAuditView: React.FC = () => {
                                         </div>
 
                                         <p className="text-slate-300 leading-relaxed text-lg font-light">
-                                            {auditData.summary}
+                                            {auditData.brutal_diagnosis}
                                         </p>
+                                        
+                                        <div className="mt-6 flex flex-wrap gap-2">
+                                            {auditData.quick_wins?.map((win, i) => (
+                                                <div key={i} className="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-2 text-sm text-slate-100">
+                                                    <Zap size={10} className="text-amber-400" />
+                                                    {win}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Actionable Suggestions (3 Cols Grid) */}
-                            <h3 className="text-xl font-bold text-slate-900 px-1">Acciones de Mejora</h3>
+                            <h3 className="text-xl font-bold text-slate-900 px-1">Roadmap Estratégico</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <SuggestionCard 
                                     title="Optimización de Titular" 
-                                    score={auditData.results.headline.score}
-                                    feedback={auditData.results.headline.feedback}
-                                    suggested={auditData.results.headline.suggested}
+                                    score={Math.round(auditData.authority_score * 0.9)}
+                                    feedback="Tu titular necesita integrar tu promesa de valor y keywords clave para el algoritmo."
+                                    suggested={auditData.strategic_roadmap.headline}
                                     onAction={() => {
-                                        navigator.clipboard.writeText(auditData.results.headline.suggested);
+                                        navigator.clipboard.writeText(auditData.strategic_roadmap.headline);
                                         toast.success("Copiado al portapapeles");
                                     }} 
                                 />
                                 <SuggestionCard 
                                     title="Narrativa del 'Acerca de'" 
-                                    score={auditData.results.about.score}
-                                    feedback={auditData.results.about.feedback}
-                                    suggested={auditData.results.about.suggested}
+                                    score={Math.round(auditData.authority_score * 0.85)}
+                                    feedback="Las primeras 3 líneas del About son críticas. Hemos optimizado el gancho inicial."
+                                    suggested={auditData.strategic_roadmap.about}
                                     onAction={() => {
-                                        navigator.clipboard.writeText(auditData.results.about.suggested);
+                                        navigator.clipboard.writeText(auditData.strategic_roadmap.about);
                                         toast.success("Copiado al portapapeles");
                                     }}
                                 />
                                 <SuggestionCard 
                                     title="Autoridad en Experiencia" 
-                                    score={auditData.results.experience.score}
-                                    feedback={auditData.results.experience.feedback}
-                                    suggested={auditData.results.experience.suggested}
+                                    score={Math.round(auditData.authority_score * 0.95)}
+                                    feedback="Ejemplo de redirección de logros enfocada en resultados cuantificables."
+                                    suggested={auditData.strategic_roadmap.experience}
                                     onAction={() => {
-                                        navigator.clipboard.writeText(auditData.results.experience.suggested);
+                                        navigator.clipboard.writeText(auditData.strategic_roadmap.experience);
                                         toast.success("Copiado al portapapeles");
                                     }}
                                 />

@@ -259,7 +259,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
                                         {t.proTip}
                                     </p>
                                     <p className="text-xs text-amber-900 leading-relaxed font-medium">
-                                        {viralAnalysis.feedback}
+                                        {viralAnalysis.proTip || viralAnalysis.feedback}
                                     </p>
                                 </div>
                             </div>

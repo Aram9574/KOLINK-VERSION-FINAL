@@ -1,8 +1,8 @@
-import { GoogleGenerativeAI } from "npm:@google/generative-ai@^0.21.0";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export class BaseAIService {
   protected genAI: GoogleGenerativeAI;
-  protected model = "gemini-2.0-flash-exp";
+  protected model = "gemini-3-flash-preview";
 
   constructor(geminiApiKey: string) {
     if (!geminiApiKey) {
@@ -29,6 +29,25 @@ export class BaseAIService {
         return this.retryWithBackoff(operation, retries - 1, delay * 2);
       }
       throw error;
+    }
+  }
+
+  /**
+   * Helper to extract JSON from AI response, stripping markdown markers if present.
+   */
+  protected extractJson(text: string): Record<string, unknown> {
+    try {
+      // Find the first { and last }
+      const start = text.indexOf('{');
+      const end = text.lastIndexOf('}');
+      if (start === -1 || end === -1) {
+          throw new Error("No JSON object found in response: " + text);
+      }
+      const jsonStr = text.substring(start, end + 1);
+      return JSON.parse(jsonStr);
+    } catch (_error) {
+      console.error("[BaseAIService] Failed to parse JSON:", text);
+      throw new Error("INTERNAL_JSON_PARSE_ERROR");
     }
   }
 

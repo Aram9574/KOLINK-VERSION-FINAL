@@ -30,6 +30,7 @@ import {
     Type,
     Wand2,
     Zap,
+    Fingerprint,
 } from "lucide-react";
 import { translations } from "../../../translations";
 import Tooltip from "../../ui/Tooltip";
@@ -142,7 +143,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                         <div
                             className={`text-xs font-bold px-3 py-1.5 rounded-full border flex items-center gap-1.5 transition-all duration-300
                   ${
-                                credits > 0
+                                 credits > 0
                                     ? "bg-brand-50 text-brand-700 border-brand-200"
                                     : "bg-red-50 text-red-600 border-red-200"
                             }
@@ -618,6 +619,22 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                         </div>
                     )}
                 </div>
+
+                {/* Section 3: DNA INSIGHT (If Available) */}
+                {user?.behavioral_dna && (
+                    <div className="p-4 bg-brand-50/30 border border-brand-100/50 rounded-xl relative overflow-hidden group/dna">
+                         <div className="absolute -right-2 -bottom-2 opacity-5 group-hover/dna:opacity-10 transition-opacity">
+                            <Fingerprint className="w-16 h-16" />
+                         </div>
+                         <div className="flex items-center gap-2 mb-2">
+                            <Fingerprint className="w-4 h-4 text-brand-600" />
+                            <span className="text-[10px] font-bold text-brand-800 uppercase tracking-widest">DNA Insight</span>
+                         </div>
+                         <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                            Nexus sugiere: <span className="text-brand-700 italic">"He notado que tu tono {user.behavioral_dna.dominant_tone.toLowerCase()} funciona mejor para tu audiencia de {params.audience || 'LinkedIn'}. He activado el modo {user.behavioral_dna.archetype} para esta generación."</span>
+                         </p>
+                    </div>
+                )}
 
                 {/* Loading State Overlay/Progress */}
                 {isGenerating && (

@@ -11,10 +11,10 @@ import {
     MessageSquareText,
     MessageCircle,
     Settings as SettingsIcon,
-    Sparkles,
     FileText,
     Fingerprint,
     X,
+    Sparkles,
 } from "lucide-react";
 import { AppLanguage, AppTab, Post, UserProfile } from "../../../types.ts";
 import GamificationWidget from "./GamificationWidget.tsx";

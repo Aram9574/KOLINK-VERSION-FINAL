@@ -584,7 +584,6 @@ export const es = {
              empathetic: "Par Empático"
           }
         },
-        voiceLab: "Laboratorio de Voz",
       },
     voiceLab: {
         title: "Laboratorio de Voz",

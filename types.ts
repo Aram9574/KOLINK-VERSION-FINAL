@@ -135,6 +135,16 @@ export interface AutoPilotConfig {
   postCount: number; // Number of posts to generate per run
 }
 
+export interface BehavioralDNA {
+    archetype: string;
+    dominant_tone: string;
+    peak_hours: string[];
+    preferred_formats: string[];
+    last_updated: string | null;
+    personality_traits: string[];
+    behavioral_summary?: string;
+}
+
 export interface UserProfile {
   id: string;
   email?: string; // Added for context convenience
@@ -171,6 +181,8 @@ export interface UserProfile {
   created_at?: string;
   scheduled_for_deletion?: boolean;
   deletion_date?: string;
+  // Behavioral identity
+  behavioral_dna?: BehavioralDNA;
 }
 
 export interface CustomSource {
@@ -194,6 +206,11 @@ export interface StylisticDNA {
     hooks_dna: string[];
     technical_terms: string[];
     formatting_rules: string[];
+    rhythm?: string;
+    vocabulary_profile?: string[];
+    authority_level?: string;
+    forbidden_patterns?: string[];
+    punctuation_style?: string;
 }
 
 export interface BrandVoice {
@@ -201,6 +218,8 @@ export interface BrandVoice {
   user_id: string;
   name: string;
   description: string;
+  voice_name?: string; // SOTA field
+  mimicry_instructions?: string; // SOTA field
   hookPatterns?: { category: string; pattern: string; example: string }[];
   stylisticDNA?: StylisticDNA;
   isActive?: boolean;
@@ -235,33 +254,28 @@ export interface ExperienceItem {
 }
 
 export interface LinkedInAuditResult {
-  overall_score: number;
+  authority_score: number;
   visual_score: number;
-  authority_metrics: {
-      headline_impact: number;
-      keyword_density: number;
-      storytelling_power: number;
-      recruiter_clarity: number;
+  brutal_diagnosis: string;
+  quick_wins: string[];
+  strategic_roadmap: {
+    headline: string;
+    about: string;
+    experience: string;
   };
-  summary: string;
-  results: {
-    headline: { score: number; feedback: string; suggested: string };
-    about: { score: number; feedback: string; suggested: string };
-    experience: { score: number; feedback: string; suggested: string };
-  };
+  visual_critique: string;
+  technical_seo_keywords: string[];
   source_type?: "hybrid" | "pdf" | "visual";
-  // The raw extracted data for visualization
   processed_data?: {
-      name?: string;
-      headline?: string;
-      about?: string;
-      company?: string;
-      location?: string;
-      skills?: string[];
-      experiences?: { company: string; position: string; duration: string; description: string }[];
-      education?: string[];
+    name?: string;
+    headline?: string;
+    about?: string;
+    company?: string;
+    location?: string;
+    skills?: string[];
+    experiences?: { company: string; position: string; duration: string; description: string }[];
+    education?: string[];
   };
-  debug_trace?: string[];
 }
 
 export interface LinkedInAudit {
@@ -287,4 +301,59 @@ export interface LinkedInProfileData {
   skills?: string[];
   education?: string[];
   scraped_data?: Record<string, unknown>;
+}
+
+export interface Fragment {
+    id: string;
+    user_id: string;
+    name: string;
+    content: string;
+    usage_count: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface NexusConversation {
+    id: string;
+    user_id: string;
+    messages: Record<string, any>[]; // Or a more specific Message type if available
+    context_data: Record<string, any>;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Draft {
+    id: string;
+    user_id: string;
+    type: "post" | "carousel";
+    content: Record<string, any>;
+    last_saved_at: string;
+    created_at: string;
+}
+
+export interface ScheduledPost {
+    id: string;
+    user_id: string;
+    post_id: string;
+    scheduled_datetime: string;
+    status: "pending" | "published" | "failed";
+    linkedin_scheduled_id?: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface UserSubscription {
+    id: string;
+    user_id: string;
+    plan_type: PlanTier;
+    status: "active" | "canceled" | "past_due" | "incomplete";
+    billing_cycle: "mensual" | "anual";
+    price: number;
+    credits_limit: number;
+    reset_date: string;
+    stripe_customer_id?: string;
+    stripe_subscription_id?: string;
+    canceled_at?: string;
+    created_at: string;
+    updated_at: string;
 }

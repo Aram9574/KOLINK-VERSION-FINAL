@@ -14,6 +14,7 @@ import FeedbackModal from "../../modals/FeedbackModal.tsx";
 import { getAvatarUrl } from "../../../utils.ts";
 import { motion, AnimatePresence } from "framer-motion";
 import { hapticFeedback } from "../../../lib/animations.ts";
+import { supabase } from "../../../services/supabaseClient.ts";
 
 import NotificationBell from "../notifications/NotificationBell.tsx";
 
@@ -22,6 +23,7 @@ interface DashboardHeaderProps {
     language: AppLanguage;
     setLanguage: (lang: AppLanguage) => void;
     activeTab: string;
+    setActiveTab: (tab: any) => void;
 }
 
 const getBreadcrumb = (tab: string) => {
@@ -40,7 +42,7 @@ const getBreadcrumb = (tab: string) => {
     }
 };
 
-const DashboardHeader = ({ user, language, setLanguage, activeTab }: DashboardHeaderProps) => {
+const DashboardHeader = ({ user, language, setLanguage, activeTab, setActiveTab }: DashboardHeaderProps) => {
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     
@@ -117,15 +119,33 @@ const DashboardHeader = ({ user, language, setLanguage, activeTab }: DashboardHe
                                             </div>
                                             
                                             <div className="p-1">
-                                                <button className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                                                <button 
+                                                    onClick={() => {
+                                                        setActiveTab('audit');
+                                                        setIsProfileOpen(false);
+                                                    }}
+                                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+                                                >
                                                     <User size={16} strokeWidth={1.5} />
                                                     <span>Perfil</span>
                                                 </button>
-                                                <button className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                                                <button 
+                                                    onClick={() => {
+                                                        setActiveTab('settings');
+                                                        setIsProfileOpen(false);
+                                                    }}
+                                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+                                                >
                                                     <CreditCard size={16} strokeWidth={1.5} />
                                                     <span>Suscripción</span>
                                                 </button>
-                                                <button className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                                                <button 
+                                                    onClick={() => {
+                                                        setActiveTab('settings');
+                                                        setIsProfileOpen(false);
+                                                    }}
+                                                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+                                                >
                                                     <Settings size={16} strokeWidth={1.5} />
                                                     <span>Ajustes</span>
                                                 </button>
@@ -133,7 +153,9 @@ const DashboardHeader = ({ user, language, setLanguage, activeTab }: DashboardHe
 
                                             <div className="p-1 border-t border-slate-100">
                                                 <button 
-                                                    onClick={() => window.location.reload()} // Simple logout sim
+                                                    onClick={async () => {
+                                                        await supabase.auth.signOut();
+                                                    }}
                                                     className="flex w-full items-center gap-2 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                                                 >
                                                     <LogOut size={16} strokeWidth={1.5} />

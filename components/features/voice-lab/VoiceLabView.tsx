@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Database, Scan, Activity, Fingerprint, Loader2, Bot } from 'lucide-react';
+import { Database, Scan, Activity, Fingerprint, Loader2, Bot, Lock } from 'lucide-react';
 import { useUser } from '../../../context/UserContext';
 import { usePosts } from '../../../context/PostContext';
 import { fetchBrandVoices, createBrandVoice, deleteBrandVoice, setBrandVoiceActive, updateUserProfile } from '../../../services/userRepository';
@@ -14,6 +14,8 @@ import AuthorityGap from './AuthorityGap';
 import ShadowingPlayground from './ShadowingPlayground';
 
 type LabTab = 'vault' | 'scanner' | 'authority' | 'shadowing';
+
+import PremiumLockOverlay from '../../ui/PremiumLockOverlay';
 
 const VoiceLabView: React.FC = () => {
     const { user, setUser, language } = useUser();
@@ -70,7 +72,8 @@ const VoiceLabView: React.FC = () => {
                 user.id, 
                 result.styleName, 
                 result.toneDescription,
-                result.hookPatterns
+                result.hookPatterns,
+                result.stylisticDNA || {}
             );
             
             if (newVoice) {
@@ -92,6 +95,19 @@ const VoiceLabView: React.FC = () => {
     };
 
     const activeVoice = voices.find(v => v.isActive);
+
+    // Premium Lock for Voice Lab
+    if (!user.isPremium) {
+        return (
+            <PremiumLockOverlay 
+                title={language === 'es' ? 'Laboratorio de Voz' : 'Voice Lab'}
+                description={language === 'es' 
+                    ? 'Clona tu voz y estilo de escritura para generar contenido indistinguible de ti.' 
+                    : 'Clone your voice and writing style to generate content indistinguishable from you.'}
+                icon={<Fingerprint className="w-8 h-8" />}
+            />
+        );
+    }
 
     return (
         <div className="h-full w-full bg-slate-50 relative overflow-hidden flex flex-col">

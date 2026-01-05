@@ -65,10 +65,10 @@ serve(async (req) => {
       { topic: "Tips & Tricks", weight: 30 },
     ];
 
-    // 4. Initialize Gemini 2.0 Flash
+    // 4. Initialize Gemini 3 Flash
     const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY")!);
-    // Using gemini-2.0-flash-exp for SOTA speed/multimodal
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    // Using gemini-3-flash-preview for SOTA speed/multimodal
+    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
     // 5. Construct Prompt
     const prompt = `

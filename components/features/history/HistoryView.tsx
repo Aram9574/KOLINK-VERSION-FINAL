@@ -144,31 +144,13 @@ const HistoryView: React.FC<HistoryViewProps> = ({
 
     if (!user?.isPremium) {
         return (
-            <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-50/50">
-                <div className="bg-white rounded-xl p-12 text-center max-w-lg shadow-xl border border-slate-200/60">
-                    <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <FolderOpen className="w-10 h-10 text-indigo-500" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                        {language === "es"
-                            ? "Historial Premium"
-                            : "Premium History"}
-                    </h2>
-                    <p className="text-slate-600 mb-6 text-sm">
-                        {language === "es"
-                            ? "Accede a todo tu historial de publicaciones, estadísticas y favoritos."
-                            : "Access your entire post history, analytics, and favorites."}
-                    </p>
-                    <button
-                        onClick={onUpgrade}
-                        className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all transform hover:-translate-y-1"
-                    >
-                        {language === "es"
-                            ? "Desbloquear Historial"
-                            : "Unlock History"}
-                    </button>
-                </div>
-            </div>
+            <PremiumLockOverlay 
+                title={language === "es" ? "Historial & Bóveda" : "History & Vault"}
+                description={language === "es"
+                    ? "Accede a todo tu historial de publicaciones, estadísticas y favoritos. Mantén un registro de tus mejores contenidos en un solo lugar."
+                    : "Access your entire post history, analytics, and favorites. Keep track of your best content in one place."}
+                icon={<FolderOpen className="w-8 h-8" />}
+            />
         );
     }
 

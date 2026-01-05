@@ -2,11 +2,22 @@ import { SupabaseClient } from "@supabase/supabase-js";
 
 export interface GeneratedPost {
   post_content: string;
-  overall_viral_score: number;
-  hook_score: number;
-  readability_score: number;
-  value_score: number;
-  feedback: string;
+  auditor_report: {
+    viral_score: number;
+    hook_strength: string;
+    hook_score: number;
+    readability_score: number;
+    value_score: number;
+    pro_tip: string;
+    retention_estimate: string;
+    flags_triggered: string[];
+    predicted_archetype_resonance?: string;
+  };
+  strategy_reasoning: string;
+  meta: {
+    suggested_hashtags: string[];
+    character_count: number;
+  };
 }
 
 export class PostRepository {
@@ -18,14 +29,11 @@ export class PostRepository {
       .insert({
         user_id: userId,
         content: content.post_content,
-        viral_score: content.overall_viral_score,
-        viral_analysis: {
-          hookScore: content.hook_score,
-          readabilityScore: content.readability_score,
-          valueScore: content.value_score,
-          feedback: content.feedback,
-        },
         params: params,
+        viral_score: content.auditor_report.viral_score,
+        viral_analysis: content.auditor_report,
+        tags: content.meta.suggested_hashtags,
+        is_auto_pilot: (params as any).isAutoPilot || false, // params is still unknown, so cast is needed for now
         created_at: new Date().toISOString(),
       })
       .select("id, created_at")

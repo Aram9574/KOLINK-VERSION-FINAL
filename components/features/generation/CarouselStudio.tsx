@@ -7,6 +7,7 @@ import LoadingProgress from "../../ui/LoadingProgress";
 import { Sparkles } from "lucide-react";
 import { useUser } from "../../../context/UserContext";
 import { toast } from "sonner";
+import PremiumLockOverlay from "../../ui/PremiumLockOverlay";
 
 type SourceType = "url" | "youtube" | "text";
 
@@ -32,6 +33,18 @@ const DEFAULT_CAROUSEL = {
 const CarouselStudio: React.FC<CarouselStudioProps> = ({ initialContent }) => {
     const location = useLocation();
     const { language, user } = useUser();
+
+    if (!user.isPremium) {
+        return (
+            <PremiumLockOverlay 
+                title={language === 'es' ? 'Generador de Carruseles' : 'Carousel Generator'}
+                description={language === 'es' 
+                    ? 'Crea carruseles virales de alta conversión a partir de cualquier contenido. Convierte artículos, videos de YouTube o texto en piezas visuales irresistibles.' 
+                    : 'Create high-converting viral carousels from any content. Turn articles, YouTube videos, or text into irresistible visual pieces.'}
+                icon={<Sparkles className="w-8 h-8" />}
+            />
+        );
+    }
 
     // Initialize state from props (priority) or navigation state or default
     const [source, setSource] = useState(

@@ -1,7 +1,14 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Check, X, Sparkles, BarChart2 } from "lucide-react";
+
+import { fetchSchedule, updateScheduleStatus, ScheduleItem } from "../../../services/strategyRepository.ts";
+import { toast } from "sonner";
+
+interface StrategyTimelineProps {
+    userId: string;
+}
 
 interface Node {
     id: string;
@@ -13,23 +20,74 @@ interface Node {
     authorityScore?: number;
 }
 
-const StrategyTimeline: React.FC = () => {
-    // Mock Data for "Vision" phase
-    const [nodes, setNodes] = useState<Node[]>([
-        { id: "1", day: "Lun", date: "Oct 24", status: "posted", pillar: "Tendencias IA", authorityScore: 92 },
-        { id: "2", day: "Mar", date: "Oct 25", status: "scheduled", pillar: "Historia Personal", authorityScore: 88 },
-        { id: "3", day: "Mie", date: "Oct 26", status: "pending_approval", pillar: "Productividad", content: "🚀 3 Herramientas que uso a diario...\n\n1. Obsidian\n2. Raycast\n3. Kolink\n\n¿Cuál es tu stack?", authorityScore: 75 },
-        { id: "4", day: "Jue", date: "Oct 27", status: "pending_approval", pillar: "Tendencias IA", content: "El futuro de la IA Agéntica no es el reemplazo, es la aumentación.", authorityScore: 85 },
-        { id: "5", day: "Vie", date: "Oct 28", status: "empty" },
-    ]);
-
+const StrategyTimeline: React.FC<StrategyTimelineProps> = ({ userId }) => {
+    const [nodes, setNodes] = useState<Node[]>([]);
+    const [loading, setLoading] = useState(true);
     const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
-    const handleApprove = (id: string, e: React.MouseEvent) => {
+    useEffect(() => {
+        const load = async () => {
+             const data = await fetchSchedule(userId);
+             // MAP DB data to UI Nodes
+             // This logic needs to map specific dates to days of week.
+             // For simplicity, we'll just map the incoming list directly or creating filled days.
+             // Ideally we want to show the NEXT 7 DAYS always.
+             
+             const today = new Date();
+             const next7Days = Array.from({ length: 7 }, (_, i) => {
+                 const d = new Date();
+                 d.setDate(today.getDate() + i + 1); // Start tomorrow
+                 return d;
+             });
+
+             const mappedNodes: Node[] = next7Days.map((dateObj) => {
+                 const dateStr = dateObj.toISOString().split('T')[0];
+                 const item = data.find(d => d.scheduled_date.startsWith(dateStr));
+                 
+                 const dayName = dateObj.toLocaleDateString('es-ES', { weekday: 'short' });
+                 const dateDisplay = dateObj.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+
+                 if (item) {
+                     return {
+                         id: item.id,
+                         day: dayName,
+                         date: dateDisplay,
+                         status: item.status,
+                         pillar: item.pillar_name || "General",
+                         content: item.idea_summary || item.idea_title, // Use summary if avail
+                         authorityScore: item.authority_score || 85 // Fallback
+                     };
+                 } else {
+                     return {
+                         id: `empty-${dateStr}`,
+                         day: dayName,
+                         date: dateDisplay,
+                         status: 'empty'
+                     };
+                 }
+             });
+
+             setNodes(mappedNodes);
+             setLoading(false);
+        };
+        load();
+    }, [userId]);
+
+
+    const handleApprove = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        setNodes(prev => prev.map(n => n.id === id ? { ...n, status: "scheduled" } : n));
-        // Add haptic logic here if needed
+        try {
+            // Optimistic update
+            setNodes(prev => prev.map(n => n.id === id ? { ...n, status: "scheduled" } : n));
+            await updateScheduleStatus(id, "scheduled");
+            toast.success("Post programado");
+        } catch (err) {
+            toast.error("Error al aprobar"); 
+            // Revert? (omitted for brevity)
+        }
     };
+
+    if (loading) return <div className="mt-8 text-center text-slate-400 text-sm">Cargando calendario...</div>;
 
     return (
         <div className="col-span-12 mt-8">
@@ -56,7 +114,7 @@ const StrategyTimeline: React.FC = () => {
                         <div className="flex justify-between items-start">
                             <div>
                                 <span className="block text-xs font-bold uppercase tracking-wider text-slate-400">{node.day}</span>
-                                <span className="block text-lg font-bold text-slate-900">{node.date.split(" ")[1]}</span>
+                                <span className="block text-lg font-bold text-slate-900">{node.date}</span>
                             </div>
                             {node.authorityScore && (
                                 <div className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 ${node.authorityScore > 80 ? "bg-emerald-100 text-emerald-700" : "bg-brand-100 text-brand-700"}`}>
@@ -123,10 +181,14 @@ const StrategyTimeline: React.FC = () => {
                             <div className="flex gap-3">
                                 <button className="flex-1 py-3 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50" onClick={() => setSelectedNode(null)}>Editar</button>
                                 <button className="flex-1 py-3 bg-brand-600 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 hover:bg-brand-700" onClick={() => {
-                                     // Approve logic
+                                     if (nodes.find(n => n.id === selectedNode)?.status === 'pending_approval') {
+                                         // Approve logic reuse
+                                         handleApprove(selectedNode, {} as any); // mock event
+                                     }
                                      setSelectedNode(null);
-                                     setNodes(prev => prev.map(n => n.id === selectedNode ? { ...n, status: "scheduled" } : n));
-                                }}>Agendar (1-Tap)</button>
+                                }}>
+                                    {nodes.find(n => n.id === selectedNode)?.status === 'pending_approval' ? "Aprobar y Agendar" : "Cerrar"}
+                                </button>
                             </div>
                          </motion.div>
                      </div>

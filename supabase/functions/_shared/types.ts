@@ -16,32 +16,16 @@ export interface LinkedInPDFData {
 }
 
 export interface LinkedInAuditResult {
-  overall_score: number;
-  visual_score: number;
-  authority_metrics: {
-    headline_impact: number;
-    keyword_density: number;
-    storytelling_power: number;
-    recruiter_clarity: number;
+  authority_score: number;
+  brutal_diagnosis: string;
+  quick_wins: string[];
+  strategic_roadmap: {
+    headline: string;
+    about: string;
+    experience: string;
   };
-  summary: string;
-  results: {
-    headline: {
-      score: number;
-      feedback: string;
-      suggested: string;
-    };
-    about: {
-      score: number;
-      feedback: string;
-      suggested: string;
-    };
-    experience: {
-      score: number;
-      feedback: string;
-      suggested: string;
-    };
-  };
+  visual_critique: string;
+  technical_seo_keywords: string[];
 }
 
 export interface Profile {

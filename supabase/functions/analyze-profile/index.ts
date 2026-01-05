@@ -1,10 +1,10 @@
-import { serve } from "std/http/server.ts";
 import { createClient } from "@supabase/supabase-js";
 import { AuditService } from "../_shared/services/AuditService.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { LinkedInProfileData } from "../_shared/types.ts";
+import { BehaviorService } from "../_shared/services/BehaviorService.ts";
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -24,6 +24,19 @@ serve(async (req: Request) => {
     const language = profile?.language || "es";
 
     const auditService = new AuditService(Deno.env.get("GEMINI_API_KEY")!);
+    const behaviorService = new BehaviorService(
+        Deno.env.get("GEMINI_API_KEY") ?? "",
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    // Track Audit Start
+    if (user?.id) {
+        behaviorService.trackEvent(user.id, "audit_started", { 
+            hasPdf: !!pdfBase64, 
+            hasImage: !!imageBase64 
+        }).catch(e => console.error("Behavior tracking error:", e));
+    }
     
     // DEBUG: Logs accumulator
     const debugLogs: string[] = [];

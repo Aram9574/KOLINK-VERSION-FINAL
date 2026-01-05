@@ -65,6 +65,12 @@ export class BillingService {
         })
         .eq("id", userId);
 
+      // Sync subscriptions table
+      await this.supabaseAdmin
+        .from("subscriptions")
+        .update({ status: "canceled", canceled_at: new Date().toISOString() })
+        .eq("user_id", userId);
+
       await this.stripe.subscriptions.update(subscription.id, {
         cancel_at_period_end: false, // Immediate cancel for deletion flow
       });
@@ -86,6 +92,12 @@ export class BillingService {
         .from("profiles")
         .update({ subscription_status: "canceled_pending", cancel_at_period_end: true })
         .eq("id", userId);
+
+      // Sync subscriptions table
+      await this.supabaseAdmin
+        .from("subscriptions")
+        .update({ status: "canceled_pending", canceled_at: new Date().toISOString() })
+        .eq("user_id", userId);
 
       return {
         success: true,
@@ -113,6 +125,7 @@ export class BillingService {
    * Processes credit updates and plan tier changes after payment.
    */
   async processPaymentSuccess(profile: Profile, amountPaid: number, periodEndTimestamp: number, priceId?: string) {
+    console.log(`Processing payment success for user ${profile.id}. Amount: ${amountPaid}, PriceId: ${priceId}`);
     let creditsToAdd = 0;
     let newPlan = "pro";
 
@@ -142,6 +155,20 @@ export class BillingService {
       .eq("id", profile.id);
 
     if (updateError) throw new Error("Database update failed");
+
+    // Sync with 'subscriptions' table (Source of Truth)
+    const { error: subError } = await this.supabaseAdmin
+      .from("subscriptions")
+      .upsert({
+        user_id: profile.id,
+        plan_type: newPlan,
+        status: "active",
+        reset_date: new Date(periodEndTimestamp * 1000).toISOString(),
+        stripe_customer_id: profile.stripe_customer_id, // Ensure this is available on profile object passed in
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "user_id" });
+
+    if (subError) console.error("Failed to sync subscription table:", subError);
 
     // Referral Logic
     if (profile.referred_by) {
@@ -192,6 +219,17 @@ export class BillingService {
         subscription_status: status === "active" ? "active" : "past_due",
         plan_tier: newPlan,
         subscription_end_date: new Date(periodEnd * 1000).toISOString(),
+      })
+      .eq("stripe_customer_id", customerId);
+
+    // Sync with 'subscriptions' table
+    await this.supabaseAdmin
+      .from("subscriptions")
+      .update({
+        status: status === "active" ? "active" : "past_due",
+        plan_type: newPlan,
+        reset_date: new Date(periodEnd * 1000).toISOString(),
+        updated_at: new Date().toISOString(),
       })
       .eq("stripe_customer_id", customerId);
   }

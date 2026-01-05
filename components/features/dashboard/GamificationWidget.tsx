@@ -36,6 +36,16 @@ const GamificationWidget: React.FC<GamificationWidgetProps> = ({ user }) => {
             <p className="text-sm font-bold leading-none">Creator</p>
           </div>
         </div>
+
+        {/* Streak Counter */}
+        {user.currentStreak > 0 && (
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-orange-50 dark:bg-orange-500/10 border border-orange-200/50 dark:border-orange-500/20 rounded-full">
+            <Flame className="w-3.5 h-3.5 text-orange-500 fill-current animate-pulse" />
+            <span className="text-sm font-bold text-orange-600 dark:text-orange-400">
+              {user.currentStreak}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Progress Bar */}

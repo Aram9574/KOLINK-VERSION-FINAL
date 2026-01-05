@@ -24,7 +24,7 @@ export class AIService extends BaseAIService {
     return await this.content.generatePost(params, profile);
   }
 
-  async generateCarousel(source: string, sourceType: string, styleFragments: string[], profile: UserProfileContext, language: string = "es") {
+  async generateCarousel(source: string, sourceType: string, styleFragments: string[], _profile: UserProfileContext, language: string = "es") {
     return await this.content.generateCarousel(source, sourceType, styleFragments, language);
   }
 
