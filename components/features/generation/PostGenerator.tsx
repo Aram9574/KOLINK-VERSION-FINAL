@@ -277,7 +277,7 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
       <div className="hidden lg:flex justify-between items-end mb-6">
         <div className="space-y-2">
           <h1 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 tracking-tight">
-            {language === "es" ? "Estudio" : "Studio"}
+            {language === "es" ? "Generador de Post" : "Post Generator"}
           </h1>
           <p className="text-slate-500">
             {language === "es"
@@ -323,7 +323,7 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
           {/* Mobile Title (Hidden on Desktop) */}
           <div className="lg:hidden space-y-2 mb-4">
             <h1 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 tracking-tight">
-              {language === "es" ? "Estudio" : "Studio"}
+              {language === "es" ? "Generador de Post" : "Post Generator"}
             </h1>
             <p className="text-slate-500">
               {language === "es"

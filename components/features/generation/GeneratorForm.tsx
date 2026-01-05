@@ -167,58 +167,66 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
             </div>
 
             <div className="space-y-6">
-                {/* Topic Input - Keeping it here as it's the main prompt */}
-                <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700 ml-1">
-                        {t.topicLabel}
-                    </label>
-                    <textarea
-                        className="w-full h-28 resize-none"
-                        placeholder={t.topicPlaceholder}
-                        value={params.topic}
-                        onChange={(e) =>
-                            onUpdateParams({ topic: e.target.value })}
-                        required
-                        maxLength={5000}
-                    />
-                    <div className="flex justify-end mt-1">
-                        <span
-                            className={`text-xs font-medium ${
-                                params.topic.length > 4500
-                                    ? "text-amber-500"
-                                    : "text-slate-400"
-                            }`}
-                        >
-                            {params.topic.length}/5000
-                        </span>
+                {/* Hero Topic Input */}
+                <div className="space-y-4">
+                    <div className="relative group/input">
+                        <div className="absolute inset-0 bg-gradient-to-r from-brand-500/10 to-indigo-500/10 rounded-2xl blur-lg opacity-0 group-hover/input:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                        <div className="relative bg-white border-0 ring-1 ring-slate-200 focus-within:ring-2 focus-within:ring-brand-500/20 rounded-2xl shadow-sm transition-all duration-300">
+                             <div className="absolute top-4 left-4 text-slate-400">
+                                <Sparkles className="w-5 h-5 text-brand-500" />
+                             </div>
+                             <textarea
+                                className="w-full h-32 md:h-40 p-4 pl-12 bg-transparent border-0 focus:ring-0 text-lg text-slate-800 placeholder:text-slate-400 resize-none leading-relaxed transition-all"
+                                placeholder={t.topicPlaceholder}
+                                value={params.topic}
+                                onChange={(e) => onUpdateParams({ topic: e.target.value })}
+                                required
+                                maxLength={5000}
+                            />
+                             {/* Character Counter */}
+                            <div className="absolute bottom-3 right-4">
+                                <span className={`text-[10px] font-bold tracking-wider uppercase ${params.topic.length > 4500 ? "text-amber-500" : "text-slate-300"}`}>
+                                    {params.topic.length} / 5000
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Section 1: ESTRATEGIA DE CONTENIDO */}
-                <div className="space-y-4">
+                {/* Section 1: ESTRATEGIA DE CONTENIDO (Premium Accordion) */}
+                <div className="space-y-4 pt-2">
                     <button
                         type="button"
                         onClick={() => setIsStrategyOpen(!isStrategyOpen)}
-                        className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider w-full hover:text-slate-600 transition-colors group cursor-pointer"
-                    >
-                        <AlignLeft strokeWidth={1.5} className="w-4 h-4" />
-                        {language === "es"
-                            ? "ESTRATEGIA DE CONTENIDO"
-                            : "CONTENT STRATEGY"}
+                        className={`
+                            flex items-center justify-between w-full p-4 rounded-xl border transition-all duration-300 text-left group
+                            ${isStrategyOpen 
+                                ? "bg-slate-50 border-brand-200 shadow-inner" 
+                                : "bg-white border-slate-100 hover:border-brand-200 hover:shadow-sm"
+                            }
+                        `}
+                    >   
+                        <div className="flex items-center gap-3">
+                            <div className={`
+                                p-2 rounded-lg transition-colors duration-300
+                                ${isStrategyOpen ? "bg-brand-100 text-brand-600" : "bg-slate-100 text-slate-500 group-hover:text-brand-500 group-hover:bg-brand-50"}
+                            `}>
+                                <AlignLeft strokeWidth={2} className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h3 className={`text-sm font-bold tracking-tight transition-colors ${isStrategyOpen ? "text-slate-900" : "text-slate-600 group-hover:text-slate-900"}`}>
+                                    {language === "es" ? "Estrategia de Contenido" : "Content Strategy"}
+                                </h3>
+                                <p className="text-[11px] text-slate-400 font-medium">
+                                    {language === "es" ? "Define formato, gancho y voz" : "Format, hook and voice"}
+                                </p>
+                            </div>
+                        </div>
+                        
                         <div
-                            className={`ml-auto transition-transform duration-200 ${
-                                isStrategyOpen ? "rotate-180" : ""
-                            }`}
+                            className={`p-1 rounded-full transition-transform duration-300 ${isStrategyOpen ? "rotate-180 bg-slate-200" : "bg-transparent text-slate-400 group-hover:text-brand-500"}`}
                         >
-                            <svg
-                                className="w-4 h-4"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
                         </div>
@@ -443,31 +451,40 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                     )}
                 </div>
 
-                {/* Section 2: DETALLES & AJUSTES */}
-                <div className="space-y-4 pt-2">
+                {/* Section 2: DETALLES & AJUSTES (Premium Accordion) */}
+                <div className="space-y-4">
                     <button
                         type="button"
                         onClick={() => setIsDetailsOpen(!isDetailsOpen)}
-                        className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-wider w-full hover:text-slate-600 transition-colors group cursor-pointer"
+                        className={`
+                            flex items-center justify-between w-full p-4 rounded-xl border transition-all duration-300 text-left group
+                            ${isDetailsOpen 
+                                ? "bg-slate-50 border-brand-200 shadow-inner" 
+                                : "bg-white border-slate-100 hover:border-brand-200 hover:shadow-sm"
+                            }
+                        `}
                     >
-                        <Sliders strokeWidth={1.5} className="w-4 h-4" />
-                        {language === "es"
-                            ? "DETALLES & AJUSTES"
-                            : "DETAILS & SETTINGS"}
+                         <div className="flex items-center gap-3">
+                            <div className={`
+                                p-2 rounded-lg transition-colors duration-300
+                                ${isDetailsOpen ? "bg-indigo-100 text-indigo-600" : "bg-slate-100 text-slate-500 group-hover:text-indigo-500 group-hover:bg-indigo-50"}
+                            `}>
+                                <Sliders strokeWidth={2} className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h3 className={`text-sm font-bold tracking-tight transition-colors ${isDetailsOpen ? "text-slate-900" : "text-slate-600 group-hover:text-slate-900"}`}>
+                                    {language === "es" ? "Detalles & Ajustes" : "Details & Settings"}
+                                </h3>
+                                <p className="text-[11px] text-slate-400 font-medium">
+                                    {language === "es" ? "Audiencia, creatividad y hashtags" : "Audience, creativity & hashtags"}
+                                </p>
+                            </div>
+                        </div>
+
                         <div
-                            className={`ml-auto transition-transform duration-200 ${
-                                isDetailsOpen ? "rotate-180" : ""
-                            }`}
+                            className={`p-1 rounded-full transition-transform duration-300 ${isDetailsOpen ? "rotate-180 bg-slate-200" : "bg-transparent text-slate-400 group-hover:text-indigo-500"}`}
                         >
-                            <svg
-                                className="w-4 h-4"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
                         </div>
