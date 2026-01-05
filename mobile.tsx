@@ -11,7 +11,7 @@ import { PostHogProvider } from "posthog-js/react";
 import { initAnalytics } from "./services/analytics";
 import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
-import { toast } from "sonner";
+import { toast } from "./components/ui/toast";
 
 const posthogClient = initAnalytics();
 

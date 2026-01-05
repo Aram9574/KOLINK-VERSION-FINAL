@@ -35,7 +35,7 @@ import {
 import { translations } from "../../../translations";
 import Tooltip from "../../ui/Tooltip";
 
-import { toast } from "sonner";
+import { useToasts } from "../../ui/toast";
 import { GenerationParamsSchema } from "../../../schemas";
 import { CustomSelect } from "../../ui/CustomSelect";
 import LoadingProgress from "../../ui/LoadingProgress";
@@ -62,13 +62,14 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
     isCancelled,
 }) => {
     const t = translations[language].app.generator;
+    const toasts = useToasts();
     const tConstants = translations[language].app.constants;
     const { user } = useUser();
     const isFreeUser = user?.planTier === "free";
 
     const checkPremiumAccess = (option: { isPremium?: boolean }) => {
         if (isFreeUser && option.isPremium) {
-            toast.error(
+            toasts.error(
                 language === "es"
                     ? "Esta opción es solo para usuarios Premium 🔒"
                     : "This option is for Premium users only 🔒",
@@ -109,7 +110,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
         if (!result.success) {
             const errorMsg = (result.error as any).errors[0]?.message ||
                 "Validation failed";
-            toast.error(errorMsg);
+            toasts.error(errorMsg);
             return;
         }
 
@@ -329,7 +330,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                         ? <Lock size={16} />
                                         : <Wand2 size={16} />}
                                     onPremiumClick={() =>
-                                        toast.error(
+                                        toasts.error(
                                             language === "es"
                                                 ? "Las voces de marca son solo para usuarios Premium 🔒"
                                                 : "Brand voices are for Premium users only 🔒",

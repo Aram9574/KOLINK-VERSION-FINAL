@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
 import confetti from "canvas-confetti";
 import { useLocation } from "react-router-dom";
-import { toast } from "sonner";
+import { useToasts } from "../../ui/toast";
 import {
   AppLanguage,
   EmojiDensity,
@@ -69,6 +69,7 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
   });
   const { currentPost, updatePost } = usePosts();
   const { checkCredits } = useCredits();
+  const toasts = useToasts();
 
   // Legacy voices load (kept for future integration)
   useEffect(() => {
@@ -90,7 +91,7 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
         if (params.generateCarousel && onGoToCarousel) {
             setTimeout(() => {
                 onGoToCarousel(currentPost.content);
-                toast.success("Redirecting to Carousel Studio...");
+                toasts.success("Redirecting to Carousel Studio...");
             }, 1000);
         }
     }
@@ -116,7 +117,7 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
       onGenerate(finalParams);
     } catch (e) {
       console.error("Generator error", e);
-      toast.error("Error starting generation");
+      toasts.error("Error starting generation");
     }
   };
 

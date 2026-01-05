@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useToasts } from "../components/ui/toast";
 import { AppTab, GenerationParams, Post, UserProfile } from "../types";
 import { executePostGeneration } from "../services/postWorkflow";
 import { supabase } from "../services/supabaseClient";
@@ -43,6 +43,7 @@ export const useGenerationLogic = ({
     setIsGenerating,
     savePostToHistory,
 }: UseGenerationLogicProps) => {
+    const toasts = useToasts();
     const [prefilledParams, setPrefilledParams] = useState<
         GenerationParams | null
     >(null);
@@ -79,7 +80,7 @@ export const useGenerationLogic = ({
                                 .getTime();
 
                             if (postTime > startTime) {
-                                toast.success(
+                                toasts.success(
                                     "¡Post recuperado! Se generó mientras no estabas.",
                                 );
                                 const mappedPost: Post = {
@@ -186,10 +187,7 @@ export const useGenerationLogic = ({
 
                 const xpGained = gamificationResult.newXP - user.xp;
                 if (xpGained > 0) {
-                    toast.success(`+${xpGained} XP`, {
-                        description: "¡Sigue así para subir de nivel!",
-                        icon: "⭐",
-                    });
+                    toasts.success(`+${xpGained} XP! Sigue así para subir de nivel!`);
                 }
 
                 fetchUserProfile(user.id).then((updatedProfile) => {
@@ -217,12 +215,12 @@ export const useGenerationLogic = ({
                 if (msg.includes("Insufficient credits")) {
                     setShowUpgradeModal(true);
                 } else if (msg.includes("Rate limit exceeded")) {
-                    toast.warning(
+                    toasts.warning(
                         "Por favor espera unos segundos antes de generar otro post.",
                     );
                 } else {
                     // Generic error - distinguish between network and server if possible
-                    toast.error(
+                    toasts.error(
                         "Error al generar contenido. Inténtalo de nuevo o contacta soporte.",
                         {
                             description: msg.length < 50

@@ -8,11 +8,11 @@
   /* SOTA Semantic Colors (Standardized on Slate) */
   --color-primary: #2563eb;
   --color-primary-foreground: #ffffff;
-  
+
   --color-secondary: #f1f5f9; /* Slate 100 */
   --color-secondary-foreground: #0f172a; /* Slate 900 */
 
-  --color-accent: #3b82f6; 
+  --color-accent: #3b82f6;
   --color-accent-foreground: #ffffff;
 
   /* Surfaces */
@@ -22,17 +22,17 @@
   --color-card-foreground: #020617;
   --color-muted: #f8fafc;
   --color-muted-foreground: #64748b; /* Slate 500 */
-  
+
   /* Borders - Standardized Fine */
   --color-border: #e2e8f0; /* Slate 200 */
   --color-input: #e2e8f0;
-  
+
   /* Shapes - Strict SOTA */
   --radius-xl: 12px;
   --radius-2xl: 12px; /* Force 12px as standard */
   --radius-3xl: 12px; /* Force 12px as standard */
   --radius-full: 9999px;
-  
+
   /* Brand Palette - Unified SOTA */
   --color-brand-50: #eff6ff;
   --color-brand-100: #dbeafe;
@@ -45,21 +45,95 @@
   --color-brand-800: #1e40af;
   --color-brand-900: #1e3a8a;
   --color-brand-950: #172554;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-ai: 0 0 20px rgba(37, 99, 235, 0.1);
   --shadow-soft-glow: 0 4px 20px -2px rgba(37, 99, 235, 0.08);
 
   /* Typography Extras */
   --tracking-tightest: -0.02em;
+
+  /* Toast System Variables */
+  --color-context-card-border: var(--context-card-border);
+  --color-red-800: var(--ds-red-800);
+  --color-red-900: var(--ds-red-900);
+  --color-blue-700: var(--ds-blue-700);
+  --color-amber-800: var(--ds-amber-800);
+  --color-amber-850: var(--ds-amber-850);
+  --color-gray-100: var(--ds-gray-100);
+  --color-gray-400: var(--ds-gray-400);
+  --color-gray-700: var(--ds-gray-700);
+  --color-gray-1000: var(--ds-gray-1000);
+  --color-gray-1000-h: var(--ds-gray-1000-h);
+  --color-gray-alpha-200: var(--ds-gray-alpha-200);
+  --color-gray-alpha-400: var(--ds-gray-alpha-400);
+  --color-background-100: var(--ds-background-100);
+  --color-contrast-fg: var(--ds-contrast-fg);
+  --color-geist-background: var(--geist-background);
+  --shadow-focus-ring: var(--ds-focus-ring);
+  --shadow-border-small: var(--ds-shadow-border-small);
+  --shadow-menu: var(--ds-shadow-menu);
+  --animate-fade-spin: fade-spin 1.2s linear infinite;
 }
 
 /* Global Styles & Variables */
 :root {
   --radius: 0.75rem; /* 12px Standard */
+
+  /* Toast System :root Variables */
+  --context-card-border: hsla(0, 0%, 92%, 1);
+  --ds-contrast-fg: #ffffff;
+  --geist-background: #fff;
+  --ds-shadow-menu:
+    var(--ds-shadow-border), 0px 1px 1px rgba(0, 0, 0, 0.02), 0px 4px 8px -4px
+    rgba(0, 0, 0, 0.04), 0px 16px 24px -8px rgba(0, 0, 0, 0.06);
+  --ds-red-800: oklch(58.19% 0.2482 25.15);
+  --ds-red-900: oklch(54.99% 0.232 25.29);
+  --ds-blue-700: oklch(57.61% 0.2508 258.23);
+  --ds-amber-800: oklch(77.21% 0.1991 64.28);
+  --ds-amber-850: hsl(33, 96%, 42%);
+  --ds-gray-100: hsla(0, 0%, 95%, 1);
+  --ds-gray-400: hsla(0, 0%, 92%, 1);
+  --ds-gray-700: hsla(0, 0%, 56%, 1);
+  --ds-gray-1000: hsla(0, 0%, 9%, 1);
+  --ds-gray-1000-h: hsl(0, 0%, 22%);
+  --ds-gray-alpha-200: hsla(0, 0%, 0%, 0.08);
+  --ds-gray-alpha-400: hsla(0, 0%, 0%, 0.08);
+  --ds-background-100: hsla(0, 0%, 100%, 1);
+  --ds-focus-color: var(--ds-blue-700);
+  --ds-focus-ring:
+    0 0 0 2px var(--ds-background-100), 0 0 0 4px var(--ds-focus-color);
+  --ds-shadow-border: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  --ds-shadow-small: 0px 2px 2px rgba(0, 0, 0, 0.04);
+  --ds-shadow-border-small: var(--ds-shadow-border), var(--ds-shadow-small);
+}
+
+.dark {
+  --context-card-border: hsla(0, 0%, 18%, 1);
+  --geist-background: #000;
+  --ds-shadow-menu:
+    var(--ds-shadow-border), 0px 1px 1px rgba(0, 0, 0, 0.02), 0px 4px 8px -4px
+    rgba(0, 0, 0, 0.04), 0px 16px 24px -8px rgba(0, 0, 0, 0.06);
+  --ds-red-800: oklch(58.01% 0.227 25.12);
+  --ds-red-900: oklch(69.96% 0.2136 22.03);
+  --ds-blue-700: oklch(57.61% 0.2321 258.23);
+  --ds-amber-800: oklch(77.21% 0.1991 64.28);
+  --ds-gray-100: hsla(0, 0%, 10%, 1);
+  --ds-gray-400: hsla(0, 0%, 18%, 1);
+  --ds-gray-700: hsla(0, 0%, 56%, 1);
+  --ds-gray-1000: hsla(0, 0%, 93%, 1);
+  --ds-gray-1000-h: hsl(0, 0%, 80%);
+  --ds-gray-alpha-200: hsla(0, 0%, 100%, 0.09);
+  --ds-gray-alpha-400: hsla(0, 0%, 100%, 0.14);
+  --ds-background-100: hsla(0, 0%, 4%, 1);
+  --ds-shadow-border: 0 0 0 1px rgba(255, 255, 255, 0.145);
+  --ds-shadow-small: 0px 1px 2px rgba(0, 0, 0, 0.16);
+  --ds-shadow-border-small:
+    var(--ds-shadow-border), 0px 1px 2px rgba(0, 0, 0, 0.16);
 }
 
 h1, h2, h3 {
@@ -83,30 +157,42 @@ body {
 }
 
 input, textarea, select {
-  @apply px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:ring-offset-2 outline-none transition-all text-slate-900 placeholder-slate-400 text-sm font-medium shadow-sm hover:border-slate-300;
+  @apply px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50
+    focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500
+    focus:ring-offset-2 outline-none transition-all text-slate-900
+    placeholder-slate-400 text-sm font-medium shadow-sm hover:border-slate-300;
 }
 
 /* Utility Classes for Components */
 
 /* AI Glass Card */
 @utility card-ai {
-  @apply bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl shadow-card hover:shadow-ai transition-all duration-300;
+  @apply bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl
+    shadow-card hover:shadow-ai transition-all duration-300;
 }
 
 /* Primary AI Button */
 @utility btn-ai-primary {
-  @apply bg-brand-600 text-white rounded-full px-6 py-3 font-semibold hover:bg-brand-700 hover:shadow-ai hover:-translate-y-0.5 transition-all duration-300 active:translate-y-0 shadow-lg shadow-brand-600/20;
+  @apply bg-brand-600 text-white rounded-full px-6 py-3 font-semibold
+    hover:bg-brand-700 hover:shadow-ai hover:-translate-y-0.5 transition-all
+    duration-300 active:translate-y-0 shadow-lg shadow-brand-600/20;
 }
 
 /* Secondary AI Button */
 @utility btn-ai-secondary {
-  @apply bg-white text-slate-700 border border-slate-200 rounded-full px-6 py-3 font-medium hover:bg-slate-50 hover:border-slate-300 transition-all duration-200;
+  @apply bg-white text-slate-700 border border-slate-200 rounded-full px-6 py-3
+    font-medium hover:bg-slate-50 hover:border-slate-300 transition-all
+    duration-200;
 }
 
 /* Animations */
 @keyframes scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes shimmer {
@@ -116,9 +202,24 @@ input, textarea, select {
 }
 
 @keyframes shine {
-  0% { transform: translateX(-100%) skewX(-15deg); }
-  50% { transform: translateX(100%) skewX(-15deg); }
-  100% { transform: translateX(100%) skewX(-15deg); }
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+  50% {
+    transform: translateX(100%) skewX(-15deg);
+  }
+  100% {
+    transform: translateX(100%) skewX(-15deg);
+  }
+}
+
+@keyframes fade-spin {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.15;
+  }
 }
 
 @utility animate-shine {
@@ -136,20 +237,34 @@ input, textarea, select {
 }
 
 /* Safe Area Utilities */
-@utility pb-safe { padding-bottom: env(safe-area-inset-bottom); }
-@utility pt-safe { padding-top: env(safe-area-inset-top); }
-@utility pl-safe { padding-left: env(safe-area-inset-left); }
-@utility pr-safe { padding-right: env(safe-area-inset-right); }
-@utility h-dvh { height: 100dvh; }
-@utility min-h-dvh { min-height: 100dvh; }
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+@utility pl-safe {
+  padding-left: env(safe-area-inset-left);
+}
+@utility pr-safe {
+  padding-right: env(safe-area-inset-right);
+}
+@utility h-dvh {
+  height: 100dvh;
+}
+@utility min-h-dvh {
+  min-height: 100dvh;
+}
 
 /* Premium Glass Card (Bento Style) */
 @utility card-premium {
-  @apply bg-card backdrop-blur-md border border-border rounded-xl shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-300;
+  @apply bg-card backdrop-blur-md border border-border rounded-xl shadow-sm
+    hover:shadow-xl hover:shadow-primary/5 transition-all duration-300;
 }
 
 @utility glass-surface {
-  @apply bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-xl transition-all duration-300;
+  @apply bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-xl
+    transition-all duration-300;
 }
 
 @utility soft-glow-blue {

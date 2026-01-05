@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { Post } from '../types';
 import { fetchUserPosts } from '../services/postRepository';
 import { useUser } from './UserContext';
-import { toast } from 'sonner';
+import { useToasts } from '../components/ui/toast';
 
 interface PostContextType {
     posts: Post[];
@@ -30,6 +30,7 @@ const PostContext = createContext<PostContextType | undefined>(undefined);
 
 export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { user } = useUser();
+    const toasts = useToasts();
     const [posts, setPosts] = useState<Post[]>([]);
     const [currentPost, setCurrentPost] = useState<Post | null>(null);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -82,7 +83,7 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 }
             } catch (error) {
                 console.error("Error loading posts:", error);
-                toast.error("Failed to load posts");
+                toasts.error("Failed to load posts");
             } finally {
                 if (isMounted) setIsLoading(false);
             }
@@ -116,7 +117,7 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }
         } catch (error) {
             console.error("Error loading more posts:", error);
-            toast.error("Failed to load more posts");
+            toasts.error("Failed to load more posts");
         } finally {
             setIsLoadingMore(false);
         }

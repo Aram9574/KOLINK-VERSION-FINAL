@@ -6,7 +6,7 @@ import {
     Routes,
     useLocation,
 } from "react-router-dom";
-import { Toaster } from "sonner";
+
 import { useUser } from "./context/UserContext";
 import { useSessionTimeout } from "./hooks/useSessionTimeout";
 import ProtectedRoute from "./components/features/auth/ProtectedRoute";
@@ -92,7 +92,7 @@ const App: React.FC = () => {
 
     return (
         <>
-            <Toaster position="top-center" richColors />
+
             <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<LandingPage />} />

@@ -27,7 +27,7 @@ import LockedAuditState from "../audit/LockedAuditState";
 import ReferralModal from "../../modals/ReferralModal";
 import { Gift } from "lucide-react";
 
-import { toast } from "sonner";
+import { useToasts } from "../../ui/toast";
 import { AppTab, Post, UserProfile } from "../../../types";
 import { translations } from "../../../translations";
 import { ActionFunctionArgs } from "react-router-dom";
@@ -54,6 +54,7 @@ const AutoPostStudio = React.lazy(() => import("../autopost/AutoPostStudio.tsx")
 
 const DashboardContent: React.FC = () => {
     const { user, refreshUser, setUser, language, setLanguage } = useUser();
+    const toasts = useToasts();
     const {
         posts,
         setPosts,
@@ -122,7 +123,7 @@ const DashboardContent: React.FC = () => {
             } catch (error) {
                 console.error("Failed to persist user updates:", error);
                 // Optional: Revert optimistic update here if critical
-                toast.error("Error saving progress");
+                toasts.error("Error saving progress");
             }
         }
     };
@@ -156,7 +157,7 @@ const DashboardContent: React.FC = () => {
         if (queryParams.has("session_id")) {
             console.log("Stripe session detected, refreshing user...");
             refreshUser().then(() => {
-                toast.success(
+                toasts.success(
                     language === "es"
                         ? "¡Suscripción actualizada!"
                         : "Subscription updated!",
@@ -172,7 +173,7 @@ const DashboardContent: React.FC = () => {
         e.stopPropagation();
         if (window.confirm("Are you sure you want to delete this post?")) {
             removePost(id);
-            toast.success("Post deleted");
+            toasts.success("Post deleted");
         }
     };
 

@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { translations } from "../../../translations";
 import { supabase } from "../../../services/supabaseClient";
-import { toast } from "sonner";
+import { useToasts } from "../../ui/toast";
 import { Haptics, NotificationType } from "@capacitor/haptics";
 import confetti from "canvas-confetti";
 import ScheduleModal from "../../modals/ScheduleModal";
@@ -70,6 +70,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
     const [showAudit, setShowAudit] = useState(true);
     const [isPublishing, setIsPublishing] = useState(false);
     const [isScheduling, setIsScheduling] = useState(false);
+    const toasts = useToasts();
 
     const t = translations[language].app.preview;
     const navigate = useNavigate();
@@ -97,7 +98,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
     const handlePublish = () => {
         const textToCopy = displayContent || "";
         navigator.clipboard.writeText(textToCopy).then(() => {
-            toast.success(
+            toasts.success(
                 language === "es"
                     ? "Texto copiado. Ahora pégalo en LinkedIn."
                     : "Text copied. Now paste it on LinkedIn.",
@@ -105,7 +106,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
             // Open LinkedIn in a new tab
             window.open("https://www.linkedin.com/feed/", "_blank");
         }).catch(() => {
-            toast.error(
+            toasts.error(
                 language === "es"
                     ? "Error al copiar el texto"
                     : "Failed to copy text",
@@ -260,7 +261,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
                 onConfirm={(date) => {
                     if (onSchedule) onSchedule(date);
                     setIsScheduling(false);
-                    toast.success(t.scheduled);
+                    toasts.success(t.scheduled);
                 }}
                 language={language}
             />

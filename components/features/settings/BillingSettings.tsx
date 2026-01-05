@@ -5,6 +5,7 @@ import { CreditCard, ChevronRight, Zap, Target } from 'lucide-react';
 import { PLANS } from '../../../constants';
 import CancellationModal from '../../modals/CancellationModal';
 import { motion } from 'framer-motion';
+import { Pricing } from '../../ui/pricing-cards';
 
 interface BillingSettingsProps {
     user: UserProfile;
@@ -140,6 +141,23 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpg
                     onSave({ cancelAtPeriodEnd: true });
                 }}
             />
+
+            {/* Upgrade / Plans Section */}
+            <div className="pt-8 border-t border-slate-200">
+                <Pricing 
+                    currentPlanId={user.planTier} 
+                    onPlanSelect={(planId) => {
+                         // Redirect to payment or trigger upgrade logic
+                         // For now, we reuse the onUpgrade prop which presumably handles generic upgrade flow
+                         // OR we might need specific logic per plan.
+                         // Given onUpgrade is () => void, we assume it opens a modal or redirects.
+                         // If we want specific plan selection, we might need to update onUpgrade signature or handle it here.
+                         // For now, let's just trigger onUpgrade() or console log.
+                         window.location.href = '/checkout?plan=' + planId; 
+                    }}
+                    isUpgradeView
+                />
+            </div>
         </div>
     );
 };

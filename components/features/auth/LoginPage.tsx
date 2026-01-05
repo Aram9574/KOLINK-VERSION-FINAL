@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Lock, Mail } from "lucide-react";
 import { supabase } from "../../../services/supabaseClient";
 import { APP_DOMAIN } from "../../../constants";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { useToasts } from "../../ui/toast";
 import { Helmet } from "react-helmet-async";
 import { useUser } from "../../../context/UserContext";
 import SocialLoginButtons from "./SocialLoginButtons";
@@ -14,6 +14,7 @@ import { Capacitor } from "@capacitor/core";
 const LoginPage: React.FC = () => {
     const { language } = useUser();
     const navigate = useNavigate();
+    const toasts = useToasts();
     const [isForgotPasswordMode, setIsForgotPasswordMode] = useState(false);
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [email, setEmail] = useState("");
@@ -56,16 +57,16 @@ const LoginPage: React.FC = () => {
             });
 
             if (error) {
-                toast.error(error.message);
+                toasts.error(error.message);
             } else {
-                toast.success(
+                toasts.success(
                     "Correo de recuperación enviado. Revisa tu bandeja de entrada.",
                 );
                 setIsForgotPasswordMode(false);
             }
         } catch (err) {
             console.error("Reset password error:", err);
-            toast.error("Error al enviar el correo. Intenta de nuevo.");
+            toasts.error("Error al enviar el correo. Intenta de nuevo.");
         } finally {
             setIsLoading(false);
         }
@@ -99,7 +100,7 @@ const LoginPage: React.FC = () => {
                     },
                 });
                 if (error) throw error;
-                toast.success("Cuenta creada. Por favor verifica tu correo.");
+                toasts.success("Cuenta creada. Por favor verifica tu correo.");
                 setIsLoading(false);
             }
             setIsLoading(false);
@@ -111,7 +112,7 @@ const LoginPage: React.FC = () => {
                     ? "Error de conexión. Verifica tu internet o si tienes un AdBlocker activo." 
                     : "Connection error. Check your internet or AdBlocker.";
             }
-            toast.error(msg);
+            toasts.error(msg);
             setIsLoading(false);
         }
     };
@@ -131,7 +132,7 @@ const LoginPage: React.FC = () => {
             });
             if (error) throw error;
         } catch (error: any) {
-            toast.error(error.message || `Error al iniciar con ${provider}`);
+            toasts.error(error.message || `Error al iniciar con ${provider}`);
             setIsLoading(false);
         }
     };
