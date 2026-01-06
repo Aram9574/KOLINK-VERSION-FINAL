@@ -357,3 +357,12 @@ export interface UserSubscription {
     created_at: string;
     updated_at: string;
 }
+
+export interface UserFeedback {
+    id: string;
+    user_id: string | null;
+    content: string;
+    rating: number | null;
+    status: "new" | "reviewed" | "resolved";
+    created_at: string;
+}

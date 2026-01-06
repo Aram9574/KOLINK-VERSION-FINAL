@@ -10,7 +10,7 @@ import {
     CreditCard
 } from "lucide-react";
 import { AppLanguage, UserProfile } from "../../../types.ts";
-import FeedbackModal from "../../modals/FeedbackModal.tsx";
+import { Feedback } from "../../ui/feedback.tsx";
 import { getAvatarUrl } from "../../../utils.ts";
 import { motion, AnimatePresence } from "framer-motion";
 import { hapticFeedback } from "../../../lib/animations.ts";
@@ -43,7 +43,6 @@ const getBreadcrumb = (tab: string) => {
 };
 
 const DashboardHeader = ({ user, language, setLanguage, activeTab, setActiveTab }: DashboardHeaderProps) => {
-    const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     
     const breadcrumb = getBreadcrumb(activeTab);
@@ -66,14 +65,9 @@ const DashboardHeader = ({ user, language, setLanguage, activeTab, setActiveTab 
                     <div className="flex items-center gap-3 md:gap-4">
                         
                         {/* Suggestions / Feedback Button */}
-                        <motion.button
-                            onClick={() => setIsFeedbackOpen(true)}
-                            {...hapticFeedback}
-                            className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-50 hover:bg-white border border-slate-200 hover:border-slate-300 text-slate-600 rounded-lg text-xs font-medium transition-all group hover:shadow-sm hover:ring-1 hover:ring-slate-100"
-                        >
-                            <Sparkles className="w-3.5 h-3.5 text-brand-600 group-hover:text-brand-500 transition-colors" />
-                            <span>Sugerencias</span>
-                        </motion.button>
+                        <div className="hidden md:block">
+                            <Feedback label="Sugerencias" />
+                        </div>
 
                         <div className="h-6 w-px bg-slate-200 mx-1 hidden md:block" />
 
@@ -172,12 +166,6 @@ const DashboardHeader = ({ user, language, setLanguage, activeTab, setActiveTab 
                 </div>
             </header>
 
-            <FeedbackModal
-                isOpen={isFeedbackOpen}
-                onClose={() => setIsFeedbackOpen(false)}
-                language={language}
-                user={user}
-            />
         </>
     );
 };

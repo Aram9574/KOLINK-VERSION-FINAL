@@ -1,5 +1,5 @@
 import React from "react";
-import { Spinner } from "./spinner-1";
+import { Spinner } from "@/components/ui/spinner-1";
 import clsx from "clsx";
 
 const sizes = [
@@ -62,6 +62,8 @@ export interface ButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   ref?: React.Ref<HTMLButtonElement>;
   className?: string;
+  tabIndex?: number;
+  htmlType?: "button" | "submit" | "reset";
 }
 
 export const Button = ({
@@ -80,13 +82,14 @@ export const Button = ({
   onClick,
   ref,
   className,
+  htmlType = "button",
   ...rest
 }: ButtonProps) => {
   return (
     <button
       ref={ref}
-      type="submit"
-      disabled={disabled}
+      type={htmlType}
+      disabled={disabled || loading}
       onClick={onClick}
       tabIndex={0}
       className={clsx(
