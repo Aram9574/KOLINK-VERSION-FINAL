@@ -6,6 +6,17 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+interface ScheduleItem {
+  pillar_name: string;
+  idea_title: string;
+  idea_summary: string;
+  confidence: number;
+}
+
+interface ScheduleResponse {
+  schedule: ScheduleItem[];
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -115,12 +126,13 @@ Deno.serve(async (req) => {
         });
 
         // D. Insert into DB
-        if (scheduleIdeas && scheduleIdeas.schedule) {
-             const inserts = scheduleIdeas.schedule.map((item: any) => {
+        const ideasResponse = scheduleIdeas as unknown as ScheduleResponse;
+        if (ideasResponse && ideasResponse.schedule) {
+             const inserts = ideasResponse.schedule.map((item: ScheduleItem) => {
                  const matchedPillar = pillars?.find(p => p.name === item.pillar_name) || pillars?.[0];
                  // Calculate date: Tomorrow + index days
                  const date = new Date();
-                 date.setDate(date.getDate() + 1 + scheduleIdeas.schedule.indexOf(item));
+                 date.setDate(date.getDate() + 1 + ideasResponse.schedule.indexOf(item));
 
                  return {
                      user_id: userId,

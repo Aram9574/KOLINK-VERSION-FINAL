@@ -10,6 +10,7 @@ import {
     List as ListIcon,
     X,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import LibrarySidebar from "./LibrarySidebar";
 import HistoryCard from "./HistoryCard";
 import CalendarView from "./CalendarView";
@@ -17,6 +18,8 @@ import { updatePost as updatePostInDb } from "../../../services/postRepository";
 import { Share } from "@capacitor/share";
 import Skeleton from "../../ui/Skeleton";
 import { toast } from "sonner";
+import { cn } from "../../../lib/utils";
+import PremiumLockOverlay from "../../ui/PremiumLockOverlay";
 
 interface HistoryViewProps {
     onSelect: (post: Post) => void;
@@ -101,23 +104,19 @@ const HistoryView: React.FC<HistoryViewProps> = ({
     ]);
 
     const handleToggleFavorite = async (id: string, isFavorite: boolean) => {
-        // Optimistic update
         const post = posts.find((p) => p.id === id);
         if (post) {
-            updatePost({ ...post, isFavorite }); // Update Context
-
-            // Persist
+            updatePost({ ...post, isFavorite });
             try {
                 const success = await updatePostInDb(id, { isFavorite });
                 if (!success) {
-                    // Revert if failed
                     updatePost({ ...post, isFavorite: !isFavorite });
                     toast.error("Failed to update favorite status");
                 } else {
                     toast.success(
                         isFavorite
-                            ? "Added to favorites"
-                            : "Removed from favorites",
+                            ? (language === "es" ? "Añadido a favoritos" : "Added to favorites")
+                            : (language === "es" ? "Eliminado de favoritos" : "Removed from favorites"),
                     );
                 }
             } catch (error) {
@@ -145,142 +144,147 @@ const HistoryView: React.FC<HistoryViewProps> = ({
     if (!user?.isPremium) {
         return (
             <PremiumLockOverlay 
-                title={language === "es" ? "Historial & Bóveda" : "History & Vault"}
+                title={language === "es" ? "Bóveda & Historial" : "Vault & History"}
                 description={language === "es"
-                    ? "Accede a todo tu historial de publicaciones, estadísticas y favoritos. Mantén un registro de tus mejores contenidos en un solo lugar."
-                    : "Access your entire post history, analytics, and favorites. Keep track of your best content in one place."}
+                    ? "Organiza tu contenido, accede a estadísticas avanzadas y mantén tus mejores posts seguros en tu bóveda personal."
+                    : "Organize your content, access advanced analytics, and keep your best posts safe in your personal vault."}
                 icon={<FolderOpen className="w-8 h-8" />}
             />
         );
     }
 
     return (
-        <div className="flex flex-col md:flex-row h-full">
-            {/* Sidebar (Desktop: Always visible, Mobile: Collapsible) */}
-            <div
-                className={`
-                w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-slate-200/60 
-                flex-col md:flex 
-                ${showMobileFilters ? "flex" : "hidden"}
-                md:h-full overflow-y-auto transition-all duration-300
-            `}
+        <div className="flex flex-col md:flex-row h-full overflow-hidden">
+            {/* Sidebar Explorer */}
+            <aside
+                className={cn(
+                    "fixed inset-0 z-50 bg-white md:bg-transparent md:relative md:flex md:w-72 lg:w-80 border-r border-slate-200/60 transition-transform duration-300 transform md:translate-x-0",
+                    showMobileFilters ? "translate-x-0" : "-translate-x-full"
+                )}
             >
-                <div className="p-4 md:p-6 relative">
-                    {/* Mobile Close Button */}
-                    <button
-                        onClick={() => setShowMobileFilters(false)}
-                        className="md:hidden absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600"
-                    >
-                        <X strokeWidth={1.5} className="w-5 h-5" />
-                    </button>
-                    <LibrarySidebar
-                        searchTerm={searchQuery}
-                        setSearchTerm={setSearchQuery}
-                        selectedTone={selectedTone}
-                        setSelectedTone={setSelectedTone}
-                        selectedFramework={selectedFramework}
-                        setSelectedFramework={setSelectedFramework}
-                        selectedStatus={selectedStatus}
-                        setSelectedStatus={setSelectedStatus}
-                        showFavorites={showFavorites}
-                        setShowFavorites={setShowFavorites}
-                        language={language}
-                    />
-                </div>
-            </div>
-
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col h-full bg-slate-50/50">
-                {/* Top Bar */}
-                <div className="p-6 pb-0 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <h1 className="text-2xl font-display font-bold text-slate-900">
-                                {viewMode === "list"
-                                    ? (language === "es"
-                                        ? "Biblioteca"
-                                        : "Library")
-                                    : (language === "es"
-                                        ? "Calendario"
-                                        : "Calendar")}
-                            </h1>
-                            <p className="text-sm text-slate-500">
-                                {filteredPosts.length} {language === "es"
-                                    ? "publicaciones"
-                                    : "posts found"}
-                            </p>
+                <div className="flex flex-col h-full w-full bg-white relative">
+                    <div className="p-6 h-full overflow-y-auto scrollbar-hide">
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Vault</h2>
+                            <button
+                                onClick={() => setShowMobileFilters(false)}
+                                className="md:hidden p-2 text-slate-400 hover:text-slate-600 rounded-lg bg-slate-50"
+                            >
+                                <X strokeWidth={2} className="w-5 h-5" />
+                            </button>
                         </div>
+                        
+                        <LibrarySidebar
+                            searchTerm={searchQuery}
+                            setSearchTerm={setSearchQuery}
+                            selectedTone={selectedTone}
+                            setSelectedTone={setSelectedTone}
+                            selectedFramework={selectedFramework}
+                            setSelectedFramework={setSelectedFramework}
+                            selectedStatus={selectedStatus}
+                            setSelectedStatus={setSelectedStatus}
+                            showFavorites={showFavorites}
+                            setShowFavorites={setShowFavorites}
+                            language={language}
+                        />
+                    </div>
+                </div>
+            </aside>
 
+            {/* Content Area */}
+            <main className="flex-1 flex flex-col h-full bg-white relative">
+                {/* Header */}
+                <div className="p-6 md:p-8 flex flex-col gap-6 md:flex-row md:items-end md:justify-between sticky top-0 bg-white/80 backdrop-blur-xl z-20 border-b border-slate-100/50">
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+                                {viewMode === "list"
+                                    ? (language === "es" ? "Biblioteca" : "Library")
+                                    : (language === "es" ? "Calendario" : "Calendar")}
+                            </h1>
+                            <div className="px-2 py-0.5 bg-brand-50 text-brand-700 text-[10px] font-bold rounded-full uppercase tracking-wider">
+                                {filteredPosts.length} posts
+                            </div>
+                        </div>
+                        <p className="text-sm text-slate-500 font-medium">
+                            {language === "es" ? "Gestiona y perfecciona tu estrategia de contenido" : "Manage and refine your content strategy"}
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
                         {/* Mobile Filter Toggle */}
                         <button
-                            onClick={() =>
-                                setShowMobileFilters(!showMobileFilters)}
-                            className="md:hidden p-2 bg-white border border-slate-200/60 rounded-lg text-slate-600 shadow-sm"
+                            onClick={() => setShowMobileFilters(true)}
+                            className="md:hidden flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold text-xs shadow-sm"
                         >
-                            <Filter strokeWidth={1.5} className="w-5 h-5" />
+                            <Filter className="w-4 h-4" />
+                            {language === "es" ? "Filtros" : "Filters"}
                         </button>
-                    </div>
 
-                    {/* View Switcher */}
-                    <div className="flex bg-white p-1 rounded-lg border border-slate-200/60 shadow-sm self-start md:self-auto">
-                        <button
-                            onClick={() => setViewMode("list")}
-                            className={`p-2 rounded-md transition-all ${
-                                viewMode === "list"
-                                    ? "bg-slate-100 text-slate-900 shadow-sm"
-                                    : "text-slate-400 hover:text-slate-600"
-                            }`}
-                            title="List View"
-                        >
-                            <ListIcon strokeWidth={1.5} className="w-4 h-4" />
-                        </button>
-                        <button
-                            onClick={() => setViewMode("calendar")}
-                            className={`p-2 rounded-md transition-all ${
-                                viewMode === "calendar"
-                                    ? "bg-slate-100 text-slate-900 shadow-sm"
-                                    : "text-slate-400 hover:text-slate-600"
-                            }`}
-                            title="Calendar View"
-                        >
-                            <CalendarIcon strokeWidth={1.5} className="w-4 h-4" />
-                        </button>
+                        {/* View Custom Switcher */}
+                        <div className="flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200/40">
+                            <button
+                                onClick={() => setViewMode("list")}
+                                className={cn(
+                                    "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200",
+                                    viewMode === "list"
+                                        ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/50"
+                                        : "text-slate-500 hover:text-slate-700"
+                                )}
+                            >
+                                <ListIcon className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">{language === "es" ? "Lista" : "List"}</span>
+                            </button>
+                            <button
+                                onClick={() => setViewMode("calendar")}
+                                className={cn(
+                                    "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200",
+                                    viewMode === "calendar"
+                                        ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/50"
+                                        : "text-slate-500 hover:text-slate-700"
+                                )}
+                            >
+                                <CalendarIcon className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">{language === "es" ? "Calendario" : "Calendar"}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                {/* Content Area */}
-                <div className="flex-1 p-6 min-h-0 overflow-y-auto">
-                    {viewMode === "calendar"
-                        ? (
-                            <div className="h-full">
+                {/* Viewport */}
+                <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={viewMode}
+                            initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 1.02, y: -10 }}
+                            transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                            className="h-full"
+                        >
+                            {viewMode === "calendar" ? (
                                 <CalendarView
-                                    posts={filteredPosts} // Only show filtered posts in calendar? Or all? Usually filter applies to view.
+                                    posts={filteredPosts}
                                     language={language}
                                     onSelectPost={onSelect}
                                 />
-                            </div>
-                        )
-                        : (
-                            // List View (CSS Grid)
-                            <div className="pb-20">
-                                {/* Padding bottom for scroll space */}
-                                {filteredPosts.length === 0
-                                    ? (
-                                        <div className="flex flex-col items-center justify-center h-[400px] border-2 border-dashed border-slate-200/60 rounded-xl text-center">
-                                            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                                                <FolderOpen className="w-8 h-8 text-slate-400" />
+                            ) : (
+                                <div className="space-y-12">
+                                    {filteredPosts.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center py-24 px-6 border-2 border-dashed border-slate-100 rounded-3xl text-center bg-slate-50/20">
+                                            <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-soft">
+                                                <FolderOpen className="w-10 h-10 text-slate-300" />
                                             </div>
-                                            <h3 className="text-base font-bold text-slate-900 mb-1">
+                                            <h3 className="text-lg font-bold text-slate-900 mb-2">
                                                 {t.noResults}
                                             </h3>
-                                            <p className="text-sm text-slate-500 max-w-xs mx-auto">
+                                            <p className="text-sm text-slate-500 max-w-xs mx-auto leading-relaxed">
                                                 {t.noResultsDesc}
                                             </p>
                                         </div>
-                                    )
-                                    : (
-                                        <>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+                                            <AnimatePresence>
                                                 {filteredPosts.map((post) => (
                                                     <HistoryCard
                                                         key={post.id}
@@ -293,34 +297,38 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                                                         onShare={handleShare}
                                                     />
                                                 ))}
-                                                {isLoadingMore && (
-                                                    <>
-                                                        <Skeleton className="h-[400px]" />
-                                                        <Skeleton className="h-[400px]" />
-                                                        <Skeleton className="h-[400px]" />
-                                                    </>
-                                                )}
-                                            </div>
-
-                                            {/* Load More Trigger */}
-                                            {hasMore && !isLoadingMore && (
-                                                <div className="mt-8 flex justify-center">
-                                                    <button
-                                                        onClick={loadMorePosts}
-                                                        className="px-6 py-2 bg-white border border-slate-200/60 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium"
-                                                    >
-                                                        {language === "es"
-                                                            ? "Cargar más"
-                                                            : "Load More"}
-                                                    </button>
-                                                </div>
+                                            </AnimatePresence>
+                                            
+                                            {isLoadingMore && (
+                                                <>
+                                                    <Skeleton className="h-[380px] rounded-2xl" />
+                                                    <Skeleton className="h-[380px] rounded-2xl" />
+                                                    <Skeleton className="h-[380px] rounded-2xl" />
+                                                </>
                                             )}
-                                        </>
+                                        </div>
                                     )}
-                            </div>
-                        )}
+
+                                    {/* Load More */}
+                                    {hasMore && !isLoadingMore && (
+                                        <div className="flex justify-center pb-12">
+                                            <button
+                                                onClick={loadMorePosts}
+                                                className="group relative px-8 py-3 bg-slate-900 text-white rounded-2xl text-sm font-bold shadow-lg shadow-slate-200/50 hover:bg-black transition-all hover:scale-105 active:scale-95"
+                                            >
+                                                <span className="relative z-10 flex items-center gap-2">
+                                                    {language === "es" ? "Cargar más contenido" : "Load more content"}
+                                                    <div className="w-1.5 h-1.5 bg-brand-400 rounded-full animate-pulse" />
+                                                </span>
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
-            </div>
+            </main>
         </div>
     );
 };

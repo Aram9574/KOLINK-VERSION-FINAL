@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
+import { serve } from "server";
+import { createClient } from "supabase";
 import { NexusService } from "../_shared/services/NexusService.ts";
 
 const corsHeaders = {
@@ -57,9 +57,10 @@ serve(async (req) => {
             JSON.stringify({ message: "Seeding completed", results }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
-    } catch (error) {
+    } catch (error: unknown) {
+        const err = error as Error;
         return new Response(
-            JSON.stringify({ error: error.message }),
+            JSON.stringify({ error: err.message }),
             { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
     }

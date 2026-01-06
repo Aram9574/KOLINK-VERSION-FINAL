@@ -12,6 +12,8 @@ import {
   Maximize2,
   X,
   Fingerprint,
+  CornerDownLeft,
+  Mic,
 } from "lucide-react";
 import Skeleton from "../../ui/Skeleton";
 import { useUser } from "../../../context/UserContext.tsx";
@@ -19,6 +21,8 @@ import { supabase } from "../../../services/supabaseClient.ts";
 import { motion, AnimatePresence } from "framer-motion";
 import { hapticFeedback } from "../../../lib/animations.ts";
 import { toast } from "sonner";
+import { ChatInput } from "../../ui/chat-input";
+import { Button } from "../../ui/button";
 
 interface Message {
   role: "user" | "assistant";
@@ -313,7 +317,7 @@ const LinkedInExpertChat: React.FC = () => {
         </div>
 
         {/* Input Dock */}
-        <div className="p-5 bg-white/60 backdrop-blur-xl border-t border-white/50 relative z-30">
+        <div className="p-4 md:p-6 bg-white/40 backdrop-blur-md border-t border-slate-100 relative z-30">
             {/* Image Preview Area */}
             <AnimatePresence>
                 {imagePreview && (
@@ -336,53 +340,66 @@ const LinkedInExpertChat: React.FC = () => {
                 )}
             </AnimatePresence>
 
-            <div className="relative flex items-end gap-2 bg-white border border-slate-200 hover:border-indigo-300 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 rounded-2xl p-2 transition-all shadow-sm">
-                {/* Clip Button */}
-                <button 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors self-end mb-0.5"
-                    title="Upload Image"
+            <form 
+              className="relative rounded-xl border border-slate-200 bg-white focus-within:ring-1 focus-within:ring-slate-300 p-1 transition-all shadow-sm"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSend();
+              }}
+            >
+              <ChatInput
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder={language === "es" ? "Escribe un borrador o pide consejo..." : "Type a draft or ask for advice..."}
+              />
+              
+              <div className="flex items-center p-2.5 pt-0">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-slate-500 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-colors"
                 >
-                    <Paperclip className="w-5 h-5" />
-                </button>
+                  <Paperclip className="size-5" />
+                  <span className="sr-only">Attach file</span>
+                </Button>
                 <input 
-                    type="file" 
-                    ref={fileInputRef}
-                    className="hidden" 
-                    accept="image/*"
-                    onChange={handleImageSelect}
+                  type="file" 
+                  ref={fileInputRef}
+                  className="hidden" 
+                  accept="image/*"
+                  onChange={handleImageSelect}
                 />
 
-                <textarea
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSend();
-                        }
-                    }}
-                    placeholder={language === "es" ? "Escribe un borrador o pide consejo..." : "Type a draft or ask for advice..."}
-                    className="w-full max-h-[120px] bg-transparent border-0 focus:ring-0 text-slate-700 placeholder:text-slate-400 resize-none py-3.5 text-sm font-medium leading-relaxed"
-                    rows={1}
-                    style={{ minHeight: '48px' }}
-                />
+                <Button variant="ghost" size="icon" type="button" className="text-slate-500 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-colors ml-1">
+                  <Mic className="size-5" />
+                  <span className="sr-only">Use Microphone</span>
+                </Button>
 
-                <motion.button
-                    onClick={handleSend}
-                    disabled={(!input.trim() && !imageFile) || isLoading}
-                    whileTap={{ scale: 0.95 }}
-                    className={`p-3 rounded-xl mb-0.5 transition-all self-end ${
-                        (!input.trim() && !imageFile) || isLoading
-                         ? "bg-slate-100 text-slate-300"
-                         : "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-700"
-                    }`}
+                <Button
+                  type="submit"
+                  disabled={(!input.trim() && !imageFile) || isLoading}
+                  size="sm"
+                  className={`ml-auto gap-1.5 rounded-lg py-5 px-5 font-semibold transition-all ${
+                    (!input.trim() && !imageFile) || isLoading
+                     ? "bg-slate-100 text-slate-300 pointer-events-none"
+                     : "bg-slate-900 text-white hover:bg-black"
+                  }`}
                 >
-                    <SendHorizontal className="w-5 h-5" />
-                </motion.button>
-            </div>
+                  {isLoading ? (language === "es" ? "Enviando..." : "Sending...") : (language === "es" ? "Enviar Mensaje" : "Send Message")}
+                  {!isLoading && <CornerDownLeft className="size-3.5" />}
+                </Button>
+              </div>
+            </form>
             
-            <div className="text-center mt-3">
+            <div className="text-center mt-4">
                  <p className="text-[10px] text-slate-400 font-medium flex items-center justify-center gap-1.5">
                     <Sparkles className="w-3 h-3 text-amber-400" />
                     <span>Nexus AI Strategic Engine (Gemini 3 Flash - SOTA)</span>
