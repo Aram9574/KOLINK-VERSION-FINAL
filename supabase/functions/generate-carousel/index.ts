@@ -1,6 +1,14 @@
 import { corsHeaders } from "../_shared/cors.ts";
-import { ContentService } from "../_shared/services/ContentService.ts";
+import { ContentService, CarouselGenerationResult } from "../_shared/services/ContentService.ts";
+import { CreditService } from "../_shared/services/CreditService.ts";
 import { createClient } from "@supabase/supabase-js";
+
+interface UserContextType {
+    behavioral_dna?: string;
+    brand_voice?: string;
+    xp?: number;
+    user_id?: string;
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -8,14 +16,14 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { source, tone, audience, language = "es" } = await req.json();
+    const { source, sourceType = "text", tone, audience, language = "es" } = await req.json();
     const apiKey = Deno.env.get("GEMINI_API_KEY")!;
 
     if (!source || !apiKey) throw new Error("Missing source or API key");
 
     // 1. Auth & User Context
     const authHeader = req.headers.get("Authorization");
-    let userContext = {};
+    let userContext: UserContextType = {};
     
     if (authHeader) {
         const supabaseClient = createClient(
@@ -32,12 +40,21 @@ Deno.serve(async (req) => {
                 Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
              );
 
+             // CHECK CREDITS
+             const creditService = new CreditService(supabaseAdmin, supabaseClient);
+             const hasCredits = await creditService.hasCredits(user.id);
+             if (!hasCredits) {
+                 throw new Error("INSUFFICIENT_CREDITS");
+             }
+
+             // FETCH PROFILE CONTEXT
              const { data: profile } = await supabaseAdmin.from("profiles").select("*").eq("id", user.id).single();
              if (profile) {
                  userContext = {
                      behavioral_dna: profile.behavioral_dna ? JSON.stringify(profile.behavioral_dna) : "",
-                     brand_voice: "", // Will try to fetch active voice
-                     xp: profile.xp
+                     brand_voice: "", 
+                     xp: profile.xp,
+                     user_id: user.id // Pass user_id for credit deduction later
                  };
 
                  if (profile.active_voice_id) {
@@ -50,7 +67,7 @@ Deno.serve(async (req) => {
         }
     }
 
-    console.log(`[CarouselFunc] Processing source length: ${source.length} with tone: ${tone}. DNA Present: ${!!(userContext as any).behavioral_dna}`);
+    console.log(`[CarouselFunc] Processing source type: ${sourceType}, with tone: ${tone}.`);
     
     const contentService = new ContentService(apiKey);
     
@@ -59,11 +76,17 @@ Deno.serve(async (req) => {
     if (tone) styleFragments.push(`Tone: ${tone}`);
     if (audience) styleFragments.push(`Target Audience: ${audience}`);
 
-    const enrichedSource = `[RAW TEXT]: ${source.substring(0, 15000)}`;
+    let finalInputSource = source;
+    // Only truncate and label if it's raw text. 
+    // If it's a URL or YouTube ID, we need the full string as is.
+    if (sourceType === 'text' || sourceType === 'topic') {
+        finalInputSource = `[RAW TEXT]: ${source.substring(0, 15000)}`;
+    }
     
-    const generatedContent = await contentService.generateCarousel(
-      enrichedSource, 
-      "RAW_TEXT", 
+    // Explicitly type the result from service
+    const generatedContent: CarouselGenerationResult = await contentService.generateCarousel(
+      finalInputSource, 
+      sourceType, 
       styleFragments,
       language,
       userContext
@@ -79,13 +102,38 @@ Deno.serve(async (req) => {
         tone: tone || "Professional",
         analysis: generatedContent.carousel_metadata.topic
       },
-      slides: generatedContent.slides.map((s: any) => ({
-        number: s.slide_number,
-        title: s.headline,
-        content: s.content
+      slides: generatedContent.slides.map((s, index: number) => ({
+        id: `gen-slide-${index}`,
+        type: s.type || (index === 0 ? 'intro' : index === generatedContent.slides.length - 1 ? 'outro' : 'content'),
+        content: {
+            title: s.title,
+            subtitle: s.subtitle,
+            body: s.body,
+            cta_text: s.cta_text
+        },
+        isVisible: true
       })),
       linkedin_post_copy: generatedContent.linkedin_post_copy
     };
+
+    // DEDUCT CREDIT IF SUCCESSFUL
+    if (userContext.user_id) {
+        try {
+             // Re-instantiate admin client if needed, or reuse from scope if we refactored to keep it. 
+             // Since scope is closed above, we need to create it again or move declaration up. 
+             // To be safe and clean, I will recreate it cheaply here.
+             const supabaseAdmin = createClient(
+                Deno.env.get("SUPABASE_URL") ?? "",
+                Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+             );
+             const creditService = new CreditService(supabaseAdmin, createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? ""));
+             await creditService.deductCredit(userContext.user_id);
+             console.log(`[CarouselFunc] Credit deducted for user ${userContext.user_id}`);
+        } catch (e) {
+            console.error("[CarouselFunc] Failed to deduct credit:", e);
+            // Don't fail the response, just log it. Admin can reconcile later.
+        }
+    }
 
     return new Response(
       JSON.stringify(responseData),

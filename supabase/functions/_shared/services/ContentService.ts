@@ -2,6 +2,7 @@ import { SchemaType, Tool, Schema } from "@google/generative-ai";
 import { BaseAIService } from "./BaseAIService.ts";
 import { PostGeneratorBrain } from "../prompts/PostGeneratorBrain.ts";
 import { CarouselBrain } from "../prompts/CarouselBrain.ts";
+import { PredictiveSimBrain } from "../prompts/PredictiveSimBrain.ts";
 import { IdeaGeneratorBrain } from "../prompts/IdeaGeneratorBrain.ts";
 import { GeneratedPost } from "./PostRepository.ts";
 import { 
@@ -11,6 +12,7 @@ import {
   getTemplates, 
   VIRAL_EXAMPLES 
 } from "../prompts.ts";
+import { RepurposeService } from "./RepurposeService.ts";
 
 export interface Idea {
   title: string;
@@ -38,13 +40,48 @@ export interface GenerationParams {
 }
 
 export interface UserProfileContext {
-  brand_voice?: string; // Resolved description, not the column
+  brand_voice?: string;
   company_name?: string;
   industry?: string;
   headline?: string;
   xp?: number;
   language?: string;
   behavioral_dna?: string;
+}
+
+export interface CarouselSlideData {
+    type: "intro" | "content" | "outro";
+    title: string;
+    subtitle?: string;
+    body: string;
+    cta_text?: string;
+    visual_hint?: string;
+}
+
+export interface CarouselMetadata {
+    topic: string;
+    total_slides: number;
+    suggested_color_palette: string[];
+}
+
+export interface CarouselGenerationResult {
+    carousel_metadata: CarouselMetadata;
+    slides: CarouselSlideData[];
+    linkedin_post_copy: string;
+}
+
+export interface EngagementPrediction {
+  predicted_performance: {
+    total_score: number;
+    top_archetype_resonance: string;
+    dwell_time_estimate: string;
+  };
+  audience_feedback: {
+    archetype: string;
+    reaction: string;
+  }[];
+  micro_optimization_tips: string[];
+  improved_hook_alternative: string;
 }
 
 export class ContentService extends BaseAIService {
@@ -168,11 +205,11 @@ export class ContentService extends BaseAIService {
    */
   async generateCarousel(
     source: string,
-    _sourceType: string,
+    sourceType: string,
     styleFragments: string[],
     language: string = "es",
     profileContext?: UserProfileContext
-  ) {
+  ): Promise<CarouselGenerationResult> {
     const styleContext = styleFragments.length > 0
       ? `Tone and style examples from the user:\n${styleFragments.join("\n---\n")}`
       : "Tone: Professional and engaging.";
@@ -185,16 +222,37 @@ export class ContentService extends BaseAIService {
       ? `\nBRAND VOICE INSTRUCTIONS:\n${profileContext.brand_voice}`
       : "";
 
-    const hasCalculatedContent = source.includes("[VIDEO TRANSCRIPT]") || source.includes("[WEB CONTENT]") || source.includes("[RAW TEXT]");
-    const isMetadataOnly = source.includes("[VIDEO METADATA]") || source.includes("[WEB METADATA]");
-
+    const repurposeService = new RepurposeService();
+    let finalSource = source;
     let analysisStrategy = "";
-    if (hasCalculatedContent) {
-      analysisStrategy = "The content has been pre-extracted for you. ANALYZE THE TEXT PROVIDED DEEPLY. Focus on the value and unique insights.";
-    } else if (isMetadataOnly) {
-      analysisStrategy = "The input is a URL where auto-extraction failed. YOU MUST USE your 'googleSearch' tool to find the content of this URL.";
-    } else {
-      analysisStrategy = "The input is likely a raw topic. Use your 'googleSearch' tool to find relevant, high-performing content to ground your carousel.";
+
+    // 1. CONTENT FETCHING PHASE
+    try {
+      if (sourceType === 'youtube') {
+           console.log(`Fetching YouTube transcript for ${source}...`);
+           // Extract video ID from flexible inputs (url or id)
+           let videoId = source;
+           if (source.includes('v=')) videoId = source.split('v=')[1].split('&')[0];
+           else if (source.includes('youtu.be/')) videoId = source.split('youtu.be/')[1].split('?')[0];
+
+           const transcript = await repurposeService.fetchYoutubeTranscript(videoId);
+           finalSource = `[VIDEO TRANSCRIPT]:\n"${transcript}"\n\n(Source Video: ${source})`;
+           analysisStrategy = "The content provided is a VIDEO TRANSCRIPT. Extract the core educational value, ignore conversational filler, and structure the key lessons into a carousel.";
+      } 
+      else if (sourceType === 'url') {
+           console.log(`Scraping URL ${source}...`);
+           const webContent = await repurposeService.scrapeUrl(source);
+           finalSource = `[WEB ARTICLE CONTENT]:\n"${webContent}"\n\n(Source URL: ${source})`;
+           analysisStrategy = "The content provided is a WEB ARTICLE. Summarize the main points and turn the key insights into a slide-by-slide narrative.";
+      }
+      else {
+           // Default TEXT or TOPIC
+           analysisStrategy = "The input is a user-provided topic or text. Use your 'googleSearch' tool to find relevant, high-performing content to ground your carousel if the input is sparse.";
+      }
+    } catch (error) {
+       console.error("Repurposing Error:", error);
+       // Fallback: If fetch fails, treat as topic/metadata and ask AI to search or improvise
+       analysisStrategy = `WARNING: Failed to fetch external content (${error instanceof Error ? error.message : 'Unknown'}). Treat the input "${source}" as a topic and use Google Search to find information about it.`;
     }
 
     const prompt = `
@@ -204,21 +262,23 @@ export class ContentService extends BaseAIService {
       Your mission is to analyze the provided INPUT SOURCE and transform it into a high-impact LinkedIn Carousel.
 
       INPUT SOURCE:
-      ${source}
+      ${finalSource}
       
       USER STYLE CONTEXT:
+      ${styleContext}
+      ${dnaInstruction}
+      ${userVoice}
       ${styleContext}
       
       PHASE 1: ANALYSIS STRATEGY
       ${analysisStrategy}
       
       PHASE 2: NARRATIVE ARCHITECTURE
-      Apply Kolink's viral strategies: Short sentences, high impact, and visual breathing room.
       Design a 7-12 slide carousel JSON.
-      Slide 1 (Hook): Must stop the scroll. Bold and controversial.
-      Slides 2-N: Each slide represents ONE clear idea/step. Use bolding.
-      Final Slide (CTA): Driven by value.
-
+      - SLIDE 1 (Type: intro): Hook the reader immediately. Big title.
+      - SLIDES 2-N (Type: content): Deliver value. One idea per slide.
+      - FINAL SLIDE (Type: outro): Strong Call to Action (CTA).
+      
       USER DNA: 
       ${dnaInstruction}
 
@@ -259,13 +319,14 @@ export class ContentService extends BaseAIService {
                 items: {
                   type: SchemaType.OBJECT,
                   properties: {
-                    slide_number: { type: SchemaType.INTEGER },
-                    headline: { type: SchemaType.STRING },
-                    subheadline: { type: SchemaType.STRING },
-                    visual_hint: { type: SchemaType.STRING },
-                    content: { type: SchemaType.STRING }
+                    type: { type: SchemaType.STRING, enum: ["intro", "content", "outro"] },
+                    title: { type: SchemaType.STRING },
+                    subtitle: { type: SchemaType.STRING },
+                    body: { type: SchemaType.STRING },
+                    cta_text: { type: SchemaType.STRING },
+                    visual_hint: { type: SchemaType.STRING }
                   },
-                  required: ["slide_number", "headline", "subheadline", "visual_hint", "content"]
+                  required: ["type", "title", "body"]
                 },
               },
               linkedin_post_copy: { type: SchemaType.STRING }
@@ -275,7 +336,7 @@ export class ContentService extends BaseAIService {
         },
       });
 
-      return this.extractJson(result.response.text());
+      return this.extractJson(result.response.text()) as unknown as CarouselGenerationResult;
     });
   }
 
@@ -357,5 +418,69 @@ export class ContentService extends BaseAIService {
 
           return this.extractJson(result.response.text());
       });
+  }
+
+  /**
+   * Predicts the performance of a post or carousel using the "The Crowd Proxy" approach.
+   */
+  async predictPerformance(content: string, language: string = "es"): Promise<EngagementPrediction> {
+    
+    const prompt = `
+      ${PredictiveSimBrain.system_instruction}
+
+      INPUT CONTENT TO ANALYZE:
+      ${content}
+
+      LANGUAGE OF ANALYSIS: ${language === "es" ? "Spanish" : "English"}
+    `;
+
+    return await this.retryWithBackoff(async () => {
+      const model = this.genAI.getGenerativeModel({
+        model: this.model,
+      });
+
+      const result = await model.generateContent({
+        // @ts-ignore: Google Generative AI types might be strict, casting parts to any for flex
+        // deno-lint-ignore no-explicit-any
+        contents: [{ role: "user", parts: [{ text: prompt }] as any }],
+        generationConfig: {
+          temperature: 0.4, // Balanced for critique but creative suggestions
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: SchemaType.OBJECT,
+            properties: {
+              predicted_performance: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  total_score: { type: SchemaType.INTEGER },
+                  top_archetype_resonance: { type: SchemaType.STRING },
+                  dwell_time_estimate: { type: SchemaType.STRING }
+                },
+                required: ["total_score", "top_archetype_resonance", "dwell_time_estimate"]
+              },
+              audience_feedback: {
+                type: SchemaType.ARRAY,
+                items: {
+                  type: SchemaType.OBJECT,
+                  properties: {
+                    archetype: { type: SchemaType.STRING },
+                    reaction: { type: SchemaType.STRING }
+                  },
+                  required: ["archetype", "reaction"]
+                }
+              },
+              micro_optimization_tips: {
+                type: SchemaType.ARRAY,
+                items: { type: SchemaType.STRING }
+              },
+              improved_hook_alternative: { type: SchemaType.STRING }
+            },
+            required: ["predicted_performance", "audience_feedback", "micro_optimization_tips", "improved_hook_alternative"]
+          } as Schema,
+        },
+      });
+
+      return this.extractJson(result.response.text()) as unknown as EngagementPrediction;
+    });
   }
 }

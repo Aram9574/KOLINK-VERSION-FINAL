@@ -204,7 +204,7 @@ const Default = ({ label }: { label: string }) => {
               placeholder="Tu feedback..." 
               className="h-[100px]" 
               value={content}
-              onChange={(val) => setContent(val || "")}
+              onChange={(e) => setContent(e.target.value)}
               required
             />
             <div className="flex items-center gap-1 text-xs text-gray-500 ml-auto">
@@ -434,7 +434,7 @@ const Inline = ({ label }: { label: string }) => {
               className="h-[100px]" 
               ref={textAreaRef}
               value={content}
-              onChange={(val) => setContent(val || "")}
+              onChange={(e) => setContent(e.target.value)}
               required
             />
             <div className="flex items-center gap-1 text-xs text-gray-500 ml-auto">

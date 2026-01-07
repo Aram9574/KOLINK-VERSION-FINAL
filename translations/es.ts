@@ -547,6 +547,69 @@ export const es = {
         "Selecciona tu idioma preferido para la interfaz y la generación de contenido.",
     },
     // APP INTERFACE TRANSLATIONS (ES)
+    carouselStudio: {
+      title: "Generador de Carruseles",
+      tabs: {
+        ai: "Generator IA",
+        templates: "Plantillas",
+        design: "Diseño Global",
+        slide: "Editar Slide"
+      },
+      aiGenerator: {
+        topic: {
+          label: "Tu Idea / Tema",
+          placeholder: "ej. Cómo escalar un negocio B2B...",
+        },
+        text: {
+          label: "Texto Crudo",
+          placeholder: "Pega aquí tu borrador...",
+        },
+        url: {
+          label: "URL del Artículo",
+          placeholder: "https://...",
+        },
+        generateBtn: "Generar Carrusel",
+        generating: "Diseñando Slides...",
+      },
+      templates: {
+        modern: "Moderno",
+        minimal: "Minimalista",
+        bold: "Atrevido",
+        gradient: "Gradiente",
+      },
+      properties: {
+        globalDesign: "Diseño Global",
+        slideEditor: "Editor de Slide",
+        palette: "Paleta de Colores",
+        font: "Tipografía",
+        background: "Fondo",
+        showProfile: "Mostrar Perfil",
+        showPageNumbers: "Paginas",
+        slideType: "Tipo de Slide",
+        title: "Título",
+        subtitle: "Subtítulo",
+        body: "Cuerpo",
+        cta: "Texto CTA",
+        deleteSlide: "Borrar Slide",
+        deleteConfirm: "¿Seguro que quieres borrar esta slide?",
+        addSlide: "Añadir Slide",
+        intro: "Intro",
+        content: "Contenido",
+        outro: "Outro"
+      },
+      export: {
+        download: "Descargar PDF",
+        exporting: "Exportando...",
+      },
+      ai: {
+        predict: "Predecir Rendimiento",
+        analyzing: "Analizando audiencia...",
+        score: "Puntuación Viral",
+        feedback: "Feedback de la Audiencia",
+        tips: "Micro-Optimizaciones",
+        hook: "Mejor Gancho Sugerido"
+      }
+    },
     app: {
       sidebar: {
         studio: "Estudio",

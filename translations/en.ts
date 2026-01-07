@@ -482,6 +482,69 @@ export const en = {
       },
     },
     // APP INTERFACE TRANSLATIONS
+    carouselStudio: {
+      title: "Carousel Generator",
+      tabs: {
+        ai: "AI Generator",
+        templates: "Templates",
+        design: "Global Design",
+        slide: "Edit Slide"
+      },
+      aiGenerator: {
+        topic: {
+          label: "Your Idea / Topic",
+          placeholder: "e.g. How to scale a B2B business...",
+        },
+        text: {
+          label: "Raw Text",
+          placeholder: "Paste your draft here...",
+        },
+        url: {
+          label: "Article URL",
+          placeholder: "https://...",
+        },
+        generateBtn: "Generate Carousel",
+        generating: "Designing Slides...",
+      },
+      templates: {
+        modern: "Modern",
+        minimal: "Minimalist",
+        bold: "Bold",
+        gradient: "Gradient",
+      },
+      properties: {
+        globalDesign: "Global Design",
+        slideEditor: "Slide Editor",
+        palette: "Color Palette",
+        font: "Typography",
+        background: "Background",
+        showProfile: "Show Profile",
+        showPageNumbers: "Page Numbers",
+        slideType: "Slide Type",
+        title: "Title",
+        subtitle: "Subtitle",
+        body: "Body",
+        cta: "CTA Text",
+        deleteSlide: "Delete Slide",
+        deleteConfirm: "Are you sure you want to delete this slide?",
+        addSlide: "Add Slide",
+        intro: "Intro",
+        content: "Content",
+        outro: "Outro"
+      },
+      export: {
+        download: "Download PDF",
+        exporting: "Exporting...",
+      },
+      ai: {
+        predict: "Predict Performance",
+        analyzing: "Analyzing audience...",
+        score: "Viral Score",
+        feedback: "Audience Feedback",
+        tips: "Micro-Optimizations",
+        hook: "Improved Hook Suggestion"
+      }
+    },
     app: {
       sidebar: {
         studio: "Studio",
