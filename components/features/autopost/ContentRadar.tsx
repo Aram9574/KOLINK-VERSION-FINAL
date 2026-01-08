@@ -1,117 +1,179 @@
-
-import React, { useState, useRef } from "react";
-import { motion } from "framer-motion";
-import { Scan, UploadCloud, FileImage, X } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Radar, Globe, MessageCircle, FileText, Search, RefreshCw, Filter } from 'lucide-react';
+import { Trend, TrendCategory, ContentAngle } from '../../../types';
+import { getRecommendedTrends } from '../../../lib/services/trendsService';
+import AngleGenerator from './AngleGenerator';
+import { toast } from 'sonner';
 
 const ContentRadar: React.FC = () => {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [files, setFiles] = useState<File[]>([]);
-    const [isScanning, setIsScanning] = useState(false);
+    const [trends, setTrends] = useState<Trend[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedTrend, setSelectedTrend] = useState<Trend | null>(null);
+    const [filter, setFilter] = useState<TrendCategory | 'all'>('all');
 
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        const droppedFiles = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
-        if (droppedFiles.length > 0) processFiles(droppedFiles);
-    };
+    useEffect(() => {
+        loadTrends();
+    }, []);
 
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const selectedFiles = Array.from(e.target.files).filter(file => file.type.startsWith('image/'));
-            processFiles(selectedFiles);
+    const loadTrends = async () => {
+        setLoading(true);
+        try {
+            const data = await getRecommendedTrends([]); // Pass user keywords eventually
+            setTrends(data);
+        } catch (error) {
+            console.error("Failed to load trends");
+        } finally {
+            setLoading(false);
         }
     };
 
-    const processFiles = (newFiles: File[]) => {
-        setFiles(prev => [...prev, ...newFiles]);
-        // Simulate scanning effect
-        setIsScanning(true);
-        setTimeout(() => setIsScanning(false), 2000);
+    const handleGenerate = async (angle: ContentAngle) => {
+        // Simulate generation
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        toast.success(`¡Borrador creado usando la lente de ${angle.title}!`, {
+            description: "Revisa tu calendario de contenido."
+        });
+        setSelectedTrend(null);
     };
 
-    const removeFile = (index: number) => {
-        setFiles(prev => prev.filter((_, i) => i !== index));
+    const getScoreColor = (score: number) => {
+        if (score >= 90) return 'text-emerald-500 bg-emerald-50 ring-emerald-500/20';
+        if (score >= 70) return 'text-amber-500 bg-amber-50 ring-amber-500/20';
+        return 'text-slate-500 bg-slate-50 ring-slate-500/20';
+    };
+
+    const getCategoryIcon = (cat: TrendCategory) => {
+        switch (cat) {
+            case 'news': return <Globe size={14} />;
+            case 'social': return <MessageCircle size={14} />;
+            case 'regulatory': return <FileText size={14} />;
+            case 'search': return <Search size={14} />;
+        }
+    };
+
+    const filteredTrends = filter === 'all' ? trends : trends.filter(t => t.category === filter);
+
+    const translateCategory = (cat: string) => {
+        switch(cat) {
+            case 'all': return 'Todos';
+            case 'news': return 'Noticias';
+            case 'social': return 'Social';
+            case 'regulatory': return 'Legal';
+            case 'search': return 'Búsquedas';
+            default: return cat;
+        }
     };
 
     return (
-        <div className="col-span-12 mt-6">
-            <div 
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={handleDrop}
-                className="relative bg-slate-900 rounded-2xl p-6 min-h-[160px] flex flex-col items-center justify-center overflow-hidden border border-slate-700/50 group cursor-pointer"
-                onClick={() => fileInputRef.current?.click()}
-            >
-                 {/* Radar Grid Background */}
-                 <div className="absolute inset-0 opacity-20 pointer-events-none" 
-                      style={{ backgroundImage: 'radial-gradient(circle, #4f46e5 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-                 
-                 {/* Scanning Beam */}
-                 {isScanning && (
-                     <motion.div 
-                        initial={{ top: "-10%" }}
-                        animate={{ top: "110%" }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                        className="absolute left-0 right-0 h-32 bg-gradient-to-b from-transparent via-brand-500/20 to-transparent pointer-events-none z-0"
-                     />
-                 )}
-
-                 <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    onChange={handleFileSelect} 
-                    multiple 
-                    accept="image/*" 
-                    className="hidden" 
-                />
-
-                 {files.length === 0 ? (
-                     <div className="text-center z-10">
-                        <div className="bg-slate-800/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-700 group-hover:border-brand-500/50 transition-colors">
-                            <Scan className="text-brand-400 group-hover:scale-110 transition-transform duration-300" size={32} />
-                        </div>
-                        <h3 className="text-white font-bold text-lg">Radar de Contenido Multimodal</h3>
-                        <p className="text-slate-400 text-sm mt-1">Arrastra capturas o ideas para alimentar la red neuronal.</p>
-                     </div>
-                 ) : (
-                     <div className="w-full relative z-10">
-                        <div className="flex justify-between items-center mb-4 px-2">
-                             <span className="text-brand-300 font-mono text-xs uppercase tracking-wider flex items-center gap-2">
-                                <span className={`w-2 h-2 rounded-full ${isScanning ? "bg-brand-400 animate-pulse" : "bg-emerald-400"}`} />
-                                {isScanning ? "Analizando Contexto..." : "Contexto Asegurado"}
-                             </span>
-                             <span className="text-slate-500 text-xs">{files.length} fuentes</span>
-                        </div>
-                        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none">
-                            {files.map((file, i) => (
-                                <motion.div 
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    key={i} 
-                                    className="relative flex-shrink-0 w-32 h-24 bg-slate-800 rounded-lg border border-slate-700 overflow-hidden group/item"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <div className="absolute inset-0 flex items-center justify-center z-0">
-                                        <FileImage className="text-slate-600" />
-                                    </div>
-                                    <img 
-                                        src={URL.createObjectURL(file)} 
-                                        alt="preview" 
-                                        className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover/item:opacity-40 transition-opacity"
-                                    />
-                                    <button 
-                                        onClick={() => removeFile(i)}
-                                        className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-rose-500 rounded-md text-white opacity-0 group-hover/item:opacity-100 transition-all"
-                                    >
-                                        <X size={12} />
-                                    </button>
-                                </motion.div>
-                            ))}
-                            <div className="flex-shrink-0 w-32 h-24 border-2 border-dashed border-slate-700 hover:border-slate-500 rounded-lg flex items-center justify-center text-slate-500 transition-colors">
-                                <UploadCloud size={24} />
-                            </div>
-                        </div>
-                     </div>
-                 )}
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-rose-100 text-rose-600 rounded-lg animate-pulse">
+                        <Radar size={24} />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-bold text-slate-900">Radar de Tendencias</h3>
+                        <p className="text-sm text-slate-500">Oportunidades en tiempo real alineadas a tu ADN.</p>
+                    </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                    <div className="flex bg-slate-100 p-1 rounded-lg">
+                        {(['all', 'news', 'social', 'search'] as const).map((cat) => (
+                            <button
+                                key={cat}
+                                onClick={() => setFilter(cat as any)}
+                                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+                                    filter === cat 
+                                        ? 'bg-white text-slate-900 shadow-sm' 
+                                        : 'text-slate-500 hover:text-slate-700'
+                                }`}
+                            >
+                                {translateCategory(cat)}
+                            </button>
+                        ))}
+                    </div>
+                    <button 
+                        onClick={loadTrends} 
+                        disabled={loading}
+                        className="p-2 text-slate-400 hover:text-indigo-600 transition-colors"
+                    >
+                        <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
+                    </button>
+                </div>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                <AnimatePresence mode='popLayout'>
+                    {loading ? (
+                        [1,2,3,4].map(i => (
+                            <div key={i} className="h-40 bg-slate-100 rounded-xl animate-pulse" />
+                        ))
+                    ) : filteredTrends.map((trend) => (
+                        <motion.div
+                            layout
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            key={trend.id}
+                            onClick={() => setSelectedTrend(trend)}
+                            className="group bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all cursor-pointer relative overflow-hidden"
+                        >
+                            {/* Match Score Badge */}
+                            <div className={`absolute top-4 right-4 px-2 py-1 rounded-lg text-xs font-bold ring-1 flex items-center gap-1 ${getScoreColor(trend.matchScore)}`}>
+                                {trend.matchScore}% Match
+                            </div>
+
+                            <div className="flex items-start gap-3 mb-3">
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-slate-100 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
+                                    {getCategoryIcon(trend.category)}
+                                    {translateCategory(trend.category)}
+                                </span>
+                                <span className="text-xs text-slate-400">
+                                    {new Date(trend.timestamp).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' })}
+                                </span>
+                            </div>
+
+                            <h4 className="font-bold text-slate-800 text-lg mb-2 group-hover:text-indigo-700 transition-colors pr-20">
+                                {trend.title}
+                            </h4>
+                            <p className="text-sm text-slate-500 line-clamp-2 mb-4 group-hover:text-slate-600">
+                                {trend.summary}
+                            </p>
+
+                            <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-50">
+                                <span className="text-xs font-medium text-slate-400 flex items-center gap-1">
+                                    Fuente: <span className="text-slate-600">{trend.source}</span>
+                                </span>
+                                <span className="text-xs font-bold text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
+                                    Reutilizar →
+                                </span>
+                            </div>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+            </div>
+
+            {/* Modal for Angle Generation */}
+            <AnimatePresence>
+                {selectedTrend && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 50 }}
+                            className="w-full max-w-2xl"
+                        >
+                            <AngleGenerator 
+                                trend={selectedTrend} 
+                                onGenerate={handleGenerate} 
+                                onClose={() => setSelectedTrend(null)} 
+                            />
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

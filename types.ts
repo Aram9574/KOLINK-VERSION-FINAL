@@ -147,6 +147,44 @@ export interface BehavioralDNA {
     behavioral_summary?: string;
 }
 
+// --- Content Factory Types ---
+
+export type ToneArchetype = "Educator" | "Challenger" | "Storyteller" | "Analyst";
+
+export interface ExpertiseProfile {
+    archetype: ToneArchetype;
+    keywords: string[]; // e.g., "SaaS", "Growth", "AI"
+    negativeKeywords: string[]; // e.g., "Politics", "Crypto"
+    bioSummary?: string;
+    industry?: string;
+}
+
+export type TrendCategory = "news" | "social" | "search" | "regulatory";
+
+export interface Trend {
+    id: string;
+    title: string;
+    summary: string;
+    source: string;
+    category: TrendCategory;
+    matchScore: number; // 0-100
+    timestamp: number;
+    url?: string;
+}
+
+export interface ContentAngle {
+    type: "visionary" | "implementer" | "analyst";
+    title: string;
+    hook: string;
+    description: string;
+}
+
+export interface GeneratedPostContent {
+    angle: "visionary" | "implementer" | "analyst";
+    content: string;
+    metadata?: any;
+}
+
 export interface UserProfile {
   id: string;
   email?: string; // Added for context convenience

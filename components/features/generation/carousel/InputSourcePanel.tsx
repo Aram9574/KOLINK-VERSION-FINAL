@@ -13,7 +13,8 @@ type InputType = 'topic' | 'url' | 'youtube' | 'pdf';
 
 export const InputSourcePanel = () => {
   const { language } = useUser();
-  const { setIsGenerating, isGenerating } = useCarouselStore(state => state.editor);
+  const isGenerating = useCarouselStore(state => state.editor.isGenerating);
+  const setIsGenerating = useCarouselStore(state => state.setIsGenerating);
   
   // Local state for inputs
   const [activeTab, setActiveTab] = useState<InputType>('topic');

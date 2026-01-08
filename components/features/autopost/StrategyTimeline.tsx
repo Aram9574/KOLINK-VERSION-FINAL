@@ -46,7 +46,13 @@ const StrategyTimeline: React.FC<StrategyTimelineProps> = ({ userId, refreshTrig
                  const item = data.find(d => d.scheduled_date.startsWith(dateStr));
                  
                  const dayName = dateObj.toLocaleDateString('es-ES', { weekday: 'short' });
+                 const fullDayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' }); // For logic check
                  const dateDisplay = dateObj.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+
+                 let suggestedPillar = "General";
+                 if (fullDayName === "Monday") suggestedPillar = "Autoridad (Técnico)";
+                 if (fullDayName === "Wednesday") suggestedPillar = "Conexión (Personal)";
+                 if (fullDayName === "Friday") suggestedPillar = "Engagement (Viral)";
 
                  if (item) {
                      return {
@@ -54,7 +60,7 @@ const StrategyTimeline: React.FC<StrategyTimelineProps> = ({ userId, refreshTrig
                          day: dayName,
                          date: dateDisplay,
                          status: item.status,
-                         pillar: item.pillar_name || "General",
+                         pillar: item.pillar_name || suggestedPillar,
                          content: item.idea_summary || item.idea_title, // Use summary if avail
                          authorityScore: item.authority_score || 85 // Fallback
                      };
@@ -63,7 +69,8 @@ const StrategyTimeline: React.FC<StrategyTimelineProps> = ({ userId, refreshTrig
                          id: `empty-${dateStr}`,
                          day: dayName,
                          date: dateDisplay,
-                         status: 'empty'
+                         status: 'empty',
+                         pillar: suggestedPillar
                      };
                  }
              });
