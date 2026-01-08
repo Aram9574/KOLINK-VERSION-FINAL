@@ -333,7 +333,7 @@ const DashboardContent: React.FC = () => {
 
 
                     {activeTab === "autopilot" && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full overflow-y-auto">
                              <Suspense fallback={<div className="p-8 text-center text-slate-400">Loading Command Center...</div>}>
                                 <AutoPostStudio
                                     user={user}

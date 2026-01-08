@@ -50,7 +50,7 @@ HOOK: "${angle.hook}"`;
             id: `draft-${Date.now()}`,
             content: "", // Empty because we want to GENERATE based on the idea
             createdAt: Date.now(),
-            updatedAt: Date.now(),
+            // updatedAt removed as it is not in Post type
             status: 'draft',
             params: {
                 topic: ideaText, 
@@ -147,7 +147,7 @@ HOOK: "${angle.hook}"`;
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <AnimatePresence mode='popLayout'>
                     {loading ? (
                         [1,2,3,4].map(i => (
