@@ -29,18 +29,32 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // 2. Identify Users with active Content Pillars (AutoPilot Candidates)
-    // We fetch distinct users who have pillars defined
-    const { data: usersWithPillars, error: pillarsError } = await supabaseAdmin
-      .from("content_pillars")
-      .select("user_id")
-      .gt("weight_percentage", 0); // Only active pillars
+    // 2. Determine Scope: Manual Trigger vs Cron Batch
+    let userIds: string[] = [];
 
-    if (pillarsError) throw pillarsError;
+    try {
+        const body = await req.json();
+        if (body.user_id) {
+            userIds = [body.user_id];
+            console.log(`[AutoPilot] Manual trigger for user: ${body.user_id}`);
+        }
+    } catch (e) {
+        // No body or invalid JSON, proceed to batch mode
+    }
 
-    // Deduplicate user IDs
-    const userIds = [...new Set(usersWithPillars.map(u => u.user_id))];
-    console.log(`[AutoPilot] Found ${userIds.length} users with active pillars.`);
+    if (userIds.length === 0) {
+        console.log("[AutoPilot] Starting Cron Batch Mode...");
+        // Fetch distinct users who have pillars defined
+        const { data: usersWithPillars, error: pillarsError } = await supabaseAdmin
+            .from("content_pillars")
+            .select("user_id")
+            .gt("weight_percentage", 0); // Only active pillars
+
+        if (pillarsError) throw pillarsError;
+        userIds = [...new Set(usersWithPillars.map(u => u.user_id))];
+    }
+
+    console.log(`[AutoPilot] Processing ${userIds.length} users.`);
 
     const contentService = new ContentService(Deno.env.get("GEMINI_API_KEY") ?? "");
     const results = [];

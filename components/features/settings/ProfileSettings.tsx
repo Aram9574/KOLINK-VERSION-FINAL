@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { UserProfile, AppLanguage } from '../../../types';
 import { translations } from '../../../translations';
-import { User, Building2, Briefcase, Camera } from 'lucide-react';
+import { User, Building2, Briefcase, Camera, Upload } from 'lucide-react';
 import Tooltip from '../../ui/Tooltip';
 import { getAvatarUrl } from '../../../utils';
 import { motion } from 'framer-motion';
+import { INDUSTRIES } from '../../../constants';
+import { uploadAvatar } from '../../../services/storageService';
+import { toast } from 'sonner';
 
 interface ProfileSettingsProps {
     user: UserProfile;
@@ -19,6 +22,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
     const [headline, setHeadline] = useState(user.headline || '');
     const [companyName, setCompanyName] = useState(user.companyName || '');
     const [industry, setIndustry] = useState(user.industry || '');
+    const [isUploading, setIsUploading] = useState(false);
     const t = translations[language].app.settings;
 
     return (
@@ -26,16 +30,44 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
             {/* Profile Avatar Section */}
             <section className="flex flex-col md:flex-row items-center gap-8 pb-8 border-b border-slate-100">
                 <div className="relative group">
-                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 p-1 shadow-md group-hover:shadow-lg transition-all">
+                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 p-1 shadow-md group-hover:shadow-lg transition-all relative overflow-hidden">
                         <img 
                             src={getAvatarUrl(user)} 
                             alt={user.name} 
-                            className="w-full h-full rounded-full object-cover bg-white" 
+                            className={`w-full h-full rounded-full object-cover bg-white ${isUploading ? 'opacity-50 blur-sm' : ''}`} 
                         />
+                         {isUploading && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                        )}
                     </div>
-                    <button className="absolute bottom-0 right-0 p-2 bg-white rounded-full border border-slate-200 shadow-sm hover:shadow-md hover:bg-slate-50 transition-all text-slate-600">
+
+                    <label className={`absolute bottom-0 right-0 p-2 bg-white rounded-full border border-slate-200 shadow-sm hover:shadow-md hover:bg-slate-50 transition-all text-slate-600 cursor-pointer ${isUploading ? 'pointer-events-none opacity-70' : ''}`}>
                         <Camera size={16} strokeWidth={2} />
-                    </button>
+                        <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            disabled={isUploading}
+                            onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (file && user.id) {
+                                    try {
+                                        setIsUploading(true);
+                                        const publicUrl = await uploadAvatar(user.id, file);
+                                        onSave({ avatarUrl: publicUrl });
+                                        toast.success(language === 'es' ? 'Foto actualizada' : 'Photo updated');
+                                    } catch (error) {
+                                        console.error('Upload failed:', error);
+                                        toast.error(language === 'es' ? 'Error al subir imagen' : 'Upload failed');
+                                    } finally {
+                                        setIsUploading(false);
+                                    }
+                                }
+                            }}
+                        />
+                    </label>
                 </div>
                 
                 <div className="text-center md:text-left space-y-2">
@@ -108,16 +140,19 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
                         </label>
                         <div className="relative">
                             <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                            <input
-                                type="text"
+                            <select
                                 value={industry}
                                 onChange={(e) => {
                                     setIndustry(e.target.value);
                                     onSave({ industry: e.target.value });
                                 }}
-                                className="w-full pl-11 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none transition-all hover:bg-white"
-                                placeholder="SaaS, FinTech..."
-                            />
+                                className="w-full pl-11 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none transition-all hover:bg-white appearance-none cursor-pointer"
+                            >
+                                <option value="" disabled>Selecciona tu industria...</option>
+                                {INDUSTRIES.map((ind) => (
+                                    <option key={ind} value={ind}>{ind}</option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                 </div>

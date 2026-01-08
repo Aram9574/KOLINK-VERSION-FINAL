@@ -215,9 +215,9 @@ const InsightResponderView: React.FC = () => {
                                     <p className="text-slate-500 text-sm max-w-xs mx-auto mt-2">
                                         {t.uploadDesc}
                                     </p>
-                                    <div className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full">
+                                    <div className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100">
                                         <ImageIcon className="w-3 h-3" />
-                                        Soporta PNG, JPG, WebP
+                                        Arrastra, Pega (Ctrl+V) o Clic
                                     </div>
                                     {dragActive && (
                                         <div className="absolute inset-0 bg-indigo-500/10 flex items-center justify-center rounded-2xl">
@@ -231,9 +231,31 @@ const InsightResponderView: React.FC = () => {
                         {/* Intent & Tone */}
                         <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-sm flex flex-col">
                             <div className="flex-1">
-                                <label className="block text-xs font-bold uppercase text-slate-500 mb-2">{t.intentLabel}</label>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="block text-xs font-bold uppercase text-slate-500">{t.intentLabel}</label>
+                                    <span className="text-[10px] text-indigo-500 font-medium bg-indigo-50 px-2 py-0.5 rounded-full">Pro Tip: Sé específico</span>
+                                </div>
+                                
+                                {/* Quick Intents */}
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    {[
+                                        { label: "🤝 Agradecer", text: "Agradece por el insight y comparte una breve experiencia personal relacionada." },
+                                        { label: "❓ Preguntar", text: "Haz una pregunta reflexiva para fomentar la discusión en los comentarios." },
+                                        { label: "🤔 Debatir", text: "Presenta un contraargumento educado validando primero su punto." },
+                                        { label: "😂 Humor", text: "Haz una broma profesional y ligera relacionada con el tema." }
+                                    ].map((item) => (
+                                        <button
+                                            key={item.label}
+                                            onClick={() => setIntent(item.text)}
+                                            className="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-50 text-slate-600 border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                                        >
+                                            {item.label}
+                                        </button>
+                                    ))}
+                                </div>
+
                                 <textarea 
-                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl resize-none h-32 text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl resize-none h-32 text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all placeholder:text-slate-400"
                                     placeholder={t.intentPlaceholder}
                                     value={intent}
                                     onChange={(e) => setIntent(e.target.value)}

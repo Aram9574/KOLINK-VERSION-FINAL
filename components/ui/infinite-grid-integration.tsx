@@ -31,12 +31,12 @@ const GridPattern = ({ offsetX, offsetY, size }: { offsetX: any; offsetY: any; s
           x={offsetX}
           y={offsetY}
         >
-          <path
-            d={`M ${size} 0 L 0 0 0 ${size}`}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-            className="text-muted-foreground" 
+          <circle
+            cx="1"
+            cy="1"
+            r="1"
+            fill="currentColor"
+            className="text-slate-300" 
           />
         </motion.pattern>
       </defs>
@@ -91,7 +91,7 @@ export const InfiniteGrid = ({ children, className, gridOpacity = 0.15 }: { chil
       ref={containerRef}
       onMouseMove={handleMouseMove}
       className={cn(
-        "relative w-full min-h-screen flex flex-col overflow-hidden bg-background",
+        "relative w-full min-h-screen flex flex-col overflow-hidden bg-transparent",
         className
       )}
     >

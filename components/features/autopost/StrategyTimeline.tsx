@@ -3,11 +3,12 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Check, X, Sparkles, BarChart2 } from "lucide-react";
 
-import { fetchSchedule, updateScheduleStatus, ScheduleItem } from "../../../services/strategyRepository.ts";
+import { fetchSchedule, updateScheduleStatus, ScheduleItem } from "../../../services/strategyRepository";
 import { toast } from "sonner";
 
 interface StrategyTimelineProps {
     userId: string;
+    refreshTrigger?: number;
 }
 
 interface Node {
@@ -20,7 +21,7 @@ interface Node {
     authorityScore?: number;
 }
 
-const StrategyTimeline: React.FC<StrategyTimelineProps> = ({ userId }) => {
+const StrategyTimeline: React.FC<StrategyTimelineProps> = ({ userId, refreshTrigger }) => {
     const [nodes, setNodes] = useState<Node[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedNode, setSelectedNode] = useState<string | null>(null);
@@ -71,7 +72,7 @@ const StrategyTimeline: React.FC<StrategyTimelineProps> = ({ userId }) => {
              setLoading(false);
         };
         load();
-    }, [userId]);
+    }, [userId, refreshTrigger]);
 
 
     const handleApprove = async (id: string, e: React.MouseEvent) => {

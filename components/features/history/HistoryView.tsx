@@ -55,6 +55,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
     // View Mode
     const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
     const [showMobileFilters, setShowMobileFilters] = useState(false);
+    const [sortOrder, setSortOrder] = useState<string>("newest");
 
     const t = translations[language].app.history;
 
@@ -93,6 +94,17 @@ const HistoryView: React.FC<HistoryViewProps> = ({
             if (showFavorites && !post.isFavorite) return false;
 
             return true;
+        }).sort((a, b) => {
+            if (sortOrder === 'newest') {
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            }
+            if (sortOrder === 'oldest') {
+                return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            }
+            if (sortOrder === 'viral') {
+                return (b.viralScore || 0) - (a.viralScore || 0);
+            }
+            return 0;
         });
     }, [
         posts,
@@ -101,6 +113,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({
         selectedFramework,
         selectedStatus,
         showFavorites,
+        sortOrder,
     ]);
 
     const handleToggleFavorite = async (id: string, isFavorite: boolean) => {
@@ -165,7 +178,9 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                 <div className="flex flex-col h-full w-full bg-white relative">
                     <div className="p-6 h-full overflow-y-auto scrollbar-hide">
                         <div className="flex items-center justify-between mb-8">
-                            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Vault</h2>
+                            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                                {language === 'es' ? 'Biblioteca' : 'Content Library'}
+                            </h2>
                             <button
                                 onClick={() => setShowMobileFilters(false)}
                                 className="md:hidden p-2 text-slate-400 hover:text-slate-600 rounded-lg bg-slate-50"
@@ -183,6 +198,8 @@ const HistoryView: React.FC<HistoryViewProps> = ({
                             setSelectedFramework={setSelectedFramework}
                             selectedStatus={selectedStatus}
                             setSelectedStatus={setSelectedStatus}
+                            sortOrder={sortOrder}
+                            setSortOrder={setSortOrder}
                             showFavorites={showFavorites}
                             setShowFavorites={setShowFavorites}
                             language={language}

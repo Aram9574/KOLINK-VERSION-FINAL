@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { translations } from "../../../translations";
 import { supabase } from "../../../services/supabaseClient";
-import { useToasts } from "../../ui/toast";
+import { useToast } from "../../../context/ToastContext";
 import { Haptics, NotificationType } from "@capacitor/haptics";
 import confetti from "canvas-confetti";
 import ScheduleModal from "../../modals/ScheduleModal";
@@ -70,7 +70,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
     const [showAudit, setShowAudit] = useState(true);
     const [isPublishing, setIsPublishing] = useState(false);
     const [isScheduling, setIsScheduling] = useState(false);
-    const toasts = useToasts();
+    const toast = useToast();
 
     const t = translations[language].app.preview;
     const navigate = useNavigate();
@@ -98,18 +98,20 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
     const handlePublish = () => {
         const textToCopy = displayContent || "";
         navigator.clipboard.writeText(textToCopy).then(() => {
-            toasts.success(
+            toast.success(
                 language === "es"
                     ? "Texto copiado. Ahora pégalo en LinkedIn."
                     : "Text copied. Now paste it on LinkedIn.",
+                "Copiado"
             );
             // Open LinkedIn in a new tab
             window.open("https://www.linkedin.com/feed/", "_blank");
         }).catch(() => {
-            toasts.error(
+            toast.error(
                 language === "es"
                     ? "Error al copiar el texto"
                     : "Failed to copy text",
+                "Error"
             );
         });
     };
@@ -142,9 +144,6 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
     return (
         <div className="w-full bg-slate-100/50 pb-20"> {/* Wrapper with slight bg for contrast if needed, padding for scrolling */}
             
-
-
-
             {/* NATIVE FEED ITEM CONTAINER */}
             <div className="bg-white w-full border-t border-b border-slate-200 mb-2">
                 
@@ -261,7 +260,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
                 onConfirm={(date) => {
                     if (onSchedule) onSchedule(date);
                     setIsScheduling(false);
-                    toasts.success(t.scheduled);
+                    toast.success(t.scheduled, "Programado");
                 }}
                 language={language}
             />

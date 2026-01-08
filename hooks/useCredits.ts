@@ -1,10 +1,10 @@
 
 import { useUser } from "../context/UserContext";
-import { useToasts } from "../components/ui/toast";
+import { useToast } from "../context/ToastContext";
 
 export const useCredits = () => {
     const { user, refreshUser } = useUser();
-    const toasts = useToasts();
+    const toast = useToast();
     
     const credits = user?.credits || 0;
 
@@ -14,10 +14,7 @@ export const useCredits = () => {
 
     const checkCredits = (cost: number = 1): boolean => {
         if (!hasCredits(cost)) {
-            toasts.error("Créditos insuficientes. Por favor recarga.", {
-                action: "Recargar",
-                onAction: () => window.location.href = '/plans'
-            });
+            toast.error("Créditos insuficientes. Por favor recarga.", "Sin Créditos");
             return false;
         }
         return true;

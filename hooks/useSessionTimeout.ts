@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useUser } from '../context/UserContext';
-import { useToasts } from '../components/ui/toast';
+import { useToast } from '../context/ToastContext';
 
 // 30 minutes in milliseconds
 const TIMEOUT_DURATION = 30 * 60 * 1000;
@@ -9,7 +9,7 @@ const TIMEOUT_DURATION = 30 * 60 * 1000;
 
 export const useSessionTimeout = () => {
     const { user, logout } = useUser();
-    const toasts = useToasts();
+    const toast = useToast();
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const lastActivityRef = useRef<number>(Date.now());
 
@@ -17,8 +17,7 @@ export const useSessionTimeout = () => {
         if (!user.id) return;
         
         // Show toast explanation
-        // Show toast explanation
-        toasts.message({ text: "Session expired due to inactivity. You have been logged out for security.", action: "Close" });
+        toast.info("Session expired due to inactivity.", "Logged out");
         
         await logout();
     }, [user.id, logout]);

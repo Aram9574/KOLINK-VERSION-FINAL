@@ -112,6 +112,7 @@ export interface Invoice {
 export type AppLanguage = "en" | "es";
 
 export type AppTab =
+  | "home"
   | "create"
   | "history"
   | "settings"
@@ -121,7 +122,8 @@ export type AppTab =
   | "editor"
   | "voice-lab"
   | "audit"
-  | "insight-responder";
+  | "insight-responder"
+  | "inferencia";
 
 export interface AutoPilotConfig {
   enabled: boolean;

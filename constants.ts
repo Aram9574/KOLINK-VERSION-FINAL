@@ -347,3 +347,18 @@ export const ALGORITHM_TIPS_CONTENT = {
     { title: "Native Content", desc: "The LinkedIn algorithm prioritizes native content over external links." },
   ],
 };
+
+export const INDUSTRIES = [
+  "SaaS / Software",
+  "Marketing & Advertising",
+  "E-commerce / Retail",
+  "Finance / Fintech",
+  "Healthcare / Medtech",
+  "Education / Edtech",
+  "Real Estate",
+  "Consulting / Coaching",
+  "Content Creation",
+  "Recruiting / HR",
+  "Legal",
+  "Other"
+];

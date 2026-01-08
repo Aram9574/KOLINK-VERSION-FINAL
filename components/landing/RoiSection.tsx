@@ -74,17 +74,7 @@ const RoiSection: React.FC<RoiSectionProps> = ({ language }) => {
     return (
         <section className="py-24 bg-white relative overflow-hidden" id="comparison">
             {/* Background Grid - Premium SOTA Style */}
-            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-[0.4]">
-                <div 
-                    className="absolute inset-0" 
-                    style={{ 
-                        backgroundImage: `linear-gradient(#e2e8f0 1.5px, transparent 1.5px), linear-gradient(90deg, #e2e8f0 1.5px, transparent 1.5px)`, 
-                        backgroundSize: '40px 40px',
-                        maskImage: 'radial-gradient(circle at center, black 40%, transparent 80%)',
-                        WebkitMaskImage: 'radial-gradient(circle at center, black 40%, transparent 80%)'
-                    }} 
-                />
-            </div>
+            {/* Grid removed for cleaner dotted aesthetic */}
 
             <div className="max-w-4xl mx-auto px-6 relative z-10">
                 <div className="text-center mb-16">

@@ -35,7 +35,44 @@ import {
 import { translations } from "../../../translations";
 import Tooltip from "../../ui/Tooltip";
 
-import { useToasts } from "../../ui/toast";
+import React from "react";
+import {
+    AppLanguage,
+    BrandVoice,
+    EmojiDensity,
+    GenerationParams,
+    PostLength,
+    ViralFramework,
+    ViralHook,
+    ViralTone,
+} from "../../../types";
+import { useUser } from "../../../context/UserContext";
+import { fetchBrandVoices } from "../../../services/userRepository";
+import {
+    EMOJI_OPTIONS,
+    FRAMEWORKS,
+    HOOK_STYLES,
+    LENGTH_OPTIONS,
+    TONES,
+} from "../../../constants";
+import {
+    AlignLeft,
+    Info,
+    Lock,
+    MessageSquare,
+    Sliders,
+    Smile,
+    Sparkles,
+    Target,
+    Type,
+    Wand2,
+    Zap,
+    Fingerprint,
+} from "lucide-react";
+import { translations } from "../../../translations";
+import Tooltip from "../../ui/Tooltip";
+
+import { useToast } from "../../../context/ToastContext";
 import { GenerationParamsSchema } from "../../../schemas";
 import { CustomSelect } from "../../ui/CustomSelect";
 import LoadingProgress from "../../ui/LoadingProgress";
@@ -62,7 +99,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
     isCancelled,
 }) => {
     const t = translations[language].app.generator;
-    const toasts = useToasts();
+    const toast = useToast();
     const tConstants = translations[language].app.constants;
     const { user } = useUser();
     const isFreeUser = user?.planTier === "free";

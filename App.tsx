@@ -35,13 +35,15 @@ const AutoPostView = lazy(() =>
     import("./components/features/autopost/AutoPostStudio")
 );
 
-const PrivacyPolicy = lazy(() => import("./components/landing/PrivacyPolicy"));
+const PrivacyPolicy = lazy(() => import("./components/legal/PrivacyPolicy"));
 const TermsOfService = lazy(() =>
-    import("./components/landing/TermsOfService")
+    import("./components/legal/TermsOfService")
 );
 const CookiesPage = lazy(() => import("./components/landing/CookiesPage"));
 const AuthCallback = lazy(() => import("./components/features/auth/AuthCallback"));
+const InferenciaStudio = lazy(() => import("./components/features/inferencia/InferenciaStudio"));
 const InfiniteGridDemo = lazy(() => import("./demo"));
+const CookieConsent = lazy(() => import("./components/features/compliance/CookieConsent"));
 
 const App: React.FC = () => {
     const { user, language, loading } = useUser();
@@ -92,7 +94,7 @@ const App: React.FC = () => {
 
     return (
         <>
-
+            <CookieConsent />
             <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<LandingPage />} />
@@ -107,11 +109,11 @@ const App: React.FC = () => {
                 />
                 <Route
                     path="/privacy"
-                    element={<PrivacyPolicy language={language} />}
+                    element={<PrivacyPolicy />}
                 />
                 <Route
                     path="/terms"
-                    element={<TermsOfService language={language} />}
+                    element={<TermsOfService />}
                 />
                 <Route
                     path="/cookies"
@@ -131,6 +133,14 @@ const App: React.FC = () => {
                     element={
                         <ProtectedRoute>
                             <Dashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/inferencia"
+                    element={
+                        <ProtectedRoute>
+                            <InferenciaStudio />
                         </ProtectedRoute>
                     }
                 />

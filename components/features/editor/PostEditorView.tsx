@@ -598,9 +598,9 @@ const PostEditorView: React.FC = () => {
   return (
     <div className="flex h-full bg-white overflow-hidden select-none">
       {/* LEFT: Editor Column */}
-      <div className="flex-[1.5] flex flex-col min-w-0 border-r border-slate-200/60/60">
+      <div className="flex-[1.5] flex flex-col min-w-0 border-r border-slate-200/60 transition-all duration-300">
         {/* 1. Header Row */}
-        <div className="h-14 border-b border-slate-200/60/60 flex items-center justify-between px-6 bg-white shrink-0">
+        <div className="h-14 border-b border-slate-200/60 flex items-center justify-between px-6 bg-white shrink-0">
           <input
             type="text"
             value={postTitle}
@@ -613,7 +613,7 @@ const PostEditorView: React.FC = () => {
               type="button"
               onClick={handleSave}
               {...hapticFeedback}
-              className="flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors"
+              className="btn-nexus-primary flex items-center gap-2 text-sm"
             >
               <Save className="w-4 h-4" />
               <span className="hidden sm:inline">
@@ -641,7 +641,7 @@ const PostEditorView: React.FC = () => {
               </motion.button>
 
               {showDraftsMenu && (
-                <div className="absolute top-full right-0 mt-2 w-72 bg-white border border-slate-200/60/60 rounded-xl shadow-xl z-[50] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute top-full right-0 mt-2 w-72 bg-white border border-slate-200/60 rounded-xl shadow-2xl z-[50] overflow-hidden animate-nexus-in">
                   <div className="p-3 border-b border-slate-200/60/60 bg-slate-50">
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                       {t.drafts} ({drafts.length})
@@ -712,17 +712,18 @@ const PostEditorView: React.FC = () => {
         </div>
 
         {/* 2. Advanced Toolbar */}
-        <div className="h-12 border-b border-slate-200/60/60 flex items-center px-4 bg-white gap-0.5 shrink-0 overflow-x-auto no-scrollbar">
+        <div className="h-12 border-b border-slate-200/60 flex items-center px-4 bg-white gap-0.5 shrink-0 overflow-x-auto no-scrollbar">
           <motion.button
             type="button"
             onClick={handleUndo}
             disabled={historyIndex <= 0}
             {...hapticFeedback}
-            className={`p-2 rounded-lg ${
+            className={`p-2 rounded-lg transition-colors ${
               historyIndex > 0
-                ? "text-slate-500 hover:bg-slate-50"
+                ? "text-slate-600 hover:bg-slate-100 active:bg-slate-200"
                 : "text-slate-300 cursor-not-allowed"
             }`}
+            aria-label="Undo"
             title="Undo"
           >
             <Undo className="w-4 h-4" />
@@ -732,11 +733,12 @@ const PostEditorView: React.FC = () => {
             onClick={handleRedo}
             disabled={historyIndex >= history.length - 1}
             {...hapticFeedback}
-            className={`p-2 rounded-lg ${
+            className={`p-2 rounded-lg transition-colors ${
               historyIndex < history.length - 1
-                ? "text-slate-500 hover:bg-slate-50"
+                ? "text-slate-600 hover:bg-slate-100 active:bg-slate-200"
                 : "text-slate-300 cursor-not-allowed"
             }`}
+            aria-label="Redo"
             title="Redo"
           >
             <Redo className="w-4 h-4" />
@@ -887,14 +889,14 @@ const PostEditorView: React.FC = () => {
             onChange={(e) => setEditorContent(e.target.value)}
             onSelect={handleEditorSelect}
             placeholder={language === "es"
-              ? "Escribe algo increíble..."
-              : "Write something amazing..."}
+              ? "Empieza a escribir tu post aquí...\n\nConsejo: Usa ganchos atractivos y párrafos cortos para mayor legibilidad."
+              : "Start writing your post here...\n\nTip: Use engaging hooks and short paragraphs for better readability."}
             className="w-full h-full text-lg leading-relaxed text-slate-800 placeholder:text-slate-300 border-none focus:ring-0 resize-none p-8 lg:p-12 font-sans"
           />
         </div>
 
         {/* 4. Bottom Metric Bar */}
-        <div className="h-16 border-t border-slate-200/60/60 flex items-center justify-between px-6 bg-white shrink-0">
+        <div className="h-16 border-t border-slate-200/60 flex items-center justify-between px-6 bg-white shrink-0">
           <div className="flex items-center gap-6">
             <div
               className="flex items-center gap-2 relative"
@@ -1151,6 +1153,7 @@ const PostEditorView: React.FC = () => {
               id: "preview",
               label: language === "es" ? "Vista previa" : "Preview",
               icon: Monitor,
+              className: "lg:hidden"
             },
             {
               id: "hooks",
@@ -1601,44 +1604,46 @@ const PostEditorView: React.FC = () => {
                                 snippet,
                               )}
                             {...hapticFeedback}
-                            className="w-full text-left p-5 bg-white border border-slate-200/60/60 rounded-[22px] hover:border-brand-400 transition-all shadow-sm hover:shadow-md pr-12"
+                            className="w-full text-left p-4 bg-white border border-slate-200/60/60 rounded-xl hover:border-brand-400 transition-all shadow-sm hover:shadow-md flex items-start gap-3"
                           >
-                            <p className="text-[14px] font-medium text-slate-700 leading-relaxed line-clamp-3">
-                              {snippet.text}
-                            </p>
+                            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
+                                <Code className="w-4 h-4 text-indigo-500" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-slate-700 line-clamp-2">
+                                    {snippet.text}
+                                </p>
+                                <span className="text-[10px] text-slate-400 mt-1 block">
+                                    {new Date(
+                                      snippet.createdAt,
+                                    ).toLocaleDateString()}
+                                </span>
+                            </div>
                           </motion.button>
+                          
                           <motion.button
                             type="button"
-                            onClick={() =>
-                              handleDeleteSnippet(
-                                snippet.id,
-                              )}
-                            {...hapticFeedback}
-                            className="absolute top-1/2 -translate-y-1/2 right-4 p-2 bg-slate-50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
-                            title="Eliminar fragmento"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteSnippet(snippet.id);
+                            }}
+                            className="absolute top-2 right-2 p-1.5 bg-slate-100 rounded-lg text-slate-400 opacity-0 group-hover:opacity-100 hover:bg-rose-100 hover:text-rose-500 transition-all"
+                            title="Eliminar"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </motion.button>
                         </div>
                       ))
-                  )
+                    )
                   : (
-                    <div className="text-center py-12 px-4">
-                      <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-4 border border-slate-200/60/60">
-                        <Sparkles className="w-8 h-8 text-slate-300" />
+                    <div className="text-center py-12">
+                      <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-3">
+                        <Copy className="w-6 h-6 text-slate-300" />
                       </div>
-                      <h4 className="text-slate-900 font-bold mb-2">
-                        No tienes fragmentos aún
-                      </h4>
-                      <p className="text-sm text-slate-500 leading-relaxed">
-                        Con los fragmentos puedes guardar firmas, llamadas a la
-                        acción o frases que usas a menudo.
-                        <br />
-                        <br />
-                        <span className="font-medium text-brand-600">
-                          Selecciona texto en el editor
-                        </span>{" "}
-                        para crear tu primero.
+                      <p className="text-sm font-medium text-slate-400">
+                        {language === "es"
+                          ? "No tienes fragmentos guardados"
+                          : "No saved snippets"}
                       </p>
                     </div>
                   )}

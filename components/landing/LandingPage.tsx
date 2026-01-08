@@ -170,7 +170,7 @@ const LandingPage: React.FC = () => {
     }, []);
 
     return (
-            <InfiniteGrid className="font-sans selection:bg-brand-200 selection:text-brand-900">
+            <div className="font-sans selection:bg-brand-200 selection:text-brand-900 pb-20">
              <div className="relative z-10">
                 <Helmet>
                     <title>Kolink - Viral LinkedIn Studio</title>
@@ -243,7 +243,7 @@ const LandingPage: React.FC = () => {
 
                 <Footer language={language} scrollToSection={scrollToSection} />
              </div>
-            </InfiniteGrid>
+            </div>
 
     );
 };

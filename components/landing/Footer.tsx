@@ -173,9 +173,15 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
                         </div>
                         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-sm border-t border-slate-50 pt-8">
                             <p>{footer.rights}</p>
-                            <p className="font-medium">
-                                {footer.madeWith}
-                            </p>
+                            <div className="flex items-center gap-4 text-xs font-semibold">
+                                <Link to="/privacy" className="hover:text-brand-600 transition-colors">Privacy</Link>
+                                <span className="text-slate-300">•</span>
+                                <Link to="/terms" className="hover:text-brand-600 transition-colors">Terms</Link>
+                                <span className="text-slate-300">•</span>
+                                <p className="font-medium">
+                                    {footer.madeWith}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

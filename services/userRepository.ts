@@ -117,6 +117,10 @@ export const updateUserProfile = async (userId: string, updates: Partial<UserPro
         dbUpdates.unlocked_achievements = updates.unlockedAchievements;
         delete dbUpdates.unlockedAchievements;
     }
+    if (updates.avatarUrl !== undefined) {
+        dbUpdates.avatar_url = updates.avatarUrl;
+        delete dbUpdates.avatarUrl;
+    }
     const { data, error } = await supabase
         .from('profiles')
         .update(dbUpdates)

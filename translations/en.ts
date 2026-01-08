@@ -547,8 +547,9 @@ export const en = {
     },
     app: {
       sidebar: {
-        studio: "Studio",
-        carousel: "Carousel Generator",
+        home: "Home",
+        studio: "Post Editor",
+        carousel: "Carousels",
         ideas: "Idea Generator",
         insightResponder: "Insight Responder",
         autopilot: "AutoPost",
@@ -918,6 +919,12 @@ export const en = {
         saveChanges: "Save Changes",
         saving: "Saving...",
         saved: "Saved!",
+        support: {
+          title: "Need Help?",
+          subtitle:
+            "Our support team is ready to help you with any issues or questions you may have.",
+          cta: "Contact Support",
+        },
       },
       cancellation: {
         title: "We're sorry to see you go",

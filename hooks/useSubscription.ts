@@ -1,14 +1,14 @@
-import { useToasts } from '../components/ui/toast';
+import { useToast } from '../context/ToastContext';
 import { supabase } from '../services/supabaseClient';
 import { SubscriptionPlan } from '../types';
 
 export const useSubscription = () => {
-    const toasts = useToasts();
+    const toast = useToast();
     const handleUpgrade = async (plan: SubscriptionPlan) => {
         console.log("handleUpgrade called for:", plan);
         if (plan.id === 'free') return;
 
-        const toastId = toasts.message({ text: "Iniciando pasarela de pago...", preserve: true });
+        const toastId = toast.info("Iniciando pasarela de pago...", "Procesando");
 
         try {
             console.log("Invoking create-checkout-session with priceId:", plan.stripePriceId);
@@ -34,15 +34,15 @@ export const useSubscription = () => {
 
             if (data?.url) {
                 console.log("Redirecting to Stripe:", data.url);
-            toasts.dismiss(toastId); // Clear toast before redirect
+                toast.removeToast(toastId); // Clear toast before redirect
                 window.location.href = data.url;
             } else {
                 throw new Error("No URL returned from checkout session");
             }
         } catch (e: any) {
             console.error("Checkout failed", e);
-            toasts.dismiss(toastId);
-            toasts.error("Error al iniciar pago: " + (e.message || "Desconocido"));
+            toast.removeToast(toastId);
+            toast.error("Error al iniciar pago: " + (e.message || "Desconocido"));
         }
     };
 

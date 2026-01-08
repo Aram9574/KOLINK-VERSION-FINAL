@@ -1,6 +1,6 @@
 import Section from "@/components/ui/Section.tsx";
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { MoveRight, PhoneCall } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { translations } from "../../translations.ts";
@@ -34,27 +34,21 @@ function Hero({ language }: HeroProps) {
             <span className="text-foreground">{t.hero.titleLine1}</span>
             <span className="relative flex w-full justify-center overflow-hidden text-center md:pb-6 md:pt-2 min-h-[1.3em]">
               &nbsp;
-              {titles.map((title: string, index: number) => (
+              <AnimatePresence mode="popLayout">
                 <motion.span
-                  key={index}
+                  key={titleNumber}
                   className="absolute font-semibold text-transparent bg-clip-text bg-gradient-to-r from-brand-600 via-accent to-brand-500 whitespace-nowrap px-4"
                   initial={{ opacity: 0, y: 40 }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                  animate={
-                    titleNumber === index
-                      ? {
-                          y: 0,
-                          opacity: 1,
-                        }
-                      : {
-                          y: titleNumber > index ? -40 : 40,
-                          opacity: 0,
-                        }
-                  }
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -40, position: "absolute" }}
+                  transition={{ 
+                    y: { type: "spring", stiffness: 100, damping: 20 },
+                    opacity: { duration: 0.2 } // Faster fade for crispness
+                  }}
                 >
-                  {title}
+                  {titles[titleNumber]}
                 </motion.span>
-              ))}
+              </AnimatePresence>
             </span>
           </h1>
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useToasts } from "../components/ui/toast";
+import { useToast } from "../context/ToastContext";
 import { AppTab, GenerationParams, Post, UserProfile } from "../types";
 import { executePostGeneration } from "../services/postWorkflow";
 import { supabase } from "../services/supabaseClient";
@@ -43,7 +43,7 @@ export const useGenerationLogic = ({
     setIsGenerating,
     savePostToHistory,
 }: UseGenerationLogicProps) => {
-    const toasts = useToasts();
+    const toast = useToast();
     const [prefilledParams, setPrefilledParams] = useState<
         GenerationParams | null
     >(null);
@@ -80,8 +80,9 @@ export const useGenerationLogic = ({
                                 .getTime();
 
                             if (postTime > startTime) {
-                                toasts.success(
+                                toast.success(
                                     "¡Post recuperado! Se generó mientras no estabas.",
+                                    "Recuperado"
                                 );
                                 const mappedPost: Post = {
                                     id: recoveredPost.id,
@@ -187,7 +188,7 @@ export const useGenerationLogic = ({
 
                 const xpGained = gamificationResult.newXP - user.xp;
                 if (xpGained > 0) {
-                    toasts.success(`+${xpGained} XP! Sigue así para subir de nivel!`);
+                    toast.success(`+${xpGained} XP! Sigue así para subir de nivel!`, "Ganancia de XP");
                 }
 
                 fetchUserProfile(user.id).then((updatedProfile) => {
@@ -215,18 +216,17 @@ export const useGenerationLogic = ({
                 if (msg.includes("Insufficient credits")) {
                     setShowUpgradeModal(true);
                 } else if (msg.includes("Rate limit exceeded")) {
-                    toasts.warning(
+                    toast.warning(
                         "Por favor espera unos segundos antes de generar otro post.",
+                        "Límite de velocidad"
                     );
                 } else {
                     // Generic error - distinguish between network and server if possible
-                    toasts.error(
-                        "Error al generar contenido. Inténtalo de nuevo o contacta soporte.",
-                        {
-                            description: msg.length < 50
+                    toast.error(
+                        msg.length < 50
                                 ? msg
-                                : "Error de conexión o del servidor",
-                        },
+                                : "Error de conexión",
+                        "Error"
                     );
                 }
             }

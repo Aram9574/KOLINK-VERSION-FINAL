@@ -1,12 +1,17 @@
+import React, { useState } from 'react'; // Added useState
 import { SlideRenderer } from './SlideRenderer';
 import { useCarouselStore } from '@/lib/store/useCarouselStore';
 import { Button } from '@/components/ui/button';
-import { ZoomIn, ZoomOut, Download } from 'lucide-react';
+import { ZoomIn, ZoomOut, Download, Maximize } from 'lucide-react'; // Added Maximize
+import { FullscreenPreview } from './FullscreenPreview'; // Imported
 
 export const EditorCanvas = () => {
   const { slides, design } = useCarouselStore(state => state.project);
   const { activeSlideId, zoomLevel } = useCarouselStore(state => state.editor);
   const { setZoom, setActiveSlide } = useCarouselStore(state => state);
+
+  // Local state for fullscreen
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Calculate base width/height for the slide container based on zoom
   const baseWidth = design.aspectRatio === '4:5' ? 1080 : design.aspectRatio === '9:16' ? 1080 : 1080;
@@ -33,7 +38,21 @@ export const EditorCanvas = () => {
            <Button variant="ghost" size="icon" onClick={() => setZoom(Math.min(3, zoomLevel + 0.1))}>
              <ZoomIn className="w-4 h-4" />
            </Button>
+           
            <div className="w-px h-4 bg-slate-300 mx-2" />
+           
+           {/* Fullscreen Trigger */}
+           <Button 
+             variant="ghost" 
+             size="icon" 
+             onClick={() => setIsFullscreen(true)}
+             title="Fullscreen Preview"
+           >
+             <Maximize className="w-4 h-4 text-slate-600" />
+           </Button>
+
+           <div className="w-px h-4 bg-slate-300 mx-2" />
+           
            <Button className="bg-slate-900 text-white hover:bg-slate-800 h-8 text-xs gap-2">
              <Download className="w-3 h-3" /> Export
            </Button>
@@ -81,6 +100,16 @@ export const EditorCanvas = () => {
             </div>
          </div>
       </div>
+
+      {/* Fullscreen Modal Overlay */}
+      {isFullscreen && (
+          <FullscreenPreview 
+            slides={slides} 
+            design={design} 
+            initialSlideIndex={slides.findIndex(s => s.id === activeSlideId) !== -1 ? slides.findIndex(s => s.id === activeSlideId) : 0}
+            onClose={() => setIsFullscreen(false)} 
+          />
+      )}
     </div>
   );
 };

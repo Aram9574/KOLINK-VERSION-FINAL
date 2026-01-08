@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useToasts } from '../components/ui/toast';
+import { useToast } from '../context/ToastContext';
 import { supabase } from '../services/supabaseClient';
 import { Post } from '../types';
 
 export const useLinkedInPublishing = () => {
-    const toasts = useToasts();
+    const toast = useToast();
     const [isPublishing, setIsPublishing] = useState(false);
 
     const handlePublish = async (currentPost: Post | null) => {
@@ -16,7 +16,7 @@ export const useLinkedInPublishing = () => {
             const providerToken = session?.provider_token;
 
             if (!providerToken) {
-                toasts.error("No se detectó conexión con LinkedIn. Por favor inicia sesión nuevamente con LinkedIn.");
+                toast.error("No se detectó conexión con LinkedIn. Por favor inicia sesión nuevamente.", "Error de Auth");
                 return;
             }
 
@@ -34,10 +34,10 @@ export const useLinkedInPublishing = () => {
                 throw new Error(data.error || "Error desconocido al publicar");
             }
 
-            toasts.success("¡Post publicado exitosamente en LinkedIn!");
+            toast.success("¡Post publicado exitosamente en LinkedIn!", "Publicado");
         } catch (error: any) {
             console.error("Publishing error:", error);
-            toasts.error(error.message || "Error al publicar en LinkedIn");
+            toast.error(error.message || "Error al publicar en LinkedIn", "Error");
         } finally {
             setIsPublishing(false);
         }

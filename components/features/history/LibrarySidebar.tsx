@@ -26,6 +26,8 @@ interface LibrarySidebarProps {
     setSelectedFramework: (fw: string) => void;
     selectedStatus: string;
     setSelectedStatus: (status: string) => void;
+    sortOrder: string;
+    setSortOrder: (order: string) => void;
     showFavorites: boolean;
     setShowFavorites: (show: boolean) => void;
     language: AppLanguage;
@@ -40,6 +42,8 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
     setSelectedFramework,
     selectedStatus,
     setSelectedStatus,
+    sortOrder,
+    setSortOrder,
     showFavorites,
     setShowFavorites,
     language,
@@ -163,6 +167,27 @@ const LibrarySidebar: React.FC<LibrarySidebarProps> = ({
                 </div>
 
                 <div className="space-y-5 px-1">
+                    {/* Sort Order */}
+                    <div className="space-y-2">
+                        <label className="flex items-center gap-2 text-[11px] font-bold text-slate-500 px-2 uppercase tracking-wide">
+                            <Clock className="w-3 h-3 opacity-70" />
+                            {language === 'es' ? 'Ordenar por' : 'Sort by'}
+                        </label>
+                        <div className="relative">
+                            <select
+                                value={sortOrder}
+                                onChange={(e) => setSortOrder(e.target.value)}
+                                className="w-full appearance-none px-3 py-2.5 bg-white border border-slate-200/60 rounded-xl text-xs font-semibold text-slate-700 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/5 outline-none transition-all cursor-pointer hover:border-slate-300"
+                            >
+                                <option value="newest">{language === 'es' ? 'Más recientes' : 'Newest first'}</option>
+                                <option value="oldest">{language === 'es' ? 'Más antiguos' : 'Oldest first'}</option>
+                                <option value="viral">{language === 'es' ? 'Mejor rendimiento' : 'Best performance'}</option>
+                            </select>
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                <Filter className="w-3 h-3" />
+                            </div>
+                        </div>
+                    </div>
                     {/* Tone Filter */}
                     <div className="space-y-2">
                         <label className="flex items-center gap-2 text-[11px] font-bold text-slate-500 px-2 uppercase tracking-wide">

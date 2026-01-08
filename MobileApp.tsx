@@ -6,10 +6,14 @@ import {
     Routes,
     useLocation,
 } from "react-router-dom";
-import { Toaster } from "sonner";
+import { Toaster } from "sonner"; // Removed Sonner
 import { useUser } from "./context/UserContext";
 import { useSessionTimeout } from "./hooks/useSessionTimeout";
 import ProtectedRoute from "./components/features/auth/ProtectedRoute";
+import { useToast } from "./context/ToastContext";
+import { Capacitor } from "@capacitor/core";
+import { App as CapacitorApp } from "@capacitor/app";
+import { supabase } from "./lib/supabase";
 
 // Lazy load components specific to Mobile Flow
 const LoginPage = lazy(() => import("./components/features/auth/LoginPage"));
@@ -30,6 +34,7 @@ const CookiesPage = lazy(() => import("./components/landing/CookiesPage"));
 
 const MobileApp: React.FC = () => {
     const { user, language, loading } = useUser();
+    const toast = useToast();
 
     // Initialize session timeout monitoring
     useSessionTimeout();
@@ -58,6 +63,86 @@ const MobileApp: React.FC = () => {
             localStorage.setItem("kolink_referral_code", refCode);
         }
     }, []);
+
+    // Handle Mobile Auth Logic (Deep Links)
+    useEffect(() => {
+        if (!Capacitor.isNativePlatform()) return;
+
+        const handleAuthURL = async (urlString: string) => {
+            console.log("Processing Auth URL:", urlString);
+            try {
+                const url = new URL(urlString);
+                const hash = url.hash.substring(1);
+                const search = url.search.substring(1);
+                const params = new URLSearchParams(hash || search);
+
+                const access_token = params.get("access_token");
+                const refresh_token = params.get("refresh_token");
+                const provider_token = params.get("provider_token");
+                const code = params.get("code");
+
+                if (provider_token) {
+                    console.log("Found provider_token in URL, storing...");
+                    localStorage.setItem("linkedin_provider_token", provider_token);
+                }
+
+                if (access_token && refresh_token) {
+                    toast.info("Iniciando sesión...", "Conectando");
+                    console.log(
+                        "Direct tokens found. Has access_token:",
+                        !!access_token,
+                        "Has provider_token (URL):",
+                        !!provider_token,
+                    );
+
+                    const { error } = await supabase.auth.setSession({
+                        access_token,
+                        refresh_token,
+                    });
+                    if (error) throw error;
+                    toast.success("¡Sesión iniciada!", "Bienvenido");
+                } else if (code) {
+                    toast.info("Canjeando código de acceso...", "Procesando");
+                    const { data, error } = await supabase.auth
+                        .exchangeCodeForSession(code);
+                    if (error) throw error;
+
+                    // Capture provider_token from exchange if available
+                    if (data?.session?.provider_token) {
+                        console.log(
+                            "Found provider_token in code exchange, storing...",
+                        );
+                        localStorage.setItem(
+                            "linkedin_provider_token",
+                            data.session.provider_token,
+                        );
+                    }
+
+                    toast.success("¡Acceso verificado!", "Listo");
+                }
+            } catch (e: any) {
+                console.error("Auth URL Error:", e);
+                toast.error(
+                    "Error en la autenticación: " + (e.message || "URL no válida"), "Error"
+                );
+            }
+        };
+
+        const appUrlOpenListener = CapacitorApp.addListener("appUrlOpen", async (data: any) => {
+             handleAuthURL(data.url);
+        });
+
+        CapacitorApp.getLaunchUrl().then((data) => {
+            if (data?.url) {
+                handleAuthURL(data.url);
+            }
+        });
+
+        return () => {
+            appUrlOpenListener.then(listener => listener.remove());
+        };
+
+    }, []); // Run once on mount
 
     if (loading && !isTimeout) {
         return (
@@ -88,7 +173,6 @@ const MobileApp: React.FC = () => {
 
     return (
         <>
-            <Toaster position="top-center" richColors />
             <Routes>
                 {
                     /*

@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import { UserProvider } from "./context/UserContext";
+import { ToastProvider } from "./context/ToastContext";
 import App from "./App";
 import "./index.css";
 import * as Sentry from "@sentry/react";
@@ -38,7 +39,9 @@ root.render(
         <HelmetProvider>
           <BrowserRouter>
             <UserProvider>
-              <App />
+              <ToastProvider>
+                <App />
+              </ToastProvider>
             </UserProvider>
           </BrowserRouter>
         </HelmetProvider>

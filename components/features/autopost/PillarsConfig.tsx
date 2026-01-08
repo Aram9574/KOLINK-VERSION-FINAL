@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sliders, Plus, X } from "lucide-react";
 
-import { fetchPillars, updatePillars, ContentPillar } from "../../../services/strategyRepository.ts";
+import { fetchPillars, updatePillars, ContentPillar } from "../../../services/strategyRepository";
 import { toast } from "sonner";
 
 interface PillarsConfigProps {

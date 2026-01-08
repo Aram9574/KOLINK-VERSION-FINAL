@@ -16,7 +16,7 @@ interface SettingsViewProps {
     onLogout?: () => Promise<void>;
 }
 
-type SettingsTab = "profile" | "billing" | "security" | "achievements";
+type SettingsTab = "profile" | "billing" | "security" | "achievements" | "support";
 
 const SettingsView: React.FC<SettingsViewProps> = (
     { user, onUpgrade, onSave, onLogout },
@@ -63,6 +63,7 @@ const SettingsView: React.FC<SettingsViewProps> = (
         { id: "billing", label: language === 'es' ? 'Suscripción' : 'Subscription', icon: CreditCard, color: "amber" },
         { id: "security", label: language === 'es' ? 'Seguridad' : 'Security', icon: Shield, color: "rose" },
         { id: "achievements", label: language === 'es' ? 'Logros' : 'Achievements', icon: Trophy, color: "orange" },
+        { id: "support", label: language === 'es' ? 'Soporte' : 'Support', icon: User, color: "indigo" },
     ];
 
     return (
@@ -209,6 +210,29 @@ const SettingsView: React.FC<SettingsViewProps> = (
                                         })}
                                     </div>
                                 </div>
+
+                            )}
+
+                            {activeTab === "support" && (
+                                <div className="space-y-6 text-center py-10">
+                                    <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-600">
+                                        <User className="w-8 h-8" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-slate-900">
+                                        {(t as any).support?.title || "Need Help?"}
+                                    </h3>
+                                    <p className="text-slate-500 max-w-sm mx-auto">
+                                        {(t as any).support?.subtitle || "Our support team is ready to help you."}
+                                    </p>
+                                    <div className="pt-4">
+                                        <a 
+                                            href={`mailto:${(t as any).support?.email || "info@kolink.es"}`}
+                                            className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-colors inline-block"
+                                        >
+                                            {(t as any).support?.cta || "Contact Support"}
+                                        </a>
+                                    </div>
+                                </div>
                             )}
                         </motion.div>
                     </AnimatePresence>
@@ -231,7 +255,12 @@ const SettingsView: React.FC<SettingsViewProps> = (
             </div>
             
             {/* Logout Link */}
-            <div className="mt-12 pt-8 border-t border-slate-200/60 flex justify-center">
+            <div className="mt-12 pt-8 border-t border-slate-200/60 flex flex-col items-center gap-4">
+                <div className="flex items-center gap-4 text-xs font-semibold text-slate-400">
+                    <a href="/privacy" className="hover:text-brand-600 transition-colors">Privacy Policy</a>
+                    <span className="text-slate-200">•</span>
+                    <a href="/terms" className="hover:text-brand-600 transition-colors">Terms of Service</a>
+                </div>
                 {onLogout && (
                     <button
                         onClick={onLogout}

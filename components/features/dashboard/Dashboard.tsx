@@ -1,4 +1,5 @@
 import React, { useEffect, useState, Suspense } from "react";
+import { useKeyboardShortcuts } from "../../../hooks/useKeyboardShortcuts";
 import { Capacitor } from "@capacitor/core";
 import { useUser } from "../../../context/UserContext";
 import { PostProvider, usePosts } from "../../../context/PostContext";
@@ -6,11 +7,17 @@ import { useSubscription } from "../../../hooks/useSubscription";
 import { usePostGeneration } from "../../../hooks/usePostGeneration";
 
 import { useUserSync } from "../../../hooks/useUserSync";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import DashboardLayout from "../../layouts/DashboardLayout";
+
+import TopBar from "../../navigation/TopBar";
+
 import HistoryView from "../history/HistoryView";
 import SettingsView from "../settings/SettingsView";
+import LaunchpadView from "./LaunchpadView";
+import { motion } from "framer-motion";
+
+import { Home as HomeIcon } from "lucide-react";
 
 
 import UpgradeModal from "../../modals/UpgradeModal";
@@ -27,7 +34,7 @@ import LockedAuditState from "../audit/LockedAuditState";
 import ReferralModal from "../../modals/ReferralModal";
 import { Gift } from "lucide-react";
 
-import { useToasts } from "../../ui/toast";
+import { useToast } from "../../../context/ToastContext";
 import { AppTab, Post, UserProfile } from "../../../types";
 import { translations } from "../../../translations";
 import { ActionFunctionArgs } from "react-router-dom";
@@ -42,7 +49,7 @@ const LinkedInExpertChat = React.lazy(() =>
 );
 const PostEditorView = React.lazy(() => import("../editor/PostEditorView"));
 const LinkedInAuditView = React.lazy(() =>
-    import("../audit/LinkedInAuditView.tsx")
+    import("../audit/LinkedInAuditView")
 );
 const VoiceLabView = React.lazy(() =>
     import("../voice-lab/VoiceLabView")
@@ -50,11 +57,46 @@ const VoiceLabView = React.lazy(() =>
 const InsightResponderView = React.lazy(() =>
     import("../insight-responder/InsightResponderView")
 );
-const AutoPostStudio = React.lazy(() => import("../autopost/AutoPostStudio.tsx"));
+const AutoPostStudio = React.lazy(() => import("../autopost/AutoPostStudio"));
+
+interface DashboardLayoutProps {
+    children: React.ReactNode;
+    activeTab: AppTab;
+    setActiveTab: (tab: AppTab) => void;
+    onUpgrade: () => void;
+    onReferral: () => void;
+    showCreditDeduction: boolean;
+    onDeletePost: (id: string, e: React.MouseEvent) => void;
+}
+
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ 
+    children, 
+    activeTab, 
+    setActiveTab, 
+    onUpgrade, 
+    onReferral, 
+    showCreditDeduction,
+    onDeletePost
+}) => {
+    const { user, language, setLanguage } = useUser();
+    const { posts, currentPost } = usePosts();
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+
+    return (
+        <div className="flex h-screen w-full bg-white font-sans overflow-hidden">
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+                <main className="flex-1 overflow-hidden relative">
+                    {children}
+                </main>
+            </div>
+        </div>
+    );
+};
 
 const DashboardContent: React.FC = () => {
+    const navigate = useNavigate();
     const { user, refreshUser, setUser, language, setLanguage } = useUser();
-    const toasts = useToasts();
+    const toast = useToast();
     const {
         posts,
         setPosts,
@@ -84,7 +126,8 @@ const DashboardContent: React.FC = () => {
     const [activeTab, setActiveTabRaw] = useState<AppTab>(() => {
         const saved = localStorage.getItem("kolink_active_tab");
         if (saved === "ideas") return "create"; // Legacy
-        return (saved as any) || "create";
+        if (saved === "create") return "home"; // Migrate create to home
+        return (saved as any) || "home";
     });
 
     const setActiveTab = (tab: AppTab) => {
@@ -123,7 +166,7 @@ const DashboardContent: React.FC = () => {
             } catch (error) {
                 console.error("Failed to persist user updates:", error);
                 // Optional: Revert optimistic update here if critical
-                toasts.error("Error saving progress");
+                toast.error("Error saving progress");
             }
         }
     };
@@ -149,7 +192,12 @@ const DashboardContent: React.FC = () => {
         setIsGenerating,
     });
 
+
+
     // Effects
+
+    // Handle Keyboard Shortcuts
+    useKeyboardShortcuts({ onNavigate: setActiveTab });
 
     // Handle Stripe Success Redirect
     useEffect(() => {
@@ -157,10 +205,11 @@ const DashboardContent: React.FC = () => {
         if (queryParams.has("session_id")) {
             console.log("Stripe session detected, refreshing user...");
             refreshUser().then(() => {
-                toasts.success(
+                toast.success(
                     language === "es"
                         ? "¡Suscripción actualizada!"
                         : "Subscription updated!",
+                    "Éxito"
                 );
                 // Clean up URL to prevent multiple refreshes on re-render
                 window.history.replaceState({}, "", window.location.pathname);
@@ -173,7 +222,7 @@ const DashboardContent: React.FC = () => {
         e.stopPropagation();
         if (window.confirm("Are you sure you want to delete this post?")) {
             removePost(id);
-            toasts.success("Post deleted");
+            toast.success("Post deleted", "Success");
         }
     };
 
@@ -187,23 +236,29 @@ const DashboardContent: React.FC = () => {
             onDeletePost={handleDeletePost}
         >
             <div
-                className={`h-full ${
-                    ["create", "history", "editor", "chat", "carousel", "voice-lab"].includes(
-                            activeTab,
-                        )
-                        ? "overflow-hidden"
-                        : "overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent"
-                }`}
+                className="h-full w-full flex flex-col"
             >
+                <TopBar activeTab={activeTab} onNavigate={setActiveTab} />
+                
                 <div
                     className={`${
-                        ["create", "history", "editor", "chat", "carousel", "voice-lab"].includes(
+                        ["home", "create", "history", "editor", "chat", "carousel", "voice-lab", "inferencia", "audit", "insight-responder", "autopilot"].includes(
                                 activeTab,
                             )
-                            ? "h-full w-full flex flex-col"
-                            : "max-w-7xl mx-auto p-4 lg:p-8 pb-24"
-                    }`}
+                            ? "flex-1 flex flex-col min-h-0 overflow-hidden"
+                            : "max-w-7xl mx-auto p-4 lg:p-8 pb-24 flex-1 overflow-y-auto"
+                    } ${activeTab === "home" ? "overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent h-screen" : "w-full"}`}
                 >
+                    {activeTab === "home" && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <LaunchpadView 
+                                user={user} 
+                                onSelectTool={setActiveTab} 
+                                onInferenciaClick={() => navigate("/inferencia")}
+                            />
+                        </div>
+                    )}
+
                     {activeTab === "create" && (
                         <div
                             id="viral-engine-view"

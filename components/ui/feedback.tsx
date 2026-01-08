@@ -6,7 +6,7 @@ import clsx from "clsx";
 import { useClickOutside } from "@/components/ui/use-click-outside";
 import { useUser } from "@/context/UserContext";
 import { feedbackRepository } from "@/services/feedbackRepository";
-import { toast } from "@/components/ui/toast";
+import { useToast } from "@/context/ToastContext";
 
 interface FeedbackProps {
   label: string;
@@ -107,6 +107,7 @@ const Default = ({ label }: { label: string }) => {
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useUser();
+  const toast = useToast();
   const [position, setPosition] = useState<{ top?: number, bottom?: number }>();
   const inputRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -291,6 +292,7 @@ const Inline = ({ label }: { label: string }) => {
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useUser();
+  const toast = useToast();
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const ref = useRef<HTMLDivElement | null>(null);
   const [showContent, setShowContent] = useState(false);

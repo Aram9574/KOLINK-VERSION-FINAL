@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../../../services/supabaseClient";
 import { APP_DOMAIN } from "../../../constants";
 import { useNavigate } from "react-router-dom";
-import { useToasts } from "../../ui/toast";
+import { useToast } from "../../../context/ToastContext";
 import { Helmet } from "react-helmet-async";
 import { useUser } from "../../../context/UserContext";
 import { SignInPage, Testimonial } from "../../ui/sign-in";
@@ -70,7 +70,7 @@ const sampleTestimonials: Testimonial[] = [
 const LoginPage: React.FC = () => {
     const { language } = useUser();
     const navigate = useNavigate();
-    const toasts = useToasts();
+    const toast = useToast();
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -120,10 +120,11 @@ const LoginPage: React.FC = () => {
                     },
                 });
                 if (error) throw error;
-                toasts.success(
+                toast.success(
                     language === "es"
                         ? "Cuenta creada. Por favor verifica tu correo."
-                        : "Account created. Please check your email."
+                        : "Account created. Please check your email.",
+                    "Registro Exitoso"
                 );
             }
         } catch (error: any) {
@@ -134,7 +135,7 @@ const LoginPage: React.FC = () => {
                     ? "Error de conexión. Verifica tu internet." 
                     : "Connection error. Check your internet.";
             }
-            toasts.error(msg);
+            toast.error(msg, "Error");
         } finally {
             setIsLoading(false);
         }
@@ -152,16 +153,17 @@ const LoginPage: React.FC = () => {
             });
             if (error) throw error;
         } catch (error: any) {
-            toasts.error(error.message || `Error al iniciar sesión`);
+            toast.error(error.message || `Error al iniciar sesión`, "Error");
             setIsLoading(false);
         }
     };
 
     const handleResetPassword = () => {
-        toasts.info(
+        toast.info(
             language === "es"
                 ? "Función de recuperación en mantenimiento. Por favor contacta a soporte."
-                : "Reset password feature in maintenance. Please contact support."
+                : "Reset password feature in maintenance. Please contact support.",
+            "Info"
         );
     };
 

@@ -32,6 +32,7 @@ interface Message {
 
 import { useCredits } from "../../../hooks/useCredits.ts";
 import PremiumLockOverlay from "../../ui/PremiumLockOverlay";
+import BrandVoiceModal from "../../modals/BrandVoiceModal";
 
 const LinkedInExpertChat: React.FC = () => {
   const { user, language } = useUser();
@@ -64,6 +65,15 @@ const LinkedInExpertChat: React.FC = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Check for Brand Voice
+  const [showVoiceModal, setShowVoiceModal] = useState(false);
+  useEffect(() => {
+    if (user.isPremium && !user.brandVoice) {
+       const timer = setTimeout(() => setShowVoiceModal(true), 1500);
+       return () => clearTimeout(timer);
+    }
+  }, [user.brandVoice, user.isPremium]);
 
   // --- 4. Helpers ---
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -173,11 +183,7 @@ const LinkedInExpertChat: React.FC = () => {
   };
 
   return (
-    <div className="flex w-full h-full bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/40 overflow-hidden ring-1 ring-slate-900/5 relative">
-      
-      {/* Background Grid */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 contrast-125 pointer-events-none z-0"></div>
-      <div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_1px_center] pointer-events-none z-0"></div>
+    <div className="flex w-full h-full bg-white/40 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/40 overflow-hidden ring-1 ring-slate-900/5 relative">
 
       {/* Sidebar: Context Hub */}
       <AnimatePresence>
@@ -189,14 +195,14 @@ const LinkedInExpertChat: React.FC = () => {
                 className="hidden md:flex flex-col border-r border-slate-200/60 bg-white/50 backdrop-blur-md z-10"
             >
                 <div className="p-5 border-b border-slate-200/60 flex items-center gap-2">
-                    <BrainCircuit className="w-5 h-5 text-indigo-600" />
+                    <BrainCircuit className="w-5 h-5 text-brand-600" />
                     <h3 className="font-bold text-slate-800 text-sm tracking-tight">Active Context</h3>
                 </div>
                 
                 <div className="flex-1 p-5 space-y-6 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
                     <div className="space-y-2">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Brand Voice</label>
-                        <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100/50 text-xs text-indigo-900 leading-relaxed font-medium">
+                        <div className="p-3 bg-brand-50/50 rounded-xl border border-brand-100/50 text-xs text-brand-900 leading-relaxed font-medium">
                             {user?.brandVoice || (language === "es" ? "No definido. Nexus usará un tono profesional estándar." : "Not defined. Nexus will use a standard professional tone.")}
                         </div>
                     </div>
@@ -218,7 +224,7 @@ const LinkedInExpertChat: React.FC = () => {
                             <span className="text-xs font-medium text-slate-600">Ghostwriter</span>
                             <button 
                                 onClick={() => setIsGhostwriter(!isGhostwriter)}
-                                className={`w-10 h-5 rounded-full relative transition-colors ${isGhostwriter ? "bg-indigo-600" : "bg-slate-300"}`}
+                                className={`w-10 h-5 rounded-full relative transition-colors ${isGhostwriter ? "bg-brand-600" : "bg-slate-300"}`}
                             >
                                 <motion.div 
                                     animate={{ x: isGhostwriter ? 20 : 2 }}
@@ -271,7 +277,7 @@ const LinkedInExpertChat: React.FC = () => {
                         <div className={`
                             flex gap-3 p-4 rounded-2xl shadow-sm backdrop-blur-md border 
                             ${msg.role === "user" 
-                                ? "bg-gradient-to-br from-indigo-600 to-indigo-500 text-white rounded-tr-sm border-indigo-400/20" 
+                                ? "bg-brand-600 text-white rounded-tr-sm border-brand-400/20" 
                                 : "bg-white/70 text-slate-700 rounded-tl-sm border-white/50 shadow-soft-glow"}
                         `}>
                             <div className="flex-col w-full">
@@ -304,9 +310,9 @@ const LinkedInExpertChat: React.FC = () => {
                             <motion.div 
                                 animate={{ rotate: 360 }}
                                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                className="w-full h-full rounded-full border-2 border-indigo-100 border-t-indigo-500"
+                                className="w-full h-full rounded-full border-2 border-brand-100 border-t-brand-500"
                             />
-                            <Bot className="w-4 h-4 text-indigo-500 absolute" />
+                            <Bot className="w-4 h-4 text-brand-500 absolute" />
                          </div>
                          <span className="text-xs font-semibold text-slate-500 animate-pulse">
                              {language === "es" ? "Analizando estrategia..." : "Analyzing strategy..."}
@@ -365,7 +371,7 @@ const LinkedInExpertChat: React.FC = () => {
                   size="icon" 
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="text-slate-500 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-colors"
+                  className="text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
                 >
                   <Paperclip className="size-5" />
                   <span className="sr-only">Attach file</span>
@@ -407,6 +413,13 @@ const LinkedInExpertChat: React.FC = () => {
             </div>
         </div>
       </div>
+      {/* Brand Voice Modal */}
+      <BrandVoiceModal 
+        isOpen={showVoiceModal} 
+        onClose={() => setShowVoiceModal(false)} 
+        language={language}
+      />
+
     </div>
   );
 };

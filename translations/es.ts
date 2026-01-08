@@ -545,6 +545,13 @@ export const es = {
       language: "Idioma",
       languageDesc:
         "Selecciona tu idioma preferido para la interfaz y la generación de contenido.",
+      support: {
+        title: "¿Necesitas ayuda?",
+        subtitle:
+          "Nuestro equipo de soporte está listo para ayudarte con cualquier problema o duda que tengas.",
+        cta: "Contactar Soporte",
+        email: "info@kolink.es"
+      },
     },
     // APP INTERFACE TRANSLATIONS (ES)
     carouselStudio: {
@@ -612,8 +619,9 @@ export const es = {
     },
     app: {
       sidebar: {
-        studio: "Estudio",
-        carousel: "Generador de Carrusel",
+        home: "Inicio",
+        studio: "Post Editor",
+        carousel: "Carruseles",
         ideas: "Generador de Ideas",
         insightResponder: "Respuesta Inteligente",
         autopilot: "AutoPost",

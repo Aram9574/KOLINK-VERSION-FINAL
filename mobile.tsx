@@ -11,7 +11,7 @@ import { PostHogProvider } from "posthog-js/react";
 import { initAnalytics } from "./services/analytics";
 import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
-import { toast } from "./components/ui/toast";
+import { ToastProvider } from "./context/ToastContext";
 
 const posthogClient = initAnalytics();
 
@@ -39,77 +39,7 @@ if (Capacitor.isNativePlatform()) {
         }
     });
 
-    const handleAuthURL = async (urlString: string) => {
-        console.log("Processing Auth URL:", urlString);
-        try {
-            const url = new URL(urlString);
-            const hash = url.hash.substring(1);
-            const search = url.search.substring(1);
-            const params = new URLSearchParams(hash || search);
-
-            const access_token = params.get("access_token");
-            const refresh_token = params.get("refresh_token");
-            const provider_token = params.get("provider_token");
-            const code = params.get("code");
-
-            if (provider_token) {
-                console.log("Found provider_token in URL, storing...");
-                localStorage.setItem("linkedin_provider_token", provider_token);
-            }
-
-            if (access_token && refresh_token) {
-                toast.info("Iniciando sesión...");
-                console.log(
-                    "Direct tokens found. Has access_token:",
-                    !!access_token,
-                    "Has provider_token (URL):",
-                    !!provider_token,
-                );
-
-                const { error } = await supabase.auth.setSession({
-                    access_token,
-                    refresh_token,
-                });
-                if (error) throw error;
-                toast.success("¡Sesión iniciada!");
-            } else if (code) {
-                toast.info("Canjeando código de acceso...");
-                const { data, error } = await supabase.auth
-                    .exchangeCodeForSession(code);
-                if (error) throw error;
-
-                // Capture provider_token from exchange if available
-                if (data?.session?.provider_token) {
-                    console.log(
-                        "Found provider_token in code exchange, storing...",
-                    );
-                    localStorage.setItem(
-                        "linkedin_provider_token",
-                        data.session.provider_token,
-                    );
-                }
-
-                toast.success("¡Acceso verificado!");
-            }
-        } catch (e: any) {
-            console.error("Auth URL Error:", e);
-            toast.error(
-                "Error en la autenticación: " + (e.message || "URL no válida"),
-            );
-        }
-    };
-
-    // Handle Deep Links (App is already open)
-    CapacitorApp.addListener("appUrlOpen", async (data: any) => {
-        handleAuthURL(data.url);
-    });
-
-    // Handle Cold Start (App was closed)
-    CapacitorApp.getLaunchUrl().then((data) => {
-        if (data?.url) {
-            handleAuthURL(data.url);
-        }
-    });
+    // Valid logic is now moved to MobileApp.tsx to use useToast hook
 }
 
 const rootElement = document.getElementById("root");
@@ -125,7 +55,9 @@ root.render(
                 <HelmetProvider>
                     <BrowserRouter>
                         <UserProvider>
-                            <MobileApp />
+                            <ToastProvider>
+                                <MobileApp />
+                            </ToastProvider>
                         </UserProvider>
                     </BrowserRouter>
                 </HelmetProvider>
