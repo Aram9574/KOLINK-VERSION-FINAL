@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Radar, Globe, MessageCircle, FileText, Search, RefreshCw, Filter } from 'lucide-react';
-import { Trend, TrendCategory, ContentAngle } from '../../../types';
+import { Trend, TrendCategory, ContentAngle, Post, ViralTone, ViralFramework, EmojiDensity, PostLength } from '../../../types';
 import { getRecommendedTrends } from '../../../lib/services/trendsService';
+import { usePosts } from '../../../context/PostContext';
 import AngleGenerator from './AngleGenerator';
 import { toast } from 'sonner';
 
 const ContentRadar: React.FC = () => {
+    // const navigate = useNavigate(); // Not using router matching for internal tabs
+    const { setCurrentPost } = usePosts();
     const [trends, setTrends] = useState<Trend[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTrend, setSelectedTrend] = useState<Trend | null>(null);
@@ -31,10 +35,49 @@ const ContentRadar: React.FC = () => {
     const handleGenerate = async (angle: ContentAngle) => {
         // Simulate generation
         await new Promise(resolve => setTimeout(resolve, 2000));
-        toast.success(`¡Borrador creado usando la lente de ${angle.title}!`, {
-            description: "Revisa tu calendario de contenido."
+        
+        // Enrich the context for the AI
+        const ideaText = `TEMA: ${selectedTrend?.title}
+
+CONTEXTO: ${selectedTrend?.summary}
+FUENTE: ${selectedTrend?.source}
+
+ESTRATEGIA: ${angle.title}
+HOOK: "${angle.hook}"`;
+
+        // Create a temporary post object for the Generator
+        const newPost: Post = {
+            id: `draft-${Date.now()}`,
+            content: "", // Empty because we want to GENERATE based on the idea
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            status: 'draft',
+            params: {
+                topic: ideaText, 
+                audience: "General",
+                tone: ViralTone.PROFESSIONAL, 
+                framework: ViralFramework.STANDARD,
+                length: PostLength.MEDIUM,
+                creativityLevel: 50,
+                emojiDensity: EmojiDensity.MODERATE, 
+                hashtagCount: 3,
+                includeCTA: true
+            },
+            likes: 0,
+            views: 0
+        };
+
+        toast.success(`¡Estrategia definida: ${angle.title}!`, {
+            description: "Llevando esta idea al Laboratorio Viral..."
         });
+        
         setSelectedTrend(null);
+        
+        // Set context and switch tab to GENERATOR (create)
+        setTimeout(() => {
+            setCurrentPost(newPost);
+            window.dispatchEvent(new CustomEvent('kolink-switch-tab', { detail: 'create' }));
+        }, 800);
     };
 
     const getScoreColor = (score: number) => {
@@ -122,7 +165,7 @@ const ContentRadar: React.FC = () => {
                         >
                             {/* Match Score Badge */}
                             <div className={`absolute top-4 right-4 px-2 py-1 rounded-lg text-xs font-bold ring-1 flex items-center gap-1 ${getScoreColor(trend.matchScore)}`}>
-                                {trend.matchScore}% Match
+                                {trend.matchScore}% Afinidad
                             </div>
 
                             <div className="flex items-start gap-3 mb-3">

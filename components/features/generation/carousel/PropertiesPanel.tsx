@@ -1,36 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useCarouselStore } from '@/lib/store/useCarouselStore';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Edit3, Palette, Type, Layout, User, Layers } from 'lucide-react';
+import { Settings, Edit3, Palette, Type, Layout, User, Layers, Sparkles, Loader2, Image as ImageIcon, X, Upload, TrendingUp, Wand2, Quote, Hash, List, Columns as ColumnsIcon, Code, Plus, MoreHorizontal } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 import { useUser } from '@/context/UserContext';
 import { translations } from '@/translations';
 import { supabase } from '@/services/supabaseClient';
 import { toast } from 'sonner';
+
 import { PredictiveModal, EngagementPrediction } from './PredictiveModal';
 import { PolishReviewDialog } from './PolishReviewDialog';
-import { Sparkles, Loader2, Image as ImageIcon, X, Upload, CheckCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Slider } from '../../../ui/slider';
-
 import { ImageSelector } from './ImageSelector';
 
 export const PropertiesPanel = () => {
   const { language } = useUser();
   const t = translations[language || 'en'].carouselStudio;
+  
+  // Store Hooks
   const { activeSlideId } = useCarouselStore(state => state.editor);
-  const { slides, design } = useCarouselStore(state => state.project);
+  const { slides, design } = useCarouselStore(state => state.project); // project is needed for globalDesign
+  const project = useCarouselStore(state => state.project); // Get full project object for access to author etc.
+  
   const updateSlide = useCarouselStore(state => state.updateSlide);
-  const updateDesign = useCarouselStore(state => state.updateDesign); 
-
-  const activeSlide = slides.find(s => s.id === activeSlideId);
+  const updateDesign = useCarouselStore(state => state.updateDesign);
+  const updateGlobalDesign = useCarouselStore(state => state.updateGlobalDesign);
+  const updateAuthor = useCarouselStore(state => state.updateAuthor);
+  
+  const removeSlide = useCarouselStore(state => state.removeSlide);
   
   // Presets
   const savedPresets = useCarouselStore(state => state.savedPresets);
@@ -39,72 +45,34 @@ export const PropertiesPanel = () => {
   const deletePreset = useCarouselStore(state => state.deletePreset);
   const setTheme = useCarouselStore(state => state.setTheme);
 
-  React.useEffect(() => {
+  const activeSlide = slides.find(s => s.id === activeSlideId);
+
+  // Local State
+  const [brandKitName, setBrandKitName] = useState('');
+  
+  // AI State
+  const [isPredictiveModalOpen, setIsPredictiveModalOpen] = useState(false);
+  const [predictionData, setPredictionData] = useState<EngagementPrediction | null>(null);
+  const [isPredicting, setIsPredicting] = useState(false);
+  
+  const [isPolishReviewOpen, setIsPolishReviewOpen] = useState(false);
+  const [isPolishing, setIsPolishing] = useState(false);
+  const [polishedData, setPolishedData] = useState<Partial<typeof activeSlide.content> | null>(null);
+
+  // Load presets on mount
+  useEffect(() => {
      loadPresets();
   }, []);
 
-  const handleSavePreset = () => {
-      // Simple prompt for now, can be a dialog later
-      const name = window.prompt(t.properties?.brandNamePrompt || "Name your Brand Kit:"); // Ensure translation key exists or fallback
-      if (name) {
-          savePreset(name);
-          toast.success("Brand Kit saved!");
-      }
-  };
-
-  const [isPredictiveModalOpen, setIsPredictiveModalOpen] = React.useState(false);
-  const [predictionData, setPredictionData] = React.useState<EngagementPrediction | null>(null);
-  const [isPredicting, setIsPredicting] = React.useState(false);
-  const [isPolishing, setIsPolishing] = React.useState(false);
-  
-  // Polish Review State
-  const [isPolishReviewOpen, setIsPolishReviewOpen] = React.useState(false);
-  const [polishedData, setPolishedData] = React.useState<Partial<typeof activeSlide.content> | null>(null);
-
-  const handlePolishSlide = async () => {
-      if (!activeSlide) return;
-      setIsPolishing(true);
-      try {
-          const { data, error } = await supabase.functions.invoke('polish-slide', {
-              body: { 
-                  title: activeSlide.content.title,
-                  body: activeSlide.content.body,
-                  subtitle: activeSlide.content.subtitle,
-                  language: language || 'es'
-              }
-          });
-
-          if (error) throw error;
-          
-          if (data) {
-              setPolishedData({
-                  title: data.title,
-                  body: data.body,
-                  subtitle: data.subtitle
-              });
-              setIsPolishReviewOpen(true);
-          }
-      } catch (error: any) {
-          console.error("Polish failed:", error);
-          toast.error("Failed to polish slide");
-      } finally {
-          setIsPolishing(false);
-      }
-  };
-
-  const applyPolish = () => {
-      if (!activeSlide || !polishedData) return;
-      
-      updateSlide(activeSlide.id, {
-          content: {
-              ...activeSlide.content,
-              title: polishedData.title || activeSlide.content.title,
-              body: polishedData.body || activeSlide.content.body,
-              subtitle: polishedData.subtitle || activeSlide.content.subtitle
-          }
-      });
-      toast.success("Slide polished successfully!");
-      setPolishedData(null);
+  // Handlers
+  const handleSaveBrandKit = () => {
+    if (!brandKitName.trim()) {
+        toast.error(t.properties.brandNamePrompt);
+        return;
+    }
+    savePreset(brandKitName);
+    toast.success("Brand Kit saved!");
+    setBrandKitName('');
   };
 
   const handlePredictPerformance = async () => {
@@ -131,7 +99,6 @@ export const PropertiesPanel = () => {
               throw error;
           }
           
-          console.log("Prediction Success:", data);
           setPredictionData(data);
       } catch (error: any) {
           console.error("Prediction failed:", error);
@@ -142,220 +109,235 @@ export const PropertiesPanel = () => {
       }
   };
 
+  const handlePolishSlide = async () => {
+      if (!activeSlide) return;
+      setIsPolishing(true);
+      try {
+          const { data, error } = await supabase.functions.invoke('polish-slide', {
+              body: { 
+                  title: activeSlide.content.title,
+                  body: activeSlide.content.body,
+                  subtitle: activeSlide.content.subtitle,
+                  language: language || 'es'
+              }
+          });
+
+          if (error) throw error;
+          
+          if (data) {
+              setPolishedData({
+                  title: data.title,
+                  body: data.body,
+                  subtitle: data.subtitle
+              });
+              setIsPolishReviewOpen(true);
+          }
+      } catch (error: any) {
+          console.error("Polish failed:", error);
+          toast.error(t.toasts?.captionFailed || "Failed to polish slide");
+      } finally {
+          setIsPolishing(false);
+      }
+  };
+
+  const applyPolish = () => {
+      if (!activeSlide || !polishedData) return;
+      
+      updateSlide(activeSlide.id, {
+          content: {
+              ...activeSlide.content,
+              title: polishedData.title || activeSlide.content.title,
+              body: polishedData.body || activeSlide.content.body,
+              subtitle: polishedData.subtitle || activeSlide.content.subtitle
+          }
+      });
+      toast.success(t.toasts?.captionGenerated || "Updated!");
+      setPolishedData(null);
+  };
+
+  if (!activeSlide) {
+      return (
+        <div className="h-full flex flex-col items-center justify-center text-center p-8 text-slate-400 bg-white border-l border-slate-200 w-80">
+            <Sparkles className="w-12 h-12 mb-4 opacity-20" />
+            <p className="text-sm font-medium">Select a slide to edit its properties</p>
+        </div>
+      );
+  }
+
   return (
-    <div className="w-80 border-l border-slate-200 bg-white h-full flex flex-col z-20 shadow-sm transition-all overflow-hidden">
-      <Tabs defaultValue="edit" className="flex-1 flex flex-col h-full overflow-hidden">
-          <div className="px-4 pt-4 border-b border-slate-100 bg-white shrink-0">
-            <TabsList className="w-full grid grid-cols-2 mb-4">
-              <TabsTrigger value="edit" className="flex items-center gap-2">
-                 <Edit3 className="w-3.5 h-3.5" /> {t.tabs.slide}
-              </TabsTrigger>
-              <TabsTrigger value="design" className="flex items-center gap-2">
-                 <Palette className="w-3.5 h-3.5" /> {t.tabs.design}
-              </TabsTrigger>
-            </TabsList>
-          </div>
+    <div className="w-80 border-l border-slate-200 bg-white h-full flex flex-col z-20 shadow-sm overflow-hidden">
+        <Tabs defaultValue="slide" className="w-full flex-1 flex flex-col h-full">
+            <div className="px-4 pt-4 shrink-0 bg-white z-10 border-b border-slate-100">
+               <TabsList className="w-full grid grid-cols-2 mb-4">
+                  <TabsTrigger value="slide">{t.properties.slideEditor}</TabsTrigger>
+                  <TabsTrigger value="design">{t.properties.globalDesign}</TabsTrigger>
+               </TabsList>
+            </div>
 
-          <div className="flex-1 overflow-hidden">
-                {/* EDIT TAB */}
-                <TabsContent value="edit" className="m-0 h-full animate-in slide-in-from-left-4 duration-300 outline-none">
+            <div className="flex-1 overflow-hidden">
+                {/* --- SLIDE PROPERTIES --- */}
+                <TabsContent value="slide" className="h-full mt-0">
                     <ScrollArea className="h-full">
-                        <div className="p-4 space-y-8 pb-24">
-                            {/* AI TOOLS SECTION */}
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <Sparkles className="w-4 h-4 text-brand-500" />
-                                    <h3 className="text-sm font-semibold text-slate-800">AI Magic Tools</h3>
-                                </div>
-                                
-                                <div className="grid gap-3">
-                                    {/* AI PREDICT */}
-                                    <div className="p-3 bg-gradient-to-br from-brand-50/50 to-indigo-50/50 rounded-xl border border-brand-100/50 shadow-sm">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <div className="flex items-center gap-2">
-                                                <div className="p-1.5 bg-white rounded-lg shadow-sm text-brand-600">
-                                                    <Sparkles className="w-3.5 h-3.5" />
-                                                </div>
-                                                <h4 className="font-bold text-xs text-brand-900">{t.ai.predict}</h4>
-                                            </div>
-                                            <button
-                                                onClick={handlePredictPerformance}
-                                                disabled={isPredicting}
-                                                className="px-3 py-1 bg-white border border-brand-200 shadow-sm rounded-lg text-[10px] font-bold text-brand-700 hover:bg-brand-50 disabled:opacity-50 transition-all flex items-center gap-1.5"
-                                            >
-                                                {isPredicting ? <Loader2 className="w-3 h-3 animate-spin"/> : <Sparkles className="w-3 h-3" />}
-                                                {t.ai.predict}
-                                            </button>
-                                        </div>
-                                        <p className="text-[10px] text-brand-700/70 leading-snug">
-                                            {t.ai.predictSubtitle}
-                                        </p>
-                                    </div>
-
-                                    {/* AI POLISH */}
-                                    <div className="p-3 bg-gradient-to-br from-indigo-50/50 to-violet-50/50 rounded-xl border border-indigo-100/50 shadow-sm">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <div className="flex items-center gap-2">
-                                                <div className="p-1.5 bg-white rounded-lg shadow-sm text-indigo-600">
-                                                    <Edit3 className="w-3.5 h-3.5" />
-                                                </div>
-                                                <h4 className="font-bold text-xs text-indigo-900">{t.ai.polish}</h4>
-                                            </div>
-                                            <button
-                                                onClick={handlePolishSlide}
-                                                disabled={isPolishing}
-                                                className="px-3 py-1 bg-white border border-indigo-200 shadow-sm rounded-lg text-[10px] font-bold text-indigo-700 hover:bg-indigo-50 disabled:opacity-50 transition-all flex items-center gap-1.5"
-                                            >
-                                                {isPolishing ? <Loader2 className="w-3 h-3 animate-spin"/> : <Sparkles className="w-3 h-3" />}
-                                                {t.ai.optimizeBtn}
-                                            </button>
-                                        </div>
-                                        <p className="text-[10px] text-indigo-700/70 leading-snug">
-                                            {t.ai.polishSubtitle}
-                                        </p>
-                                    </div>
+                        <div className="p-4 space-y-6 pb-24">
+                            
+                            {/* Magic Tools Module */}
+                            <div className="space-y-3">
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                     <Sparkles className="w-3.5 h-3.5" />
+                                     {t.properties.aiTools}
+                                </h3>
+                                <div className="grid grid-cols-2 gap-2">
+                                     <Button 
+                                        variant="outline" 
+                                        onClick={handlePredictPerformance}
+                                        disabled={isPredicting}
+                                        className="h-auto py-3 justify-start flex-col items-start gap-1 border-slate-200 hover:border-brand-300 hover:bg-brand-50 group"
+                                     >
+                                         {isPredicting ? <Loader2 className="w-4 h-4 text-brand-500 mb-1 animate-spin" /> : <TrendingUp className="w-4 h-4 text-brand-500 mb-1" />}
+                                         <span className="text-xs font-semibold text-slate-700">{t.ai.predict}</span>
+                                         <span className="text-[9px] text-slate-400 font-normal leading-tight text-left">
+                                            {t.ai.predictSubtitle.substring(0, 30)}...
+                                         </span>
+                                     </Button>
+                                     <Button 
+                                        variant="outline" 
+                                        onClick={handlePolishSlide}
+                                        disabled={isPolishing}
+                                        className="h-auto py-3 justify-start flex-col items-start gap-1 border-slate-200 hover:border-violet-300 hover:bg-violet-50 group"
+                                     >
+                                         {isPolishing ? <Loader2 className="w-4 h-4 text-violet-500 mb-1 animate-spin" /> : <Wand2 className="w-4 h-4 text-violet-500 mb-1" />}
+                                         <span className="text-xs font-semibold text-slate-700">{t.ai.polish}</span>
+                                         <span className="text-[9px] text-slate-400 font-normal leading-tight text-left">
+                                            {t.ai.polishSubtitle.substring(0, 30)}...
+                                         </span>
+                                     </Button>
                                 </div>
                             </div>
 
-                            {/* CONTENT EDIT SECTION */}
-                            {activeSlide && (
-                                <div className="space-y-6">
-                                    <div className="flex items-center justify-between">
-                                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t.properties.slideEditor}</h3>
-                                        <button 
-                                            onClick={() => {
-                                                if (globalThis.confirm(t.properties.deleteConfirm)) {
-                                                    useCarouselStore.getState().removeSlide(activeSlide.id);
-                                                }
-                                            }}
-                                            className="text-red-500 hover:text-red-600 transition-colors p-1"
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </button>
-                                    </div>
+                            <div className="h-px bg-slate-100" />
 
-                                    <div className="space-y-4">
-                                        <div className="space-y-1.5">
-                                            <Label className="text-[10px] font-bold text-slate-500 uppercase">{t.properties.title}</Label>
+                            {/* Content Editor */}
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                        {t.properties.slideEditor}
+                                    </h3>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-6 w-6 text-red-400 hover:text-red-500 hover:bg-red-50"
+                                        onClick={() => {
+                                            if (globalThis.confirm(t.properties.deleteConfirm)) {
+                                                removeSlide(activeSlide.id);
+                                            }
+                                        }}
+                                    >
+                                        <X className="w-3.5 h-3.5" />
+                                    </Button>
+                                </div>
+
+                                {/* Text Fields */}
+                                {Object.entries(activeSlide.content).map(([key, value]) => {
+                                    // Skip keys that shouldn't be edited directly or are hidden
+                                    if (key === 'image' || key === 'backgroundImage') return null;
+
+                                    return (
+                                        <div key={key} className="space-y-1.5">
+                                            <Label className="text-xs text-slate-500 capitalize">{t.properties[key as keyof typeof t.properties] || key}</Label>
                                             <Textarea 
-                                                value={activeSlide.content.title}
-                                                onChange={(e) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, title: e.target.value } })}
-                                                className="min-h-[80px] text-sm resize-none"
+                                                value={typeof value === 'string' ? value : ''}
+                                                onChange={(e) => updateSlide(activeSlide.id, { 
+                                                    content: { ...activeSlide.content, [key]: e.target.value } 
+                                                })}
+                                                className="min-h-[80px] text-sm bg-slate-50 border-slate-200 focus:bg-white resize-none"
                                             />
                                         </div>
+                                    );
+                                })}
+                            </div>
 
-                                        <div className="space-y-1.5">
-                                            <Label className="text-[10px] font-bold text-slate-500 uppercase">{t.properties.body}</Label>
-                                            <Textarea 
-                                                value={activeSlide.content.body}
-                                                onChange={(e) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, body: e.target.value } })}
-                                                className="min-h-[120px] text-sm resize-none"
-                                            />
-                                        </div>
+                            <div className="h-px bg-slate-100" />
+                            
+                            {/* Layout Selector */}
+                            <div className="space-y-3">
+                                <Label className="text-xs font-bold uppercase tracking-wider text-slate-400">{t.properties.slideLayout}</Label>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {[
+                                        { id: 'default', icon: Layout, label: t.properties.layouts.default },
+                                        { id: 'full-image', icon: ImageIcon, label: t.properties.layouts.fullImg },
+                                        { id: 'quote', icon: Quote, label: t.properties.layouts.quote },
+                                        { id: 'number', icon: Hash, label: t.properties.layouts.number },
+                                        { id: 'list', icon: List, label: t.properties.layouts.list },
+                                        { id: 'compare', icon: ColumnsIcon, label: t.properties.layouts.compare },
+                                        { id: 'code', icon: Code, label: t.properties.layouts.code },
+                                    ].map((layout) => (
+                                         <button
+                                            key={layout.id}
+                                            onClick={() => updateSlide(activeSlide.id, { layout: layout.id as any })}
+                                            className={cn(
+                                                "flex flex-col items-center justify-center p-2 rounded-lg border transition-all",
+                                                activeSlide.layout === layout.id
+                                                    ? 'border-brand-500 bg-brand-50 text-brand-700 ring-1 ring-brand-500'
+                                                    : 'border-slate-200 hover:border-brand-200 hover:bg-slate-50 text-slate-500'
+                                            )}
+                                         >
+                                            <layout.icon className="w-5 h-5 mb-1.5" />
+                                            <span className="text-[10px] font-medium truncate w-full text-center">{layout.label}</span>
+                                         </button>
+                                    ))}
+                                </div>
+                            </div>
 
-                                        {activeSlide.type === 'intro' && (
-                                            <div className="space-y-1.5">
-                                                <Label className="text-[10px] font-bold text-slate-500 uppercase">{t.properties.subtitle}</Label>
-                                                <Input 
-                                                    value={activeSlide.content.subtitle}
-                                                    onChange={(e) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, subtitle: e.target.value } })}
-                                                    className="h-9 text-sm"
-                                                />
-                                            </div>
-                                        )}
-
-                                        {activeSlide.type === 'outro' && (
-                                            <div className="space-y-1.5">
-                                                <Label className="text-[10px] font-bold text-slate-500 uppercase">CTA</Label>
-                                                <Input 
-                                                    value={activeSlide.content.cta_text}
-                                                    onChange={(e) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, cta_text: e.target.value } })}
-                                                    className="h-9 text-sm"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* SLIDE LAYOUT */}
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <Layout className="w-4 h-4 text-brand-500" />
-                                            <h3 className="text-sm font-semibold text-slate-800">Slide Layout</h3>
-                                        </div>
-                                        <div className="space-y-3">
-                                            <Label className="text-xs text-slate-500">Slide Layout</Label>
-                                        <div className="grid grid-cols-3 gap-2">
-                                            {[
-                                                { id: 'default', label: 'Default', icon: <Layout className="w-4 h-4" /> },
-                                                { id: 'image-full', label: 'Full Img', icon: <ImageIcon className="w-4 h-4" /> },
-                                                { id: 'quote', label: 'Quote', icon: <div className="text-[10px] font-serif font-bold">""</div> },
-                                                { id: 'big-number', label: 'Number', icon: <span className="text-[10px] font-bold">#1</span> },
-                                                { id: 'checklist', label: 'List', icon: <CheckCircle className="w-4 h-4" /> },
-                                                { id: 'comparison', label: 'Compare', icon: <div className="flex text-[8px] gap-0.5"><div className="w-2 h-3 bg-slate-300"/><div className="w-2 h-3 bg-brand-500"/></div> },
-                                                { id: 'code', label: 'Code', icon: <div className="font-mono text-[8px]">&lt;/&gt;</div> },
-                                            ].map((layout) => (
-                                                <button
-                                                    key={layout.id}
-                                                    onClick={() => updateSlide(activeSlide.id, { layoutVariant: layout.id as any })}
-                                                    className={cn(
-                                                        "flex flex-col items-center justify-center p-2 rounded-lg border transition-all h-20 gap-2",
-                                                        activeSlide.layoutVariant === layout.id 
-                                                            ? "bg-brand-50 border-brand-500 text-brand-700 ring-1 ring-brand-500 shadow-sm"
-                                                            : "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
-                                                    )}
-                                                >
-                                                    <div className={cn("p-1.5 rounded-md", activeSlide.layoutVariant === layout.id ? "bg-white shadow-sm" : "bg-slate-100")}>
-                                                        {layout.icon}
-                                                    </div>
-                                                    <span className="text-[10px] font-medium">{layout.label}</span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                        </div>
-                                    </div>
-
-                                    {/* IMAGE UPLOAD */}
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <ImageIcon className="w-4 h-4 text-brand-500" />
-                                            <h3 className="text-sm font-semibold text-slate-800">Slide Image</h3>
-                                        </div>
-                                        <div className="space-y-3">
-                                            <Label className="text-xs text-slate-500">Image URL</Label>
-                                            <div className="flex gap-2">
-                                                <Input 
-                                                    value={activeSlide.content.image_url || ''}
-                                                    onChange={(e) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, image_url: e.target.value } })}
-                                                    className="h-9 text-sm flex-1"
-                                                />
-                                                <ImageSelector 
-                                                    onSelect={(url) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, image_url: url } })}
-                                                    trigger={
-                                                        <Button variant="outline" size="sm" className="h-9 px-2">
-                                                            <Upload className="w-3.5 h-3.5" />
-                                                        </Button>
-                                                    }
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
+                            {/* Helper for specific layouts (e.g., Image URL for Full Image) */}
+                            {activeSlide.layout === 'full-image' && (
+                                <div className="space-y-1.5">
+                                     <Label className="text-xs text-slate-500">{t.properties.imageUrl}</Label>
+                                      <div className="flex gap-2">
+                                        <Input 
+                                            value={activeSlide.content.backgroundImage || ''}
+                                            onChange={(e) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, backgroundImage: e.target.value } })}
+                                            placeholder="https://..." 
+                                            className="text-xs"
+                                        />
+                                        <ImageSelector 
+                                            onSelect={(url) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, backgroundImage: url } })}
+                                            trigger={
+                                                <Button size="icon" variant="outline" className="shrink-0">
+                                                    <Upload className="w-4 h-4" />
+                                                </Button>
+                                            }
+                                        />
+                                      </div>
                                 </div>
                             )}
 
-                            {!activeSlide && (
-                                <div className="text-center py-12 px-4 border-2 border-dashed border-slate-100 rounded-2xl">
-                                    <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                                        <Settings className="w-6 h-6 text-slate-300" />
-                                    </div>
-                                    <p className="text-sm text-slate-400">Select a slide to edit its properties</p>
+                             {/* Slide specific image for non-full-image layouts if desired, typically handled automatically but good to have manual override */}
+                            <div className="space-y-1.5 pt-2">
+                                <Label className="text-xs text-slate-500">{t.properties.slideImage}</Label>
+                                <div className="flex gap-2">
+                                    <Input 
+                                        value={activeSlide.content.image || ''}
+                                        onChange={(e) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, image: e.target.value } })}
+                                        placeholder="https://..." 
+                                        className="text-xs"
+                                    />
+                                    <ImageSelector 
+                                        onSelect={(url) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, image: url } })}
+                                        trigger={
+                                            <Button size="icon" variant="outline" className="shrink-0">
+                                                <Upload className="w-4 h-4" />
+                                            </Button>
+                                        }
+                                    />
                                 </div>
-                            )}
+                            </div>
+
                         </div>
                     </ScrollArea>
                 </TabsContent>
 
-                {/* DESIGN TAB */}
-                <TabsContent value="design" className="m-0 h-full animate-in slide-in-from-right-4 duration-300 outline-none">
+                {/* --- GLOBAL DESIGN --- */}
+                <TabsContent value="design" className="h-full mt-0">
                     <ScrollArea className="h-full">
                         <div className="p-4 space-y-8 pb-24">
                             {/* Layout & Ratio */}
@@ -369,7 +351,12 @@ export const PropertiesPanel = () => {
                                        <button 
                                          key={ratio}
                                          onClick={() => updateDesign({ aspectRatio: ratio as any })}
-                                         className={`px-2 py-3 rounded-lg border text-xs font-bold transition-all ${design.aspectRatio === ratio ? 'border-brand-500 bg-brand-50 text-brand-700 ring-1 ring-brand-500' : 'border-slate-200 hover:border-slate-300 text-slate-600 bg-white'}`}
+                                         className={cn(
+                                            "px-2 py-3 rounded-lg border text-xs font-bold transition-all",
+                                            design.aspectRatio === ratio 
+                                                ? 'border-brand-500 bg-brand-50 text-brand-700 ring-1 ring-brand-500' 
+                                                : 'border-slate-200 hover:border-slate-300 text-slate-600 bg-white'
+                                         )}
                                        >
                                          {ratio}
                                        </button>
@@ -387,16 +374,16 @@ export const PropertiesPanel = () => {
                                      <div className="space-y-1.5">
                                          <Label className="text-[10px] text-slate-500 uppercase font-bold">{t.creator.name}</Label>
                                          <Input 
-                                            value={useCarouselStore.getState().project.author.name}
-                                            onChange={(e) => useCarouselStore.getState().updateAuthor({ name: e.target.value })}
+                                            value={project.author.name}
+                                            onChange={(e) => updateAuthor({ name: e.target.value })}
                                             className="h-8 text-xs bg-white"
                                          />
                                      </div>
                                      <div className="space-y-1.5">
                                          <Label className="text-[10px] text-slate-500 uppercase font-bold">{t.creator.handle}</Label>
                                          <Input 
-                                            value={useCarouselStore.getState().project.author.handle}
-                                            onChange={(e) => useCarouselStore.getState().updateAuthor({ handle: e.target.value })}
+                                            value={project.author.handle}
+                                            onChange={(e) => updateAuthor({ handle: e.target.value })}
                                             className="h-8 text-xs bg-white"
                                          />
                                      </div>
@@ -404,12 +391,12 @@ export const PropertiesPanel = () => {
                                          <Label className="text-[10px] text-slate-500 uppercase font-bold">{t.creator.photo}</Label>
                                          <div className="flex gap-2">
                                              <Input 
-                                                value={useCarouselStore.getState().project.author.avatarUrl || ''}
-                                                onChange={(e) => useCarouselStore.getState().updateAuthor({ avatarUrl: e.target.value })}
+                                                value={project.author.avatarUrl || ''}
+                                                onChange={(e) => updateAuthor({ avatarUrl: e.target.value })}
                                                 className="h-8 text-xs bg-white flex-1"
                                              />
                                              <ImageSelector 
-                                                onSelect={(url) => useCarouselStore.getState().updateAuthor({ avatarUrl: url })}
+                                                onSelect={(url) => updateAuthor({ avatarUrl: url })}
                                                 trigger={
                                                     <Button variant="outline" size="sm" className="h-8 px-2">
                                                         <ImageIcon className="w-3.5 h-3.5" />
@@ -436,7 +423,7 @@ export const PropertiesPanel = () => {
                                             >
                                                <input 
                                                  type="color" 
-                                                 className="absolute inset-0 opacity-0 cursor-pointer w-full h-fullScale"
+                                                 className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                                  value={value}
                                                  onChange={(e) => updateDesign({ 
                                                     colorPalette: { ...design.colorPalette, [key]: e.target.value } 
@@ -463,7 +450,12 @@ export const PropertiesPanel = () => {
                                                  <button
                                                      key={type}
                                                      onClick={() => updateDesign({ background: { ...design.background, patternType: type as any } })}
-                                                     className={`py-2 rounded-lg border text-[10px] font-bold uppercase transition-all ${design.background.patternType === type ? 'bg-brand-500 border-brand-500 text-white shadow-sm' : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'}`}
+                                                     className={cn(
+                                                        "py-2 rounded-lg border text-[10px] font-bold uppercase transition-all",
+                                                        design.background.patternType === type 
+                                                            ? 'bg-brand-500 border-brand-500 text-white shadow-sm' 
+                                                            : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+                                                     )}
                                                  >
                                                      {type === 'none' ? t.patterns.none : t.patterns[type as keyof typeof t.patterns]}
                                                  </button>
@@ -520,7 +512,7 @@ export const PropertiesPanel = () => {
                                 </div>
                                 <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
                                    <div className="space-y-1.5">
-                                       <Label className="text-[10px] text-slate-500 uppercase font-bold">Primary Font</Label>
+                                       <Label className="text-[10px] text-slate-500 uppercase font-bold">{t.properties.primaryFont}</Label>
                                         <Select 
                                           value={design.fonts.heading} 
                                           onValueChange={(val) => updateDesign({ fonts: { ...design.fonts, heading: val } })}
@@ -546,16 +538,44 @@ export const PropertiesPanel = () => {
                                 <div className="flex items-center justify-between mb-2">
                                    <div className="flex items-center gap-2">
                                        <Sparkles className="w-4 h-4 text-indigo-500" />
-                                       <h3 className="text-sm font-semibold text-slate-800">Brand Kits</h3>
+                                       <h3 className="text-sm font-semibold text-slate-800">{t.properties.brandKits}</h3>
                                    </div>
-                                   <Button variant="outline" size="sm" onClick={handleSavePreset} className="h-7 text-[10px] font-bold uppercase px-2">
-                                       + Save Kits
-                                   </Button>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                           <Button variant="ghost" size="sm" className="h-6 text-[10px] px-2 text-brand-600 hover:text-brand-700 hover:bg-brand-50">
+                                               <Plus className="w-3 h-3 mr-1" />
+                                               {t.properties.saveKits}
+                                           </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-[425px]">
+                                            <DialogHeader>
+                                                <DialogTitle>{t.properties.saveKits}</DialogTitle>
+                                                <DialogDescription>
+                                                    {t.properties.brandKitHint}
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="grid gap-4 py-4">
+                                                <div className="grid grid-cols-4 items-center gap-4">
+                                                    <Label htmlFor="name" className="text-right text-xs">Name</Label>
+                                                    <Input 
+                                                       id="name" 
+                                                       value={brandKitName} 
+                                                       onChange={(e) => setBrandKitName(e.target.value)}
+                                                       className="col-span-3" 
+                                                       placeholder="My Awesome Brand" 
+                                                    />
+                                                </div>
+                                            </div>
+                                            <DialogFooter>
+                                                <Button type="submit" onClick={handleSaveBrandKit}>Save changes</Button>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </Dialog>
                                 </div>
                                 
                                 {savedPresets.length === 0 ? (
                                     <div className="text-[11px] text-slate-400 italic p-3 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-center">
-                                        Save your brand colors to reuse them.
+                                        {t.properties.brandKitHint}
                                     </div>
                                 ) : (
                                     <div className="space-y-2">
@@ -587,8 +607,8 @@ export const PropertiesPanel = () => {
                         </div>
                     </ScrollArea>
                 </TabsContent>
-          </div>
-      </Tabs>
+            </div>
+        </Tabs>
       
       <PredictiveModal 
         isOpen={isPredictiveModalOpen}

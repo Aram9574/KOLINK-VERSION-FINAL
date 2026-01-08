@@ -22,10 +22,8 @@ const AutoPostStudio: React.FC<AutoPostStudioProps> = ({ user, language }) => {
     if (!user.isPremium) {
         return (
             <PremiumLockOverlay 
-                title="The Content Factory"
-                description={language === "es" 
-                    ? "Tu Director de Marketing (CMO) personal con IA. Analiza tendencias, define tu estrategia y agenda contenido automáticamente." 
-                    : "Your Personal AI CMO. Analyzes trends, defines strategy, and schedules content automatically."}
+                title="Fábrica de Contenido"
+                description="Tu Director de Marketing (CMO) personal con IA. Analiza tendencias, define tu estrategia y agenda contenido automáticamente."
                 icon={<Zap className="w-8 h-8" />}
             />
         );
@@ -40,7 +38,7 @@ const AutoPostStudio: React.FC<AutoPostStudioProps> = ({ user, language }) => {
         <div className="min-h-screen pb-20 bg-slate-50/50 p-6">
             {/* Header */}
             <div className="mb-8">
-                <h2 className="text-3xl font-display font-bold text-slate-900">The Content Factory</h2>
+                <h2 className="text-3xl font-display font-bold text-slate-900">Fábrica de Contenido</h2>
                 <p className="text-slate-500 mt-1 max-w-2xl">
                     Agente Autónomo de Inteligencia Competitiva. Convierte tendencias globales en autoridad personal.
                 </p>

@@ -46,6 +46,7 @@ import { hapticFeedback } from "../../../lib/animations";
 // Lazy load for performance
 // const LinkedInPreview = React.lazy(() => import("../generation/LinkedInPreview"));
 import LinkedInPreview from "../generation/LinkedInPreview";
+import { useLocation } from "react-router-dom";
 
 const PostEditorView: React.FC = () => {
   const { user, language } = useUser();
@@ -57,6 +58,7 @@ const PostEditorView: React.FC = () => {
   } = usePosts();
   const t = translations[language as AppLanguage].app.editor;
   const [editorContent, setEditorContent] = useState("");
+  const location = useLocation();
   const [currentPost, setCurrentPost] = useState<Post | null>(null);
   const [postTitle, setPostTitle] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -82,6 +84,16 @@ const PostEditorView: React.FC = () => {
 
   // Persistence: Load from localStorage on mount
   useEffect(() => {
+    // Check key location state first
+    if (location.state && (location.state as any).initialDraft) {
+        setEditorContent((location.state as any).initialDraft);
+        setPostTitle((location.state as any).initialTitle || "");
+        // Clear state to prevent reload persistence oddities? 
+        // Window.history.replaceState clears it from browser history stack state
+        window.history.replaceState({}, document.title);
+        return;
+    }
+
     // Only load if context doesn't have a specific post selected
     if (!contextCurrentPost) {
       const savedContent = localStorage.getItem("kolink_post_editor_content");

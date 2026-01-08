@@ -7,12 +7,15 @@ import { supabase } from '@/services/supabaseClient';
 import { toast } from 'sonner';
 import { useUser } from '@/context/UserContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { translations } from '@/translations';
 
 // Input types
 type InputType = 'topic' | 'url' | 'youtube' | 'pdf';
 
 export const InputSourcePanel = () => {
   const { language } = useUser();
+  const t = translations[language || 'en'].carouselStudio.inputs;
+  const toasts = translations[language || 'en'].carouselStudio.toasts;
   const isGenerating = useCarouselStore(state => state.editor.isGenerating);
   const setIsGenerating = useCarouselStore(state => state.setIsGenerating);
   
@@ -29,12 +32,12 @@ export const InputSourcePanel = () => {
       if (!file) return;
 
       if (file.type !== 'application/pdf') {
-          toast.error("Please upload a PDF file.");
+          toast.error(toasts?.pdfNeeded || "Please upload a PDF file.");
           return;
       }
 
       if (file.size > 5 * 1024 * 1024) { // 5MB limit
-          toast.error("File is too large. Max 5MB.");
+          toast.error(t.pdf.maxSize);
           return;
       }
 
@@ -43,7 +46,7 @@ export const InputSourcePanel = () => {
           const base64 = (reader.result as string).split(',')[1];
           setPdfBase64(base64);
           setPdfName(file.name);
-          toast.success(`Loaded: ${file.name}`);
+          toast.success(`${toasts?.loaded || "Loaded"}: ${file.name}`);
       };
       reader.readAsDataURL(file);
   };
@@ -64,7 +67,7 @@ export const InputSourcePanel = () => {
           sourceType = 'youtube';
       } else if (activeTab === 'pdf') {
           if (!pdfBase64) {
-              toast.error("Please upload a PDF first.");
+              toast.error(toasts?.pdfNeeded || "Please upload a PDF first.");
               return;
           }
           source = pdfBase64;
@@ -72,7 +75,7 @@ export const InputSourcePanel = () => {
       }
 
       if (!source.trim()) {
-          toast.error("Please provide content to generate from.");
+          toast.error(toasts?.contentNeeded || "Please provide content to generate from.");
           return;
       }
       
@@ -89,12 +92,12 @@ export const InputSourcePanel = () => {
                useCarouselStore.setState((state) => ({ 
                   project: { ...state.project, slides: data.slides } 
                }));
-               toast.success("Carousel generated successfully!"); 
+               toast.success(toasts?.genSuccess || "Carousel generated successfully!"); 
            }
 
       } catch (err) {
           console.error("Generation failed:", err);
-          toast.error("Generation failed. Please try again.");
+          toast.error(toasts?.genFailed || "Generation failed. Please try again.");
       } finally {
           setIsGenerating(false);
       }
@@ -104,10 +107,10 @@ export const InputSourcePanel = () => {
     <div className="flex flex-col h-full">
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as InputType)} className="w-full">
         <TabsList className="w-full grid grid-cols-4 mb-4">
-          <TabsTrigger value="topic">Topic</TabsTrigger>
-          <TabsTrigger value="url">URL</TabsTrigger>
-          <TabsTrigger value="youtube">YouTube</TabsTrigger>
-          <TabsTrigger value="pdf">PDF</TabsTrigger>
+          <TabsTrigger value="topic">{t.tabs.topic}</TabsTrigger>
+          <TabsTrigger value="url">{t.tabs.url}</TabsTrigger>
+          <TabsTrigger value="youtube">{t.tabs.youtube}</TabsTrigger>
+          <TabsTrigger value="pdf">{t.tabs.pdf}</TabsTrigger>
         </TabsList>
 
         <div className="space-y-4">
@@ -115,12 +118,12 @@ export const InputSourcePanel = () => {
             <TabsContent value="topic" className="mt-0">
                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                   <p className="text-sm text-slate-600 mb-3 font-medium">
-                    What is your carousel about?
+                    {t.topic.question}
                   </p>
                   <Textarea 
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    placeholder="E.g., 5 Tips for Remote Work Productivity..."
+                    placeholder={t.topic.placeholder}
                     className="mb-4 bg-white min-h-[100px] resize-none focus:ring-brand-500"
                   />
                   <Button 
@@ -130,11 +133,11 @@ export const InputSourcePanel = () => {
                   >
                       {isGenerating ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating... (~15s)
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t.buttons.generating}
                         </>
                      ) : (
                         <>
-                          <Sparkles className="mr-2 h-4 w-4" /> Generate with AI
+                          <Sparkles className="mr-2 h-4 w-4" /> {t.buttons.generate}
                         </>
                      )}
                   </Button>
@@ -145,7 +148,7 @@ export const InputSourcePanel = () => {
             <TabsContent value="url" className="mt-0">
                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                   <p className="text-sm text-slate-600 mb-3 font-medium">
-                    Article or Blog Post URL
+                    {t.url.label}
                   </p>
                   <Textarea 
                     value={urlInput}
@@ -154,7 +157,7 @@ export const InputSourcePanel = () => {
                     className="mb-4 bg-white min-h-[100px] resize-none focus:ring-brand-500"
                   />
                   <div className="text-xs text-slate-400 mb-4 bg-white p-2 rounded border border-slate-100 italic">
-                      Supports: Medium, Substack, News Articles, and Blog Posts.
+                      {t.url.hint}
                   </div>
                    <Button 
                     onClick={handleGenerate}
@@ -162,7 +165,7 @@ export const InputSourcePanel = () => {
                     className="w-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg shadow-brand-500/20"
                   >
                      {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                     {isGenerating ? 'Converting... (~20s)' : 'Convert Article'}
+                     {isGenerating ? t.buttons.converting : t.buttons.convert}
                   </Button>
                </div>
             </TabsContent>
@@ -171,7 +174,7 @@ export const InputSourcePanel = () => {
             <TabsContent value="youtube" className="mt-0">
                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                   <p className="text-sm text-slate-600 mb-3 font-medium">
-                    YouTube Video URL
+                    {t.youtube.label}
                   </p>
                   <Textarea 
                     value={urlInput}
@@ -180,7 +183,7 @@ export const InputSourcePanel = () => {
                     className="mb-4 bg-white min-h-[100px] resize-none focus:ring-brand-500"
                   />
                   <div className="text-xs text-slate-400 mb-4 bg-white p-2 rounded border border-slate-100 italic">
-                      We'll analyze the video and create a visual story from it.
+                      {t.youtube.hint}
                   </div>
                    <Button 
                     onClick={handleGenerate}
@@ -188,7 +191,7 @@ export const InputSourcePanel = () => {
                     className="w-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg shadow-brand-500/20"
                   >
                      {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                     {isGenerating ? 'Analyzing... (~30s)' : 'Turn Video → Carousel'}
+                     {isGenerating ? t.buttons.analyzing : t.buttons.video}
                   </Button>
                </div>
             </TabsContent>
@@ -197,7 +200,7 @@ export const InputSourcePanel = () => {
             <TabsContent value="pdf" className="mt-0">
                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                   <p className="text-sm text-slate-600 mb-3 font-medium">
-                    Upload PDF Document
+                    {t.pdf.label}
                   </p>
                   
                   <div className="relative mb-4">
@@ -216,13 +219,13 @@ export const InputSourcePanel = () => {
                             <div className="flex flex-col items-center">
                                 <FileText className="w-8 h-8 text-brand-500 mb-2" />
                                 <span className="text-sm font-medium text-slate-700 truncate max-w-[200px]">{pdfName}</span>
-                                <span className="text-[10px] text-slate-400 mt-1">Click to change</span>
+                                <span className="text-[10px] text-slate-400 mt-1">{t.pdf.change}</span>
                             </div>
                          ) : (
                             <div className="flex flex-col items-center">
                                 <Upload className="w-8 h-8 text-slate-400 group-hover:text-brand-500 mb-2 transition-colors" />
-                                <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">Select PDF</span>
-                                <span className="text-[10px] text-slate-400 mt-1">Max 5MB</span>
+                                <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">{t.pdf.select}</span>
+                                <span className="text-[10px] text-slate-400 mt-1">{t.pdf.maxSize}</span>
                             </div>
                          )}
                       </label>
@@ -234,7 +237,7 @@ export const InputSourcePanel = () => {
                     className="w-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg shadow-brand-500/20"
                   >
                      {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                     {isGenerating ? 'Extracting... (~20s)' : 'Extract & Build'}
+                     {isGenerating ? t.buttons.extracting : t.buttons.extract}
 
                   </Button>
                </div>
@@ -245,7 +248,7 @@ export const InputSourcePanel = () => {
       {/* Footer / Hint */}
       <div className="mt-auto pt-6 border-t border-slate-100">
           <p className="text-[10px] text-slate-400 text-center">
-              AI generated content may require editing. Review before publishing.
+              {t.footer}
           </p>
       </div>
     </div>

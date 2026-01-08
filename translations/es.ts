@@ -584,6 +584,11 @@ export const es = {
         bold: "Atrevido",
         gradient: "Gradiente",
       },
+      tabs: {
+        ai: "Generador",
+        templates: "Plantillas",
+        design: "Diseño"
+      },
       properties: {
         globalDesign: "Diseño Global",
         slideEditor: "Editor de Slide",
@@ -603,11 +608,99 @@ export const es = {
         intro: "Intro",
         content: "Contenido",
         outro: "Outro",
-        brandNamePrompt: "Ingresa un nombre para tu Kit de Marca:"
+        brandNamePrompt: "Ingresa un nombre para tu Kit de Marca:",
+        aiTools: "Herramientas Mágicas IA",
+        brandKits: "Kits de Marca",
+        saveKits: "Guardar Kit",
+        brandKitHint: "Guarda tus colores de marca para reusarlos.",
+        primaryFont: "Fuente Principal",
+        layouts: {
+            default: "Default",
+            fullImg: "Img Completa",
+            quote: "Cita",
+            number: "Número",
+            list: "Lista",
+            compare: "Comparar",
+            code: "Código"
+        },
+        slideImage: "Imagen del Slide",
+        slideLayout: "Diseño del Slide",
+        imageUrl: "URL de Imagen"
       },
-      export: {
-        download: "Descargar PDF",
-        exporting: "Exportando...",
+      sidebar: {
+        caption: "Caption",
+      },
+      toasts: {
+        captionGenerated: "¡Caption generado!",
+        addSlides: "Por favor añade slides primero.",
+        captionFailed: "Fallo al generar caption.",
+        copied: "¡Copiado al portapapeles!",
+        bgRemoved: "Fondo eliminado con éxito",
+        bgFailed: "Fallo al eliminar fondo",
+        pdfNeeded: "Por favor sube un archivo PDF.",
+        contentNeeded: "Por favor proporciona contenido para generar.",
+        genSuccess: "¡Carrusel generado con éxito!",
+        genFailed: "Generación fallida. Intenta de nuevo.",
+        loaded: "Cargado",
+        templateApplied: "¡Plantilla aplicada con éxito!"
+      },
+      captions: {
+        title: "Caption para LinkedIn",
+        copy: "Copiar al portapapeles",
+        copied: "¡Copiado!"
+      },
+      inputs: {
+        tabs: {
+            topic: "Tema",
+            url: "URL",
+            youtube: "YouTube",
+            pdf: "PDF"
+        },
+        topic: {
+            question: "¿De qué trata tu carrusel?",
+            placeholder: "Ej. 5 Tips para Productividad Remota..."
+        },
+        url: {
+            label: "URL de Artículo o Blog",
+            hint: "Soporta: Medium, Substack, Noticias y Blogs."
+        },
+        youtube: {
+            label: "URL de Video YouTube",
+            hint: "Analizaremos el video para crear una historia visual."
+        },
+        pdf: {
+            label: "Subir Documento PDF",
+            select: "Seleccionar PDF",
+            change: "Clic para cambiar",
+            maxSize: "Max 5MB"
+        },
+        buttons: {
+            generate: "Generar con IA",
+            generating: "Diseñando... (~15s)",
+            convert: "Convertir Artículo",
+            converting: "Convirtiendo... (~20s)",
+            video: "Video → Carrusel",
+            analyzing: "Analizando... (~30s)",
+            extract: "Extraer y Crear",
+            extracting: "Extrayendo... (~20s)",
+            magic: "Magia IA"
+        },
+        footer: "El contenido generado por IA puede requerir edición. Revisa antes de publicar."
+      },
+      canvas: {
+        new: "Nuevo Carrusel",
+        slides: "Slides",
+        zoomIn: "Acercar",
+        zoomOut: "Alejar",
+        export: "Exportar",
+        resetTitle: "Crear Nuevo Carrusel",
+        resetDesc: "¿Estás seguro de querer empezar de cero? Esta acción no se puede deshacer.",
+        confirmReset: "Confirmar y Resetear",
+        cancel: "Cancelar",
+        slideIndicator: "Slide {{current}} de {{total}}",
+        useArrows: "Usa las Flechas",
+        fit: "Ajustar",
+        fullscreen: "Pantalla Completa"
       },
       ai: {
         predict: "Predecir Rendimiento",

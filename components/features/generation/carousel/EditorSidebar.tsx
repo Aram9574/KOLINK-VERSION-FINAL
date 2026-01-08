@@ -43,7 +43,7 @@ export const EditorSidebar = () => {
     try {
         const project = useCarouselStore.getState().project;
         if (!project.slides || project.slides.length === 0) {
-            toast.error("Please add some slides first.");
+            toast.error(t.toasts?.addSlides || "Please add some slides first.");
             return;
         }
 
@@ -59,11 +59,11 @@ export const EditorSidebar = () => {
         if (data?.caption) {
             setGeneratedCaption(data.caption);
             setShowCaptionModal(true);
-            toast.success("Caption generated!");
+            toast.success(t.toasts?.captionGenerated || "Caption generated!");
         }
     } catch (err) {
         console.error("Caption gen failed:", err);
-        toast.error("Failed to generate caption.");
+        toast.error(t.toasts?.captionFailed || "Failed to generate caption.");
     } finally {
         setIsGeneratingCaption(false);
     }
@@ -72,7 +72,7 @@ export const EditorSidebar = () => {
   const copyToClipboard = () => {
       navigator.clipboard.writeText(generatedCaption);
       setCopied(true);
-      toast.success("Copied to clipboard!");
+      toast.success(t.toasts?.copied || "Copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
   };
 
@@ -83,7 +83,7 @@ export const EditorSidebar = () => {
       <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-white">
         <h2 className="font-bold text-slate-800 flex items-center gap-2 text-lg">
           <Sparkles className="w-5 h-5 text-brand-500 fill-brand-50" />
-          AI Studio
+          {t.title}
         </h2>
         
         <Button 
@@ -94,7 +94,7 @@ export const EditorSidebar = () => {
             disabled={isGeneratingCaption}
         >
             {isGeneratingCaption ? <Loader2 className="w-3.5 h-3.5 animate-spin"/> : <Linkedin className="w-3.5 h-3.5 text-[#0077b5]" />}
-            Caption
+            {t.sidebar.caption}
         </Button>
       </div>
       
@@ -103,15 +103,15 @@ export const EditorSidebar = () => {
           <TabsList className="w-full grid grid-cols-3 mb-2 p-1 bg-slate-100/80">
             <TabsTrigger value="generate" className="text-xs font-semibold">
                 <Sparkles className="w-3.5 h-3.5 mr-2" />
-                Generate
+                {t.tabs.ai}
             </TabsTrigger>
             <TabsTrigger value="templates" className="text-xs font-semibold">
                 <LayoutTemplate className="w-3.5 h-3.5 mr-2" />
-                Templates
+                {t.tabs.templates}
             </TabsTrigger>
             <TabsTrigger value="design" className="text-xs font-semibold">
                 <Sparkles className="w-3.5 h-3.5 mr-2" />
-                Design
+                {t.tabs.design}
             </TabsTrigger>
           </TabsList>
         </div>
@@ -125,7 +125,7 @@ export const EditorSidebar = () => {
             <TabsContent value="templates" className="mt-0">
                 <TemplatesPanel onSelectTemplate={(slides) => {
                     setSlides(slides);
-                    toast.success("Template applied successfully!");
+                    toast.success(t.toasts?.templateApplied || "Template applied successfully!");
                 }} />
             </TabsContent>
 
@@ -142,7 +142,7 @@ export const EditorSidebar = () => {
             <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                     <Linkedin className="w-5 h-5 text-[#0077b5]" />
-                    LinkedIn Post Caption
+                    {t.captions.title}
                 </DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-2">
@@ -151,7 +151,7 @@ export const EditorSidebar = () => {
                 </div>
                 <Button onClick={copyToClipboard} className="w-full gap-2 font-bold mb-2">
                      <Copy className="w-4 h-4" />
-                    {copied ? "Copied!" : "Copy to Clipboard"}
+                    {copied ? t.captions?.copied : t.captions?.copy}
                 </Button>
             </div>
         </DialogContent>

@@ -488,9 +488,8 @@ export const en = {
         ai: "AI Generator",
         templates: "Templates",
         design: "Global Design",
-        slide: "Edit Slide"
       },
-      aiGenerator: {
+      inputs: {
         topic: {
           label: "Your Idea / Topic",
           placeholder: "e.g. How to scale a B2B business...",
@@ -565,6 +564,35 @@ export const en = {
         dots: "Dots",
         grid: "Grid",
         waves: "Waves"
+      },
+      canvas: {
+        new: "New Carousel",
+        slides: "Slides",
+        zoomIn: "Zoom In",
+        zoomOut: "Zoom Out",
+        fit: "Fit to Screen",
+        fullscreen: "Fullscreen",
+        export: "Export",
+        resetTitle: "Create New Carousel",
+        resetDesc: "Are you sure you want to start over? This action cannot be undone.",
+        cancel: "Cancel",
+        confirmReset: "Confirm & Reset",
+        slideIndicator: "Slide {{current}} / {{total}}",
+        useArrows: "Use Arrow Keys"
+      },
+      toasts: {
+        captionGenerated: "Caption generated!",
+        addSlides: "Please add some slides first.",
+        captionFailed: "Failed to generate caption.",
+        copied: "Copied to clipboard!",
+        bgRemoved: "Background removed successfully",
+        bgFailed: "Failed to remove background",
+        pdfNeeded: "Please upload a PDF file.",
+        contentNeeded: "Please provide content to generate from.",
+        genSuccess: "Carousel generated successfully!",
+        genFailed: "Generation failed. Please try again.",
+        loaded: "Loaded",
+        templateApplied: "Template applied successfully!"
       }
     },
     app: {

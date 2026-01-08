@@ -3,8 +3,8 @@ import { Trend } from "../../../types";
 const MOCK_TRENDS: Trend[] = [
     {
         id: 'trend-1',
-        title: 'GPT-5 Rumors & Enterprise Impact',
-        summary: 'Leaks suggest GPT-5 will focus on "Agentic Workflows" rather than just chat. This shifts the focus from chatbots to reliable automated employees.',
+        title: 'Rumores de GPT-5 e Impacto Empresarial',
+        summary: 'Filtraciones sugieren que GPT-5 se centrará en "Flujos de Trabajo Agénticos" más que solo chat. Esto cambia el foco de chatbots a empleados automatizados fiables.',
         source: 'TechCrunch',
         category: 'news',
         matchScore: 98,
@@ -13,8 +13,8 @@ const MOCK_TRENDS: Trend[] = [
     },
     {
         id: 'trend-2',
-        title: 'LinkedIn Algorithm Update 2026',
-        summary: 'LinkedIn is prioritizing depth over frequency. Carousel posts are seeing a 140% boost if they have more than 7 slides.',
+        title: 'Actualización del Algoritmo LinkedIn 2026',
+        summary: 'LinkedIn está priorizando la profundidad sobre la frecuencia. Los carruseles están viendo un aumento del 140% en alcance si tienen más de 7 diapositivas.',
         source: 'SocialMediaToday',
         category: 'social',
         matchScore: 92,
@@ -23,8 +23,8 @@ const MOCK_TRENDS: Trend[] = [
     },
     {
         id: 'trend-3',
-        title: 'New EU AI Act Compliance Deadline',
-        summary: 'Companies must declare AI usage in marketing content by next quarter or face fines of up to 4% turnover.',
+        title: 'Nueva Ley de IA de la UE: Plazo de Cumplimiento',
+        summary: 'Las empresas deben declarar el uso de IA en contenido de marketing para el próximo trimestre o enfrentar multas de hasta el 4% de la facturación.',
         source: 'Reuters',
         category: 'regulatory',
         matchScore: 85,
@@ -33,8 +33,8 @@ const MOCK_TRENDS: Trend[] = [
     },
     {
         id: 'trend-4',
-        title: 'Remote Work vs Return to Office Stats',
-        summary: 'Search volume for "Remote jobs" is at an all-time high, contradicting corporate push for RTO.',
+        title: 'Estadísticas: Trabajo Remoto vs Vuelta a la Oficina',
+        summary: 'El volumen de búsqueda de "Trabajos remotos" está en su punto más alto, contradiciendo el impulso corporativo para volver a la oficina (RTO).',
         source: 'Google Trends',
         category: 'search',
         matchScore: 78,
