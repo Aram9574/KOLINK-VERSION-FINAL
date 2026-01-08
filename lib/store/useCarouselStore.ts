@@ -4,6 +4,7 @@ import { CarouselProject, CarouselSlide, CarouselDesign, AspectRatio } from '../
 
 interface EditorState {
   activeSlideId: string | null;
+  activeElementId: string | null;
   zoomLevel: number;
   isSidebarOpen: boolean;
   activePanel: 'generator' | 'templates' | 'brand';
@@ -30,12 +31,15 @@ interface CarouselStore {
   // Design Actions
   updateDesign: (updates: Partial<CarouselDesign> | Partial<CarouselDesign['layout']> | Partial<CarouselDesign['background']>) => void;
   setTheme: (themeId: string) => void; // Will apply a preset of colors/fonts
+  updateElementOverride: (slideId: string, elementId: string, styles: any) => void; // Using any to avoid circular deps for now, but should be Partial<ElementStyle>
+
 
   // Editor Actions
   setZoom: (zoom: number) => void;
   toggleSidebar: () => void;
   setActivePanel: (panel: EditorState['activePanel']) => void;
   setIsGenerating: (isGenerating: boolean) => void;
+  setActiveElement: (id: string | null) => void;
 
   // Presets
   savedPresets: any[]; // Using any for simplicity in this phase, ideally defining a Preset type
@@ -124,6 +128,7 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
   },
   editor: {
     activeSlideId: 'slide-1',
+    activeElementId: null,
     zoomLevel: 1,
     isSidebarOpen: true,
     activePanel: 'generator',
@@ -213,6 +218,25 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
       },
     })),
 
+  updateElementOverride: (slideId, elementId, styles) =>
+    set((state) => ({
+      project: {
+        ...state.project,
+        slides: state.project.slides.map((s) => {
+           if (s.id !== slideId) return s;
+           const currentOverrides = s.elementOverrides || {};
+           const currentElementStyle = currentOverrides[elementId] || {};
+           return {
+             ...s,
+             elementOverrides: {
+               ...currentOverrides,
+               [elementId]: { ...currentElementStyle, ...styles }
+             }
+           };
+        })
+      }
+    })),
+
   // Presets
   savedPresets: [],
   
@@ -274,6 +298,9 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
 
   setIsGenerating: (isGenerating) =>
     set((state) => ({ editor: { ...state.editor, isGenerating } })),
+
+  setActiveElement: (id) =>
+    set((state) => ({ editor: { ...state.editor, activeElementId: id } })),
 
   resetProject: () =>
     set(() => ({

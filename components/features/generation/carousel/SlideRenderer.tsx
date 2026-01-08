@@ -4,6 +4,7 @@ import { AutoTypography } from './AutoTypography';
 import { Quote, MessageCircle, Heart, Repeat, Share, CheckCircle, Terminal, ArrowRight, XCircle, User, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { InteractiveElement } from './InteractiveElement';
 
 interface SlideRendererProps {
   slide: CarouselSlide;
@@ -44,23 +45,40 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
     if (slide.layoutVariant === 'big-number') {
        return (
            <div className="flex flex-col h-full items-center justify-center p-16 text-center relative z-10 w-full overflow-hidden">
-               <div className="text-[14rem] font-black leading-none tracking-tighter mb-8 opacity-90" style={{ color: accent, fontFamily: heading }}>
-                  {slide.content.title}
-               </div>
-               <AutoTypography 
-                  content={slide.content.subtitle || ""}
-                  fontFamily={body}
-                  baseSize={40}
-                  className="mb-8 font-bold uppercase tracking-widest"
-                  color={primary}
-               />
-               <AutoTypography 
-                  content={slide.content.body || ""}
-                  fontFamily={body}
-                  baseSize={32}
-                  className="max-w-2xl mx-auto opacity-80"
-                  color={text}
-               />
+               <InteractiveElement elementId="title" slideId={slide.id} isActiveSlide={isActive}>
+                 <div 
+                    className="text-[14rem] font-black leading-none tracking-tighter mb-8 opacity-90" 
+                    style={{ 
+                        color: slide.elementOverrides?.['title']?.color || accent, 
+                        fontFamily: heading,
+                        fontSize: slide.elementOverrides?.['title']?.fontSize ? `${slide.elementOverrides['title'].fontSize}px` : undefined
+                    }}
+                 >
+                    {slide.content.title}
+                 </div>
+               </InteractiveElement>
+
+               <InteractiveElement elementId="subtitle" slideId={slide.id} isActiveSlide={isActive}>
+                   <AutoTypography 
+                      content={slide.content.subtitle || ""}
+                      fontFamily={body}
+                      baseSize={40}
+                      className="mb-8 font-bold uppercase tracking-widest"
+                      color={slide.elementOverrides?.['subtitle']?.color || primary}
+                      overrideFontSize={slide.elementOverrides?.['subtitle']?.fontSize}
+                   />
+               </InteractiveElement>
+
+               <InteractiveElement elementId="body" slideId={slide.id} isActiveSlide={isActive}>
+                   <AutoTypography 
+                      content={slide.content.body || ""}
+                      fontFamily={body}
+                      baseSize={32}
+                      className="max-w-2xl mx-auto opacity-80"
+                      color={slide.elementOverrides?.['body']?.color || text}
+                      overrideFontSize={slide.elementOverrides?.['body']?.fontSize}
+                   />
+               </InteractiveElement>
            </div>
        );
     }
@@ -69,21 +87,27 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
         return (
            <div className="flex flex-col h-full justify-center p-20 text-center relative z-10 w-full overflow-hidden">
                <Quote className="w-20 h-20 mx-auto mb-12 text-brand-500 opacity-20" style={{ color: accent }} />
-               <AutoTypography 
-                   content={`"${slide.content.body || slide.content.title}"`}
-                   fontFamily="Playfair Display"
-                   baseSize={56}
-                   className="italic leading-relaxed mb-12"
-                   color={primary}
-               />
+               <InteractiveElement elementId="body" slideId={slide.id} isActiveSlide={isActive}>
+                   <AutoTypography 
+                       content={`"${slide.content.body || slide.content.title}"`}
+                       fontFamily="Playfair Display"
+                       baseSize={56}
+                       className="italic leading-relaxed mb-12"
+                       color={slide.elementOverrides?.['body']?.color || primary}
+                       overrideFontSize={slide.elementOverrides?.['body']?.fontSize}
+                   />
+               </InteractiveElement>
                <div className="w-24 h-1 mx-auto mb-6" style={{ backgroundColor: accent }} />
-               <AutoTypography 
-                   content={slide.content.subtitle || "Author Name"}
-                   fontFamily={body}
-                   baseSize={24}
-                   className="font-bold uppercase tracking-wider"
-                   color={text}
-               />
+               <InteractiveElement elementId="subtitle" slideId={slide.id} isActiveSlide={isActive}>
+                   <AutoTypography 
+                       content={slide.content.subtitle || "Author Name"}
+                       fontFamily={body}
+                       baseSize={24}
+                       className="font-bold uppercase tracking-wider"
+                       color={slide.elementOverrides?.['subtitle']?.color || text}
+                       overrideFontSize={slide.elementOverrides?.['subtitle']?.fontSize}
+                   />
+               </InteractiveElement>
            </div>
         );
     }
@@ -232,22 +256,28 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
           <div className="flex flex-col h-full justify-center p-20 text-center relative z-10 w-full overflow-hidden">
              {slide.content.subtitle && (
                <div className="mb-8">
-                   <AutoTypography 
-                     content={slide.content.subtitle}
-                     fontFamily={body}
-                     baseSize={28}
-                     color={secondary}
-                     className="font-bold uppercase tracking-[0.25em]"
-                   />
+                   <InteractiveElement elementId="subtitle" slideId={slide.id} isActiveSlide={isActive}>
+                       <AutoTypography 
+                         content={slide.content.subtitle}
+                         fontFamily={body}
+                         baseSize={28}
+                         color={slide.elementOverrides?.['subtitle']?.color || secondary}
+                         className="font-bold uppercase tracking-[0.25em]"
+                         overrideFontSize={slide.elementOverrides?.['subtitle']?.fontSize}
+                       />
+                   </InteractiveElement>
                </div>
              )}
-             <AutoTypography 
-               content={slide.content.title || "Carousel Title"}
-               fontFamily={heading}
-               baseSize={84}
-               color={primary}
-               className="font-black leading-[1.1] mb-12 tracking-tight"
-             />
+              <InteractiveElement elementId="title" slideId={slide.id} isActiveSlide={isActive}>
+                 <AutoTypography 
+                   content={slide.content.title || "Carousel Title"}
+                   fontFamily={heading}
+                   baseSize={84}
+                   color={slide.elementOverrides?.['title']?.color || primary}
+                   className="font-black leading-[1.1] mb-12 tracking-tight"
+                   overrideFontSize={slide.elementOverrides?.['title']?.fontSize}
+                 />
+              </InteractiveElement>
              
              {slide.content.cta_text && (
                  <div className="mt-12 flex items-center justify-center gap-3 opacity-90 animate-pulse">
@@ -307,13 +337,16 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
           return (
              <div className="flex flex-col h-full p-20 relative z-10 w-full overflow-hidden">
                  <div className="mb-10 pb-10 border-b border-slate-100/10">
-                    <AutoTypography 
-                        content={slide.content.title || ""}
-                        fontFamily={heading}
-                        baseSize={52}
-                        color={primary}
-                        className="font-bold leading-tight"
-                    />
+                     <InteractiveElement elementId="title" slideId={slide.id} isActiveSlide={isActive}>
+                         <AutoTypography 
+                             content={slide.content.title || ""}
+                             fontFamily={heading}
+                             baseSize={52}
+                             color={slide.elementOverrides?.['title']?.color || primary}
+                             className="font-bold leading-tight"
+                             overrideFontSize={slide.elementOverrides?.['title']?.fontSize}
+                         />
+                     </InteractiveElement>
                  </div>
                  
                  {slide.content.image_url && (
@@ -323,13 +356,16 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
                  )}
                  
                  <div className="flex-1 flex flex-col justify-center">
-                     <AutoTypography 
-                         content={slide.content.body || ""}
-                         fontFamily={body}
-                         baseSize={36}
-                         color={text}
-                         className="font-medium leading-relaxed opacity-90"
-                     />
+                      <InteractiveElement elementId="body" slideId={slide.id} isActiveSlide={isActive}>
+                          <AutoTypography 
+                              content={slide.content.body || ""}
+                              fontFamily={body}
+                              baseSize={36}
+                              color={slide.elementOverrides?.['body']?.color || text}
+                              className="font-medium leading-relaxed opacity-90"
+                              overrideFontSize={slide.elementOverrides?.['body']?.fontSize}
+                          />
+                      </InteractiveElement>
                  </div>
                  
                  <div className="h-2 w-24 rounded-full mt-auto opacity-50" style={{ backgroundColor: accent }} />

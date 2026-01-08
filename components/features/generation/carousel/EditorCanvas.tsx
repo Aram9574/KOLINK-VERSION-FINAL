@@ -169,8 +169,8 @@ export const EditorCanvas = () => {
                          height: baseHeight,
                          transform: `scale(${visualScale})`,
                          transformOrigin: 'top left',
-                         // Remove pointerEvents: 'none' for interactions if needed, kept for now to avoid dragging issues in canvas
-                         pointerEvents: 'none'
+                         // Allow interactions for drag/drop
+                         pointerEvents: 'auto'
                      }}
                   >
                      <SlideRenderer

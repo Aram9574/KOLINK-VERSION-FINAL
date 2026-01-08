@@ -696,6 +696,21 @@ export const en = {
           mobile: "Mobile",
           desktop: "Desktop",
           seeMore: "...see more",
+          live: "Live Preview",
+          tipTitle: "Pro Tip",
+          tipDesc: "This view simulates how your post will look in the feed. Ensure your line breaks are clean."
+        },
+        hooks: {
+          title: "Viral Hooks",
+          empty: "No hooks available for this search."
+        },
+        endings: {
+            title: "Closings / CTAs",
+            empty: "No closings available for this search."
+        },
+        snippets: {
+            title: "My Snippets",
+            empty: "No saved snippets yet. Select text in the editor to save one."
         },
         metrics: {
           characters: "characters",

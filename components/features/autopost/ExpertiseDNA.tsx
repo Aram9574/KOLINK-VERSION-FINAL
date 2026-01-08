@@ -44,6 +44,14 @@ const ExpertiseDNA: React.FC<ExpertiseDNAProps> = ({ initialProfile, onSave }) =
             negativeKeywords: [],
         }
     );
+    const [isSaving, setIsSaving] = useState(false);
+
+    // Sync validation when initialProfile loads from backend
+    React.useEffect(() => {
+        if (initialProfile) {
+            setProfile(initialProfile);
+        }
+    }, [initialProfile]);
 
     const [keywordInput, setKeywordInput] = useState('');
     const [negKeywordInput, setNegKeywordInput] = useState('');
@@ -76,11 +84,19 @@ const ExpertiseDNA: React.FC<ExpertiseDNAProps> = ({ initialProfile, onSave }) =
         }
     };
 
-    const handleSave = () => {
-        onSave(profile);
-        toast.success("ADN de Experticia Actualizado", {
-            description: "Tu motor de piloto automático ahora se alineará con esta identidad."
-        });
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            await onSave(profile);
+            toast.success("ADN de Experticia Actualizado", {
+                description: "Tu motor de piloto automático ahora se alineará con esta identidad."
+            });
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al guardar configuración");
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -97,10 +113,20 @@ const ExpertiseDNA: React.FC<ExpertiseDNAProps> = ({ initialProfile, onSave }) =
                 </div>
                 <button
                     onClick={handleSave}
-                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors text-sm font-medium"
+                    disabled={isSaving}
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                    <Save size={16} />
-                    Guardar Configuración
+                    {isSaving ? (
+                        <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                            Guardando...
+                        </>
+                    ) : (
+                        <>
+                            <Save size={16} />
+                            Guardar Configuración
+                        </>
+                    )}
                 </button>
             </div>
 

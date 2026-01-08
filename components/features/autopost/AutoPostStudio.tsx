@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { UserProfile, AppLanguage, ExpertiseProfile } from "../../../types.ts";
 import PremiumLockOverlay from "../../ui/PremiumLockOverlay";
 
@@ -7,6 +7,8 @@ import ContentRadar from "./ContentRadar";
 import StrategyTimeline from "./StrategyTimeline";
 import { Zap, Layout, Calendar as CalendarIcon, SlidersHorizontal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { updateUserDNA, getUserDNA } from "../../../lib/services/userRepository";
+import { toast } from "sonner";
 
 interface AutoPostStudioProps {
     user: UserProfile;
@@ -18,6 +20,15 @@ interface AutoPostStudioProps {
 const AutoPostStudio: React.FC<AutoPostStudioProps> = ({ user, language }) => {
     const [activeTab, setActiveTab] = useState<'radar' | 'identity' | 'schedule'>('radar');
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [dnaProfile, setDnaProfile] = useState<ExpertiseProfile | undefined>(undefined);
+
+    useEffect(() => {
+        if (user.id) {
+            getUserDNA(user.id).then(profile => {
+                if (profile) setDnaProfile(profile);
+            });
+        }
+    }, [user.id]);
 
     if (!user.isPremium) {
         return (
@@ -29,9 +40,16 @@ const AutoPostStudio: React.FC<AutoPostStudioProps> = ({ user, language }) => {
         );
     }
 
-    const handleSaveIdentity = (profile: ExpertiseProfile) => {
-        // Here we would save to Supabase
-        console.log("Saving profile:", profile);
+    const handleSaveIdentity = async (profile: ExpertiseProfile) => {
+        try {
+            await updateUserDNA(user.id, profile);
+            setDnaProfile(profile);
+            // Toast handling is done inside ExpertiseDNA component mostly, 
+            // but we can add robust error handling here.
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al conectar con la base de datos");
+        }
     };
 
     return (
@@ -113,7 +131,10 @@ const AutoPostStudio: React.FC<AutoPostStudioProps> = ({ user, language }) => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
                         >
-                            <ExpertiseDNA onSave={handleSaveIdentity} />
+                            <ExpertiseDNA 
+                                initialProfile={dnaProfile} 
+                                onSave={handleSaveIdentity} 
+                            />
                         </motion.div>
                     )}
                 </AnimatePresence>

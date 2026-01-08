@@ -21,7 +21,9 @@ import {
     Home,
     HelpCircle,
     Shield,
-    Grid
+    Grid,
+    Mic,
+    FileEdit,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { UserProfile, AppTab } from '../../../types';
@@ -107,6 +109,16 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
             badge: 'POPULAR'
         },
         {
+            id: 'editor',
+            name: 'Editor de Posts',
+            description: 'Refina, optimiza y da formato a tus borradores con herramientas avanzadas.',
+            icon: FileEdit,
+            color: 'from-pink-500 to-pink-600',
+            bg: 'bg-pink-50/50',
+            onClick: () => onSelectTool('editor'),
+            premium: false
+        },
+        {
             id: 'autopost',
             name: 'Programador Inteligente',
             description: 'Automatiza tu calendario de publicaciones y maximiza tu alcance.',
@@ -136,6 +148,16 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
             onClick: () => onSelectTool('chat'),
             premium: true,
             badge: 'RECOMENDADO'
+        },
+        {
+            id: 'voice-lab',
+            name: 'Laboratorio de Voz',
+            description: 'Clona tu voz y genera contenido de audio hiper-realista.',
+            icon: Mic,
+            color: 'from-cyan-500 to-cyan-600',
+            bg: 'bg-cyan-50/50',
+            onClick: () => onSelectTool('voice-lab'),
+            premium: true
         },
         {
             id: 'audit',
@@ -204,7 +226,7 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                              <span>S: Settings</span>
                         </div>
                         <ExpandableTabs 
-                            tabs={shortcuts} 
+                            tabs={shortcuts as any} 
                             activeColor="text-brand-600"
                             className="border-slate-200/60 bg-white/50 backdrop-blur-sm"
                         />

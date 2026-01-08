@@ -12,6 +12,7 @@ interface AutoTypographyProps {
   color?: string;
   weight?: 'normal' | 'medium' | 'bold' | 'black';
   as?: 'h1' | 'h2' | 'h3' | 'p' | 'div';
+  overrideFontSize?: number;
 }
 
 export const AutoTypography: React.FC<AutoTypographyProps> = ({
@@ -25,6 +26,7 @@ export const AutoTypography: React.FC<AutoTypographyProps> = ({
   color,
   weight = 'bold',
   as: Component = 'div',
+  overrideFontSize,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [fontSize, setFontSize] = useState(baseSize);
@@ -77,7 +79,7 @@ export const AutoTypography: React.FC<AutoTypographyProps> = ({
       className={cn("whitespace-pre-wrap transition-all duration-300", className)}
       style={{
         fontFamily,
-        fontSize: `${fontSize}px`,
+        fontSize: `${overrideFontSize || fontSize}px`,
         lineHeight: lineHeight,
         color: color,
         fontWeight: weight === 'black' ? 900 : weight === 'bold' ? 700 : weight === 'medium' ? 500 : 400,

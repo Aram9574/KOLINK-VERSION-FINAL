@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { supabase } from '../../services/supabaseClient';
 
 interface Props {
     children: ReactNode;
@@ -22,6 +23,31 @@ class ErrorBoundary extends Component<Props, State> {
 
     public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error('Uncaught error:', error, errorInfo);
+        
+        // Fire and forget logging
+        this.logErrorToSupabase(error, errorInfo);
+    }
+
+    private async logErrorToSupabase(error: Error, errorInfo: ErrorInfo) {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            await supabase.functions.invoke('log-error', {
+                body: {
+                    error_message: error.message,
+                    stack_trace: error.stack + "\n\nComponent Stack:\n" + errorInfo.componentStack,
+                    component: "ErrorBoundary",
+                    user_id: session?.user?.id,
+                    metadata: {
+                        url: window.location.href,
+                        userAgent: navigator.userAgent,
+                        resolution: `${window.innerWidth}x${window.innerHeight}`
+                    }
+                }
+            });
+        } catch (loggingError) {
+            console.error("Failed to send error log:", loggingError);
+        }
     }
 
     public render() {
@@ -34,14 +60,14 @@ class ErrorBoundary extends Component<Props, State> {
                         </div>
                         <h1 className="text-2xl font-bold text-slate-900 mb-2">Algo salió mal</h1>
                         <p className="text-slate-500 mb-6">
-                            Ha ocurrido un error inesperado. Nuestro equipo ha sido notificado.
+                            Ha ocurrido un error inesperado. Nuestro equipo ha sido notificado automáticamente.
                         </p>
                         <div className="bg-slate-50 p-4 rounded-xl mb-6 text-left overflow-auto max-h-32">
                             <code className="text-xs text-slate-600 font-mono">
                                 {this.state.error?.message}
                                 {this.state.error?.stack && (
                                     <div className="mt-2 pt-2 border-t border-slate-200 whitespace-pre-wrap">
-                                        {this.state.error.stack}
+                                        {this.state.error.stack.split('\n')[0]}
                                     </div>
                                 )}
                             </code>

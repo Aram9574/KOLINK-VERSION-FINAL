@@ -21,12 +21,22 @@ export interface SlideDesignOverride {
   layoutVariant?: LayoutVariant;
 }
 
+export interface ElementStyle {
+  x?: number;
+  y?: number;
+  rotation?: number;
+  scale?: number;
+  fontSize?: number;
+  color?: string;
+}
+
 export interface CarouselSlide {
   id: string;
   type: SlideType;
   layoutVariant: LayoutVariant; // Explicit layout choice
   content: SlideContent;
   designOverride?: SlideDesignOverride;
+  elementOverrides?: Record<string, ElementStyle>; // Map elementId (e.g. 'title') to styles
   isVisible: boolean;
 }
 

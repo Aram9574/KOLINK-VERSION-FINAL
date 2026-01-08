@@ -834,6 +834,21 @@ export const es = {
           mobile: "Móvil",
           desktop: "Escritorio",
           seeMore: "...ver más",
+          live: "Vista Previa en Vivo",
+          tipTitle: "Consejo Pro",
+          tipDesc: "Esta vista simula cómo se verá tu post en el feed. Asegúrate de que los saltos de línea sean limpios."
+        },
+        hooks: {
+          title: "Ganchos Virales",
+          empty: "No hay ganchos disponibles para esta búsqueda."
+        },
+        endings: {
+            title: "Cierres / CTAs",
+            empty: "No hay cierres disponibles para esta búsqueda."
+        },
+        snippets: {
+            title: "Mis Snippets",
+            empty: "No has guardado ningún snippet aún. Selecciona texto en el editor para guardar uno."
         },
         metrics: {
           characters: "caracteres",

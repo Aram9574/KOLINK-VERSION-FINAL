@@ -27,7 +27,7 @@ export const PropertiesPanel = () => {
   const t = translations[language || 'en'].carouselStudio;
   
   // Store Hooks
-  const { activeSlideId } = useCarouselStore(state => state.editor);
+  const { activeSlideId, activeElementId } = useCarouselStore(state => state.editor);
   const { slides, design } = useCarouselStore(state => state.project); // project is needed for globalDesign
   const project = useCarouselStore(state => state.project); // Get full project object for access to author etc.
   
@@ -35,6 +35,8 @@ export const PropertiesPanel = () => {
   const updateDesign = useCarouselStore(state => state.updateDesign);
   const updateGlobalDesign = useCarouselStore(state => state.updateGlobalDesign);
   const updateAuthor = useCarouselStore(state => state.updateAuthor);
+  const updateElementOverride = useCarouselStore(state => state.updateElementOverride);
+  const setActiveElement = useCarouselStore(state => state.setActiveElement);
   
   const removeSlide = useCarouselStore(state => state.removeSlide);
   
@@ -179,6 +181,82 @@ export const PropertiesPanel = () => {
                 <TabsContent value="slide" className="h-full mt-0">
                     <ScrollArea className="h-full">
                         <div className="p-4 space-y-6 pb-24">
+                            
+                            {/* SELECTED ELEMENT CONTROLS */}
+                            {activeElementId && (
+                                <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-6 shadow-sm animate-in fade-in slide-in-from-top-2">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-800 flex items-center gap-2">
+                                            <Edit3 className="w-3.5 h-3.5" />
+                                            Elemento: {activeElementId}
+                                        </h3>
+                                        <Button size="icon" variant="ghost" className="h-5 w-5 bg-white/50 hover:bg-white text-indigo-400" onClick={() => setActiveElement(null)}>
+                                            <X className="w-3 h-3" />
+                                        </Button>
+                                    </div>
+                                    
+                                    <div className="space-y-4">
+                                         {/* Font Size */}
+                                         <div className="space-y-2">
+                                             <div className="flex justify-between">
+                                                 <Label className="text-[10px] text-indigo-600 font-bold uppercase">Tamaño Texto</Label>
+                                                 <span className="text-[10px] text-indigo-900 font-mono">
+                                                     {activeSlide.elementOverrides?.[activeElementId]?.fontSize || 'Auto'}px
+                                                 </span>
+                                             </div>
+                                             <Slider 
+                                                 value={[activeSlide.elementOverrides?.[activeElementId]?.fontSize || 48]} 
+                                                 min={12} 
+                                                 max={300} 
+                                                 step={1}
+                                                 onValueChange={([v]) => updateElementOverride(activeSlide.id, activeElementId, { fontSize: v })}
+                                                 className="py-1"
+                                             />
+                                         </div>
+
+                                         {/* Rotation */}
+                                          <div className="space-y-2">
+                                             <div className="flex justify-between">
+                                                 <Label className="text-[10px] text-indigo-600 font-bold uppercase">Rotación</Label>
+                                                 <span className="text-[10px] text-indigo-900 font-mono">
+                                                     {Math.round(activeSlide.elementOverrides?.[activeElementId]?.rotation || 0)}°
+                                                 </span>
+                                             </div>
+                                             <Slider 
+                                                 value={[activeSlide.elementOverrides?.[activeElementId]?.rotation || 0]} 
+                                                 min={-180} 
+                                                 max={180} 
+                                                 step={5}
+                                                 onValueChange={([v]) => updateElementOverride(activeSlide.id, activeElementId, { rotation: v })}
+                                                 className="py-1"
+                                             />
+                                         </div>
+                                         
+                                         {/* Color */}
+                                         <div className="space-y-2">
+                                              <Label className="text-[10px] text-indigo-600 font-bold uppercase">Color & Estilo</Label>
+                                              <div className="flex items-center gap-2">
+                                                  <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-indigo-200 shadow-sm cursor-pointer">
+                                                      <input 
+                                                          type="color"
+                                                          value={activeSlide.elementOverrides?.[activeElementId]?.color || '#000000'}
+                                                          onChange={(e) => updateElementOverride(activeSlide.id, activeElementId, { color: e.target.value })}
+                                                          className="absolute inset-0 w-[150%] h-[150%] -translate-x-1/4 -translate-y-1/4 cursor-pointer"
+                                                      />
+                                                  </div>
+                                                   <Button 
+                                                      variant="outline" 
+                                                      size="sm" 
+                                                      className="h-8 text-[10px] bg-white border-indigo-200 text-indigo-600 hover:bg-white"
+                                                      onClick={() => updateElementOverride(activeSlide.id, activeElementId, { color: undefined, fontSize: undefined, rotation: 0, x: 0, y: 0 })}
+                                                  >
+                                                      Resetear
+                                                  </Button>
+                                              </div>
+                                         </div>
+                                    </div>
+                                </div>
+                            )}
                             
                             {/* Magic Tools Module */}
                             <div className="space-y-3">
