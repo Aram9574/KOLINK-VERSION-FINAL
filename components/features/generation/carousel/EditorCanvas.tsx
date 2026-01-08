@@ -17,14 +17,32 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { exportToPDF } from '@/lib/utils/export';
 import { toast } from 'sonner';
+import { supabase } from '@/services/supabaseClient';
+import { 
+    Dialog, 
+    DialogContent, 
+    DialogHeader, 
+    DialogTitle, 
+    DialogDescription,
+    DialogFooter 
+} from '@/components/ui/dialog';
+import { ExportModal } from './ExportModal';
 
 export const EditorCanvas = () => {
   const { slides, design, author } = useCarouselStore(state => state.project);
-  const { activeSlideId, zoomLevel } = useCarouselStore(state => state.editor);
-  const { setZoom, setActiveSlide } = useCarouselStore(state => state);
+  const activeSlideId = useCarouselStore(state => state.editor.activeSlideId);
+  const zoomLevel = useCarouselStore(state => state.editor.zoomLevel);
+  const setZoom = useCarouselStore(state => state.setZoom);
+  const setActiveSlide = useCarouselStore(state => state.setActiveSlide);
+  const resetProject = useCarouselStore(state => state.resetProject);
 
-  // Local state for fullscreen
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
+
+  const handleReset = () => {
+      setShowResetDialog(true);
+  };
 
   // Calculate base width/height for the slide container based on zoom
   const baseWidth = design.aspectRatio === '4:5' ? 1080 : design.aspectRatio === '9:16' ? 1080 : 1080;
@@ -40,9 +58,21 @@ export const EditorCanvas = () => {
     <div className="flex-1 bg-slate-100 relative overflow-hidden flex flex-col">
       {/* Toolbar */}
       <div className="h-14 border-b border-slate-200 bg-white/80 backdrop-blur-sm flex items-center justify-between px-6 z-10">
-        <div className="text-sm font-medium text-slate-500">
-          {slides.length} Slides ({design.aspectRatio})
+        <div className="flex items-center gap-4">
+             <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleReset}
+                className="h-8 text-xs font-bold border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-red-500"
+             >
+                <Repeat className="w-3.5 h-3.5 mr-2" />
+                New Carousel
+             </Button>
+            <div className="text-sm font-medium text-slate-500 border-l border-slate-200 pl-4">
+               {slides.length} Slides ({design.aspectRatio})
+            </div>
         </div>
+
         <div className="flex items-center gap-2">
            <Button variant="ghost" size="icon" onClick={() => setZoom(Math.max(0.2, zoomLevel - 0.1))}>
              <ZoomOut className="w-4 h-4" />
@@ -68,13 +98,7 @@ export const EditorCanvas = () => {
            
            <Button 
                className="bg-slate-900 text-white hover:bg-slate-800 h-8 text-xs gap-2"
-               onClick={() => {
-                   toast.loading("Generating PDF...");
-                   // Give UI a moment to show toast
-                   setTimeout(() => {
-                       exportToPDF(slides.map(s => s.id), "carousel_export");
-                   }, 100);
-               }}
+               onClick={() => setIsExportModalOpen(true)}
             >
              <Download className="w-3 h-3" /> Export
            </Button>
@@ -197,6 +221,44 @@ export const EditorCanvas = () => {
             onClose={() => setIsFullscreen(false)} 
           />
       )}
+
+      <ExportModal 
+        isOpen={isExportModalOpen} 
+        onClose={() => setIsExportModalOpen(false)} 
+      />
+
+      {/* Confirmation Dialog for New Project */}
+      <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Carousel</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to start over? This action cannot be undone and will discard your current slide deck.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowResetDialog(false)}>Cancel</Button>
+            <Button 
+                variant="destructive" 
+                onClick={() => {
+                    resetProject();
+                    setShowResetDialog(false);
+                }}
+            >
+                Confirm & Reset
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Scroll Indicator Badge - Friction #6 Fix */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-20">
+          <div className="bg-slate-900/80 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-xs font-medium shadow-lg border border-white/10 flex items-center gap-2">
+             <span>Slide {slides.findIndex(s => s.id === activeSlideId) + 1} / {slides.length}</span>
+             <div className="w-px h-3 bg-white/20" />
+             <span className="text-white/60 text-[10px]">Use Arrow Keys</span>
+          </div>
+      </div>
     </div>
   );
 };

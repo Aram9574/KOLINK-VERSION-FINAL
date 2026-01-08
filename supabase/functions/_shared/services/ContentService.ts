@@ -49,23 +49,32 @@ export interface UserProfileContext {
   behavioral_dna?: string;
 }
 
-export interface CarouselSlideData {
-    type: "intro" | "content" | "outro";
-    title: string;
-    subtitle?: string;
-    body: string;
-    cta_text?: string;
-    visual_hint?: string;
+export interface CarouselConfig {
+    theme_id: string;
+    settings: {
+        aspect_ratio: string;
+        dark_mode: boolean;
+    };
 }
 
-export interface CarouselMetadata {
-    topic: string;
-    total_slides: number;
-    suggested_color_palette: string[];
+export interface CarouselSlideData {
+    id: string; // Add ID
+    type: "intro" | "content" | "outro";
+    layout_variant?: string; // Add variant
+    content: {
+        title: string;
+        subtitle?: string;
+        body: string;
+        visual_hint?: string;
+        cta_text?: string; // Legacy support or new CTA logic
+    };
+    design_overrides?: {
+        swipe_indicator?: boolean;
+    };
 }
 
 export interface CarouselGenerationResult {
-    carousel_metadata: CarouselMetadata;
+    carousel_config: CarouselConfig; // Renamed from carousel_metadata
     slides: CarouselSlideData[];
     linkedin_post_copy: string;
 }
@@ -85,121 +94,7 @@ export interface EngagementPrediction {
 }
 
 export class ContentService extends BaseAIService {
-  /**
-   * Generates a viral LinkedIn post.
-   */
-  async generatePost(params: GenerationParams, profile: UserProfileContext): Promise<GeneratedPost> {
-    const templates = getTemplates();
-    const frameworkRules = getFrameworkInstructions(params.framework);
-    const emojiRules = getEmojiInstructions(params.emojiDensity);
-    const lengthRules = getLengthInstructions(params.length);
-    const viralExample = VIRAL_EXAMPLES[params.framework as keyof typeof VIRAL_EXAMPLES] || "";
-
-    const ctaInstruction = params.includeCTA ? templates.cta_yes : "";
-    const hashtagInstruction = `Use strictly ${params.hashtagCount || 0} hashtags at the end of the post. They must be SEO optimized and relevant to the topic.`;
-
-    const voiceInstruction = (profile.brand_voice && profile.brand_voice.length > 0)
-      ? templates.voice_custom.replace("{{brand_voice}}", profile.brand_voice)
-      : templates.voice_default.replace("{{tone}}", params.tone);
-
-    const hookInstruction = params.hookStyle 
-      ? `\n- **Gancho Específico (Hook Style):** ${params.hookStyle}. Comienza el post respetando estrictamente esta estructura de gancho.`
-      : "";
-
-    const carouselInstruction = params.generateCarousel
-      ? `\n- **Intento de Carrusel:** Este post debe servir como base para un carrusel. Sé visual y estructurado en puntos clave.`
-      : "";
-
-    const langInstruction = (params.outputLanguage || profile.language) === "es"
-      ? templates.lang_es
-      : templates.lang_en;
-
-    const authorPersona = templates.author_persona
-      .replace("{{headline}}", profile.headline || "")
-      .replace("{{industry}}", profile.industry || "")
-      .replace("{{experience_level}}", (profile.xp || 0) > 1000 ? "Expert" : "Professional")
-      .replace("{{company_name}}", profile.company_name || "");
-
-    const dnaInstruction = profile.behavioral_dna 
-      ? `\n\nUSER BEHAVIORAL DNA (Use this to match their deep personality and tendencies):\n${profile.behavioral_dna}`
-      : "";
-
-    const prompt = (templates.main_prompt + dnaInstruction)
-      .replace("{{topic}}", params.topic)
-      .replace("{{audience}}", params.audience)
-      .replace("{{voice_instruction}}", voiceInstruction)
-      .replace("{{creativity_level}}", params.creativityLevel.toString())
-      .replace("{{emoji_density}}", params.emojiDensity)
-      .replace("{{length}}", params.length)
-      .replace("{{author_persona}}", authorPersona)
-      .replace("{{viral_example}}", viralExample)
-      .replace("{{framework_rules}}", frameworkRules)
-      .replace("{{length_rules}}", lengthRules)
-      .replace("{{emoji_rules}}", emojiRules)
-      .replace("{{lang_instruction}}", langInstruction)
-      .replace("{{cta_instruction}}", params.includeCTA ? "Yes" : "No")
-      .replace("{{cta_instruction_detail}}", ctaInstruction)
-      .replace("{{hashtag_instruction}}", hashtagInstruction)
-      .replace("{{hook_instruction}}", hookInstruction)
-      .replace("{{carousel_instruction}}", carouselInstruction);
-
-    return await this.retryWithBackoff(async () => {
-      const model = this.genAI.getGenerativeModel({
-        model: this.model,
-        systemInstruction: PostGeneratorBrain.system_instruction,
-      });
-
-      const response = await model.generateContent({
-        // @ts-ignore: Google Generative AI types might be strict, casting parts to any for flex
-        // deno-lint-ignore no-explicit-any
-        contents: [{ role: "user", parts: [{ text: prompt }] as any }],
-        generationConfig: {
-          temperature: 0.7 + (params.creativityLevel / 200),
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: SchemaType.OBJECT,
-            properties: {
-              post_content: { type: SchemaType.STRING },
-              auditor_report: {
-                type: SchemaType.OBJECT,
-                properties: {
-                  viral_score: { type: SchemaType.INTEGER },
-                  hook_strength: { type: SchemaType.STRING },
-                  hook_score: { type: SchemaType.INTEGER },
-                  readability_score: { type: SchemaType.INTEGER },
-                  value_score: { type: SchemaType.INTEGER },
-                  pro_tip: { type: SchemaType.STRING },
-                  retention_estimate: { type: SchemaType.STRING },
-                  flags_triggered: { 
-                    type: SchemaType.ARRAY, 
-                    items: { type: SchemaType.STRING } 
-                  }
-                },
-                required: ["viral_score", "hook_strength", "hook_score", "readability_score", "value_score", "pro_tip", "retention_estimate", "flags_triggered"]
-              },
-              strategy_reasoning: { type: SchemaType.STRING },
-              meta: {
-                type: SchemaType.OBJECT,
-                properties: {
-                  suggested_hashtags: { 
-                    type: SchemaType.ARRAY, 
-                    items: { type: SchemaType.STRING } 
-                  },
-                  character_count: { type: SchemaType.INTEGER }
-                },
-                required: ["suggested_hashtags", "character_count"]
-              }
-            },
-            required: ["post_content", "auditor_report", "strategy_reasoning", "meta"]
-          } as Schema,
-        },
-      });
-
-      const json = this.extractJson(response.response.text());
-      return json as unknown as GeneratedPost;
-    });
-  }
-
+  
   /**
    * Generates a LinkedIn Carousel JSON.
    */
@@ -230,36 +125,44 @@ export class ContentService extends BaseAIService {
     try {
       if (sourceType === 'youtube') {
            console.log(`Fetching YouTube transcript for ${source}...`);
-           // Extract video ID from flexible inputs (url or id)
            let videoId = source;
            if (source.includes('v=')) videoId = source.split('v=')[1].split('&')[0];
            else if (source.includes('youtu.be/')) videoId = source.split('youtu.be/')[1].split('?')[0];
 
            const transcript = await repurposeService.fetchYoutubeTranscript(videoId);
            finalSource = `[VIDEO TRANSCRIPT]:\n"${transcript}"\n\n(Source Video: ${source})`;
-           analysisStrategy = "The content provided is a VIDEO TRANSCRIPT. Extract the core educational value, ignore conversational filler, and structure the key lessons into a carousel.";
+           analysisStrategy = "CONTENT TYPE: VIDEO TRANSCRIPT. \nSTRATEGY: Extract the core educational value. Ignore conversational filler. \nFRAGMENTATION: Break down the key lessons into atomic steps.";
       } 
       else if (sourceType === 'url') {
            console.log(`Scraping URL ${source}...`);
            const webContent = await repurposeService.scrapeUrl(source);
            finalSource = `[WEB ARTICLE CONTENT]:\n"${webContent}"\n\n(Source URL: ${source})`;
-           analysisStrategy = "The content provided is a WEB ARTICLE. Summarize the main points and turn the key insights into a slide-by-slide narrative.";
+           analysisStrategy = "CONTENT TYPE: WEB ARTICLE. \nSTRATEGY: Summarize the main points. \nFRAGMENTATION: Turn sections into individual slides. Avoid walls of text.";
       }
       else if (sourceType === 'pdf') {
            console.log(`Extracting PDF content...`);
            const pdfContent = await repurposeService.extractPdfText(source);
            finalSource = `[PDF DOCUMENT CONTENT]:\n"${pdfContent}"`;
-           analysisStrategy = "The content provided is a PDF DOCUMENT. Extract the core value, structured data, and key insights to build a logical narrative for a LinkedIn carousel.";
+           analysisStrategy = "CONTENT TYPE: PDF DOCUMENT. \nSTRATEGY: Extract the core value and structured data. \nFRAGMENTATION: Use 'checklist' or 'comparison' layouts for data-heavy sections.";
       }
       else {
            // Default TEXT or TOPIC
-           analysisStrategy = "The input is a user-provided topic or text. Use your 'googleSearch' tool to find relevant, high-performing content to ground your carousel if the input is sparse.";
+           analysisStrategy = "CONTENT TYPE: RAW TOPIC/TEXT. \nSTRATEGY: Use your internal knowledge to build a comprehensive guide. \nFRAGMENTATION: 7-10 solid slides.";
       }
     } catch (error) {
        console.error("Repurposing Error:", error);
-       // Fallback: If fetch fails, treat as topic/metadata and ask AI to search or improvise
        analysisStrategy = `WARNING: Failed to fetch external content (${error instanceof Error ? error.message : 'Unknown'}). Treat the input "${source}" as a topic and use Google Search to find information about it.`;
     }
+
+    const layoutStrategy = `
+    LAYOUT STRATEGY (Use these heavily):
+    - **checklist**: Use for ANY list of 3-5 items (lessons, tools, steps).
+    - **comparison**: Use when contrasting "Old Way vs New Way" or "Mistake vs Fix".
+    - **quote**: Use for high-impact statements, definitions, or contrarian points.
+    - **big_number**: Use for statistics (e.g., "94%") or single powerful words (e.g., "STOP").
+    - **code**: Use ONLY if the topic involves programming or prompts.
+    - **default**: Use for standard text + image slides.
+    `;
 
     const prompt = `
       ${CarouselBrain.system_instruction}
@@ -276,14 +179,13 @@ export class ContentService extends BaseAIService {
       ${userVoice}
       ${styleContext}
       
-      PHASE 1: ANALYSIS STRATEGY
+      PHASE 1: ANALYSIS STRATEGY & SMART FRAGMENTATION
       ${analysisStrategy}
       
+      ${layoutStrategy}
+      
       PHASE 2: NARRATIVE ARCHITECTURE
-      Design a 7-12 slide carousel JSON.
-      - SLIDE 1 (Type: intro): Hook the reader immediately. Big title.
-      - SLIDES 2-N (Type: content): Deliver value. One idea per slide.
-      - FINAL SLIDE (Type: outro): Strong Call to Action (CTA).
+      Design a 7-12 slide carousel JSON following the Arc rules.
       
       USER DNA: 
       ${dnaInstruction}
@@ -303,41 +205,56 @@ export class ContentService extends BaseAIService {
         // deno-lint-ignore no-explicit-any
         contents: [{ role: "user", parts: [{ text: prompt }] as any }],
         generationConfig: {
-          temperature: 0.1,
+          temperature: 0.2, // Lower temp for struct adherence
           responseMimeType: "application/json",
           responseSchema: {
             type: SchemaType.OBJECT,
             properties: {
-              carousel_metadata: {
+              carousel_config: {
                 type: SchemaType.OBJECT,
                 properties: {
-                  topic: { type: SchemaType.STRING },
-                  total_slides: { type: SchemaType.INTEGER },
-                  suggested_color_palette: { 
-                    type: SchemaType.ARRAY, 
-                    items: { type: SchemaType.STRING } 
+                  theme_id: { type: SchemaType.STRING },
+                  settings: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                         aspect_ratio: { type: SchemaType.STRING },
+                         dark_mode: { type: SchemaType.BOOLEAN }
+                    }
                   }
                 },
-                required: ["topic", "total_slides", "suggested_color_palette"]
+                required: ["theme_id", "settings"]
               },
               slides: {
                 type: SchemaType.ARRAY,
                 items: {
                   type: SchemaType.OBJECT,
                   properties: {
+                    id: { type: SchemaType.STRING },
                     type: { type: SchemaType.STRING, enum: ["intro", "content", "outro"] },
-                    title: { type: SchemaType.STRING },
-                    subtitle: { type: SchemaType.STRING },
-                    body: { type: SchemaType.STRING },
-                    cta_text: { type: SchemaType.STRING },
-                    visual_hint: { type: SchemaType.STRING }
+                    layout_variant: { type: SchemaType.STRING },
+                    content: {
+                        type: SchemaType.OBJECT,
+                        properties: {
+                            title: { type: SchemaType.STRING },
+                            subtitle: { type: SchemaType.STRING },
+                            body: { type: SchemaType.STRING },
+                            visual_hint: { type: SchemaType.STRING }
+                        },
+                        required: ["title", "body"]
+                    },
+                    design_overrides: {
+                        type: SchemaType.OBJECT,
+                        properties: {
+                            swipe_indicator: { type: SchemaType.BOOLEAN }
+                        }
+                    }
                   },
-                  required: ["type", "title", "body"]
+                  required: ["type", "layout_variant", "content"]
                 },
               },
               linkedin_post_copy: { type: SchemaType.STRING }
             },
-            required: ["carousel_metadata", "slides", "linkedin_post_copy"]
+            required: ["carousel_config", "slides", "linkedin_post_copy"]
           } as Schema,
         },
       });

@@ -41,6 +41,7 @@ interface CarouselStore {
   savePreset: (name: string) => void;
   loadPresets: () => void;
   deletePreset: (id: string) => void;
+  resetProject: () => void;
 }
 
 const DEFAULT_DESIGN: CarouselDesign = {
@@ -76,6 +77,7 @@ const INITIAL_SLIDES: CarouselSlide[] = [
   {
     id: 'slide-1',
     type: 'intro',
+    layoutVariant: 'default',
     isVisible: true,
     content: {
       title: 'How to Build a Personal Brand in 2026',
@@ -86,6 +88,7 @@ const INITIAL_SLIDES: CarouselSlide[] = [
   {
     id: 'slide-2',
     type: 'content',
+    layoutVariant: 'default',
     isVisible: true,
     content: {
       title: 'Consistency is Key',
@@ -95,6 +98,7 @@ const INITIAL_SLIDES: CarouselSlide[] = [
   {
     id: 'slide-3',
     type: 'outro',
+    layoutVariant: 'default',
     isVisible: true,
     content: {
       title: 'Was this helpful?',
@@ -149,6 +153,7 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
       const newSlide: CarouselSlide = {
         id: uuidv4(),
         type,
+        layoutVariant: 'default',
         isVisible: true,
         content: {
           title: 'New Slide',
@@ -174,7 +179,7 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
       project: {
         ...state.project,
         slides: state.project.slides.map((s) =>
-          s.id === id ? { ...s, ...updates, content: { ...s.content, ...updates } } : s
+          s.id === id ? { ...s, ...updates } : s
         ),
       },
     })),
@@ -218,13 +223,14 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
        return { savedPresets: updatedPresets };
     }),
 
-  loadPresets: () => {
+  loadPresets: () =>
+    set((state) => {
       const stored = localStorage.getItem('kolink_brand_presets');
       if (stored) {
           return { savedPresets: JSON.parse(stored) };
       }
       return {};
-  },
+    }),
 
   deletePreset: (id) =>
     set((state) => {
@@ -264,4 +270,25 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
 
   setIsGenerating: (isGenerating) =>
     set((state) => ({ editor: { ...state.editor, isGenerating } })),
+
+  resetProject: () =>
+    set(() => ({
+      project: {
+        id: uuidv4(),
+        title: 'Untitled Carousel',
+        platform: 'linkedin',
+        author: { name: 'User Name', handle: '@username' },
+        slides: INITIAL_SLIDES,
+        design: DEFAULT_DESIGN,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      editor: {
+        activeSlideId: INITIAL_SLIDES[0].id,
+        zoomLevel: 1,
+        isSidebarOpen: true,
+        activePanel: 'generator',
+        isGenerating: false,
+      }
+    })),
 }));

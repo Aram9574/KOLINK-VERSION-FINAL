@@ -530,7 +530,8 @@ export const en = {
         addSlide: "Add Slide",
         intro: "Intro",
         content: "Content",
-        outro: "Outro"
+        outro: "Outro",
+        brandNamePrompt: "Enter a name for your Brand Kit:"
       },
       export: {
         download: "Download PDF",

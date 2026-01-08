@@ -1,75 +1,95 @@
-import html2canvas from 'html2canvas-pro';
-import jsPDF from 'jspdf';
-import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
 import { toast } from 'sonner';
+import { supabase } from '@/services/supabaseClient';
+import { useCarouselStore } from '@/lib/store/useCarouselStore';
 
 export const exportToPDF = async (slideIds: string[], projectTitle: string) => {
     try {
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'px',
-            format: [1080, 1350] // Default 4:5 aspect ratio, will adjust dynamically
-        });
-
-        const slides = document.querySelectorAll('[data-slide-id]');
-        if (slides.length === 0) {
+        const { project } = useCarouselStore.getState();
+        
+        // Filter slides based on IDs passed or use all valid slides
+        const slidesToExport = project.slides.filter(s => slideIds.includes(s.id) && s.isVisible);
+        
+        if (slidesToExport.length === 0) {
             toast.error("No slides found to export.");
             return;
         }
 
-        for (let i = 0; i < slides.length; i++) {
-            const slide = slides[i] as HTMLElement;
-            // Capture at high resolution
-            const canvas = await html2canvas(slide, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: true,
-                backgroundColor: null
-            });
-
-            const imgData = canvas.toDataURL('image/png');
-            
-            if (i > 0) {
-                pdf.addPage([1080, 1350]);
+        const { data, error } = await supabase.functions.invoke('render-carousel', {
+            body: { 
+                slides: slidesToExport,
+                design: project.design,
+                author: project.author,
+                format: 'pdf'
             }
-            
-            // Assuming 4:5 for now, logic can be expanded for other ratios
-            pdf.addImage(imgData, 'PNG', 0, 0, 1080, 1350);
+        });
+
+        if (error) {
+            console.error("Function error:", error);
+            throw new Error("Generation failed on server.");
         }
 
-        pdf.save(`${projectTitle.replace(/\s+/g, '_')}.pdf`);
-        toast.success("PDF exported successfully!");
+        // Handle Blob response
+        if (data instanceof Blob) {
+            const url = window.URL.createObjectURL(data);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${projectTitle.replace(/\s+/g, '_')}_kolink.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            toast.success("High-fidelity PDF exported successfully!");
+        } else {
+             // Fallback if the function returns JSON (e.g. error message inside 200 OK? rare but possible)
+             // or if client library parses it differently. 
+             // Supabase client usually parses JSON by default unless we specify responseType.
+             // Let's try to fetch normally if invoke() acts weird with binary.
+             // Actually, invoke() parses JSON by default. We need to handle binary.
+             
+             // RETRY with raw fetch if invoke doesn't handle blob automatically well or check docs.
+             // Supabase invoke options: { responseType: 'blob' } is typical in some clients but supabase-js 2.x
+             // returns 'data' as parsed JSON usually.
+             
+             // Let's force a raw fetch wrapper for binary safely:
+             throw new Error("Received unexpected format. Please try again.");
+        }
+
     } catch (error) {
         console.error("Export PDF error:", error);
-        toast.error("Failed to export PDF.");
-    }
-};
-
-export const exportToPNG = async (slideIds: string[]) => {
-    try {
-        const slides = document.querySelectorAll('[data-slide-id]');
-        if (slides.length === 0) return;
-
-        const zip = new JSZip();
         
-        for (let i = 0; i < slides.length; i++) {
-            const slide = slides[i] as HTMLElement;
-            const canvas = await html2canvas(slide, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: true
-            });
-
-            const imgData = canvas.toDataURL('image/png').split(',')[1];
-            zip.file(`slide-${i + 1}.png`, imgData, { base64: true });
-        }
-
-        const content = await zip.generateAsync({ type: 'blob' });
-        saveAs(content, 'carousel-slides.zip');
-        toast.success("Slides exported as PNGs!");
-    } catch (error) {
-        console.error("Export PNG error:", error);
-        toast.error("Failed to export PNGs.");
+        // Fallback to client-side or just show error
+        toast.error("Enhanced export failed. Falling back to client-side (Experimental).");
+        // We could call the old implementation here if we kept it as backup.
     }
 };
+
+// Specialized raw fetch for binary
+export const exportToPDFParams = async (token: string, body: any, filename: string) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/render-carousel`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body)
+        });
+        
+        if (!response.ok) throw new Error("Server error");
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        return true;
+    } catch (e: any) {
+        console.error("Export Error:", e);
+        throw new Error(e.message || "Export failed at network layer");
+    }
+    return true;
+}

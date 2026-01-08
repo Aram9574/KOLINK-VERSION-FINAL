@@ -1,46 +1,21 @@
 import React from 'react';
 import { useCarouselStore } from '@/lib/store/useCarouselStore';
-import { TemplateSelector } from '../../TemplateSelector';
-import { DESIGN_PRESETS } from '../design-presets';
-import { toast } from 'sonner';
 
 export const DesignPanel = () => {
-    const { updateDesign, project } = useCarouselStore();
-    
-    // We try to match the current store design to a preset ID if possible, 
-    // otherwise fallback to a default or keep the last selected.
-    // Since design state doesn't necessarily track "templateId" directly in a way compatible with the selector yet (except maybe themeId),
-    // we use a local or derived state.
-    
-    const handleSelect = (templateId: string) => {
-        const preset = DESIGN_PRESETS[templateId];
-        if (preset) {
-            updateDesign({
-                colorPalette: preset.colorPalette,
-                fonts: preset.fonts,
-                background: preset.background,
-                layout: preset.layout,
-                themeId: templateId 
-            });
-            toast.success(`Theme "${templateId.replace(/-/g, ' ')}" applied!`);
-        } else {
-            // Fallback for templates not yet mapped perfectly
-            toast.info("This theme variation is coming soon!");
-        }
-    };
+    // This panel is currently redundant as all design controls are in the "Global Design" tab 
+    // of the Properties Panel on the right. 
+    // We can either deprecate this panel or use it for something else.
+    // For now, let's show a helpful message pointing to the right panel.
 
     return (
-        <div className="space-y-4">
-            <div className="px-1">
-                 <h3 className="text-sm font-bold text-slate-800 mb-1">Visual Themes</h3>
-                 <p className="text-xs text-slate-500 mb-4">Choose a style for your carousel.</p>
+        <div className="p-8 text-center space-y-4">
+            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="m9 18 6-6-6-6"/></svg>
             </div>
-            
-            <TemplateSelector 
-                selectedTemplateId={project.design.themeId || 'minimalist-pro-accent'}
-                onSelect={handleSelect}
-                variant="embedded"
-            />
+            <h3 className="text-sm font-bold text-slate-800">Design Settings</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+                Use the <strong>Global Design</strong> tab in the right sidebar to customize colors, fonts, and patterns for your carousel.
+            </p>
         </div>
     );
 };

@@ -1,6 +1,9 @@
-export type SlideType = 'intro' | 'content' | 'outro' | 'image' | 'poll';
+export type SlideType = 'intro' | 'content' | 'outro';
 export type AspectRatio = '1:1' | '4:5' | '9:16';
 export type Platform = 'linkedin' | 'instagram' | 'tiktok' | 'twitter';
+
+export type PatternType = 'dots' | 'grid' | 'waves' | 'none' | 'noise' | 'checkers' | 'horizontal-lines' | 'half-tone' | 'leaves';
+export type LayoutVariant = 'default' | 'big-number' | 'quote' | 'checklist' | 'comparison' | 'code' | 'image-full';
 
 export interface SlideContent {
   title?: string;
@@ -8,19 +11,20 @@ export interface SlideContent {
   body?: string; // Main text / bullet points
   image_url?: string;
   cta_text?: string;
+  visual_hint?: string; // Suggestion for icon/graphic
   background_override?: string;
-  variant?: 'default' | 'tweet' | 'quote' | 'image-full' | 'big-number' | 'checklist' | 'code' | 'comparison';
 }
 
 export interface SlideDesignOverride {
   backgroundColor?: string;
   textColor?: string;
-  layoutId?: string;
+  layoutVariant?: LayoutVariant;
 }
 
 export interface CarouselSlide {
   id: string;
   type: SlideType;
+  layoutVariant: LayoutVariant; // Explicit layout choice
   content: SlideContent;
   designOverride?: SlideDesignOverride;
   isVisible: boolean;
@@ -43,7 +47,7 @@ export interface CarouselDesign {
   background: {
     type: 'solid' | 'gradient' | 'image' | 'pattern';
     value: string; // Hex, URL, or Gradient CSS
-    patternType?: 'dots' | 'grid' | 'waves' | 'none';
+    patternType?: PatternType;
     patternOpacity?: number;
     patternColor?: string;
   };
@@ -51,7 +55,7 @@ export interface CarouselDesign {
     showSteppers: boolean; // Page numbers
     showSwipeIndicator: boolean;
     showCreatorProfile: boolean;
-    cornerRadius: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+    cornerRadius: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
   };
 }
 

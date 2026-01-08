@@ -14,10 +14,10 @@ import { translations } from '@/translations';
 import { supabase } from '@/services/supabaseClient';
 import { toast } from 'sonner';
 import { PredictiveModal, EngagementPrediction } from './PredictiveModal';
-import { Sparkles, Loader2, Image as ImageIcon, X, Upload } from 'lucide-react';
+import { Sparkles, Loader2, Image as ImageIcon, X, Upload, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
+import { Slider } from '../../../ui/slider';
 
 import { ImageSelector } from './ImageSelector';
 
@@ -208,7 +208,7 @@ export const PropertiesPanel = () => {
                                         <button 
                                             onClick={() => {
                                                 if (globalThis.confirm(t.properties.deleteConfirm)) {
-                                                    useCarouselStore.getState().deleteSlide(activeSlide.id);
+                                                    useCarouselStore.getState().removeSlide(activeSlide.id);
                                                 }
                                             }}
                                             className="text-red-500 hover:text-red-600 transition-colors p-1"
@@ -248,11 +248,11 @@ export const PropertiesPanel = () => {
                                         )}
 
                                         {activeSlide.type === 'outro' && (
-                                             <div className="space-y-1.5">
+                                            <div className="space-y-1.5">
                                                 <Label className="text-[10px] font-bold text-slate-500 uppercase">CTA</Label>
                                                 <Input 
-                                                    value={activeSlide.content.cta}
-                                                    onChange={(e) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, cta: e.target.value } })}
+                                                    value={activeSlide.content.cta_text}
+                                                    onChange={(e) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, cta_text: e.target.value } })}
                                                     className="h-9 text-sm"
                                                 />
                                             </div>
@@ -267,21 +267,33 @@ export const PropertiesPanel = () => {
                                         </div>
                                         <div className="space-y-3">
                                             <Label className="text-xs text-slate-500">Slide Layout</Label>
-                                            <Select 
-                                                value={activeSlide.content.variant || 'default'} 
-                                                onValueChange={(val) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, variant: val as any } })}
-                                            >
-                                                <SelectTrigger className="h-9 bg-white">
-                                                    <SelectValue placeholder="Select a layout" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="default">Default</SelectItem>
-                                                    <SelectItem value="image-left">Image Left</SelectItem>
-                                                    <SelectItem value="image-right">Image Right</SelectItem>
-                                                    <SelectItem value="image-top">Image Top</SelectItem>
-                                                    <SelectItem value="image-bottom">Image Bottom</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {[
+                                                { id: 'default', label: 'Default', icon: <Layout className="w-4 h-4" /> },
+                                                { id: 'image-full', label: 'Full Img', icon: <ImageIcon className="w-4 h-4" /> },
+                                                { id: 'quote', label: 'Quote', icon: <div className="text-[10px] font-serif font-bold">""</div> },
+                                                { id: 'big-number', label: 'Number', icon: <span className="text-[10px] font-bold">#1</span> },
+                                                { id: 'checklist', label: 'List', icon: <CheckCircle className="w-4 h-4" /> },
+                                                { id: 'comparison', label: 'Compare', icon: <div className="flex text-[8px] gap-0.5"><div className="w-2 h-3 bg-slate-300"/><div className="w-2 h-3 bg-brand-500"/></div> },
+                                                { id: 'code', label: 'Code', icon: <div className="font-mono text-[8px]">&lt;/&gt;</div> },
+                                            ].map((layout) => (
+                                                <button
+                                                    key={layout.id}
+                                                    onClick={() => updateSlide(activeSlide.id, { layoutVariant: layout.id as any })}
+                                                    className={cn(
+                                                        "flex flex-col items-center justify-center p-2 rounded-lg border transition-all h-20 gap-2",
+                                                        activeSlide.layoutVariant === layout.id 
+                                                            ? "bg-brand-50 border-brand-500 text-brand-700 ring-1 ring-brand-500 shadow-sm"
+                                                            : "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+                                                    )}
+                                                >
+                                                    <div className={cn("p-1.5 rounded-md", activeSlide.layoutVariant === layout.id ? "bg-white shadow-sm" : "bg-slate-100")}>
+                                                        {layout.icon}
+                                                    </div>
+                                                    <span className="text-[10px] font-medium">{layout.label}</span>
+                                                </button>
+                                            ))}
+                                        </div>
                                         </div>
                                     </div>
 
@@ -295,12 +307,12 @@ export const PropertiesPanel = () => {
                                             <Label className="text-xs text-slate-500">Image URL</Label>
                                             <div className="flex gap-2">
                                                 <Input 
-                                                    value={activeSlide.content.imageUrl || ''}
-                                                    onChange={(e) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, imageUrl: e.target.value } })}
+                                                    value={activeSlide.content.image_url || ''}
+                                                    onChange={(e) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, image_url: e.target.value } })}
                                                     className="h-9 text-sm flex-1"
                                                 />
                                                 <ImageSelector 
-                                                    onSelect={(url) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, imageUrl: url } })}
+                                                    onSelect={(url) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, image_url: url } })}
                                                     trigger={
                                                         <Button variant="outline" size="sm" className="h-9 px-2">
                                                             <Upload className="w-3.5 h-3.5" />
@@ -442,7 +454,7 @@ export const PropertiesPanel = () => {
                                          </div>
                                      </div>
 
-                                     {design.background.pattern !== 'none' && (
+                                     {design.background.patternType !== 'none' && (
                                          <div className="space-y-4 pt-2 border-t border-slate-200/50">
                                              <div className="space-y-2">
                                                  <div className="flex justify-between items-center">

@@ -602,7 +602,8 @@ export const es = {
         addSlide: "Añadir Slide",
         intro: "Intro",
         content: "Contenido",
-        outro: "Outro"
+        outro: "Outro",
+        brandNamePrompt: "Ingresa un nombre para tu Kit de Marca:"
       },
       export: {
         download: "Descargar PDF",

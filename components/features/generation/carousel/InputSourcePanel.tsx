@@ -128,9 +128,9 @@ export const InputSourcePanel = () => {
                     disabled={isGenerating || !topic.trim()}
                     className="w-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg shadow-brand-500/20"
                   >
-                     {isGenerating ? (
+                      {isGenerating ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating... (~15s)
                         </>
                      ) : (
                         <>
@@ -162,7 +162,7 @@ export const InputSourcePanel = () => {
                     className="w-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg shadow-brand-500/20"
                   >
                      {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                     Convert Article
+                     {isGenerating ? 'Converting... (~20s)' : 'Convert Article'}
                   </Button>
                </div>
             </TabsContent>
@@ -188,7 +188,7 @@ export const InputSourcePanel = () => {
                     className="w-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg shadow-brand-500/20"
                   >
                      {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                     Turn Video → Carousel
+                     {isGenerating ? 'Analyzing... (~30s)' : 'Turn Video → Carousel'}
                   </Button>
                </div>
             </TabsContent>
@@ -234,7 +234,8 @@ export const InputSourcePanel = () => {
                     className="w-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg shadow-brand-500/20"
                   >
                      {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                     Extract & Build
+                     {isGenerating ? 'Extracting... (~20s)' : 'Extract & Build'}
+
                   </Button>
                </div>
             </TabsContent>
