@@ -149,7 +149,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     const setLanguage = (lang: AppLanguage) => {
-        setProfile(prev => ({ ...prev, language: lang }));
+        // Enforce Spanish strictly. Ignore incoming lang changes to 'en'.
+        setProfile(prev => ({ ...prev, language: 'es' }));
     };
 
     // Construct the merged user object for backward compatibility

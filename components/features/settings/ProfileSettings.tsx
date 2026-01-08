@@ -72,7 +72,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
                 
                 <div className="text-center md:text-left space-y-2">
                     <h3 className="text-base font-bold text-slate-900">{t.uploadPhoto}</h3>
-                    <p className="text-sm text-slate-500 max-w-xs">{language === 'es' ? 'Una foto profesional ayuda a que tu contenido resuene más.' : 'A professional photo helps your content resonate more.'}</p>
+                    <p className="text-sm text-slate-500 max-w-xs">{language === 'es' ? 'Una foto profesional ayuda a que tu contenido resuene más.' : 'Una foto profesional ayuda a que tu contenido resuene más.'}</p>
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider italic">Recomendado: 400x400 px • JPG/PNG/WebP</p>
                 </div>
             </section>
@@ -81,7 +81,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
             <section className="space-y-6">
                 <div className="flex items-center gap-2 mb-4">
                     <div className="w-1.5 h-6 bg-brand-500 rounded-full"></div>
-                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">{language === 'es' ? 'Información General' : 'General Information'}</h3>
+                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">{language === 'es' ? 'Información General' : 'Información General'}</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
@@ -158,38 +158,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, language, setLa
                 </div>
             </section>
 
-            {/* Application Preferences */}
-            <section className="pt-8 border-t border-slate-100 space-y-6">
-                <div className="flex items-center gap-2 mb-4">
-                    <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div>
-                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">{t.generalPrefs}</h3>
-                </div>
 
-                <div className="bg-slate-50/50 border border-slate-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 transition-colors hover:bg-white">
-                    <div className="space-y-1">
-                        <p className="font-bold text-slate-900 flex items-center gap-2">
-                            {t.languageLabel}
-                            <Tooltip>{t.languageTooltip}</Tooltip>
-                        </p>
-                        <p className="text-xs text-slate-500">{t.languageDesc}</p>
-                    </div>
-                    
-                    <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner w-full md:w-auto">
-                        <button
-                            onClick={() => setLanguage('en')}
-                            className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${language === 'en' ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/50' : 'text-slate-500 hover:text-slate-700'}`}
-                        >
-                            🇺🇸 English
-                        </button>
-                        <button
-                            onClick={() => setLanguage('es')}
-                            className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${language === 'es' ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/50' : 'text-slate-500 hover:text-slate-700'}`}
-                        >
-                            🇪🇸 Español
-                        </button>
-                    </div>
-                </div>
-            </section>
         </div>
     );
 };
