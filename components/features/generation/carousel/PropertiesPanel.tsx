@@ -14,6 +14,7 @@ import { translations } from '@/translations';
 import { supabase } from '@/services/supabaseClient';
 import { toast } from 'sonner';
 import { PredictiveModal, EngagementPrediction } from './PredictiveModal';
+import { PolishReviewDialog } from './PolishReviewDialog';
 import { Sparkles, Loader2, Image as ImageIcon, X, Upload, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -55,6 +56,10 @@ export const PropertiesPanel = () => {
   const [predictionData, setPredictionData] = React.useState<EngagementPrediction | null>(null);
   const [isPredicting, setIsPredicting] = React.useState(false);
   const [isPolishing, setIsPolishing] = React.useState(false);
+  
+  // Polish Review State
+  const [isPolishReviewOpen, setIsPolishReviewOpen] = React.useState(false);
+  const [polishedData, setPolishedData] = React.useState<Partial<typeof activeSlide.content> | null>(null);
 
   const handlePolishSlide = async () => {
       if (!activeSlide) return;
@@ -72,15 +77,12 @@ export const PropertiesPanel = () => {
           if (error) throw error;
           
           if (data) {
-              updateSlide(activeSlide.id, {
-                  content: {
-                      ...activeSlide.content,
-                      title: data.title || activeSlide.content.title,
-                      body: data.body || activeSlide.content.body,
-                      subtitle: data.subtitle || activeSlide.content.subtitle
-                  }
+              setPolishedData({
+                  title: data.title,
+                  body: data.body,
+                  subtitle: data.subtitle
               });
-              toast.success("Slide polished!");
+              setIsPolishReviewOpen(true);
           }
       } catch (error: any) {
           console.error("Polish failed:", error);
@@ -88,6 +90,21 @@ export const PropertiesPanel = () => {
       } finally {
           setIsPolishing(false);
       }
+  };
+
+  const applyPolish = () => {
+      if (!activeSlide || !polishedData) return;
+      
+      updateSlide(activeSlide.id, {
+          content: {
+              ...activeSlide.content,
+              title: polishedData.title || activeSlide.content.title,
+              body: polishedData.body || activeSlide.content.body,
+              subtitle: polishedData.subtitle || activeSlide.content.subtitle
+          }
+      });
+      toast.success("Slide polished successfully!");
+      setPolishedData(null);
   };
 
   const handlePredictPerformance = async () => {
@@ -579,6 +596,16 @@ export const PropertiesPanel = () => {
         isLoading={isPredicting}
         data={predictionData}
       />
+      
+      {activeSlide && (
+        <PolishReviewDialog 
+            isOpen={isPolishReviewOpen}
+            onClose={() => setIsPolishReviewOpen(false)}
+            originalContent={activeSlide.content}
+            polishedContent={polishedData || {}}
+            onConfirm={applyPolish}
+        />
+      )}
     </div>
   );
 };

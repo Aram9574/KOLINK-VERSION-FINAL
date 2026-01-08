@@ -24,6 +24,7 @@ interface CarouselStore {
   removeSlide: (id: string) => void;
   updateSlide: (id: string, updates: Partial<CarouselSlide> | Partial<CarouselSlide['content']>) => void;
   reorderSlides: (startIndex: number, endIndex: number) => void;
+  setSlides: (slides: CarouselSlide[]) => void;
   setActiveSlide: (id: string) => void;
 
   // Design Actions
@@ -191,6 +192,9 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
       slides.splice(endIndex, 0, removed);
       return { project: { ...state.project, slides } };
     }),
+
+  setSlides: (slides) =>
+    set((state) => ({ project: { ...state.project, slides } })),
 
   setActiveSlide: (id) =>
     set((state) => ({ editor: { ...state.editor, activeSlideId: id } })),

@@ -64,12 +64,36 @@ export const PredictiveModal: React.FC<PredictiveModalProps> = ({ isOpen, onClos
 
           <div className="overflow-y-auto p-6 scroll-smooth">
             {isLoading ? (
-               <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                   <div className="relative w-16 h-16">
-                       <div className="absolute inset-0 border-4 border-slate-100 rounded-full" />
-                       <div className="absolute inset-0 border-4 border-brand-500 rounded-full border-t-transparent animate-spin" />
+               <div className="space-y-8 animate-pulse">
+                   {/* Score Section Skeleton */}
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                       <div className="col-span-1 bg-slate-100 rounded-xl h-40"></div>
+                       <div className="col-span-2 grid grid-cols-2 gap-4">
+                           <div className="bg-slate-100 rounded-xl h-40"></div>
+                           <div className="bg-slate-100 rounded-xl h-40"></div>
+                       </div>
                    </div>
-                   <p className="text-slate-500 font-medium animate-pulse">{t.analyzing}</p>
+
+                   {/* Tips Skeleton */}
+                   <div className="space-y-3">
+                       <div className="h-4 bg-slate-100 w-32 rounded"></div>
+                       <div className="space-y-2">
+                           <div className="h-12 bg-slate-100 rounded-lg"></div>
+                           <div className="h-12 bg-slate-100 rounded-lg"></div>
+                           <div className="h-12 bg-slate-100 rounded-lg"></div>
+                       </div>
+                   </div>
+
+                   {/* Hook Skeleton */}
+                   <div className="space-y-3">
+                        <div className="h-4 bg-slate-100 w-32 rounded"></div>
+                        <div className="h-24 bg-slate-100 rounded-xl"></div>
+                   </div>
+                   
+                   <div className="flex items-center justify-center gap-2 text-slate-400 text-sm mt-8">
+                        <Sparkles className="w-4 h-4 animate-spin" />
+                        <span>{t.analyzing}</span>
+                   </div>
                </div>
             ) : data ? (
                <div className="space-y-8">

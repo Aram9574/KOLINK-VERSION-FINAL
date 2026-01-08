@@ -24,23 +24,50 @@ export interface GeneratedPostResult {
 }
 
 export const generateViralPost = async (params: GenerationParams, user: UserProfile): Promise<GeneratedPostResult> => {
-  // Llamada segura al backend (Supabase Edge Function)
-  const session = await supabase.auth.getSession();
-  console.log("[DEBUG CLIENT] Target Function URL:", `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-viral-post`);
-  console.log("[DEBUG CLIENT] Token being sent:", session.data.session?.access_token?.substring(0, 15) + "...");
+  // 1. Get current session
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
   
+  if (sessionError || !session) {
+    console.error("[GEMINI SERVICE] No active session found.", sessionError);
+    throw new Error("User not authenticated. Please log in again.");
+  }
+
+  // 2. Prepare headers explicitly
+  const token = session.access_token;
+  console.log("[DEBUG CLIENT] Target Function URL:", `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-viral-post`);
+  console.log("[DEBUG CLIENT] Token being sent manually:", token.substring(0, 15) + "...");
+
+  // 3. Invoke with explicit Authorization header
   const { data, error } = await supabase.functions.invoke('generate-viral-post', {
-    body: { params }
+    body: { params },
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
   });
 
   if (error) {
+    console.error("[GEMINI SERVICE] Invocation Error:", error);
+    if (error instanceof Error && error.message.includes("401")) {
+         throw new Error("Session expired. Please refresh the page and try again.");
+    }
     if (error.status === 406) {
       console.error("Server API returned 406 Not Acceptable. This usually means the function crashed or returned invalid content types.");
       throw new Error("Server configuration error (406). Please try again or contact support.");
     }
-    throw new Error(error.message);
+    // Handle specific Supabase Function non-200 responses wrapped in error
+    try {
+        // sometimes error is a blob or complex object
+        const text = await (error.context?.json?.() || Promise.resolve(JSON.stringify(error)));
+        console.error("Detailed Error Context:", text);
+    } catch(e) { /* ignore */ }
+    
+    throw new Error(error.message || "Failed to connect to generation service.");
   }
-  if (data.error) throw new Error(`Backend Error: ${data.error}`);
+
+  if (data?.error) {
+       console.error("[GEMINI SERVICE] Backend Logic Error:", data.error);
+       throw new Error(`Generation Failed: ${data.details || data.error}`);
+  }
 
   return {
     id: data.id,

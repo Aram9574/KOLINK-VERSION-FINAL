@@ -96,6 +96,110 @@ export interface EngagementPrediction {
 export class ContentService extends BaseAIService {
   
   /**
+   * Generates a Viral LinkedIn Post.
+   */
+  async generatePost(
+    params: GenerationParams,
+    userContext: UserProfileContext
+  ): Promise<GeneratedPost> {
+    const frameworkInstruction = getFrameworkInstructions(params.framework);
+    const emojiInstruction = getEmojiInstructions(params.emojiDensity);
+    const lengthInstruction = getLengthInstructions(params.length);
+    
+    // Build context strings
+    const behaviorContext = userContext.behavioral_dna 
+        ? `\nBEHAVIORAL DNA:\n${userContext.behavioral_dna}` 
+        : "";
+        
+    const voiceContext = userContext.brand_voice
+        ? `\nBRAND VOICE:\n${userContext.brand_voice}`
+        : "";
+
+    const userProfileFull = `
+    INDUSTRY: ${userContext.industry || "General"}
+    EXPERTISE: ${userContext.xp || 0} XP
+    HEADLINE: ${userContext.headline || ""}
+    ${voiceContext}
+    ${behaviorContext}
+    `;
+
+    const prompt = `
+      ${PostGeneratorBrain.system_instruction}
+
+      ### USER INPUT & CONTEXT
+      TOPIC: ${params.topic}
+      TARGET AUDIENCE: ${params.audience}
+      
+      ### CONFIGURATION (STRICT)
+      FRAMEWORK: ${params.framework} -> ${frameworkInstruction}
+      TONE: ${params.tone}
+      EMOJI DENSITY: ${params.emojiDensity} -> ${emojiInstruction}
+      LENGTH: ${params.length} -> ${lengthInstruction}
+      CREATIVITY: ${params.creativityLevel}/10
+      HASHTAGS: ${params.hashtagCount}
+      CTA: ${params.includeCTA ? "Must include a Call to Conversation" : "No CTA"}
+      LANGUAGE: ${params.outputLanguage || "es"}
+      
+      ### AUTHOR CONTEXT
+      ${userProfileFull}
+    `;
+
+    return await this.retryWithBackoff(async () => {
+      const model = this.genAI.getGenerativeModel({
+        model: this.model,
+      });
+
+      const result = await model.generateContent({
+        // @ts-ignore: Google Generative AI types might be strict
+        // deno-lint-ignore no-explicit-any
+        contents: [{ role: "user", parts: [{ text: prompt }] as any }],
+        generationConfig: {
+          temperature: 0.7,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: SchemaType.OBJECT,
+            properties: {
+              post_content: { type: SchemaType.STRING },
+              auditor_report: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  viral_score: { type: SchemaType.INTEGER },
+                  hook_strength: { type: SchemaType.STRING },
+                  hook_score: { type: SchemaType.INTEGER },
+                  readability_score: { type: SchemaType.INTEGER },
+                  value_score: { type: SchemaType.INTEGER },
+                  pro_tip: { type: SchemaType.STRING },
+                  retention_estimate: { type: SchemaType.STRING },
+                  flags_triggered: { 
+                    type: SchemaType.ARRAY,
+                    items: { type: SchemaType.STRING }
+                  }
+                },
+                required: ["viral_score", "hook_strength", "hook_score", "readability_score", "value_score", "pro_tip", "retention_estimate", "flags_triggered"]
+              },
+              strategy_reasoning: { type: SchemaType.STRING },
+              meta: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  suggested_hashtags: { 
+                    type: SchemaType.ARRAY,
+                    items: { type: SchemaType.STRING }
+                  },
+                  character_count: { type: SchemaType.INTEGER }
+                },
+                required: ["suggested_hashtags", "character_count"]
+              }
+            },
+            required: ["post_content", "auditor_report", "strategy_reasoning", "meta"]
+          } as Schema,
+        },
+      });
+
+      return this.extractJson(result.response.text()) as unknown as GeneratedPost;
+    });
+  }
+  
+  /**
    * Generates a LinkedIn Carousel JSON.
    */
   async generateCarousel(

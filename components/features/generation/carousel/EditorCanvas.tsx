@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SlideRenderer } from './SlideRenderer';
 import { useCarouselStore } from '@/lib/store/useCarouselStore';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,8 @@ import {
     ChevronLeft,
     ChevronRight,
     Repeat,
-    XCircle
+    XCircle,
+    Scan
 } from 'lucide-react';
 import { FullscreenPreview } from './FullscreenPreview';
 import { cn } from '@/lib/utils';
@@ -44,6 +45,29 @@ export const EditorCanvas = () => {
       setShowResetDialog(true);
   };
 
+  // Keyboard Navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+        // Ignore if typing in an input
+        if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+        const currentIndex = slides.findIndex(s => s.id === activeSlideId);
+        
+        if (e.key === 'ArrowRight') {
+            if (currentIndex < slides.length - 1) {
+                setActiveSlide(slides[currentIndex + 1].id);
+            }
+        } else if (e.key === 'ArrowLeft') {
+            if (currentIndex > 0) {
+                setActiveSlide(slides[currentIndex - 1].id);
+            }
+        }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [slides, activeSlideId, setActiveSlide]);
+
   // Calculate base width/height for the slide container based on zoom
   const baseWidth = design.aspectRatio === '4:5' ? 1080 : design.aspectRatio === '9:16' ? 1080 : 1080;
   const baseHeight = design.aspectRatio === '4:5' ? 1350 : design.aspectRatio === '9:16' ? 1920 : 1080;
@@ -74,12 +98,15 @@ export const EditorCanvas = () => {
         </div>
 
         <div className="flex items-center gap-2">
-           <Button variant="ghost" size="icon" onClick={() => setZoom(Math.max(0.2, zoomLevel - 0.1))}>
+           <Button variant="ghost" size="icon" onClick={() => setZoom(Math.max(0.2, zoomLevel - 0.1))} title="Zoom Out">
              <ZoomOut className="w-4 h-4" />
            </Button>
            <span className="text-xs font-mono w-12 text-center">{Math.round(zoomLevel * 100)}%</span>
-           <Button variant="ghost" size="icon" onClick={() => setZoom(Math.min(3, zoomLevel + 0.1))}>
+           <Button variant="ghost" size="icon" onClick={() => setZoom(Math.min(3, zoomLevel + 0.1))} title="Zoom In">
              <ZoomIn className="w-4 h-4" />
+           </Button>
+           <Button variant="ghost" size="icon" onClick={() => setZoom(1)} title="Fit to Screen">
+             <Scan className="w-4 h-4" />
            </Button>
            
            <div className="w-px h-4 bg-slate-300 mx-2" />
