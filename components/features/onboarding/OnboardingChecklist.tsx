@@ -15,13 +15,13 @@ import { cn } from '../../../lib/utils';
 interface OnboardingChecklistProps {
     user: UserProfile;
     onSelectTool: (tab: AppTab) => void;
-    onInferenciaClick: () => void;
+    onCarouselStudioClick: () => void;
 }
 
 export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({ 
     user, 
     onSelectTool,
-    onInferenciaClick 
+    onCarouselStudioClick 
 }) => {
     // Determine completion statuses
     const hasBrandVoice = !!user.brandVoice;
@@ -57,7 +57,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
             color: "text-brand-500",
             bg: "bg-brand-50",
             completed: false, // Could track via user metadata if needed
-            onClick: onInferenciaClick
+            onClick: onCarouselStudioClick
         }
     ];
 

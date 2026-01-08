@@ -41,7 +41,6 @@ const TermsOfService = lazy(() =>
 );
 const CookiesPage = lazy(() => import("./components/landing/CookiesPage"));
 const AuthCallback = lazy(() => import("./components/features/auth/AuthCallback"));
-const InferenciaStudio = lazy(() => import("./components/features/inferencia/InferenciaStudio"));
 const InfiniteGridDemo = lazy(() => import("./demo"));
 const CookieConsent = lazy(() => import("./components/features/compliance/CookieConsent"));
 
@@ -137,10 +136,10 @@ const App: React.FC = () => {
                     }
                 />
                 <Route
-                    path="/inferencia"
+                    path="/carousel-studio"
                     element={
                         <ProtectedRoute>
-                            <InferenciaStudio />
+                            <CarouselStudio />
                         </ProtectedRoute>
                     }
                 />

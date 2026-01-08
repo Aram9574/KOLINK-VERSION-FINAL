@@ -16,10 +16,20 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { source, sourceType = "text", tone, audience, language = "es" } = await req.json();
+    const { 
+        source, 
+        sourceType = "text", 
+        tone, 
+        audience, 
+        language = "es",
+        action = "generate", // Default action
+        slide, // Required for refine
+        instruction // Optional for refine
+    } = await req.json();
+    
     const apiKey = Deno.env.get("GEMINI_API_KEY")!;
 
-    if (!source || !apiKey) throw new Error("Missing source or API key");
+    if ((action === "generate" && !source) || !apiKey) throw new Error("Missing source or API key");
 
     // 1. Auth & User Context
     const authHeader = req.headers.get("Authorization");
@@ -71,19 +81,40 @@ Deno.serve(async (req) => {
     
     const contentService = new ContentService(apiKey);
     
+    // --- ACTION: REFINE SLIDE ---
+    if (action === "refine") {
+        console.log(`[CarouselFunc] Refining slide of type: ${slide.type}`);
+        const refinedSlide = await contentService.refineSlide(slide, instruction, language);
+        
+        // DEDUCT CREDIT (Refining costs 1 credit for now)
+        if (userContext.user_id) {
+            const supabaseAdmin = createClient(
+                Deno.env.get("SUPABASE_URL") ?? "",
+                Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+            );
+            const creditService = new CreditService(supabaseAdmin, createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? ""));
+            await creditService.deductCredit(userContext.user_id);
+        }
+
+        return new Response(
+            JSON.stringify({ slide: refinedSlide }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+    }
+
+    // --- ACTION: GENERATE CAROUSEL (Default) ---
+    console.log(`[CarouselFunc] Generating full carousel for source type: ${sourceType}`);
+    
     // Include tone and audience in style fragments for better context
     const styleFragments = [];
     if (tone) styleFragments.push(`Tone: ${tone}`);
     if (audience) styleFragments.push(`Target Audience: ${audience}`);
 
     let finalInputSource = source;
-    // Only truncate and label if it's raw text. 
-    // If it's a URL or YouTube ID, we need the full string as is.
     if (sourceType === 'text' || sourceType === 'topic') {
         finalInputSource = `[RAW TEXT]: ${source.substring(0, 15000)}`;
     }
     
-    // Explicitly type the result from service
     const generatedContent: CarouselGenerationResult = await contentService.generateCarousel(
       finalInputSource, 
       sourceType, 
@@ -92,10 +123,6 @@ Deno.serve(async (req) => {
       userContext
     );
 
-    // MAP TO FRONTEND CarouselData INTERFACE
-    // interface Slide { number: number; title: string; content: string; }
-    // interface CarouselData { carousel_config: { slides_count: number; tone: string; analysis: string }; slides: Slide[]; }
-    
     const responseData = {
       carousel_config: {
         slides_count: generatedContent.slides.length,
@@ -119,9 +146,6 @@ Deno.serve(async (req) => {
     // DEDUCT CREDIT IF SUCCESSFUL
     if (userContext.user_id) {
         try {
-             // Re-instantiate admin client if needed, or reuse from scope if we refactored to keep it. 
-             // Since scope is closed above, we need to create it again or move declaration up. 
-             // To be safe and clean, I will recreate it cheaply here.
              const supabaseAdmin = createClient(
                 Deno.env.get("SUPABASE_URL") ?? "",
                 Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
@@ -131,7 +155,6 @@ Deno.serve(async (req) => {
              console.log(`[CarouselFunc] Credit deducted for user ${userContext.user_id}`);
         } catch (e) {
             console.error("[CarouselFunc] Failed to deduct credit:", e);
-            // Don't fail the response, just log it. Admin can reconcile later.
         }
     }
 

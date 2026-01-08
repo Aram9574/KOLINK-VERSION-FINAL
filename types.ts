@@ -123,7 +123,7 @@ export type AppTab =
   | "voice-lab"
   | "audit"
   | "insight-responder"
-  | "inferencia";
+
 
 export interface AutoPilotConfig {
   enabled: boolean;

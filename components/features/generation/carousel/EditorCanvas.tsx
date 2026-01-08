@@ -1,12 +1,25 @@
-import React, { useState } from 'react'; // Added useState
+import React, { useState } from 'react';
 import { SlideRenderer } from './SlideRenderer';
 import { useCarouselStore } from '@/lib/store/useCarouselStore';
 import { Button } from '@/components/ui/button';
-import { ZoomIn, ZoomOut, Download, Maximize } from 'lucide-react'; // Added Maximize
-import { FullscreenPreview } from './FullscreenPreview'; // Imported
+import { 
+    ZoomIn, 
+    ZoomOut, 
+    Download, 
+    Maximize,
+    ChevronLeft,
+    ChevronRight,
+    Repeat,
+    XCircle
+} from 'lucide-react';
+import { FullscreenPreview } from './FullscreenPreview';
+import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
+import { exportToPDF } from '@/lib/utils/export';
+import { toast } from 'sonner';
 
 export const EditorCanvas = () => {
-  const { slides, design } = useCarouselStore(state => state.project);
+  const { slides, design, author } = useCarouselStore(state => state.project);
   const { activeSlideId, zoomLevel } = useCarouselStore(state => state.editor);
   const { setZoom, setActiveSlide } = useCarouselStore(state => state);
 
@@ -53,7 +66,16 @@ export const EditorCanvas = () => {
 
            <div className="w-px h-4 bg-slate-300 mx-2" />
            
-           <Button className="bg-slate-900 text-white hover:bg-slate-800 h-8 text-xs gap-2">
+           <Button 
+               className="bg-slate-900 text-white hover:bg-slate-800 h-8 text-xs gap-2"
+               onClick={() => {
+                   toast.loading("Generating PDF...");
+                   // Give UI a moment to show toast
+                   setTimeout(() => {
+                       exportToPDF(slides.map(s => s.id), "carousel_export");
+                   }, 100);
+               }}
+            >
              <Download className="w-3 h-3" /> Export
            </Button>
         </div>
@@ -62,32 +84,96 @@ export const EditorCanvas = () => {
       {/* Main Scrollable Canvas */}
       <div className="flex-1 overflow-auto flex items-center justify-start p-20 custom-scrollbar">
          <div className="flex gap-12 px-20">
-            {slides.map((slide, index) => (
-               <div 
-                 key={slide.id} 
-                 className="relative group transition-transform duration-300"
-                 style={{ 
-                    width: baseWidth * visualScale, 
-                    height: baseHeight * visualScale,
-                 }}
-                 onClick={() => setActiveSlide(slide.id)}
-               >
-                 {/* Visual Wrapper for scaling */}
-                 <div style={{ transform: `scale(${visualScale})`, transformOrigin: 'top left' }}>
-                    <SlideRenderer 
-                        slide={slide} 
-                        design={design} 
-                        isActive={activeSlideId === slide.id}
-                    />
-                 </div>
+            <AnimatePresence mode="popLayout">
+             {slides.map((slide, index) => (
+                <motion.div 
+                  key={slide.id} 
+                  layout
+                  initial={{ opacity: 0, scale: 0.9, x: -20 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  className="relative group cursor-pointer flex-shrink-0"
+                  style={{ 
+                     width: baseWidth * visualScale, 
+                     height: baseHeight * visualScale,
+                  }}
+                  onClick={() => setActiveSlide(slide.id)}
+                >
+                  {/* Visual Wrapper for scaling */}
+                  <div 
+                     data-slide-id={slide.id}
+                     className={cn(
+                         "rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 bg-white", 
+                         activeSlideId === slide.id ? "ring-[8px] ring-brand-500 ring-offset-8" : "ring-1 ring-slate-200"
+                     )}
+                     style={{ 
+                         width: baseWidth,
+                         height: baseHeight,
+                         transform: `scale(${visualScale})`, 
+                         transformOrigin: 'top left',
+                         // Remove pointerEvents: 'none' for interactions if needed, kept for now to avoid dragging issues in canvas
+                         pointerEvents: 'none'
+                     }}
+                  >
+                     <SlideRenderer 
+                         slide={slide} 
+                         design={design} 
+                         author={author}
+                         isActive={activeSlideId === slide.id}
+                     />
+                  </div>
                  
-                 {/* Slide Index Badge */}
-                 <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-sm text-xs font-bold text-slate-400 border border-slate-200">
-                    {index + 1}
+                 {/* Quick Actions Overlay (Appears on Hover) */}
+                 <div className="absolute -top-12 left-0 right-0 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                    <div className="flex gap-1 pointer-events-auto">
+                        <Button 
+                            variant="secondary" 
+                            size="icon" 
+                            className="h-8 w-8 rounded-full shadow-md bg-white border-slate-200"
+                            disabled={index === 0}
+                            onClick={(e) => { e.stopPropagation(); useCarouselStore.getState().reorderSlides(index, index - 1); }}
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                            variant="secondary" 
+                            size="icon" 
+                            className="h-8 w-8 rounded-full shadow-md bg-white border-slate-200"
+                            disabled={index === slides.length - 1}
+                            onClick={(e) => { e.stopPropagation(); useCarouselStore.getState().reorderSlides(index, index + 1); }}
+                        >
+                            <ChevronRight className="w-4 h-4" />
+                        </Button>
+                    </div>
+
+                    <div className="flex gap-1 pointer-events-auto">
+                        <Button 
+                            variant="secondary" 
+                            size="icon" 
+                            className="h-8 w-8 rounded-full shadow-md bg-white border-slate-200 hover:text-brand-500"
+                            onClick={(e) => { e.stopPropagation(); useCarouselStore.getState().addSlide(slide.type, index + 1); }}
+                        >
+                            <Repeat className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                            variant="secondary" 
+                            size="icon" 
+                            className="h-8 w-8 rounded-full shadow-md bg-white border-slate-200 hover:text-red-500"
+                            onClick={(e) => { e.stopPropagation(); useCarouselStore.getState().removeSlide(slide.id); }}
+                        >
+                            <XCircle className="w-4 h-4" />
+                        </Button>
+                    </div>
                  </div>
-               </div>
+
+                 {/* Slide Index Badge */}
+                 <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-sm text-[10px] font-black text-slate-400 border border-slate-200 uppercase tracking-widest">
+                    Slide {index + 1}
+                 </div>
+               </motion.div>
             ))}
-            
+            </AnimatePresence>
             {/* Add Slide Button Placeholder */}
             <div 
                 className="w-24 flex items-center justify-center opacity-50 hover:opacity-100 cursor-pointer transition-opacity"
@@ -106,6 +192,7 @@ export const EditorCanvas = () => {
           <FullscreenPreview 
             slides={slides} 
             design={design} 
+            author={author}
             initialSlideIndex={slides.findIndex(s => s.id === activeSlideId) !== -1 ? slides.findIndex(s => s.id === activeSlideId) : 0}
             onClose={() => setIsFullscreen(false)} 
           />

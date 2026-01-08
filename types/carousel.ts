@@ -43,7 +43,9 @@ export interface CarouselDesign {
   background: {
     type: 'solid' | 'gradient' | 'image' | 'pattern';
     value: string; // Hex, URL, or Gradient CSS
+    patternType?: 'dots' | 'grid' | 'waves' | 'none';
     patternOpacity?: number;
+    patternColor?: string;
   };
   layout: {
     showSteppers: boolean; // Page numbers

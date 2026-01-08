@@ -1,6 +1,11 @@
+import { BaseAIService } from "./BaseAIService.ts";
 
-export class RepurposeService {
+export class RepurposeService extends BaseAIService {
   
+  constructor(geminiApiKey: string) {
+    super(geminiApiKey);
+  }
+
   /**
    * Fetches the transcript from a YouTube video ID.
    * Leverages the internal API found in the video page source.
@@ -99,5 +104,33 @@ export class RepurposeService {
       console.error("URL Scrape Error:", error);
       throw new Error(`Failed to scrape URL: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  /**
+   * Extracts raw text from a PDF file (Base64) using Gemini Multimodal.
+   */
+  async extractPdfText(pdfBase64: string): Promise<string> {
+    const prompt = `
+      Extract all readable text from this PDF. 
+      Focus on structured information, headers, and body content.
+      Ignore metadata or technical artifacts.
+      Return strictly the extracted text.
+    `;
+
+    return await this.retryWithBackoff(async () => {
+      const model = this.genAI.getGenerativeModel({ model: this.model });
+      const result = await model.generateContent({
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: prompt },
+              { inlineData: { data: pdfBase64, mimeType: "application/pdf" } },
+            ],
+          },
+        ],
+      });
+      return result.response.text().trim();
+    });
   }
 }

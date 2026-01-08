@@ -8,6 +8,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface FullscreenPreviewProps {
   slides: CarouselSlide[];
   design: CarouselDesign;
+  author: {
+    name: string;
+    handle: string;
+    avatarUrl?: string;
+  };
   initialSlideIndex?: number;
   onClose: () => void;
 }
@@ -15,6 +20,7 @@ interface FullscreenPreviewProps {
 export const FullscreenPreview: React.FC<FullscreenPreviewProps> = ({ 
   slides, 
   design, 
+  author,
   initialSlideIndex = 0, 
   onClose 
 }) => {
@@ -124,6 +130,7 @@ export const FullscreenPreview: React.FC<FullscreenPreviewProps> = ({
                  <SlideRenderer 
                     slide={slides[currentIndex]}
                     design={design}
+                    author={author}
                     isActive={true}
                  />
              </div>

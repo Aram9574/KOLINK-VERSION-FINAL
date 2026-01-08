@@ -38,12 +38,12 @@ import Tooltip from '../../ui/Tooltip';
 interface LaunchpadProps {
     user: UserProfile;
     onSelectTool: (tab: AppTab) => void;
-    onInferenciaClick: () => void;
+    onCarouselStudioClick: () => void;
 }
 
 const LaunchpadView: React.FC<LaunchpadProps> = ({ 
     user,
-    onInferenciaClick,
+    onCarouselStudioClick,
     onSelectTool 
 }) => {
     const { language, logout } = useUser();
@@ -85,13 +85,13 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
     const tools = [
         // ... tools definitions
         {
-            id: 'inferencia',
+            id: 'carousel',
             name: 'Estudio de Carruseles',
             description: 'Diseña carruseles virales con IA en segundos.',
             icon: Sparkles,
             color: 'from-brand-500 to-brand-600',
             bg: 'bg-brand-50/50',
-            onClick: onInferenciaClick,
+            onClick: onCarouselStudioClick,
             premium: false,
             badge: 'NUEVO'
         },
@@ -367,7 +367,7 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                         <OnboardingChecklist 
                             user={user} 
                             onSelectTool={onSelectTool} 
-                            onInferenciaClick={onInferenciaClick} 
+                            onCarouselStudioClick={onCarouselStudioClick} 
                         />
                     </div>
                 </motion.div>

@@ -3,11 +3,13 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 export class BaseAIService {
   protected genAI: GoogleGenerativeAI;
   protected model = "gemini-3-flash-preview";
+  protected geminiApiKey: string;
 
   constructor(geminiApiKey: string) {
     if (!geminiApiKey) {
       throw new Error("GEMINI_API_KEY is required");
     }
+    this.geminiApiKey = geminiApiKey;
     this.genAI = new GoogleGenerativeAI(geminiApiKey);
   }
 

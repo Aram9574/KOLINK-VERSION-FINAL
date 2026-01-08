@@ -610,11 +610,32 @@ export const es = {
       },
       ai: {
         predict: "Predecir Rendimiento",
+        predictSubtitle: "Simular la reacción de la audiencia antes de publicar.",
         analyzing: "Analizando audiencia...",
         score: "Puntuación Viral",
         feedback: "Feedback de la Audiencia",
         tips: "Micro-Optimizaciones",
-        hook: "Mejor Gancho Sugerido"
+        hook: "Mejor Gancho Sugerido",
+        polish: "Optimizar Slide",
+        polishSubtitle: "Deja que la IA optimice esta slide específica para mayor impacto.",
+        optimizeBtn: "Optimizar con IA"
+      },
+      creator: {
+        title: "Perfil del Creador",
+        name: "Tu Nombre",
+        handle: "Tu Usuario",
+        photo: "Foto de Perfil",
+        upload: "Subir Foto"
+      },
+      patterns: {
+        title: "Patrones de Fondo",
+        type: "Tipo de Patrón",
+        opacity: "Opacidad",
+        color: "Color del Patrón",
+        none: "Ninguno",
+        dots: "Puntos",
+        grid: "Cuadrícula",
+        waves: "Ondas"
       }
     },
     app: {
@@ -710,9 +731,9 @@ export const es = {
           clear: "Limpiar Formato",
         },
         sidebar: {
-          preview: "Vista Previa",
-          hooks: "Ganchos",
-          endings: "Footers",
+          preview: "Post Final",
+          hooks: "Sugerencias",
+          endings: "Contenido",
           snippets: "Snippets",
         },
         preview: {

@@ -222,7 +222,7 @@ export class ContentService extends BaseAIService {
       ? `\nBRAND VOICE INSTRUCTIONS:\n${profileContext.brand_voice}`
       : "";
 
-    const repurposeService = new RepurposeService();
+    const repurposeService = new RepurposeService(this.geminiApiKey);
     let finalSource = source;
     let analysisStrategy = "";
 
@@ -244,6 +244,12 @@ export class ContentService extends BaseAIService {
            const webContent = await repurposeService.scrapeUrl(source);
            finalSource = `[WEB ARTICLE CONTENT]:\n"${webContent}"\n\n(Source URL: ${source})`;
            analysisStrategy = "The content provided is a WEB ARTICLE. Summarize the main points and turn the key insights into a slide-by-slide narrative.";
+      }
+      else if (sourceType === 'pdf') {
+           console.log(`Extracting PDF content...`);
+           const pdfContent = await repurposeService.extractPdfText(source);
+           finalSource = `[PDF DOCUMENT CONTENT]:\n"${pdfContent}"`;
+           analysisStrategy = "The content provided is a PDF DOCUMENT. Extract the core value, structured data, and key insights to build a logical narrative for a LinkedIn carousel.";
       }
       else {
            // Default TEXT or TOPIC
@@ -482,5 +488,55 @@ export class ContentService extends BaseAIService {
 
       return this.extractJson(result.response.text()) as unknown as EngagementPrediction;
     });
+  }
+
+  /**
+   * Refines a specific carousel slide based on user feedback or general polish.
+   */
+  async refineSlide(
+    slideContent: { title: string; body: string; subtitle?: string; type: string },
+    instruction: string = "Polish this slide for maximum impact and clarity on LinkedIn.",
+    language: string = "es"
+  ): Promise<Partial<CarouselSlideData>> {
+      const prompt = `
+        Act as a LinkedIn Content Strategist. 
+        Refine the following carousel slide content based on this instruction: "${instruction}".
+        
+        CURRENT SLIDE CONTENT:
+        Type: ${slideContent.type}
+        Title: ${slideContent.title}
+        Subtitle: ${slideContent.subtitle || "None"}
+        Body: ${slideContent.body}
+        
+        RULES:
+        1. Keep the same "Type".
+        2. Improve the Title to be more magnetic/punchy.
+        3. Clarify the Body text and make it professional yet engaging.
+        4. Return ONLY a JSON object with "title", "body", and "subtitle".
+        5. Maintain the original language (${language === "es" ? "Spanish" : "English"}).
+      `;
+
+      return await this.retryWithBackoff(async () => {
+          const model = this.genAI.getGenerativeModel({ model: this.model });
+          const result = await model.generateContent({
+              // @ts-ignore: Parts mismatch
+              contents: [{ role: "user", parts: [{ text: prompt }] }],
+              generationConfig: {
+                  temperature: 0.7,
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                      type: SchemaType.OBJECT,
+                      properties: {
+                          title: { type: SchemaType.STRING },
+                          subtitle: { type: SchemaType.STRING },
+                          body: { type: SchemaType.STRING }
+                      },
+                      required: ["title", "body"]
+                  } as Schema,
+              }
+          });
+
+          return this.extractJson(result.response.text()) as unknown as Partial<CarouselSlideData>;
+      });
   }
 }

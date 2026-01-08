@@ -17,6 +17,7 @@ interface CarouselStore {
   // Actions
   setProjectTitle: (title: string) => void;
   setAspectRatio: (ratio: AspectRatio) => void;
+  updateAuthor: (updates: Partial<CarouselProject['author']>) => void;
   
   // Slide Actions
   addSlide: (type?: CarouselSlide['type'], index?: number) => void;
@@ -57,9 +58,11 @@ const DEFAULT_DESIGN: CarouselDesign = {
     body: 'Inter',
   },
   background: {
-    type: 'solid',
+    type: 'pattern',
     value: '#FFFFFF',
+    patternType: 'dots',
     patternOpacity: 0.05,
+    patternColor: '#000000',
   },
   layout: {
     showSteppers: true,
@@ -131,6 +134,14 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
         ...state.project, 
         design: { ...state.project.design, aspectRatio: ratio } 
       } 
+    })),
+
+  updateAuthor: (updates) =>
+    set((state) => ({
+      project: {
+        ...state.project,
+        author: { ...state.project.author, ...updates }
+      }
     })),
 
   addSlide: (type = 'content', index) =>

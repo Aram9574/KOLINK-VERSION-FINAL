@@ -79,15 +79,95 @@ const MiniPreview = ({ template }: { template: CarouselTemplate }) => {
     );
 };
 
-export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
+export const TemplateSelector: React.FC<TemplateSelectorProps & { variant?: 'dropdown' | 'embedded' }> = ({
     selectedTemplateId,
     onSelect,
+    variant = 'dropdown'
 }) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(variant === 'embedded');
+    const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
     const selectedTemplate =
         CAROUSEL_TEMPLATES.find((t) => t.id === selectedTemplateId) ||
         CAROUSEL_TEMPLATES[0];
+    
+    // Filter logic
+    const filteredTemplates = selectedCategory === "All" 
+        ? CAROUSEL_TEMPLATES 
+        : CAROUSEL_TEMPLATES.filter(t => t.category === selectedCategory);
+
+    const categories = ["All", "Professional", "Creative", "Dark", "Minimal", "Premium"];
+
+    if (variant === 'embedded') {
+        return (
+            <div className="w-full flex flex-col gap-6">
+                {/* Category Filter */}
+                <div className="flex flex-wrap gap-2">
+                    {categories.map((cat) => {
+                         const isCatSelected = selectedCategory === cat;
+                         return (
+                            <button
+                                key={cat}
+                                onClick={() => setSelectedCategory(cat)}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-bold transition-all ${
+                                    isCatSelected 
+                                    ? "bg-slate-900 text-white border-slate-900 shadow-md" 
+                                    : "bg-white text-slate-500 border-slate-200 hover:border-blue-300 hover:text-blue-500"
+                                }`}
+                            >
+                                {cat !== "All" && <CategoryIcon category={cat} />}
+                                {cat}
+                            </button>
+                         );
+                    })}
+                </div>
+
+                {/* Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pb-20">
+                    {filteredTemplates.map((template) => {
+                        const isSelected = selectedTemplateId === template.id;
+                        return (
+                            <button
+                                key={template.id}
+                                onClick={() => onSelect(template.id)}
+                                className={`group/card relative p-2 rounded-xl border transition-all duration-300 flex flex-col gap-3 text-left ${
+                                    isSelected
+                                        ? "border-blue-500 bg-blue-50/30 ring-2 ring-blue-500/20 shadow-lg scale-[1.02]"
+                                        : "border-slate-200/60/60 bg-white hover:border-blue-300 hover:shadow-lg hover:-translate-y-1"
+                                }`}
+                            >
+                                <MiniPreview template={template} />
+
+                                <div className="px-1 space-y-0.5">
+                                    <div className="flex items-center justify-between gap-1">
+                                        <span
+                                            className={`text-[10px] font-black truncate ${
+                                                isSelected
+                                                    ? "text-blue-600"
+                                                    : "text-slate-700 group-hover/card:text-blue-600 transition-colors"
+                                            }`}
+                                        >
+                                            {template.name}
+                                        </span>
+                                        <CategoryIcon category={template.category} />
+                                    </div>
+                                    <p className="text-[8px] text-slate-400 font-medium leading-[1.3] line-clamp-2 min-h-[1.6em]">
+                                        {template.description}
+                                    </p>
+                                </div>
+
+                                {isSelected && (
+                                    <div className="absolute top-3 right-3 bg-blue-500 text-white p-1 rounded-full shadow-lg animate-in zoom-in-50 duration-500">
+                                        <Sparkles size={10} />
+                                    </div>
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col items-center w-full">
@@ -123,7 +203,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                 </div>
             </button>
 
-            {/* Pocket Content */}
+            {/* Pocket Content (Dropdown) */}
             {isOpen && (
                 <div className="w-full max-w-4xl mt-6 p-8 bg-white/80 backdrop-blur-xl border border-slate-200/60/60 rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-500 z-50 overflow-hidden">
                     <div className="flex items-center justify-between mb-6">
@@ -136,26 +216,25 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                             </p>
                         </div>
                         <div className="flex gap-2">
-                            {[
-                                "Professional",
-                                "Creative",
-                                "Dark",
-                                "Minimal",
-                                "Premium",
-                            ].map((cat) => (
-                                <div
+                            {categories.filter(c => c !== "All").map((cat) => (
+                                <button
                                     key={cat}
-                                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200/60/60 text-[9px] font-bold text-slate-400"
+                                    onClick={() => setSelectedCategory(selectedCategory === cat ? "All" : cat)}
+                                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[9px] font-bold transition-all ${
+                                        selectedCategory === cat
+                                        ? "bg-slate-900 text-white border-slate-900"
+                                        : "bg-slate-50 border-slate-200/60/60 text-slate-400 hover:text-slate-600"
+                                    }`}
                                 >
                                     <CategoryIcon category={cat} />
                                     {cat}
-                                </div>
+                                </button>
                             ))}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {CAROUSEL_TEMPLATES.map((template) => {
+                        {filteredTemplates.map((template) => {
                             const isSelected =
                                 selectedTemplateId === template.id;
                             return (

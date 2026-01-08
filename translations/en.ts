@@ -538,11 +538,32 @@ export const en = {
       },
       ai: {
         predict: "Predict Performance",
+        predictSubtitle: "Simulate audience reaction before you post.",
         analyzing: "Analyzing audience...",
         score: "Viral Score",
         feedback: "Audience Feedback",
         tips: "Micro-Optimizations",
-        hook: "Improved Hook Suggestion"
+        hook: "Improved Hook Suggestion",
+        polish: "Polish Slide",
+        polishSubtitle: "Let AI optimize this specific slide for clarity and impact.",
+        optimizeBtn: "Optimize with AI"
+      },
+      creator: {
+        title: "Creator Profile",
+        name: "Your Name",
+        handle: "Your Handle",
+        photo: "Profile Photo",
+        upload: "Upload Photo"
+      },
+      patterns: {
+        title: "Background Patterns",
+        type: "Pattern Type",
+        opacity: "Opacity",
+        color: "Pattern Color",
+        none: "None",
+        dots: "Dots",
+        grid: "Grid",
+        waves: "Waves"
       }
     },
     app: {

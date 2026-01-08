@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { Sparkles, Loader2, Linkedin, LayoutTemplate } from 'lucide-react';
+import { Sparkles, Loader2, Linkedin, LayoutTemplate, Copy } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/services/supabaseClient';
 import { toast } from 'sonner';
@@ -14,7 +14,8 @@ import { translations } from '@/translations';
 
 // Sub-panels
 import { InputSourcePanel } from './InputSourcePanel';
-import TemplatesPanel from '../../inferencia/panels/TemplatesPanel';
+import TemplatesPanel from './panels/TemplatesPanel';
+import { DesignPanel } from './panels/DesignPanel';
 
 export const EditorSidebar = () => {
   const { language } = useUser();
@@ -99,7 +100,7 @@ export const EditorSidebar = () => {
       
       <Tabs value={mainTab} onValueChange={setMainTab} className="flex-1 flex flex-col h-full overflow-hidden">
         <div className="px-5 pt-4">
-          <TabsList className="w-full grid grid-cols-2 mb-2 p-1 bg-slate-100/80">
+          <TabsList className="w-full grid grid-cols-3 mb-2 p-1 bg-slate-100/80">
             <TabsTrigger value="generate" className="text-xs font-semibold">
                 <Sparkles className="w-3.5 h-3.5 mr-2" />
                 Generate
@@ -107,6 +108,10 @@ export const EditorSidebar = () => {
             <TabsTrigger value="templates" className="text-xs font-semibold">
                 <LayoutTemplate className="w-3.5 h-3.5 mr-2" />
                 Templates
+            </TabsTrigger>
+            <TabsTrigger value="design" className="text-xs font-semibold">
+                <Sparkles className="w-3.5 h-3.5 mr-2" />
+                Design
             </TabsTrigger>
           </TabsList>
         </div>
@@ -122,6 +127,10 @@ export const EditorSidebar = () => {
                     setSlides(slides);
                     toast.success("Template applied successfully!");
                 }} />
+            </TabsContent>
+
+            <TabsContent value="design" className="mt-0">
+                <DesignPanel />
             </TabsContent>
           </div>
         </ScrollArea>

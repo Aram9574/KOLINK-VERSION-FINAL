@@ -27,7 +27,6 @@ import { updateUserProfile } from "../../../services/userRepository";
 
 
 import LockedHistoryState from "../history/LockedHistoryState";
-import LockedCarouselState from "../generation/LockedCarouselState";
 import LockedChatState from "../chat/LockedChatState";
 import LockedEditorState from "../editor/LockedEditorState";
 import LockedAuditState from "../audit/LockedAuditState";
@@ -242,7 +241,7 @@ const DashboardContent: React.FC = () => {
                 
                 <div
                     className={`${
-                        ["home", "create", "history", "editor", "chat", "carousel", "voice-lab", "inferencia", "audit", "insight-responder", "autopilot"].includes(
+                        ["home", "create", "history", "editor", "chat", "carousel", "voice-lab", "audit", "insight-responder", "autopilot"].includes(
                                 activeTab,
                             )
                             ? "flex-1 flex flex-col min-h-0 overflow-hidden"
@@ -254,7 +253,7 @@ const DashboardContent: React.FC = () => {
                             <LaunchpadView 
                                 user={user} 
                                 onSelectTool={setActiveTab} 
-                                onInferenciaClick={() => navigate("/inferencia")}
+                                onCarouselStudioClick={() => navigate("/carousel-studio")}
                             />
                         </div>
                     )}
@@ -284,7 +283,7 @@ const DashboardContent: React.FC = () => {
                                         initialTopic={currentPost?.params?.topic}
                                         onGoToCarousel={(content) => {
                                             setCarouselDraftContent(content);
-                                            setActiveTab("carousel");
+                                            navigate("/carousel-studio");
                                         }}
                                         onEdit={(post) => {
                                             setCurrentPost(post);
@@ -364,31 +363,6 @@ const DashboardContent: React.FC = () => {
 
 
 
-                    {activeTab === "carousel" && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0">
-                            <Suspense
-                                fallback={
-                                    <div className="flex justify-center items-center h-64">
-                                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-500 border-t-transparent">
-                                        </div>
-                                    </div>
-                                }
-                            >
-                                {user.planTier === "free"
-                                    ? (
-                                        <LockedCarouselState
-                                            onUpgrade={() =>
-                                                setShowUpgradeModal(true)}
-                                        />
-                                    )
-                                    : (
-                                        <CarouselStudio
-                                            initialContent={carouselDraftContent}
-                                        />
-                                    )}
-                            </Suspense>
-                        </div>
-                    )}
 
                     {activeTab === "chat" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">

@@ -18,7 +18,7 @@ const toolNames: Record<string, string> = {
   history: 'Biblioteca de Contenido',
   settings: 'Configuración',
   carousel: 'Estudio de Carruseles',
-  inferencia: 'Estudio de Carruseles',
+
   'voice-lab': 'Voice Lab',
   editor: 'Editor'
 };
