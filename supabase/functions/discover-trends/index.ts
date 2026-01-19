@@ -1,14 +1,14 @@
-
-import { serve } from "std/http/server.ts";
+// @ts-ignore: Deno import map support
+import { createClient } from "@supabase/supabase-js";
 import { corsHeaders } from "../_shared/cors.ts";
 
-const GEMINI_API_KEY = "AIzaSyB3NfpSDRtYK9nRqTANg4EMsYpDZOX_WB8"; 
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || ""; 
 
 // Using the project standard model found in BaseAIService.ts
 // The user explicitly requested Gemini 3 Flash.
-const MODEL = "gemini-3-flash-preview"; 
+const MODEL = "gemini-3.0-flash"; 
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -17,15 +17,18 @@ serve(async (req) => {
     const { industry = "Tech & AI", keywords = [], language = "es" } = await req.json();
 
     const prompt = `
-      Act as a Trend Hunter AI. Generate 21 (TWENTY-ONE) diverse, high-potential trending topics relevant to: ${industry} ${keywords.join(", ")}.
+      ROLE: Trend Hunter AI.
+      OUTPUT LANGUAGE: ${language.toUpperCase()}.
+      
+      TASK: Generate 21 (TWENTY-ONE) diverse, high-potential trending topics relevant to: ${industry} ${keywords.join(", ")}.
       Current Date: ${new Date().toISOString().split('T')[0]}.
       
       CRITICAL: Ensure variety. Mix global news, niche regulatory updates, and social media shifts.
       If "keywords" are empty, focus on global Tech, AI, and Business trends.
       
       For each trend, provide:
-      1. A catchy Title.
-      2. A concise Summary (2 sentences max).
+      1. A catchy Title in ${language}.
+      2. A concise Summary (2 sentences max) in ${language}.
       3. A plausible Source (e.g., TechCrunch, LinkedIn News, Bloomberg).
       4. A Category (news, social, regulatory, search).
       5. A Match Score (70-99).
@@ -42,8 +45,6 @@ serve(async (req) => {
           "timestamp": ${Date.now()}
         }
       ]
-      
-      Ensure tone is professional yet intriguing. Language: ${language}.
     `;
 
     const response = await fetch(
@@ -55,7 +56,8 @@ serve(async (req) => {
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.9, 
-            maxOutputTokens: 8000, // Increased for 21 items
+            maxOutputTokens: 8000,
+            responseMimeType: "application/json"
           },
         }),
       }

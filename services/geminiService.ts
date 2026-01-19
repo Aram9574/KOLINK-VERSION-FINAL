@@ -25,6 +25,7 @@ export interface GeneratedPostResult {
 
 export const generateViralPost = async (params: GenerationParams, user: UserProfile): Promise<GeneratedPostResult> => {
   // 1. Get current session
+  // @ts-ignore
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
   
   if (sessionError || !session) {

@@ -127,7 +127,7 @@ const MOCK_TRENDS: Trend[] = [
 export const getRecommendedTrends = async (userKeywords: string[]): Promise<Trend[]> => {
     try {
         const { data, error } = await supabase.functions.invoke('discover-trends', {
-            body: { keywords: userKeywords, industry: "Technology & Business" }
+            body: { keywords: userKeywords, industry: "Technology & Business", language: 'es' }
         });
 
         if (error || !data || !Array.isArray(data) || data.length === 0) {

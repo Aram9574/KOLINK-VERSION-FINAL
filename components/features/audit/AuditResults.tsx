@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useUser } from "../../../context/UserContext.tsx";
-import { translations } from "../../../translations.ts";
-import { LinkedInAudit, ExperienceItem } from "../../../types.ts";
+import { useUser } from "../../../context/UserContext";
+import { translations } from "../../../translations";
+import { LinkedInAudit, ExperienceItem } from "../../../types";
 import { 
     CheckCircle2, 
     AlertCircle, 
@@ -27,7 +27,7 @@ interface AuditResultsProps {
 const AuditResults = ({ audit, onNewAudit, onRegenerate }: AuditResultsProps) => {
     const { language } = useUser();
     const t = translations[language].app.audit;
-    const results = audit?.results;
+    const results = audit?.results as any;
 
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const [regeneratingSection, setRegeneratingSection] = useState<string | null>(null);

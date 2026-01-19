@@ -30,6 +30,7 @@ class ErrorBoundary extends Component<Props, State> {
 
     private async logErrorToSupabase(error: Error, errorInfo: ErrorInfo) {
         try {
+            // @ts-ignore
             const { data: { session } } = await supabase.auth.getSession();
             
             await supabase.functions.invoke('log-error', {

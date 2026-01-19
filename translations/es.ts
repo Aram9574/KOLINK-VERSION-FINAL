@@ -147,7 +147,7 @@ export const es = {
         {
           name: "Precio",
           values: {
-            kolink: "€19/mes",
+            kolink: "€15/mes",
             taplio: "$65/mes",
             supergrow: "€49/mes",
             authored: "$20/mes",
@@ -238,7 +238,7 @@ export const es = {
       totalPrice: "€1,648/mes",
       kolinkLabel: "Todo esto incluido al unirte a Kolink.",
       kolinkPlan: "Plan Creador Pro:",
-      kolinkPrice: "€19/mes",
+      kolinkPrice: "€15/mes",
     },
     testimonials: {
       title: "Creadores creciendo rápido",
@@ -541,18 +541,7 @@ export const es = {
         },
       },
     },
-    settings: {
-      language: "Idioma",
-      languageDesc:
-        "Selecciona tu idioma preferido para la interfaz y la generación de contenido.",
-      support: {
-        title: "¿Necesitas ayuda?",
-        subtitle:
-          "Nuestro equipo de soporte está listo para ayudarte con cualquier problema o duda que tengas.",
-        cta: "Contactar Soporte",
-        email: "info@kolink.es"
-      },
-    },
+
     // APP INTERFACE TRANSLATIONS (ES)
     carouselStudio: {
       title: "Generador de Carruseles",
@@ -562,10 +551,11 @@ export const es = {
         design: "Diseño Global",
         slide: "Editar Slide"
       },
-      aiGenerator: {
+      inputs: {
         topic: {
           label: "Tu Idea / Tema",
           placeholder: "ej. Cómo escalar un negocio B2B...",
+          question: "¿Sobre qué quieres escribir hoy?"
         },
         text: {
           label: "Texto Crudo",
@@ -574,9 +564,43 @@ export const es = {
         url: {
           label: "URL del Artículo",
           placeholder: "https://...",
+          hint: "Pegar enlace aquí"
         },
         generateBtn: "Generar Carrusel",
         generating: "Diseñando Slides...",
+        tabs: {
+            topic: "Tema",
+            url: "URL",
+            youtube: "YouTube",
+            pdf: "PDF"
+        },
+        youtube: {
+            label: "URL de Video YouTube",
+            placeholder: "https://youtube.com/watch?v=...",
+            hint: "Analizaremos el video para crear una historia visual."
+        },
+        pdf: {
+            label: "Subir Documento PDF",
+            placeholder: "Seleccionar archivo...",
+            select: "Seleccionar PDF",
+            change: "Clic para cambiar",
+            maxSize: "Max 5MB"
+        },
+        buttons: {
+            generate: "Generar con IA",
+            generating: "Diseñando... (~15s)",
+            convert: "Convertir Artículo",
+            converting: "Convirtiendo... (~20s)",
+            video: "Video → Carrusel",
+            analyzing: "Analizando... (~30s)",
+            extract: "Extraer y Crear",
+            extracting: "Extrayendo... (~20s)",
+            magic: "Magia IA",
+            generateBtn: "Generar",
+        },
+        hint: "Tip: Usa URLs específicas para mejores resultados.",
+        question: "¿Qué quieres crear hoy?",
+        footer: "El contenido generado por IA puede requerir edición. Revisa antes de publicar."
       },
       templates: {
         modern: "Moderno",
@@ -584,11 +608,7 @@ export const es = {
         bold: "Atrevido",
         gradient: "Gradiente",
       },
-      tabs: {
-        ai: "Generador",
-        templates: "Plantillas",
-        design: "Diseño"
-      },
+      design: "Diseño",
       properties: {
         globalDesign: "Diseño Global",
         slideEditor: "Editor de Slide",
@@ -603,7 +623,10 @@ export const es = {
         body: "Cuerpo",
         cta: "Texto CTA",
         deleteSlide: "Borrar Slide",
+        delete: "Borrar",
         deleteConfirm: "¿Seguro que quieres borrar esta slide?",
+        deleteConfirmTitle: "¿Borrar Slide?",
+        deleteConfirmDesc: "Esta acción no se puede deshacer.",
         addSlide: "Añadir Slide",
         intro: "Intro",
         content: "Contenido",
@@ -625,10 +648,34 @@ export const es = {
         },
         slideImage: "Imagen del Slide",
         slideLayout: "Diseño del Slide",
-        imageUrl: "URL de Imagen"
+        imageUrl: "URL de Imagen",
+        backgroundImage: "Imagen de Fondo",
+      },
+      export: {
+        download: "Descargar PDF",
+        exporting: "Exportando...",
       },
       sidebar: {
         caption: "Caption",
+        sidebar: "Barra Lateral",
+        tabs: {
+           ai: "IA",
+           templates: "Plantillas",
+           design: "Diseño"
+        },
+        inputs: {
+            topic: { label: "Tema o Idea", placeholder: "Ej: Estrategias de marketing para 2024...", question: "¿Sobre qué quieres escribir hoy?" },
+            url: { label: "URL del Artículo/Noticia", placeholder: "https://ejemplo.com/noticia", hint: "Pegar enlace aquí" },
+            text: { label: "Texto", placeholder: "Pega tu texto..." },
+            generateBtn: "Generar",
+            generating: "Generando..."
+        },
+        captions: "Captions"
+      },
+      captions: {
+        title: "Caption para LinkedIn",
+        copy: "Copiar al portapapeles",
+        copied: "¡Copiado!"
       },
       toasts: {
         captionGenerated: "¡Caption generado!",
@@ -644,49 +691,8 @@ export const es = {
         loaded: "Cargado",
         templateApplied: "¡Plantilla aplicada con éxito!"
       },
-      captions: {
-        title: "Caption para LinkedIn",
-        copy: "Copiar al portapapeles",
-        copied: "¡Copiado!"
-      },
-      inputs: {
-        tabs: {
-            topic: "Tema",
-            url: "URL",
-            youtube: "YouTube",
-            pdf: "PDF"
-        },
-        topic: {
-            question: "¿De qué trata tu carrusel?",
-            placeholder: "Ej. 5 Tips para Productividad Remota..."
-        },
-        url: {
-            label: "URL de Artículo o Blog",
-            hint: "Soporta: Medium, Substack, Noticias y Blogs."
-        },
-        youtube: {
-            label: "URL de Video YouTube",
-            hint: "Analizaremos el video para crear una historia visual."
-        },
-        pdf: {
-            label: "Subir Documento PDF",
-            select: "Seleccionar PDF",
-            change: "Clic para cambiar",
-            maxSize: "Max 5MB"
-        },
-        buttons: {
-            generate: "Generar con IA",
-            generating: "Diseñando... (~15s)",
-            convert: "Convertir Artículo",
-            converting: "Convirtiendo... (~20s)",
-            video: "Video → Carrusel",
-            analyzing: "Analizando... (~30s)",
-            extract: "Extraer y Crear",
-            extracting: "Extrayendo... (~20s)",
-            magic: "Magia IA"
-        },
-        footer: "El contenido generado por IA puede requerir edición. Revisa antes de publicar."
-      },
+
+
       canvas: {
         new: "Nuevo Carrusel",
         slides: "Slides",
@@ -699,6 +705,12 @@ export const es = {
         cancel: "Cancelar",
         slideIndicator: "Slide {{current}} de {{total}}",
         useArrows: "Usa las Flechas",
+        deleteSlideTitle: "¿Borrar Slide?",
+        deleteSlideDesc: "Esta acción no se puede deshacer.",
+        confirmDelete: "Borrar",
+        toasts: {
+           cannotDeleteLast: "No puedes borrar la última slide"
+        },
         fit: "Ajustar",
         fullscreen: "Pantalla Completa"
       },
@@ -732,7 +744,17 @@ export const es = {
         waves: "Ondas"
       }
     },
-    app: {
+    common: {
+    premiumLock: {
+      title: "Función Premium",
+      description: "Actualiza tu plan para acceder a esta función.",
+      button: "Ver Planes",
+      unlockNow: "Desbloquear ahora",
+      premiumFeature: "Esta es una función premium",
+      availableOn: "Disponible en planes Pro y Viral"
+    }
+  },
+  app: {
       sidebar: {
         home: "Inicio",
         studio: "Post Editor",
@@ -771,6 +793,8 @@ export const es = {
           }
         },
       },
+
+
     voiceLab: {
         title: "Laboratorio de Voz",
         description: "Analiza tu estilo de escritura y genera tu ADN de voz único.",
@@ -813,6 +837,23 @@ export const es = {
       },
       editor: {
         title: "Editor de Posts",
+        limitWarning: {
+            text: "Límite de caracteres cercano.",
+            note: "Manténlo conciso."
+        },
+        placeholder: "Escribe tu post viral aquí...",
+        status: {
+            readability: {
+                title: "Nivel de Lectura",
+                subtitle: "Basado en Flesch-Kincaid",
+                levels: [
+                   { g: "5-6", desc: "Ideal para Viralidad", color: "text-green-500" },
+                   { g: "7-8", desc: "Bueno para Artículos", color: "text-blue-500" },
+                   { g: "9+", desc: "Muy Complejo", color: "text-red-500" }
+                ],
+                tip: "Apunta a grado 5-6 para máximo alcance."
+            }
+        },
         drafts: "Borradores",
         noDrafts: "No se encontraron borradores.",
         toolbar: {
@@ -858,6 +899,7 @@ export const es = {
           readingTime: "tiempo de lectura",
           grade: "Grado",
         },
+
         aiActions: {
           title: "Acciones IA",
           rewrite: "Reescribir",
@@ -873,10 +915,7 @@ export const es = {
         continueLinkedIn: "Publicar en LinkedIn",
         copyText: "Copiar texto",
         theme: "Tema",
-        status: {
-          readability: "Legibilidad",
-          readTime: "tiempo de lectura",
-        },
+
       },
       ideas: {
         title: "Inspiración Viral",
@@ -1043,6 +1082,7 @@ export const es = {
         cancel: "Cancelar",
         placeholder: "Tu obra maestra viral aparecerá aquí...",
         follow: "Seguir",
+        scheduled: "Programado exitosamente",
         seeMore: "...ver más",
         viralPotential: "Potencial Viral",
         aiEstimate: "Probabilidad de alcance estimada por IA",
@@ -1130,6 +1170,12 @@ export const es = {
         saveChanges: "Guardar Cambios",
         saving: "Guardando...",
         saved: "¡Guardado!",
+        support: {
+            title: "¿Necesitas ayuda?",
+            subtitle: "Nuestro equipo de soporte está listo para ayudarte con cualquier problema o duda que tengas.",
+            cta: "Contactar Soporte",
+            email: "info@kolink.es"
+        },
       },
       cancellation: {
         title: "Lamentamos que te vayas",
@@ -1264,5 +1310,6 @@ export const es = {
           assertion: { label: "Afirmación Directa" },
         },
       },
+
     },
 };

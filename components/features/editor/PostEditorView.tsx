@@ -662,7 +662,7 @@ const PostEditorView: React.FC = () => {
             grade: t.grade,
             metrics: t.metrics,
             continueLinkedIn: t.continueLinkedIn,
-            readability: t.readability,
+            readability: t.status.readability,
             limitWarning: t.limitWarning
           }}
           gradeInfoRef={gradeInfoRef}
@@ -675,7 +675,8 @@ const PostEditorView: React.FC = () => {
       <EditorSidebar
         activeTab={sidebarTab}
         setActiveTab={setSidebarTab}
-        previewContent={editorContent ? editorContent.replace(/\n/g, "<br/>") : (language === "es" ? "<i>Escribe algo para ver la vista previa...</i>" : "<i>Write something to see preview...</i>")}
+        previewContent={editorContent}
+        user={user}
         hooks={filteredHooks.slice(0, visibleHooksCount).map(h => h.text)}
         endings={filteredEndings.slice(0, visibleEndingsCount).map(e => e.text)}
         snippets={snippets.filter(s => s.text.toLowerCase().includes(snippetSearch.toLowerCase())).map(s => ({ id: s.id, title: s.text.substring(0, 20), content: s.text, category: "Fragmento" }))}

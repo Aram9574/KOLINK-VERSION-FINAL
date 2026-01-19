@@ -10,6 +10,8 @@ export interface SlideContent {
   subtitle?: string; // Tagline
   body?: string; // Main text / bullet points
   image_url?: string;
+  image?: string; // Alias for image_url or specific slide image
+  backgroundImage?: string; // For full background images
   cta_text?: string;
   visual_hint?: string; // Suggestion for icon/graphic
   background_override?: string;
@@ -33,7 +35,8 @@ export interface ElementStyle {
 export interface CarouselSlide {
   id: string;
   type: SlideType;
-  layoutVariant: LayoutVariant; // Explicit layout choice
+  layoutVariant: LayoutVariant;
+  layout?: LayoutVariant | string; // Compatibility alias
   content: SlideContent;
   designOverride?: SlideDesignOverride;
   elementOverrides?: Record<string, ElementStyle>; // Map elementId (e.g. 'title') to styles

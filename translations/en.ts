@@ -1,6 +1,16 @@
 import { EmojiDensity, PostLength, ViralFramework, ViralTone } from "../types.ts";
 
 export const en = {
+  common: {
+    premiumLock: {
+      title: "Premium Feature",
+      description: "Upgrade your plan to access this feature.",
+      button: "View Plans",
+      unlockNow: "Unlock Now",
+      premiumFeature: "This is a premium feature",
+      availableOn: "Available on Pro and Viral plans"
+    }
+  },
     nav: {
       howItWorks: "How it Works",
       demo: "Demo",
@@ -93,7 +103,7 @@ export const en = {
         {
           name: "Base Price",
           values: {
-            kolink: "€19/mo",
+            kolink: "€15/mo",
             taplio: "$65/mo",
             supergrow: "€49/mo",
             authored: "$20/mo",
@@ -184,7 +194,7 @@ export const en = {
       totalPrice: "€2,648/mo",
       kolinkLabel: "All of this is included when you join Kolink.",
       kolinkPlan: "Kolink Creator Pro:",
-      kolinkPrice: "€19/mo",
+      kolinkPrice: "€15/mo",
     },
     testimonials: {
       title: "Creators are growing fast",
@@ -490,20 +500,48 @@ export const en = {
         design: "Global Design",
       },
       inputs: {
-        topic: {
-          label: "Your Idea / Topic",
-          placeholder: "e.g. How to scale a B2B business...",
-        },
+
         text: {
           label: "Raw Text",
           placeholder: "Paste your draft here...",
         },
-        url: {
-          label: "Article URL",
-          placeholder: "https://...",
-        },
+        topic: { label: "Topic", placeholder: "Enter a topic...", question: "What do you want to write about?" },
+        url: { label: "Article URL", placeholder: "https://...", hint: "Paste link here" },
         generateBtn: "Generate Carousel",
         generating: "Designing Slides...",
+        tabs: {
+            topic: "Topic",
+            url: "URL",
+            youtube: "YouTube",
+            pdf: "PDF"
+        },
+        youtube: {
+            label: "YouTube Video URL",
+            placeholder: "https://youtube.com/watch?v=...",
+            hint: "We'll analyze the video to create a visual story."
+        },
+        pdf: {
+            label: "Upload PDF Document",
+            placeholder: "Select file...",
+            select: "Select PDF",
+            change: "Click to change",
+            maxSize: "Max 5MB"
+        },
+        buttons: {
+            generate: "Generate with AI",
+            generating: "Designing... (~15s)",
+            convert: "Convert Article",
+            converting: "Converting... (~20s)",
+            video: "Video → Carousel",
+            analyzing: "Analyzing... (~30s)",
+            extract: "Extract & Create",
+            extracting: "Extracting... (~20s)",
+            magic: "AI Magic",
+            generateBtn: "Generate",
+        },
+        hint: "Tip: Use specific URLs for better results.",
+        question: "What do you want to create today?",
+        footer: "AI generated content may require editing. Review before publishing."
       },
       templates: {
         modern: "Modern",
@@ -525,12 +563,33 @@ export const en = {
         body: "Body",
         cta: "CTA Text",
         deleteSlide: "Delete Slide",
+        delete: "Delete",
         deleteConfirm: "Are you sure you want to delete this slide?",
+        deleteConfirmTitle: "Delete Slide?",
+        deleteConfirmDesc: "This action cannot be undone.",
         addSlide: "Add Slide",
         intro: "Intro",
         content: "Content",
         outro: "Outro",
-        brandNamePrompt: "Enter a name for your Brand Kit:"
+        brandNamePrompt: "Enter a name for your Brand Kit:",
+        aiTools: "AI Magic Tools",
+        brandKits: "Brand Kits",
+        saveKits: "Save Kit",
+        brandKitHint: "Save your brand colors to reuse later.",
+        primaryFont: "Primary Font",
+        layouts: {
+            default: "Default",
+            fullImg: "Full Img",
+            quote: "Quote",
+            number: "Number",
+            list: "List",
+            compare: "Compare",
+            code: "Code"
+        },
+        slideImage: "Slide Image",
+        slideLayout: "Slide Layout",
+        imageUrl: "Image URL",
+        backgroundImage: "Background Image",
       },
       export: {
         download: "Download PDF",
@@ -578,7 +637,13 @@ export const en = {
         cancel: "Cancel",
         confirmReset: "Confirm & Reset",
         slideIndicator: "Slide {{current}} / {{total}}",
-        useArrows: "Use Arrow Keys"
+        useArrows: "Use Arrow Keys",
+        deleteSlideTitle: "Delete Slide?",
+        deleteSlideDesc: "This action cannot be undone.",
+        confirmDelete: "Delete",
+        toasts: {
+           cannotDeleteLast: "Cannot delete the last slide"
+        }
       },
       toasts: {
         captionGenerated: "Caption generated!",
@@ -593,6 +658,28 @@ export const en = {
         genFailed: "Generation failed. Please try again.",
         loaded: "Loaded",
         templateApplied: "Template applied successfully!"
+      },
+      sidebar: {
+        caption: "Caption",
+        sidebar: "Sidebar",
+        tabs: {
+           ai: "AI",
+           templates: "Templates",
+           design: "Design"
+        },
+        inputs: {
+            topic: { label: "Topic", placeholder: "Enter a topic..." },
+            text: { label: "Text", placeholder: "Paste your text..." },
+            url: { label: "URL", placeholder: "https://..." },
+            generateBtn: "Generate",
+            generating: "Generating..."
+        },
+        captions: "Captions"
+      },
+      captions: {
+        title: "LinkedIn Caption",
+        copy: "Copy to clipboard",
+        copied: "Copied!"
       }
     },
     app: {
@@ -674,6 +761,23 @@ export const en = {
         }
       },
       editor: {
+        limitWarning: {
+            text: "Character limit approaching.",
+            note: "Keep it concise."
+        },
+        placeholder: "Write your viral post here...",
+        status: {
+            readability: {
+                title: "Readability Score",
+                subtitle: "Based on Flesch-Kincaid Grade Level",
+                levels: [
+                   { g: "5-6", desc: "Best for Viral Posts", color: "text-green-500" },
+                   { g: "7-8", desc: "Good for Articles", color: "text-blue-500" },
+                   { g: "9+", desc: "Too Complex", color: "text-red-500" }
+                ],
+                tip: "Aim for Grade 5-6 for maximum reach."
+            }
+        },
         title: "Post Editor",
         drafts: "Drafts",
         noDrafts: "No drafts found.",
@@ -735,10 +839,7 @@ export const en = {
         continueLinkedIn: "Publish on LinkedIn",
         copyText: "Copy text",
         theme: "Theme",
-        status: {
-          readability: "Readability",
-          readTime: "reading time",
-        },
+
       },
       ideas: {
         title: "Viral Inspiration",
@@ -900,6 +1001,7 @@ export const en = {
         cancel: "Cancel",
         placeholder: "Your viral masterpiece will appear here...",
         follow: "Follow",
+        scheduled: "Scheduled successfully",
         seeMore: "...see more",
         viralPotential: "Viral Potential",
         aiEstimate: "AI-estimated reach probability",

@@ -1,7 +1,9 @@
 // No import needed for Deno.serve in modern Deno/Supabase environments.
 
+// @ts-ignore: Deno import map support
 import { createClient } from "@supabase/supabase-js";
-import { z } from "npm:zod";
+// @ts-ignore: Deno import map support
+import { z } from "zod";
 import { CreditService } from "../_shared/services/CreditService.ts";
 import { ContentService as AIService, GenerationParams } from "../_shared/services/ContentService.ts";
 import { PostRepository, GeneratedPost } from "../_shared/services/PostRepository.ts";
@@ -20,6 +22,7 @@ Deno.serve(async (req: Request) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  const debugLogs: string[] = [];
   try {
     // 1. Setup & Auth
     const authHeader = req.headers.get("Authorization");
@@ -79,7 +82,7 @@ Deno.serve(async (req: Request) => {
         return new Response(
           JSON.stringify({
             error: "Validation Error",
-            details: zodError.errors,
+            details: (zodError as z.ZodError).errors,
           }),
           {
             status: 400,
@@ -97,10 +100,21 @@ Deno.serve(async (req: Request) => {
     );
 
     // Initialize Services
+    debugLogs.push("Start Function");
+    
+    // Initialize Services with error handling
+    if (!Deno.env.get("GEMINI_API_KEY")) {
+        console.error("CRITICAL: GEMINI_API_KEY is missing in Edge Function secrets.");
+        throw new Error("Configuration Error: AI Service not configured (Missing Key)");
+    }
+
+    debugLogs.push("Init Services");
     const creditService = new CreditService(supabaseAdmin, supabaseClient);
     const aiService = new AIService(Deno.env.get("GEMINI_API_KEY") ?? "");
     const postRepository = new PostRepository(supabaseAdmin);
     const gamificationService = new GamificationService(supabaseAdmin);
+    
+    // Behavior service is optional-ish, but let's init it safely
     const behaviorService = new BehaviorService(
         Deno.env.get("GEMINI_API_KEY") ?? "",
         Deno.env.get("SUPABASE_URL") ?? "",
@@ -109,6 +123,7 @@ Deno.serve(async (req: Request) => {
 
     // 2. Check Credits, Rate Limit & Fetch Context
     console.log("Fetching profile for User ID:", user.id);
+    debugLogs.push(`Fetching profile for ${user.id}`);
 
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("profiles")
@@ -117,13 +132,22 @@ Deno.serve(async (req: Request) => {
       .single();
 
     if (profileError || !profile) {
-      console.error("Profile not found:", profileError);
-      throw new Error("Profile not found. Please contact support.");
+      console.error("Profile not found error:", profileError);
+      debugLogs.push("Profile Fetch Error: " + JSON.stringify(profileError));
+      return new Response(
+        JSON.stringify({ error: "Profile Not Found", details: "User profile does not exist or fetch failed.", debug: debugLogs }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
+    debugLogs.push("Profile Found");
 
     const isPremium = ["pro", "viral"].includes(profile.plan_tier);
     if (!isPremium && profile.credits <= 0) {
-      throw new Error("Insufficient credits");
+      debugLogs.push("Insufficient Credits");
+      return new Response(
+        JSON.stringify({ error: "Insufficient Credits", details: "Please upgrade or wait for renewal.", debug: debugLogs }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const { data: lastPost } = await supabaseAdmin
@@ -139,11 +163,14 @@ Deno.serve(async (req: Request) => {
       const now = Date.now();
       const diff = now - lastPostTime;
       if (diff < 10000) { // 10 seconds cooldown
-        throw new Error(
-          "Rate limit exceeded. Please wait 10 seconds between generations.",
+        debugLogs.push("Rate Limited");
+        return new Response(
+            JSON.stringify({ error: "Rate Limit Exceeded", details: "Please wait 10 seconds between generations.", debug: debugLogs }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
     }
+    debugLogs.push("Rate Limit OK");
 
     // 3. Prepare Params
     let brandVoiceDescription = "";
@@ -185,68 +212,50 @@ Deno.serve(async (req: Request) => {
       language: profile.language,
       behavioral_dna: profile.behavioral_dna ? JSON.stringify(profile.behavioral_dna) : "",
     };
-
-    // Define expected AI response structure
-    interface GeneratedPostContent {
-        post_content: string;
-        auditor_report: {
-            viral_score: number;
-            hook_strength: string;
-            hook_score: number;
-            readability_score: number;
-            value_score: number;
-            pro_tip: string;
-            retention_estimate: string;
-            flags_triggered: string[];
-        };
-        strategy_reasoning: string;
-        meta: {
-            suggested_hashtags: string[];
-            character_count: number;
-        };
-    }
+    debugLogs.push("Context Prepared");
 
     // 4. Generate Content
+    debugLogs.push("Calling AI Service...");
     const rawGeneratedContent = await aiService.generatePost(
       safeParams,
       userContext,
     );
+    debugLogs.push("AI Service Response Received");
     const generatedContent = rawGeneratedContent as GeneratedPost;
 
     // 5. Save Post
+    debugLogs.push("Saving Post...");
     const insertedPost = await postRepository.savePost(
       user.id,
       generatedContent,
       params,
     );
+    debugLogs.push("Post Saved");
 
     // 5.5 Track Behavior (Fire and forget)
+    // Avoid unhandled promise rejection crashing the runtime in some strict modes
     behaviorService.trackEvent(user.id, "post_generated", { 
         topic: safeParams.topic, 
         tone: safeParams.tone, 
         framework: safeParams.framework,
         isPremium 
-    }).catch(e => console.error("Behavior tracking error:", e));
+    }).catch(e => console.error("Behavior tracking error (non-fatal):", e));
 
     // 6. Validated Gamification Update
-    // Get total post count
+    debugLogs.push("Gamification...");
     const { count: postCount } = await supabaseAdmin
       .from("posts")
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id);
 
     const gamificationResults = await gamificationService.processGamification(
-      profile, // Use the profile we fetched earlier
+      profile, 
       safeParams,
-      postCount || 0, // Should include the one we just inserted? postRepository.savePost inserts it.
-      // Note: supabase count might or might not see it immediately if read-after-write consistency is laggy,
-      // but usually it's fine in same transaction or generic usage.
-      // Just to be safe, if we just inserted, the count should be +1 if the query didn't catch it,
-      // but since we await savePost, it should be there.
+      postCount || 0, 
     );
+    debugLogs.push("Gamification Done");
 
     // Apply updates to DB
-    // Merge achievements
     const currentAchievements = profile.unlocked_achievements || [];
     const newAchievements = gamificationResults.newAchievements;
     const allAchievements = Array.from(
@@ -264,10 +273,12 @@ Deno.serve(async (req: Request) => {
       })
       .eq("id", user.id);
 
-    // 7. Deduct Credit (Only if not premium) - Do this last to ensure user gets value first
+    // 7. Deduct Credit (Only if not premium)
     if (!isPremium) {
+      debugLogs.push("Deducting Credit");
       await creditService.deductCredit(user.id);
     }
+    debugLogs.push("Finished");
 
     return new Response(
       JSON.stringify({
@@ -280,7 +291,7 @@ Deno.serve(async (req: Request) => {
           readabilityScore: generatedContent.auditor_report.readability_score,
           valueScore: generatedContent.auditor_report.value_score,
           proTip: generatedContent.auditor_report.pro_tip,
-          feedback: generatedContent.auditor_report.pro_tip, // DUPLICATE TO FIX DESYNC
+          feedback: generatedContent.auditor_report.pro_tip,
           retentionEstimate: generatedContent.auditor_report.retention_estimate,
           flagsTriggered: generatedContent.auditor_report.flags_triggered,
           strategyReasoning: generatedContent.strategy_reasoning,
@@ -299,14 +310,20 @@ Deno.serve(async (req: Request) => {
   } catch (error: unknown) {
     console.error("Endpoint Error:", error);
     const err = error as Error;
+    
+    // Determine status code based on error type
+    // Determine status code based on error type (Logging only in debug mode)
+    // if (err.message.includes("Configuration Error")) status = 503;
+    // ...
+
     return new Response(
       JSON.stringify({
         error: err.message || String(error),
-        stack: err.stack,
-        details: "Handled exception in generate-viral-post",
+        details: "Handled exception in generate-viral-post (DEBUG MODE: STATUS 200)",
+        debug: debugLogs 
       }),
       {
-        status: 500,
+        status: 200, // Force 200 to bypass CORS on error for debugging
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );

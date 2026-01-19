@@ -67,20 +67,27 @@ Deno.serve(async (req) => {
     }) as unknown as InsightResponse;
     console.log("[insight-reply] Reply generated successfully.");
 
-    // 5. Save to Database (New Feature)
-    const { error: dbError } = await supabaseClient
-      .from("insight_responses")
-      .insert({
-        user_id: user.id,
-        original_post_url: textContext.substring(0, 200) + "...", // Truncate as a rough "source" ref if no URL provided
-        user_intent: userIntent,
-        tone: tone,
-        // Safe access to content property
-        generated_response: result.suggested_replies?.[0]?.content || "", 
-        original_post_image_url: imageBase64 ? "image_provided" : null
-      });
+    // 5. Save to Database (New Feature) - Wrapped in try-catch to prevent 500 on logging failure
+    try {
+        const safeSource = String(textContext || userIntent || "image_provided");
+        const safeSnippet = safeSource.length > 200 ? safeSource.substring(0, 200) + "..." : safeSource;
 
-    if (dbError) console.error("[insight-reply] DB Save Error:", dbError.message);
+        const { error: dbError } = await supabaseClient
+        .from("insight_responses")
+        .insert({
+            user_id: user.id,
+            original_post_url: safeSnippet, 
+            user_intent: userIntent || null,
+            tone: tone || null,
+            generated_response: result?.suggested_replies?.[0]?.content || "No content generated", 
+            original_post_image_url: imageBase64 ? "image_provided" : null
+        });
+
+        if (dbError) console.error("[insight-reply] DB Save Error:", dbError.message);
+    } catch (dbEx) {
+        console.error("[insight-reply] CRITICAL DB LOGGING ERROR (Non-fatal for UI):", dbEx);
+        // Do not throw, so the user still gets the reply
+    }
 
     return new Response(JSON.stringify({ replies: result.suggested_replies }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

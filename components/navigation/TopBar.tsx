@@ -1,11 +1,12 @@
 
 import React from 'react';
-import { Home, ChevronRight, Grid, Menu } from 'lucide-react';
+import { Home, ChevronRight, Grid, Menu, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface TopBarProps {
   activeTab: string;
   onNavigate: (tab: string) => void;
+  onUpgrade?: () => void;
 }
 
 const toolNames: Record<string, string> = {
@@ -23,7 +24,7 @@ const toolNames: Record<string, string> = {
   editor: 'Editor'
 };
 
-const TopBar: React.FC<TopBarProps> = ({ activeTab, onNavigate }) => {
+const TopBar: React.FC<TopBarProps> = ({ activeTab, onNavigate, onUpgrade }) => {
   if (activeTab === 'home') return null;
 
   return (
@@ -57,6 +58,15 @@ const TopBar: React.FC<TopBarProps> = ({ activeTab, onNavigate }) => {
       </div>
 
       <div className="flex items-center gap-2">
+        {onUpgrade && (
+            <button
+                onClick={onUpgrade}
+                className="hidden md:flex bg-gradient-to-r from-brand-600 to-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-brand-500/20 hover:shadow-brand-500/30 hover:-translate-y-0.5 transition-all items-center gap-2"
+            >
+                <Zap className="w-3.5 h-3.5 fill-current" />
+                Mejorar Plan
+            </button>
+        )}
         <button
           onClick={() => onNavigate('home')}
           className="p-2 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-wider"

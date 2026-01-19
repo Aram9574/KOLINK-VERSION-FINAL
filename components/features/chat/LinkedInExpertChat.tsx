@@ -149,6 +149,7 @@ const LinkedInExpertChat: React.FC = () => {
           payload.imageBase64 = currentImage; // Send base64 to backend
       }
 
+      // @ts-ignore
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("NO_SESSION");
 

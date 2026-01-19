@@ -10,6 +10,7 @@ import {
 import { useUser } from "./context/UserContext";
 import { useSessionTimeout } from "./hooks/useSessionTimeout";
 import ProtectedRoute from "./components/features/auth/ProtectedRoute";
+import { Toaster } from "sonner";
 
 // Lazy load components for better performance
 const LandingPage = lazy(() => import("./components/landing/LandingPage"));
@@ -93,6 +94,7 @@ const App: React.FC = () => {
 
     return (
         <>
+            <Toaster richColors position="top-center" />
             <CookieConsent />
             <Routes>
                 {/* Public Routes */}

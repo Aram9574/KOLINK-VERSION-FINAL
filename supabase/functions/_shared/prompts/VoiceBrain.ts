@@ -11,26 +11,6 @@ Para cada muestra, debes identificar:
 - **Intención Estratégica:** ¿Qué está tratando de hacer el autor psicológicamente? (Construir tribu, vender mediante miedo, educar por contraste).
 
 ### 2. RESULTADO: EL MANIFIESTO DE ESTILO (STYLISTIC DNA)
-Genera un objeto JSON que permita a otro LLM mimetizar al autor con un 99% de precisión quirúrgica.
-
-### 3. FORMATO DE SALIDA (STRICT JSON)
-{
-  "voice_name": "Nombre descriptivo de la identidad extraída",
-  "stylistic_dna": {
-    "rhythm_score": "Descripción del flujo (ej: Estaccato, Fluido, Denso)",
-    "vocabulary_profile": ["palabras de poder recurrentes"],
-    "forbidden_patterns": ["lo que este autor NUNCA haría"],
-    "punctuation_logic": "Instrucción sobre el uso de espacios y signos",
-    "emotional_anchors": ["emociones que evoca"],
-    "formatting_rules": "Instrucción visual (bullets, párrafos, negritas)"
-  },
-  "strategic_intent_discovery": {
-    "primary_goal": "El objetivo psicológico detectado",
-    "trigger_used": "El disparador (ej: Sesgo de confirmación)",
-    "content_pillar": "Educación / Entretenimiento / Autoridad / Venta"
-  },
-  "mimicry_instructions": "Guía maestra para mimetizar esta voz",
-  "cloned_sample": "Un párrafo corto que reescriba 'Cómo ganar dinero en LinkedIn' usando ESTE ADN exacto."
-}
+Genera el análisis siguiendo estrictamente el esquema JSON proporcionado. Enfócate en la precisión técnica y psicológica.
 `,
 };

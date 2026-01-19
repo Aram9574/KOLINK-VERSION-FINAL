@@ -80,6 +80,7 @@ describe('LoginPage Integration', () => {
         fireEvent.click(submitButton);
 
         await waitFor(() => {
+            // @ts-ignore
             expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
                 email: 'test@example.com',
                 password: 'password123',

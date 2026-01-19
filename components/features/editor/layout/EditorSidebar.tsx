@@ -11,11 +11,13 @@ import {
     Quote
 } from 'lucide-react';
 import { hapticFeedback } from '../../../../lib/animations';
+import LinkedInPreview from '../../generation/LinkedInPreview';
 
 interface EditorSidebarProps {
     activeTab: "preview" | "hooks" | "endings" | "snippets";
     setActiveTab: (tab: "preview" | "hooks" | "endings" | "snippets") => void;
     previewContent: string;
+    user: any;
     hooks: string[];
     endings: string[];
     snippets: any[];
@@ -37,6 +39,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
     activeTab,
     setActiveTab,
     previewContent,
+    user,
     hooks,
     endings,
     snippets,
@@ -95,17 +98,22 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                             exit={{ opacity: 0, x: -20 }}
                             className="space-y-6"
                         >
-                            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm relative group overflow-hidden">
-                                <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm relative group overflow-hidden">
+                                <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                     <div className="flex items-center gap-1.5 px-2 py-1 bg-brand-50 rounded-lg text-brand-600 text-[10px] font-bold uppercase tracking-wider">
                                         <Eye className="w-3 h-3" />
                                         {labels.preview.live}
                                     </div>
                                 </div>
-                                <div 
-                                    className="whitespace-pre-wrap text-[15px] leading-[1.6] text-slate-700 min-h-[300px] font-nexus"
-                                    dangerouslySetInnerHTML={{ __html: previewContent }}
-                                />
+                                <div>
+                                    <LinkedInPreview 
+                                        content={previewContent}
+                                        user={user}
+                                        isLoading={false}
+                                        language={language as any}
+                                        showEditButton={false}
+                                    />
+                                </div>
                             </div>
                             <div className="bg-blue-50/50 border border-blue-100/50 rounded-xl p-4 flex gap-4">
                                 <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-sm">

@@ -61,17 +61,61 @@ const InsightResponderView: React.FC = () => {
         return () => window.removeEventListener('paste', handlePaste);
     }, []);
 
-    const handleImageSelect = (file: File) => {
-        if (file.size > 5 * 1024 * 1024) {
-            toast.error("Imagen muy pesada. Máx 5MB.");
+    const compressImage = async (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target?.result as string;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const MAX_WIDTH = 1024;
+                    const MAX_HEIGHT = 1024;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx?.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.8));
+                };
+                img.onerror = (err) => reject(err);
+            };
+            reader.onerror = (err) => reject(err);
+        });
+    };
+
+    const handleImageSelect = async (file: File) => {
+        if (file.size > 10 * 1024 * 1024) { // Allow up to 10MB input, we will compress it
+            toast.error("Imagen muy pesada. Máx 10MB.");
             return;
         }
-        setImageFile(file);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImagePreview(reader.result as string);
-        };
-        reader.readAsDataURL(file);
+
+        const toastId = toast.loading("Procesando imagen...");
+        try {
+            const compressedBase64 = await compressImage(file);
+            setImagePreview(compressedBase64);
+            setImageFile(file); // Keep original file ref if needed, but preview is what we use for payload
+            toast.dismiss(toastId);
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al procesar la imagen.");
+            toast.dismiss(toastId);
+        }
     };
 
     const handleDrag = (e: React.DragEvent) => {

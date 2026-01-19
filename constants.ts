@@ -189,7 +189,7 @@ export const PLANS: SubscriptionPlan[] = [
       "Nexus Chat 24/7",
     ],
     highlight: true,
-    stripePriceId: "price_1SZJKhE0zDGmS9ihOiYOzLa1",
+    stripePriceId: "price_1SrNfsE0zDGmS9ihTHe1GTTH",
   },
   {
     id: "viral",

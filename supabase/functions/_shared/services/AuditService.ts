@@ -1,9 +1,8 @@
 import { BaseAIService } from "./BaseAIService.ts";
-import { Schema, SchemaType, Part } from "@google/generative-ai";
 import { LinkedInAuditResult, LinkedInPDFData, LinkedInProfileData } from "../types.ts";
 import { AuditBrain } from "../prompts/AuditBrain.ts";
 import { VoiceBrain } from "../prompts/VoiceBrain.ts";
-import pdf from "pdf-parse";
+import pdf from "npm:pdf-parse@^1.1.1";
 import { Buffer } from "node:buffer";
 
 export class AuditService extends BaseAIService {
@@ -34,23 +33,26 @@ export class AuditService extends BaseAIService {
     `;
 
     return await this.retryWithBackoff(async () => {
-      const model = this.genAI.getGenerativeModel({ model: this.model });
-      const result = await model.generateContent({
+      const payload = {
         contents: [
           {
             role: "user",
             parts: [
               { text: prompt },
-              { inlineData: { data: pdfBase64, mimeType: "application/pdf" } },
+              { inline_data: { mime_type: "application/pdf", data: pdfBase64 } },
             ],
           },
         ],
         generationConfig: {
           temperature: 0.1,
-          responseMimeType: "application/json",
+          response_mime_type: "application/json",
         },
-      });
-      return JSON.parse(result.response.text());
+      };
+
+      const data = await this.generateViaFetch(this.MODEL, payload);
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error("No text returned from Gemini");
+      return JSON.parse(text);
     });
   }
 
@@ -140,15 +142,11 @@ export class AuditService extends BaseAIService {
                       console.log("[AuditService] Scraping successful");
                       return data[0]; // Return the first record
                   }
-                  // If "status" is running/ready but empty, continue? 
-                  // BD usually returns the data immediately when ready or 202/Pending.
-                  // If we got JSON array, it's likely done.
                   if (data && data.status === "running") {
                       console.log("[AuditService] Scraping still running...");
                       attempts++;
                       continue; 
                   }
-                  // If we get an array but it's empty, maybe it failed or no data found?
               }
               attempts++;
           }
@@ -190,20 +188,6 @@ export class AuditService extends BaseAIService {
       Generate a detailed, high-impact audit. The "summary" should be a substantial paragraph (4-5 sentences) diagnosing the profile's current market position.
       The "feedback" fields must be detailed critiques (Why is it good/bad?).
       The "suggested" fields must be "Copy-Paste" ready gold-standard examples.
-
-      REQUIRED OUTPUT (JSON):
-      {
-        "authority_score": (number 0-100),
-        "brutal_diagnosis": "Un párrafo honesto y directo que resuma el estado actual.",
-        "quick_wins": ["3 acciones que el usuario puede hacer en menos de 5 minutos."],
-        "strategic_roadmap": {
-          "headline": "Propuesta de nuevo titular de alto impacto.",
-          "about": "Estructura recomendada para el About (primeras 3 frases cruciales).",
-          "experience": "Ejemplo de cómo redactar un logro pasado."
-        },
-        "visual_critique": "Análisis de la coherencia visual y banner.",
-        "technical_seo_keywords": ["Lista de keywords para las que el perfil debería posicionar."]
-      }
     `;
 
     if (imageBase64) {
@@ -211,55 +195,58 @@ export class AuditService extends BaseAIService {
     }
 
     return await this.retryWithBackoff(async () => {
-      const model = this.genAI.getGenerativeModel({ 
-          model: this.model, 
-          systemInstruction: systemPrompt
-      });
+      const parts: any[] = [{ text: prompt }];
 
-      const parts: Part[] = [{ text: prompt }];
       if (imageBase64) {
+          const mimeType = imageBase64.match(/data:(.*?);base64/)?.[1] || "image/png";
+          const cleanData = imageBase64.split(',')[1] || imageBase64;
           parts.push({
-              inlineData: {
-                  mimeType: "image/png",
-                  data: imageBase64.split(',')[1] || imageBase64
+              inline_data: {
+                  mime_type: mimeType,
+                  data: cleanData
               }
           });
       }
 
-      const response = await model.generateContent({
+      const payload = {
         contents: [{ role: "user", parts: parts }],
+        system_instruction: { parts: [{ text: systemPrompt }] },
         generationConfig: {
           temperature: 0.3,
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: SchemaType.OBJECT,
+          response_mime_type: "application/json",
+          response_schema: {
+            type: "OBJECT",
             properties: {
-              authority_score: { type: SchemaType.NUMBER },
-              brutal_diagnosis: { type: SchemaType.STRING },
+              authority_score: { type: "NUMBER" },
+              brutal_diagnosis: { type: "STRING" },
               quick_wins: { 
-                type: SchemaType.ARRAY, 
-                items: { type: SchemaType.STRING } 
+                type: "ARRAY", 
+                items: { type: "STRING" } 
               },
               strategic_roadmap: {
-                type: SchemaType.OBJECT,
+                type: "OBJECT",
                 properties: {
-                  headline: { type: SchemaType.STRING },
-                  about: { type: SchemaType.STRING },
-                  experience: { type: SchemaType.STRING }
+                  headline: { type: "STRING" },
+                  about: { type: "STRING" },
+                  experience: { type: "STRING" }
                 },
                 required: ["headline", "about", "experience"]
               },
-              visual_critique: { type: SchemaType.STRING },
+              visual_critique: { type: "STRING" },
               technical_seo_keywords: { 
-                type: SchemaType.ARRAY, 
-                items: { type: SchemaType.STRING } 
+                type: "ARRAY", 
+                items: { type: "STRING" } 
               }
             },
             required: ["authority_score", "brutal_diagnosis", "quick_wins", "strategic_roadmap", "visual_critique", "technical_seo_keywords"]
-          } as Schema,
+          },
         },
-      });
-      return JSON.parse(response.response.text());
+      };
+
+      const data = await this.generateViaFetch(this.MODEL, payload);
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error("No text returned from Gemini");
+      return JSON.parse(text);
     });
   }
 
@@ -268,9 +255,7 @@ export class AuditService extends BaseAIService {
    */
   async analyzeVoice(contentSamples: string[], language: string = "es", imageBase64?: string) {
     const samples = contentSamples.join("\n---\n");
-    // NEW SOTA PROMPT FOR VOICE
     let prompt = `
-
         Samples to analyze:
         ${samples}
         
@@ -283,60 +268,62 @@ export class AuditService extends BaseAIService {
     }
 
     return await this.retryWithBackoff(async () => {
-      const model = this.genAI.getGenerativeModel({
-        model: this.model, // Uses gemini-2.0-flash-exp
-        systemInstruction: VoiceBrain.system_instruction,
-      });
-
-      const parts: Part[] = [{ text: prompt }];
+      const parts: any[] = [{ text: prompt }];
+      
       if (imageBase64) {
+          const mimeType = imageBase64.match(/data:(.*?);base64/)?.[1] || "image/png";
+          const cleanData = imageBase64.split(',')[1] || imageBase64;
           parts.push({
-              inlineData: {
-                  mimeType: "image/png", 
-                  data: imageBase64.split(',')[1] || imageBase64
+              inline_data: {
+                  mime_type: mimeType, 
+                  data: cleanData
               }
           });
       }
 
-      const response = await model.generateContent({
+      const payload = {
         contents: [{ role: "user", parts: parts }],
+        system_instruction: { parts: [{ text: VoiceBrain.system_instruction }] },
         generationConfig: {
           temperature: 0.2, 
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: SchemaType.OBJECT,
+          response_mime_type: "application/json",
+          response_schema: {
+            type: "OBJECT",
             properties: {
-              voice_name: { type: SchemaType.STRING },
+              voice_name: { type: "STRING" },
               stylistic_dna: {
-                type: SchemaType.OBJECT,
+                type: "OBJECT",
                 properties: {
-                  rhythm_score: { type: SchemaType.STRING },
-                  vocabulary_profile: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
-                  forbidden_patterns: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
-                  punctuation_logic: { type: SchemaType.STRING },
-                  emotional_anchors: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
-                  formatting_rules: { type: SchemaType.STRING }
+                  rhythm_score: { type: "STRING" },
+                  vocabulary_profile: { type: "ARRAY", items: { type: "STRING" } },
+                  forbidden_patterns: { type: "ARRAY", items: { type: "STRING" } },
+                  punctuation_logic: { type: "STRING" },
+                  emotional_anchors: { type: "ARRAY", items: { type: "STRING" } },
+                  formatting_rules: { type: "STRING" }
                 },
                 required: ["rhythm_score", "vocabulary_profile", "forbidden_patterns", "punctuation_logic", "emotional_anchors", "formatting_rules"]
               },
               strategic_intent_discovery: {
-                type: SchemaType.OBJECT,
+                type: "OBJECT",
                 properties: {
-                  primary_goal: { type: SchemaType.STRING },
-                  trigger_used: { type: SchemaType.STRING },
-                  content_pillar: { type: SchemaType.STRING }
+                  primary_goal: { type: "STRING" },
+                  trigger_used: { type: "STRING" },
+                  content_pillar: { type: "STRING" }
                 },
                 required: ["primary_goal", "trigger_used", "content_pillar"]
               },
-              mimicry_instructions: { type: SchemaType.STRING },
-              cloned_sample: { type: SchemaType.STRING }
+              mimicry_instructions: { type: "STRING" },
+              cloned_sample: { type: "STRING" }
             },
             required: ["voice_name", "stylistic_dna", "strategic_intent_discovery", "mimicry_instructions", "cloned_sample"]
-          } as Schema,
+          },
         },
-      });
+      };
 
-      return this.extractJson(response.response.text());
+      const data = await this.generateViaFetch(this.MODEL, payload);
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error("No text returned from Gemini");
+      return this.extractJson(text);
     });
   }
 }

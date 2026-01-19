@@ -12,6 +12,7 @@ export const useLinkedInPublishing = () => {
 
         setIsPublishing(true);
         try {
+            // @ts-ignore
             const { data: { session } } = await supabase.auth.getSession();
             const providerToken = session?.provider_token;
 

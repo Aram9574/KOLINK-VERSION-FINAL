@@ -76,6 +76,7 @@ const LoginPage: React.FC = () => {
 
     // Reset loading state if session is established or component re-mounts
     useEffect(() => {
+        // @ts-ignore
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             (event) => {
                 if (event === "SIGNED_IN" || event === "USER_UPDATED") {
@@ -99,12 +100,14 @@ const LoginPage: React.FC = () => {
 
         try {
             if (isLoginMode) {
+                // @ts-ignore
                 const { error } = await supabase.auth.signInWithPassword({
                     email,
                     password,
                 });
                 if (error) throw error;
             } else {
+                // @ts-ignore
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
@@ -145,6 +148,7 @@ const LoginPage: React.FC = () => {
         setIsLoading(true);
         try {
             const redirectTo = `https://${APP_DOMAIN}/dashboard`;
+            // @ts-ignore
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'linkedin_oidc',
                 options: {

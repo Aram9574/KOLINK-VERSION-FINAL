@@ -4,9 +4,9 @@
     "stripe": "npm:stripe@^14.0.0",
     "@supabase/supabase-js": "jsr:@supabase/supabase-js@2",
     "std/": "https://deno.land/std@0.208.0/",
+    "std/": "https://deno.land/std@0.208.0/",
+    "zod": "npm:zod@^3.23.8",
     "npm:zod": "npm:zod@^3.23.8",
-    "@google/generative-ai": "npm:@google/generative-ai@^0.21.0",
-    "npm:@google/generative-ai": "npm:@google/generative-ai@^0.21.0",
     "npm:pdf-parse": "npm:pdf-parse@^1.1.1",
     "node:buffer": "node:buffer"
   }

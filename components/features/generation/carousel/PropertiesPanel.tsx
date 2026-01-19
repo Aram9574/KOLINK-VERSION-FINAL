@@ -33,7 +33,7 @@ export const PropertiesPanel = () => {
   
   const updateSlide = useCarouselStore(state => state.updateSlide);
   const updateDesign = useCarouselStore(state => state.updateDesign);
-  const updateGlobalDesign = useCarouselStore(state => state.updateGlobalDesign);
+  /* const updateGlobalDesign = useCarouselStore(state => state.updateGlobalDesign); */
   const updateAuthor = useCarouselStore(state => state.updateAuthor);
   const updateElementOverride = useCarouselStore(state => state.updateElementOverride);
   const setActiveElement = useCarouselStore(state => state.setActiveElement);
@@ -60,6 +60,7 @@ export const PropertiesPanel = () => {
   const [isPolishReviewOpen, setIsPolishReviewOpen] = useState(false);
   const [isPolishing, setIsPolishing] = useState(false);
   const [polishedData, setPolishedData] = useState<Partial<typeof activeSlide.content> | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Load presets on mount
   useEffect(() => {
@@ -79,7 +80,7 @@ export const PropertiesPanel = () => {
 
   const handlePredictPerformance = async () => {
       // 1. Aggregate content
-      const fullContent = slides.map(s => `${s.content.title} ${s.content.body} ${s.content.subtitle || ''}`).join('\n\n');
+      const fullContent = slides.map(s => `${s.content.title || ''} ${s.content.body || ''} ${s.content.subtitle || ''}`).join('\n\n');
       
       if (!fullContent || fullContent.length < 10) {
           toast.error("Add more content before predicting performance.");
@@ -303,16 +304,41 @@ export const PropertiesPanel = () => {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-6 w-6 text-red-400 hover:text-red-500 hover:bg-red-50"
-                                        onClick={() => {
-                                            if (globalThis.confirm(t.properties.deleteConfirm)) {
-                                                removeSlide(activeSlide.id);
-                                            }
-                                        }}
+                                        className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                                        title={t.properties?.deleteSlide || "Delete Slide"}
+                                        onClick={() => setShowDeleteConfirm(true)}
                                     >
-                                        <X className="w-3.5 h-3.5" />
+                                        <X className="w-4 h-4" />
                                     </Button>
                                 </div>
+
+                                <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>{t.properties?.deleteConfirmTitle || "Delete Slide?"}</DialogTitle>
+                                            <DialogDescription>
+                                                {t.properties?.deleteConfirmDesc || "This action cannot be undone."}
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <DialogFooter>
+                                            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>{t.canvas?.cancel || "Cancel"}</Button>
+                                            <Button 
+                                                variant="destructive" 
+                                                onClick={() => {
+                                                    if (slides.length <= 1) {
+                                                        toast.error("Cannot delete the last slide");
+                                                        setShowDeleteConfirm(false);
+                                                        return;
+                                                    }
+                                                    removeSlide(activeSlide.id);
+                                                    setShowDeleteConfirm(false);
+                                                }}
+                                            >
+                                                {t.properties?.delete || "Delete"}
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
 
                                 {/* Text Fields */}
                                 {Object.entries(activeSlide.content).map(([key, value]) => {
@@ -321,7 +347,7 @@ export const PropertiesPanel = () => {
 
                                     return (
                                         <div key={key} className="space-y-1.5">
-                                            <Label className="text-xs text-slate-500 capitalize">{t.properties[key as keyof typeof t.properties] || key}</Label>
+                                            <Label className="text-xs text-slate-500 capitalize">{(t.properties as any)[key] || key}</Label>
                                             <Textarea 
                                                 value={typeof value === 'string' ? value : ''}
                                                 onChange={(e) => updateSlide(activeSlide.id, { 
@@ -353,10 +379,10 @@ export const PropertiesPanel = () => {
                                             key={layout.id}
                                             onClick={() => updateSlide(activeSlide.id, { layout: layout.id as any })}
                                             className={cn(
-                                                "flex flex-col items-center justify-center p-2 rounded-lg border transition-all",
+                                                "flex flex-col items-center justify-center p-2 rounded-lg border transition-all duration-200",
                                                 activeSlide.layout === layout.id
-                                                    ? 'border-brand-500 bg-brand-50 text-brand-700 ring-1 ring-brand-500'
-                                                    : 'border-slate-200 hover:border-brand-200 hover:bg-slate-50 text-slate-500'
+                                                    ? 'border-brand-500 bg-brand-50 text-brand-700 ring-2 ring-brand-500 shadow-sm transform scale-[1.02]'
+                                                    : 'border-slate-200 hover:border-brand-300 hover:bg-slate-50 text-slate-500 hover:text-slate-700'
                                             )}
                                          >
                                             <layout.icon className="w-5 h-5 mb-1.5" />

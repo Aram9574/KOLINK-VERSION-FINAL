@@ -5,7 +5,7 @@ import TopBar from "../navigation/TopBar";
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-white">
-      <TopBar />
+      <TopBar activeTab="settings" onNavigate={() => {}} />
       <div className="max-w-4xl mx-auto px-6 py-12 lg:py-20">
         <div className="mb-10 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 mb-6">

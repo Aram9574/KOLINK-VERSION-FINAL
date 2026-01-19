@@ -111,6 +111,7 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
         length: params.length === "random" ? pickRandom(LENGTH_OPTIONS) as PostLength : params.length,
         emojiDensity: params.emojiDensity === "random" ? pickRandom(EMOJI_OPTIONS) as EmojiDensity : params.emojiDensity,
         hookStyle: params.hookStyle === "random" ? pickRandom(isFreeUser ? HOOK_STYLES.filter(h => !h.isPremium) : HOOK_STYLES) as ViralHook : params.hookStyle,
+        outputLanguage: language, // Explicitly pass the selected language
       };
       
       console.log("PostGenerator V4: invoking generate", finalParams);

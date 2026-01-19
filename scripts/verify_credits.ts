@@ -22,6 +22,7 @@ async function runStressTest() {
     const TEST_PASSWORD = "Aram9574"; // From user prompt rules
 
     console.log(`Logging in as ${TEST_EMAIL}...`);
+    // @ts-ignore
     const { data: { session }, error: loginError } = await supabase.auth.signInWithPassword({
         email: TEST_EMAIL,
         password: TEST_PASSWORD

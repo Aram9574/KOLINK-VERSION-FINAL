@@ -13,7 +13,7 @@ import ProtectedRoute from "./components/features/auth/ProtectedRoute";
 import { useToast } from "./context/ToastContext";
 import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
-import { supabase } from "./lib/supabase";
+import { supabase } from "./services/supabaseClient";
 
 // Lazy load components specific to Mobile Flow
 const LoginPage = lazy(() => import("./components/features/auth/LoginPage"));
@@ -95,6 +95,7 @@ const MobileApp: React.FC = () => {
                         !!provider_token,
                     );
 
+                    // @ts-ignore
                     const { error } = await supabase.auth.setSession({
                         access_token,
                         refresh_token,
@@ -104,6 +105,7 @@ const MobileApp: React.FC = () => {
                 } else if (code) {
                     toast.info("Canjeando código de acceso...", "Procesando");
                     const { data, error } = await supabase.auth
+                        // @ts-ignore
                         .exchangeCodeForSession(code);
                     if (error) throw error;
 

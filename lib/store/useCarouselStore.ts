@@ -87,6 +87,7 @@ const INITIAL_SLIDES: CarouselSlide[] = [
     content: {
       title: 'How to Build a Personal Brand in 2026',
       subtitle: 'The Ultimate Guide',
+      body: '',
       cta_text: 'Swipe to learn',
     },
   },
@@ -97,7 +98,9 @@ const INITIAL_SLIDES: CarouselSlide[] = [
     isVisible: true,
     content: {
       title: 'Consistency is Key',
+      subtitle: '',
       body: 'Post daily. Engage with comments. Be present. The algorithm rewards consistency above all else.',
+      cta_text: '',
     },
   },
   {
@@ -107,6 +110,8 @@ const INITIAL_SLIDES: CarouselSlide[] = [
     isVisible: true,
     content: {
       title: 'Was this helpful?',
+      subtitle: '',
+      body: '',
       cta_text: 'Follow for more tips!',
     },
   },
@@ -163,7 +168,9 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
         isVisible: true,
         content: {
           title: 'New Slide',
+          subtitle: '',
           body: 'Add your content here.',
+          cta_text: '',
         },
       };
       const slides = [...state.project.slides];
@@ -320,6 +327,7 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
         isSidebarOpen: true,
         activePanel: 'generator',
         isGenerating: false,
+        activeElementId: null,
       }
     })),
 }));

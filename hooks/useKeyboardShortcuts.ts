@@ -26,7 +26,7 @@ export const useKeyboardShortcuts = ({ onNavigate }: KeyboardShortcutsProps) => 
                     onNavigate('home');
                     break;
                 case 'a':
-                    onNavigate('autopost');
+                    onNavigate('autopost' as any);
                     break;
                 default:
                     break;

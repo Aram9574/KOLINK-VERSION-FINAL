@@ -393,24 +393,38 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
       {slide.content.background_override ? (
          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${slide.content.background_override})` }} />
       ) : (
-         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
+            {/* DOTS PATTERN */}
             {design.background.patternType === 'dots' && (
                 <div 
                    className="absolute inset-0" 
                    style={{ 
-                      backgroundImage: `radial-gradient(${design.background.patternColor || '#000'} 1.5px, transparent 1.5px)`, 
-                      backgroundSize: '32px 32px',
-                      opacity: design.background.patternOpacity 
+                      backgroundImage: `radial-gradient(${design.background.patternColor || '#000000'} 2px, transparent 2px)`, 
+                      backgroundSize: '24px 24px',
+                      opacity: design.background.patternOpacity ?? 0.1 
                    }} 
                 />
             )}
+            
+            {/* GRID PATTERN */}
             {design.background.patternType === 'grid' && (
                 <div 
                    className="absolute inset-0" 
                    style={{ 
-                      backgroundImage: `linear-gradient(${design.background.patternColor || '#000'} 1px, transparent 1px), linear-gradient(90deg, ${design.background.patternColor || '#000'} 1px, transparent 1px)`, 
-                      backgroundSize: '64px 64px',
-                      opacity: design.background.patternOpacity 
+                      backgroundImage: `linear-gradient(${design.background.patternColor || '#000000'} 1px, transparent 1px), linear-gradient(90deg, ${design.background.patternColor || '#000000'} 1px, transparent 1px)`, 
+                      backgroundSize: '48px 48px',
+                      opacity: design.background.patternOpacity ?? 0.1 
+                   }} 
+                />
+            )}
+
+            {/* WAVES PATTERN (New) */}
+            {design.background.patternType === 'waves' && (
+                <div 
+                   className="absolute inset-0 opacity-50" 
+                   style={{ 
+                      backgroundImage: `repeating-linear-gradient(-45deg, ${design.background.patternColor || '#000000'}, ${design.background.patternColor || '#000000'} 1px, transparent 2px, transparent 12px)`,
+                      opacity: design.background.patternOpacity ?? 0.05
                    }} 
                 />
             )}

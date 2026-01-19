@@ -11,9 +11,18 @@ const AuthCallback = () => {
         const handleAuthCallback = async () => {
             try {
                 // Check if we have a session
-                const { data: { session }, error } = await supabase.auth.getSession();
+                const urlParams = new URLSearchParams(window.location.search);
+                const code = urlParams.get('code');
 
-                if (error) throw error;
+                if (!code) {
+                    throw new Error('No authorization code found in URL.');
+                }
+
+                // @ts-ignore
+                // @ts-ignore
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+                if (sessionError) throw sessionError;
 
                 if (session) {
                     console.log("AuthCallback: Session found, redirecting to dashboard");
@@ -37,6 +46,7 @@ const AuthCallback = () => {
         handleAuthCallback();
 
         // Also listen for the event, just in case getSession processes it async
+        // @ts-ignore
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
              if (event === 'SIGNED_IN' && session) {
                  console.log("AuthCallback: SIGNED_IN event caught");

@@ -12,17 +12,27 @@ const TemplatesPanel: React.FC<TemplatesPanelProps> = () => {
     const design = useCarouselStore(state => state.project.design);
     const updateDesign = useCarouselStore(state => state.updateDesign);
 
+    const [loadingThemeId, setLoadingThemeId] = React.useState<string | null>(null);
+
     const updateTheme = (themeId: string) => {
-        const template = MASTER_TEMPLATES[themeId];
-        if (template) {
-            updateDesign({
-               themeId: template.themeId,
-               colorPalette: template.colorPalette,
-               fonts: template.fonts,
-               background: template.background,
-               layout: template.layout,
-           });
-        }
+        if (loadingThemeId) return; // Prevent multiple clicks
+        
+        setLoadingThemeId(themeId);
+        
+        // Artificial delay for better UX (perception of "applying")
+        setTimeout(() => {
+            const template = MASTER_TEMPLATES[themeId];
+            if (template) {
+                updateDesign({
+                   themeId: template.themeId,
+                   colorPalette: template.colorPalette,
+                   fonts: template.fonts,
+                   background: template.background,
+                   layout: template.layout,
+               });
+            }
+            setLoadingThemeId(null);
+        }, 500);
     };
 
     return (
@@ -35,6 +45,8 @@ const TemplatesPanel: React.FC<TemplatesPanelProps> = () => {
             <div className="grid grid-cols-1 gap-4">
                 {Object.values(MASTER_TEMPLATES).map((template) => {
                     const isActive = design.themeId === template.themeId;
+                    const isLoading = loadingThemeId === template.themeId;
+                    
                     return (
                         <div 
                             key={template.themeId}
@@ -44,6 +56,12 @@ const TemplatesPanel: React.FC<TemplatesPanelProps> = () => {
                                 isActive ? "border-brand-500 bg-brand-50/10" : "border-slate-100 bg-white hover:border-slate-200"
                             )}
                         >
+                            {isLoading && (
+                                <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-10 flex items-center justify-center">
+                                    <div className="w-5 h-5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+                                </div>
+                            )}
+                            
                             <div className="flex items-stretch h-24">
                                 {/* Preview Strips */}
                                 <div className="w-24 flex-shrink-0 relative overflow-hidden bg-slate-100 border-r border-slate-100">
@@ -62,7 +80,7 @@ const TemplatesPanel: React.FC<TemplatesPanelProps> = () => {
                                         <span className="font-bold text-sm text-slate-700 capitalize">
                                             {template.themeId.replace('_', ' ')}
                                         </span>
-                                        {isActive && <CheckCircle2 className="w-4 h-4 text-brand-500" />}
+                                        {isActive && !isLoading && <CheckCircle2 className="w-4 h-4 text-brand-500" />}
                                     </div>
                                     <div className="flex items-center gap-1.5 mt-2">
                                         <div className="w-4 h-4 rounded-full border border-slate-100 shadow-sm" style={{ backgroundColor: template.colorPalette.primary }} />

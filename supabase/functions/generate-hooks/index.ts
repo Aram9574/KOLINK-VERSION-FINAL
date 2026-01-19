@@ -28,7 +28,7 @@ serve(async (req) => {
 
     const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY")!);
     // Upgrade to 2.0 Flash Exp
-    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3.0-flash" });
 
     // Construct DNA Context
     let dnaContext = "";

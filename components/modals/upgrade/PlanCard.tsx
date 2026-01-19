@@ -64,7 +64,10 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, currentPlanId, billingInterva
             </div>
 
             <button
-                onClick={() => {
+                type="button"
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     onUpgrade(plan);
                 }}
                 disabled={isDowngradeOrCurrent}

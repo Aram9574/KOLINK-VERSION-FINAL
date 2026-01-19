@@ -1,4 +1,4 @@
-import { BaseAIService } from "./BaseAIService.ts";
+import { BaseAIService, GeminiResponse } from "./BaseAIService.ts";
 
 export class RepurposeService extends BaseAIService {
   
@@ -33,7 +33,8 @@ export class RepurposeService extends BaseAIService {
       }
 
       // Prefer English or auto-generated English, or just take the first one
-      const track = captionTracks.find((t: any) => t.languageCode === 'en') || captionTracks[0];
+      // @ts-ignore: Deno type mismatch for YouTube API response
+      const track = captionTracks.find((t: Record<string, unknown>) => t.languageCode === 'en') || captionTracks[0];
       
       const transcriptResponse = await fetch(track.baseUrl);
       const transcriptXml = await transcriptResponse.text();
@@ -118,19 +119,27 @@ export class RepurposeService extends BaseAIService {
     `;
 
     return await this.retryWithBackoff(async () => {
-      const model = this.genAI.getGenerativeModel({ model: this.model });
-      const result = await model.generateContent({
+      const payload = {
         contents: [
           {
             role: "user",
             parts: [
               { text: prompt },
-              { inlineData: { data: pdfBase64, mimeType: "application/pdf" } },
+              { inline_data: { data: pdfBase64, mime_type: "application/pdf" } },
             ],
           },
         ],
-      });
-      return result.response.text().trim();
+        generationConfig: {
+            temperature: 0.2
+        }
+      };
+
+      const data = await this.generateViaFetch(this.model, payload) as GeminiResponse;
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!text) throw new Error("No text extracted from PDF");
+
+      return text.trim();
     });
   }
 }

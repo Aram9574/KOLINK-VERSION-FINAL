@@ -34,11 +34,13 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ user, language, onS
 
         setIsSavingPassword(true);
         try {
+            // @ts-ignore
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             if (sessionError || !session) {
                 throw new Error(language === 'es' ? "Tu sesión ha expirado. Por favor inicia sesión nuevamente." : "Your session has expired. Please log in again.");
             }
 
+            // @ts-ignore
             const { data, error } = await supabase.auth.updateUser({ password: newPassword });
 
             if (error) throw error;

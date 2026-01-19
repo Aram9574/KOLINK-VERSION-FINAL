@@ -7,7 +7,11 @@ import { Loader2, Download, FileImage, FileText, CheckCircle2 } from 'lucide-rea
 import { toast } from 'sonner';
 import { useCarouselStore } from '@/lib/store/useCarouselStore';
 import { supabase } from '@/services/supabaseClient';
-import { exportToPDFParams } from '@/lib/utils/export';
+import { SlideRenderer } from './SlideRenderer';
+import html2canvas from 'html2canvas-pro';
+import jsPDF from 'jspdf';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 interface ExportModalProps {
     isOpen: boolean;
@@ -19,44 +23,73 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
     const [format, setFormat] = React.useState<'pdf' | 'png' | 'zip'>('pdf');
     const [quality, setQuality] = React.useState<'standard' | 'high'>('high');
     const [isExporting, setIsExporting] = React.useState(false);
-    const [progress, setProgress] = React.useState(0); // Fake progress for UX
+    const [progress, setProgress] = React.useState(0);
+    const stagingRef = React.useRef<HTMLDivElement>(null);
 
     const handleExport = async () => {
         setIsExporting(true);
-        setProgress(10);
+        setProgress(5);
         
+        // Give React a moment to ensure hidden nodes are rendered
+        await new Promise(resolve => setTimeout(resolve, 500)); 
+
         try {
-            const { data: { session } } = await supabase.auth.getSession();
-            const token = session?.access_token;
-            if (!token) throw new Error("Not authenticated");
-
-            // Fake progress animation
-            const interval = setInterval(() => {
-                setProgress(p => Math.min(p + 10, 90));
-            }, 500);
-
-            if (format === 'pdf') {
-                 await exportToPDFParams(token, {
-                    slides,
-                    design,
-                    author,
-                    format: 'pdf',
-                    quality // future proofing
-                }, `kolink_${title.replace(/\s+/g, '_')}.pdf`);
-            } else {
-                 // Fallback or implementation for other formats if backend supports them
-                 // For now, let's just do PDF as it's the main requested one, 
-                 // effectively forcing PDF if other selected or showing a 'coming soon' toast
-                     toast.info("PNG/ZIP export coming soon. Exporting as PDF for now.");
-                     await exportToPDFParams(token, {
-                        slides,
-                        design,
-                        author,
-                        format: 'pdf',
-                    }, `kolink_${title.replace(/\s+/g, '_')}.pdf`);
-            }
+            const scale = quality === 'high' ? 2 : 1.5; // High Res (2160px width) or Standard (1620px) - better than 1x
             
-            clearInterval(interval);
+            // Get all slide nodes
+            const slideNodes = stagingRef.current?.querySelectorAll('.export-slide-node');
+            if (!slideNodes || slideNodes.length === 0) throw new Error("Could not find slides to export.");
+
+            const images: string[] = [];
+            const totalSlides = slideNodes.length;
+
+            // Generate Images
+            for (let i = 0; i < totalSlides; i++) {
+                const node = slideNodes[i] as HTMLElement;
+                const canvas = await html2canvas(node, {
+                    scale: scale,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: null, // Transparent bg if set in slide
+                    logging: false,
+                    windowWidth: 1080, // Force context width
+                });
+                
+                images.push(canvas.toDataURL('image/png', 1.0));
+                setProgress(10 + Math.round(((i + 1) / totalSlides) * 60)); // Up to 70%
+            }
+
+            // Generate Output
+            if (format === 'pdf') {
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'px',
+                    format: [1080, 1080 * (design.aspectRatio === '4:5' ? 1.25 : design.aspectRatio === '9:16' ? 1.77 : 1)],
+                    hotfixes: ['px_scaling'] 
+                });
+
+                // Aspect Ratio calc
+                const width = 1080;
+                const height = design.aspectRatio === '4:5' ? 1350 : design.aspectRatio === '9:16' ? 1920 : 1080;
+
+                images.forEach((imgData, index) => {
+                    if (index > 0) pdf.addPage([width, height]);
+                    pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+                });
+
+                pdf.save(`${title.replace(/\s+/g, '_')}_kolink.pdf`);
+            } else if (format === 'zip') {
+                const zip = new JSZip();
+                images.forEach((imgData, index) => {
+                    const base64Data = imgData.replace(/^data:image\/png;base64,/, "");
+                    const name = `slide_${index + 1}.png`;
+                    zip.file(name, base64Data, { base64: true });
+                });
+                
+                const content = await zip.generateAsync({ type: "blob" });
+                saveAs(content, `${title.replace(/\s+/g, '_')}_kolink.zip`);
+            }
+
             setProgress(100);
             toast.success("Export successful!");
             setTimeout(() => {
@@ -66,13 +99,14 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
             }, 1000);
 
         } catch (error: any) {
-            console.error(error);
-            toast.error("Export failed: " + error.message);
+            console.error("Export Error:", error);
+            toast.error("Client-side export failed: " + error.message);
             setIsExporting(false);
         }
     };
 
     return (
+        <>
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
@@ -148,5 +182,43 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
                 </DialogFooter>
             </DialogContent>
         </Dialog>
+        
+        {/* Hidden Staging Area for High-Fidelity Capture */}
+        {isOpen && (
+            <div 
+                ref={stagingRef}
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: '-10000px', // Far off-screen
+                    zIndex: -1000,
+                    width: '1080px', // Exact base width
+                    height: 'auto',
+                    pointerEvents: 'none'
+                }}
+            >
+                {slides.map((slide, i) => (
+                    <div 
+                        key={slide.id} 
+                        className="export-slide-node"
+                        style={{
+                            width: 1080,
+                            height: design.aspectRatio === '4:5' ? 1350 : design.aspectRatio === '9:16' ? 1920 : 1080,
+                            marginBottom: 20
+                        }}
+                    >
+                        <SlideRenderer 
+                            slide={slide}
+                            design={design}
+                            author={author}
+                            scale={1} // Helper scales 1:1 to container
+                            isActive={false} // Clean mode
+                        />
+                        {/* Add Slide Number Overlay if needed, but usually baking it in logic is better */}
+                    </div>
+                ))}
+            </div>
+        )}
+        </>
     );
 };

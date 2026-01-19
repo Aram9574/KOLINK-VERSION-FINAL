@@ -1,5 +1,5 @@
-import { createClient } from "jsr:@supabase/supabase-js@2";
-import { BaseAIService } from "./BaseAIService.ts";
+import { createClient } from "@supabase/supabase-js";
+import { BaseAIService, GeminiResponse } from "./BaseAIService.ts";
 import { PersonaBrain } from "../prompts/PersonaBrain.ts";
 
 export class BehaviorService extends BaseAIService {
@@ -63,13 +63,20 @@ export class BehaviorService extends BaseAIService {
 
     // 3. Generate DNA using Gemini
     const dnaResult = await this.retryWithBackoff(async () => {
-      const model = this.genAI.getGenerativeModel({
-        model: this.model,
-        systemInstruction: PersonaBrain.system_instruction,
-      });
+      const payload = {
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        system_instruction: { parts: [{ text: PersonaBrain.system_instruction }] },
+        generationConfig: {
+            responseMimeType: "application/json"
+        }
+      };
 
-      const response = await model.generateContent(prompt);
-      return this.extractJson(response.response.text());
+      const data = await this.generateViaFetch(this.model, payload) as GeminiResponse;
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!text) throw new Error("No DNA analysis returned");
+
+      return this.extractJson(text);
     });
 
     // 4. Update Profile

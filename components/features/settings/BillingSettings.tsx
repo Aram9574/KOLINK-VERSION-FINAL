@@ -7,6 +7,8 @@ import CancellationModal from '../../modals/CancellationModal';
 import { motion } from 'framer-motion';
 import { Pricing } from '../../ui/pricing-cards';
 
+import { useSubscription } from '../../../hooks/useSubscription';
+
 interface BillingSettingsProps {
     user: UserProfile;
     language: AppLanguage;
@@ -16,6 +18,7 @@ interface BillingSettingsProps {
 
 const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpgrade, onSave }) => {
     const [showCancelModal, setShowCancelModal] = useState(false);
+    const { handleUpgrade } = useSubscription();
     const t = translations[language].app.settings;
 
     const currentPlan = PLANS.find(p => p.id === user.planTier) || PLANS[0];
@@ -133,7 +136,6 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpg
                 isOpen={showCancelModal}
                 onClose={() => setShowCancelModal(false)}
                 userEmail={user.email || ''}
-                userId={user.id}
                 subscriptionId={user.subscriptionId}
                 language={language}
                 planPrice={PLANS.find(p => p.id === user.planTier)?.price || 0}
@@ -147,13 +149,12 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({ user, language, onUpg
                 <Pricing 
                     currentPlanId={user.planTier} 
                     onPlanSelect={(planId) => {
-                         // Redirect to payment or trigger upgrade logic
-                         // For now, we reuse the onUpgrade prop which presumably handles generic upgrade flow
-                         // OR we might need specific logic per plan.
-                         // Given onUpgrade is () => void, we assume it opens a modal or redirects.
-                         // If we want specific plan selection, we might need to update onUpgrade signature or handle it here.
-                         // For now, let's just trigger onUpgrade() or console log.
-                         window.location.href = '/checkout?plan=' + planId; 
+                         const selectedPlan = PLANS.find(p => p.id === planId);
+                         if (selectedPlan) {
+                             handleUpgrade(selectedPlan);
+                         } else {
+                             onUpgrade(); // Fallback to modal
+                         }
                     }}
                     isUpgradeView
                 />

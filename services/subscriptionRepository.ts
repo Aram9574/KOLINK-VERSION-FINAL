@@ -9,7 +9,7 @@ export const fetchActiveSubscription = async (userId: string): Promise<UserSubsc
         .in("status", ["active", "trialing", "past_due"])
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
     if (error) {
         if (error.code !== "PGRST116") { // Ignore 'no rows returned' error
@@ -17,6 +17,8 @@ export const fetchActiveSubscription = async (userId: string): Promise<UserSubsc
         }
         return null;
     }
+
+    if (!data) return null;
 
     return {
         ...data,

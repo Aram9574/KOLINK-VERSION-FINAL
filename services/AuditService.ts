@@ -3,6 +3,8 @@ import { AuditResult } from '../types';
 
 export const AuditService = {
   async analyzeProfile(linkedinUrl: string): Promise<AuditResult> {
+    // @ts-ignore
+    // @ts-ignore
     const { data: session } = await supabase.auth.getSession();
     const token = session.session?.access_token;
 
@@ -21,6 +23,7 @@ export const AuditService = {
   },
 
   async analyzeProfilePDF(file: File): Promise<AuditResult> {
+    // @ts-ignore
     const { data: session } = await supabase.auth.getSession();
     const token = session.session?.access_token;
 

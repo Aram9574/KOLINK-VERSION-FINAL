@@ -237,7 +237,7 @@ const DashboardContent: React.FC = () => {
             <div
                 className="h-full w-full flex flex-col"
             >
-                <TopBar activeTab={activeTab} onNavigate={setActiveTab} />
+                <TopBar activeTab={activeTab} onNavigate={setActiveTab} onUpgrade={() => setShowUpgradeModal(true)} />
                 
                 <div
                     className={`${

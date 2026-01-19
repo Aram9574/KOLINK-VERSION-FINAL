@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
+// @ts-ignore: Deno import map
+import { createClient } from "@supabase/supabase-js";
 import { corsHeaders } from "../_shared/cors.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -10,10 +10,10 @@ interface ErrorPayload {
   stack_trace?: string;
   component?: string;
   user_id?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
-serve(async (req) => {
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -93,10 +93,11 @@ ${stack_trace || "No stack trace available"}
         status: 200,
       }
     );
-  } catch (error) {
-    console.error("Error in log-error function:", error);
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : "Internal Server Error";
+    console.error("Error in log-error function:", err);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,

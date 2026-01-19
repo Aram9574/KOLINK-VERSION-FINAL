@@ -33,6 +33,7 @@ import { usePosts } from '../../../context/PostContext';
 import { translations } from '../../../translations';
 import { ExpandableTabs } from '../../ui/expandable-tabs';
 import HelpModal from '../../modals/HelpModal';
+import { FeedbackModal } from '../../modals/FeedbackModal';
 import Skeleton from '../../ui/Skeleton';
 import { OnboardingChecklist } from '../onboarding/OnboardingChecklist';
 import Tooltip from '../../ui/Tooltip';
@@ -53,6 +54,7 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
     // Cast to any to bypass strict type checking if 'dashboard' is missing in type definition but present in runtime
     const t = (translations[language] as any).dashboard || {}; 
     const [showHelp, setShowHelp] = React.useState(false);
+    const [isFeedbackOpen, setIsFeedbackOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(true);
 
     // Simulate initial load for premium feel
@@ -65,7 +67,7 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
     
     // Define shortcuts ONLY ONCE
     const shortcuts = [
-        { title: "Dashboard", icon: Home, onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
+        { title: "Inicio", icon: Home, onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
         { title: "Notificaciones", icon: Bell, onClick: () => onSelectTool('history') },
         { type: "separator" as const },
         { title: "Ajustes", icon: SettingsIcon, onClick: () => onSelectTool('settings') },
@@ -215,15 +217,15 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                          <span className="w-2 h-6 bg-brand-500 rounded-full" />
-                         Command Center
+                         Centro de Comando
                     </h2>
                     <div className="flex items-center gap-4">
                         <div className="hidden md:flex gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                             <span>C: Create</span>
+                             <span>C: Crear</span>
                              <span className="text-slate-300">|</span>
-                             <span>H: Home</span>
+                             <span>H: Inicio</span>
                              <span className="text-slate-300">|</span>
-                             <span>S: Settings</span>
+                             <span>S: Ajustes</span>
                         </div>
                         <ExpandableTabs 
                             tabs={shortcuts as any} 
@@ -348,6 +350,7 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                     {/* Quick Action Card (Static) */}
                     <motion.div 
                         variants={item}
+                        onClick={() => setIsFeedbackOpen(true)}
                         className="p-8 rounded-[2rem] bg-slate-50/50 border-2 border-dashed border-slate-200 hover:border-brand-300 hover:bg-brand-50/30 flex flex-col items-center justify-center text-center gap-4 transition-all cursor-pointer group h-full min-h-[240px]"
                     >
                         <div className="w-16 h-16 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:shadow-md transition-all">
@@ -355,7 +358,7 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                         </div>
                         <div>
                             <p className="font-bold text-slate-900 mb-1">¿Falta algo?</p>
-                            <p className="text-sm font-medium text-slate-500 group-hover:text-brand-600 transition-colors">Sugerir un nuevo módulo IA</p>
+                            <p className="text-sm font-medium text-slate-500 group-hover:text-brand-600 transition-colors">Sugerir un nuevo módulo IA / Reportar Error</p>
                         </div>
                     </motion.div>
                 </motion.div>
@@ -409,7 +412,7 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                         <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-500">
                             <Zap className="w-5 h-5 fill-current" />
                         </div>
-                        AI Growth Insights
+                        Insights de Crecimiento IA
                     </h3>
 
                         <div className="flex flex-col gap-6 relative z-10">
@@ -450,7 +453,13 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                             )}
                         </div>
 
-                    <button className="w-full mt-8 btn-nexus-primary flex items-center justify-center gap-2">
+                    <Tooltip>
+                        <p>Abre el chat con el Estratega IA para analizar tus métricas.</p>
+                    </Tooltip>
+                    <button 
+                        onClick={() => onSelectTool('chat')}
+                        className="w-full mt-2 btn-nexus-primary flex items-center justify-center gap-2"
+                    >
                          <Sparkles className="w-4 h-4" /> Optimizar Estrategia
                     </button>
                 </motion.div>
@@ -484,8 +493,9 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                     </button>
                 </motion.div>
             </div>
-            {/* Help Modal */}
+            {/* Modals */}
             <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+            <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
         </div>
     );
 };

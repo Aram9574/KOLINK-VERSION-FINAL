@@ -46,6 +46,7 @@ export const EditorCanvas = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const [slideToDelete, setSlideToDelete] = useState<string | null>(null);
 
   const handleReset = () => {
       setShowResetDialog(true);
@@ -217,7 +218,14 @@ export const EditorCanvas = () => {
                             variant="secondary"
                             size="icon" 
                             className="h-8 w-8 rounded-full shadow-md bg-white border-slate-200 hover:text-red-500"
-                            onClick={(e) => { e.stopPropagation(); useCarouselStore.getState().removeSlide(slide.id); }}
+                            onClick={(e) => { 
+                                e.stopPropagation(); 
+                                if (slides.length <= 1) {
+                                    toast.error(t.toasts?.cannotDeleteLast || "Cannot delete last slide");
+                                    return;
+                                }
+                                setSlideToDelete(slide.id); 
+                            }}
                         >
                             <XCircle className="w-4 h-4" />
                         </Button>
@@ -279,6 +287,32 @@ export const EditorCanvas = () => {
                 }}
             >
                 {t.confirmReset}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!slideToDelete} onOpenChange={(open) => !open && setSlideToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t.deleteSlideTitle || "Delete Slide?"}</DialogTitle>
+            <DialogDescription>
+              {t.deleteSlideDesc || "This action cannot be undone."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSlideToDelete(null)}>{t.cancel}</Button>
+            <Button 
+                variant="destructive" 
+                onClick={() => {
+                    if (slideToDelete) {
+                        useCarouselStore.getState().removeSlide(slideToDelete);
+                        setSlideToDelete(null);
+                    }
+                }}
+            >
+                {t.confirmDelete || "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

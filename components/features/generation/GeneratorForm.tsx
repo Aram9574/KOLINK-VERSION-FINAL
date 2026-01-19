@@ -1,39 +1,3 @@
-import React from "react";
-import {
-    AppLanguage,
-    BrandVoice,
-    EmojiDensity,
-    GenerationParams,
-    PostLength,
-    ViralFramework,
-    ViralHook,
-    ViralTone,
-} from "../../../types";
-import { useUser } from "../../../context/UserContext";
-import { fetchBrandVoices } from "../../../services/userRepository";
-import {
-    EMOJI_OPTIONS,
-    FRAMEWORKS,
-    HOOK_STYLES,
-    LENGTH_OPTIONS,
-    TONES,
-} from "../../../constants";
-import {
-    AlignLeft,
-    Info,
-    Lock,
-    MessageSquare,
-    Sliders,
-    Smile,
-    Sparkles,
-    Target,
-    Type,
-    Wand2,
-    Zap,
-    Fingerprint,
-} from "lucide-react";
-import { translations } from "../../../translations";
-import Tooltip from "../../ui/Tooltip";
 
 import React from "react";
 import {
@@ -106,7 +70,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
 
     const checkPremiumAccess = (option: { isPremium?: boolean }) => {
         if (isFreeUser && option.isPremium) {
-            toasts.error(
+            toast.error(
                 language === "es"
                     ? "Esta opción es solo para usuarios Premium 🔒"
                     : "This option is for Premium users only 🔒",
@@ -147,7 +111,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
         if (!result.success) {
             const errorMsg = (result.error as any).errors[0]?.message ||
                 "Validation failed";
-            toasts.error(errorMsg);
+            toast.error(errorMsg);
             return;
         }
 
@@ -367,7 +331,7 @@ const GeneratorForm: React.FC<GeneratorFormProps> = ({
                                         ? <Lock size={16} />
                                         : <Wand2 size={16} />}
                                     onPremiumClick={() =>
-                                        toasts.error(
+                                        toast.error(
                                             language === "es"
                                                 ? "Las voces de marca son solo para usuarios Premium 🔒"
                                                 : "Brand voices are for Premium users only 🔒",

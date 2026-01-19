@@ -59,7 +59,9 @@ export const AutoTypography: React.FC<AutoTypographyProps> = ({
 
   // Helper to parse bold markdown **text**
   const parseMarkdown = (text: string) => {
-    if (!text) return null;
+    // Sanitize input: prevent "undefined" string literal or null/undefined values
+    if (!text || text === 'undefined') return "";
+
     const parts = text.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {

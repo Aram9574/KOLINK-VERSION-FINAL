@@ -1,16 +1,25 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+// import { GoogleGenerativeAI } from "@google/generative-ai"; // REMOVED: SDK incompatibility
+
+export interface GeminiCandidate {
+  content?: {
+    parts?: { text?: string }[];
+  };
+}
+
+export interface GeminiResponse {
+  candidates?: GeminiCandidate[];
+}
 
 export class BaseAIService {
-  protected genAI: GoogleGenerativeAI;
-  protected model = "gemini-3-flash-preview";
+  protected readonly MODEL = "gemini-3.0-flash";
+  protected get model() { return this.MODEL; }
   protected geminiApiKey: string;
 
   constructor(geminiApiKey: string) {
     if (!geminiApiKey) {
       throw new Error("GEMINI_API_KEY is required");
     }
-    this.geminiApiKey = geminiApiKey;
-    this.genAI = new GoogleGenerativeAI(geminiApiKey);
+    this.geminiApiKey = geminiApiKey.trim();
   }
 
   protected async retryWithBackoff<T>(
@@ -39,6 +48,7 @@ export class BaseAIService {
    */
   protected extractJson(text: string): Record<string, unknown> {
     try {
+      // Using gemini-3.0-flash for SOTA speed/multimodal
       // Find the first { and last }
       const start = text.indexOf('{');
       const end = text.lastIndexOf('}');
@@ -54,20 +64,52 @@ export class BaseAIService {
   }
 
   /**
+   * Raw Fetch implementation to bypass SDK runtime issues in Deno.
+   */
+  protected async generateViaFetch(
+    model: string,
+    payload: Record<string, unknown>,
+  ): Promise<unknown> {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.geminiApiKey}`;
+    
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        const errText = await response.text();
+        const maskedUrl = url.replace(this.geminiApiKey, "***");
+        console.error(`Gemini API Error (${response.status}) at ${maskedUrl}:`, errText);
+        throw new Error(`Gemini API Error: ${response.status} at ${maskedUrl} - ${errText}`);
+    }
+
+    return await response.json();
+  }
+
+  /**
    * Generates raw text without structured JSON.
    */
   async generateRawText(prompt: string, systemInstruction: string = "Generate ONLY the raw text requested. No introduction, no markdown.") {
     return await this.retryWithBackoff(async () => {
-      const model = this.genAI.getGenerativeModel({
-        model: this.model,
-        systemInstruction,
-      });
-
-      const response = await model.generateContent({
+      // Construct payload manually for fetch
+      const payload = {
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-      });
+        system_instruction: { parts: [{ text: systemInstruction }] },
+        generationConfig: {
+            temperature: 0.7
+        }
+      };
 
-      return response.response.text().trim().replace(/\*\*/g, "");
+      const data = await this.generateViaFetch(this.MODEL, payload) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+      
+      // Extract text from REST response structure
+      // { candidates: [ { content: { parts: [ { text: "..." } ] } } ] }
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error("No text returned from Gemini API");
+
+      return text.trim().replace(/\*\*/g, "");
     });
   }
 }
