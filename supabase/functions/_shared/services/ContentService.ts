@@ -93,6 +93,16 @@ export interface EngagementPrediction {
 
 export class ContentService extends BaseAIService {
   
+  // Convertir nivel de creatividad a temperatura (0.0 - 1.0)
+  private getTemperature(level?: string): number {
+    switch (level) {
+        case 'high': return 0.95; // Muy creativo, arriesgado
+        case 'low': return 0.3;   // Factual, conservador
+        case 'medium': 
+        default: return 0.7;      // Balanceado
+    }
+  }
+
   /**
    * Generates a Viral LinkedIn Post.
    */
@@ -121,22 +131,28 @@ export class ContentService extends BaseAIService {
     ${behaviorContext}
     `;
 
-    const prompt = PostGeneratorBrain.generatePostPrompt(params, {
+    const systemInstruction = PostGeneratorBrain.getSystemPrompt({
         ...userContext,
         industry: userContext.industry || "General",
         xp: userContext.xp || 0,
-        headline: userContext.headline || "",
-        frameworkInstruction,
-        emojiInstruction,
-        lengthInstruction
+        company_name: userContext.company_name || "an industry leader"
     });
+    
+    const userPrompt = PostGeneratorBrain.getUserPrompt(params, params.topic);
 
     return await this.retryWithBackoff(async () => {
-      // SDK-free Payload Construction for Gemini 1.5/3 Flash
+      // Set temperature based on creativity level
+      const temperature = this.getTemperature(params.creativityLevel as string);
+
       const payload = {
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        // Build chat-like history for better following of system instructions
+        contents: [
+          { role: "user", parts: [{ text: `SYSTEM INSTRUCTIONS:\n${systemInstruction}` }] },
+          { role: "model", parts: [{ text: "Understood. I am ready to write adhering to all style, audience, and formatting constraints." }] },
+          { role: "user", parts: [{ text: userPrompt }] }
+        ],
         generationConfig: {
-          temperature: 0.7,
+          temperature: temperature,
           responseMimeType: "application/json",
           responseSchema: {
             type: "OBJECT",
