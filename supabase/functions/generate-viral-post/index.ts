@@ -12,6 +12,7 @@ import { sanitizeInput } from "../_shared/validation.ts";
 import { GenerationParamsSchema } from "../_shared/schemas.ts";
 import { BehaviorService } from "../_shared/services/BehaviorService.ts";
 import { getCorsHeaders } from "../_shared/cors.ts"; // IMPORTACIÓN ACTUALIZADA
+import { SecurityLogger } from "../_shared/services/SecurityLogger.ts";
 
 
 Deno.serve(async (req: Request) => {
@@ -86,10 +87,10 @@ Deno.serve(async (req: Request) => {
     const postRepository = new PostRepository(supabaseAdmin);
     const gamificationService = new GamificationService(supabaseAdmin);
     const behaviorService = new BehaviorService(
-        Deno.env.get("GEMINI_API_KEY") ?? "",
         Deno.env.get("SUPABASE_URL") ?? "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
+    const securityLogger = new SecurityLogger(supabaseAdmin);
 
     // Check Credits & Rate Limit
     const { data: profile, error: profileError } = await supabaseAdmin
@@ -154,6 +155,19 @@ Deno.serve(async (req: Request) => {
     await creditService.checkAndUpdateQuota(user.id, profile.plan_tier);
 
     const generatedContent = await aiService.generatePost(safeParams, userContext) as GeneratedPost;
+    
+    // 3. DETECT PROMPT INJECTION / JAILBREAK
+    const fullAiOutput = (generatedContent.post_content + " " + generatedContent.strategy_reasoning).toUpperCase();
+    if (fullAiOutput.includes("REQUEST_DENIED_SECURITY")) {
+      await securityLogger.logEvent(user.id, "prompt_injection_attempt", "critical", {
+        topic: safeParams.topic,
+        audience: safeParams.audience,
+        ai_response: generatedContent.post_content,
+        strategy_reasoning: generatedContent.strategy_reasoning
+      });
+      throw new Error("Security Alert: Malicious input detected and logged.");
+    }
+
     const insertedPost = await postRepository.savePost(user.id, generatedContent, params);
 
     behaviorService.trackEvent(user.id, "post_generated", { 
