@@ -1,3 +1,4 @@
+// Version: 1.0.1 - Security Patch Verified
 import { SupabaseClient } from "@supabase/supabase-js";
 
 export type SecurityEventType = 
