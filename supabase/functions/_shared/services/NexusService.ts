@@ -1,6 +1,5 @@
 import { BaseAIService } from "./BaseAIService.ts";
 import { NexusBrain } from "../prompts/NexusBrain.ts";
-import { SchemaType, Schema, Part } from "@google/generative-ai";
 
 export class NexusService extends BaseAIService {
   /**
@@ -8,11 +7,26 @@ export class NexusService extends BaseAIService {
    */
   async createEmbedding(text: string): Promise<number[]> {
     return await this.retryWithBackoff(async () => {
-      const model = this.genAI.getGenerativeModel({
-        model: "text-embedding-004",
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${this.geminiApiKey}`;
+      
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "models/text-embedding-004",
+          content: {
+            parts: [{ text: text }]
+          }
+        })
       });
-      const result = await model.embedContent(text);
-      return result.embedding.values;
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Embedding API Error: ${response.status} - ${errText}`);
+      }
+
+      const data = await response.json();
+      return data.embedding.values;
     });
   }
 
@@ -66,12 +80,7 @@ export class NexusService extends BaseAIService {
     `;
 
     return await this.retryWithBackoff(async () => {
-      const model = this.genAI.getGenerativeModel({
-        model: this.model, // Uses default gemini-3.0-flash
-        systemInstruction: roleDescription,
-      });
-
-      const parts: Part[] = [{ text: prompt }];
+      const parts = [{ text: prompt }];
       
       if (imageBase64) {
         parts.push({
@@ -79,33 +88,40 @@ export class NexusService extends BaseAIService {
                 mimeType: "image/png",
                 data: imageBase64.split(',')[1] || imageBase64
             }
-        });
+        } as any);
       }
 
-      const response = await model.generateContent({
+      // Construct REST Payload manually
+      const payload = {
         contents: [{ role: "user", parts: parts }],
+        system_instruction: { parts: [{ text: roleDescription }] },
         generationConfig: {
           temperature: 0.3,
           responseMimeType: "application/json",
           responseSchema: {
-            type: SchemaType.OBJECT,
+            type: "OBJECT",
             properties: {
-              response: { type: SchemaType.STRING },
-              strategic_insight: { type: SchemaType.STRING },
+              response: { type: "STRING" },
+              strategic_insight: { type: "STRING" },
               suggested_actions: { 
-                type: SchemaType.ARRAY, 
-                items: { type: SchemaType.STRING } 
+                type: "ARRAY", 
+                items: { type: "STRING" } 
               },
-              rag_sources_used: { type: SchemaType.BOOLEAN },
-              cloning_recommendation: { type: SchemaType.STRING },
-              predictive_alert: { type: SchemaType.STRING }
+              rag_sources_used: { type: "BOOLEAN" },
+              cloning_recommendation: { type: "STRING" },
+              predictive_alert: { type: "STRING" }
             },
             required: ["response", "strategic_insight", "suggested_actions"]
-          } as Schema
+          }
         }
-      });
+      };
 
-      return this.extractJson(response.response.text());
+      const data: any = await this.generateViaFetch(this.model, payload);
+      
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error("No content returned from AI");
+
+      return this.extractJson(text);
     });
   }
 }

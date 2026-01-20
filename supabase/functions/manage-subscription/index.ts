@@ -1,16 +1,13 @@
 // No import needed for Deno.serve in modern Deno/Supabase environments.
 import { createClient } from "@supabase/supabase-js"
 import { BillingService } from "../_shared/services/BillingService.ts"
-
-const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
+import { getCorsHeaders } from "../_shared/cors.ts"
 
 Deno.serve(async (req: Request) => {
+    const headers = getCorsHeaders(req);
+
     if (req.method === 'OPTIONS') {
-        return new Response('ok', { headers: corsHeaders })
+        return new Response('ok', { headers })
     }
 
     try {
@@ -57,7 +54,7 @@ Deno.serve(async (req: Request) => {
 
         return new Response(
             JSON.stringify(result),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { headers: { ...headers, 'Content-Type': 'application/json' } }
         )
 
     } catch (error: unknown) {
@@ -65,7 +62,7 @@ Deno.serve(async (req: Request) => {
         console.error('Error in manage-subscription:', err.message);
         return new Response(
             JSON.stringify({ error: err.message }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 400, headers: { ...headers, 'Content-Type': 'application/json' } }
         )
     }
 })

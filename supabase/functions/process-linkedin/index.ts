@@ -1,16 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 import { AIService } from "../_shared/AIService.ts";
 import { LinkedInPDFData } from "../_shared/types.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
+  const headers = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -116,7 +114,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(JSON.stringify(audit), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Internal error";
@@ -126,7 +124,7 @@ Deno.serve(async (req) => {
         details: "Consult function logs for more information."
     }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   }
 });

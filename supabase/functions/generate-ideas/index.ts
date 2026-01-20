@@ -1,10 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
-import { corsHeaders } from "../_shared/cors.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 import { ContentService } from "../_shared/services/ContentService.ts";
 
 Deno.serve(async (req: Request) => {
+  const headers = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -39,7 +41,7 @@ Deno.serve(async (req: Request) => {
       ideas: result.ideas,
       count: result.ideas.length 
     }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
     const err = error as Error;
@@ -47,7 +49,7 @@ Deno.serve(async (req: Request) => {
       JSON.stringify({ error: err.message || "Internal error" }),
       {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }

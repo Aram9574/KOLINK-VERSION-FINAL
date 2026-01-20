@@ -1,17 +1,20 @@
 import { createClient } from "@supabase/supabase-js";
 import { AuditService } from "../_shared/services/AuditService.ts";
-import { corsHeaders } from "../_shared/cors.ts";
+import { getCorsHeaders } from "../_shared/cors.ts"; // IMPORTACIÓN ACTUALIZADA
 import { LinkedInProfileData } from "../_shared/types.ts";
 import { BehaviorService } from "../_shared/services/BehaviorService.ts";
 
 Deno.serve(async (req: Request) => {
+  // 1. HEADERS DINÁMICOS
+  const headers = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
     const { pdfBase64, imageBase64 } = await req.json();
-    if (!pdfBase64 && !imageBase64) throw new Error("Missing content: Provide 'pdfBase64' (PDF) or 'imageBase64' (Image)");
+    if (!pdfBase64 && !imageBase64) throw new Error("Missing content");
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -21,8 +24,7 @@ Deno.serve(async (req: Request) => {
     const authHeader = req.headers.get("Authorization")!;
     const { data: { user } } = await supabaseAdmin.auth.getUser(authHeader.replace("Bearer ", ""));
     const { data: profile } = await supabaseAdmin.from("profiles").select("language").eq("id", user?.id).single();
-    const language = profile?.language || "es";
-
+    
     const auditService = new AuditService(Deno.env.get("GEMINI_API_KEY")!);
     const behaviorService = new BehaviorService(
         Deno.env.get("GEMINI_API_KEY") ?? "",
@@ -30,52 +32,22 @@ Deno.serve(async (req: Request) => {
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Track Audit Start
     if (user?.id) {
-        behaviorService.trackEvent(user.id, "audit_started", { 
-            hasPdf: !!pdfBase64, 
-            hasImage: !!imageBase64 
-        }).catch(e => console.error("Behavior tracking error:", e));
+        behaviorService.trackEvent(user.id, "audit_started", { hasPdf: !!pdfBase64 }).catch(e => console.error(e));
     }
     
-    // DEBUG: Logs accumulator
-    const debugLogs: string[] = [];
-    const log = (msg: string) => {
-        console.log(msg);
-        debugLogs.push(msg);
-    };
+    let profileData: LinkedInProfileData = { full_name: "Unknown User", profile_url: null };
 
-    log(`[Start] Analyzing profile. PDF: ${!!pdfBase64}, Image: ${!!imageBase64}`);
-    let profileData: LinkedInProfileData = { 
-        full_name: "Unknown User", 
-        profile_url: null 
-    };
-
-    // 1. PDF Extraction Path
     if (pdfBase64) {
-        log("[analyze-profile] Extracting PDF data...");
         const pdfData = await auditService.extractLinkedInPDF(pdfBase64);
-        if (pdfData.error) {
-            log(`[Error] PDF Extraction failed: ${pdfData.error}`);
-            throw new Error(`PDF Extraction failed: ${pdfData.error}`);
-        }
-        
+        if (pdfData.error) throw new Error(`PDF Extraction failed: ${pdfData.error}`);
         profileData = { ...profileData, ...pdfData };
-        log(`[analyze-profile] PDF Extracted -> Name: ${profileData.full_name}, URL: ${profileData.profile_url}`);
 
-        // FALLBACK: If AI missed the URL, try deterministic parsing
         if (!profileData.profile_url) {
-            log("[analyze-profile] AI missed URL. Trying deterministic fallback...");
             const deterministicUrl = await auditService.extractPdfUrlDeterministic(pdfBase64);
-            if (deterministicUrl) {
-                profileData.profile_url = deterministicUrl;
-                log(`[analyze-profile] URL recovered via fallback: ${deterministicUrl}`);
-            } else {
-                log("[analyze-profile] Fallback failed. No URL found.");
-            }
+            if (deterministicUrl) profileData.profile_url = deterministicUrl;
         }
 
-        // 2. Hybrid Enrichment (Scraping)
         if (profileData.profile_url) {
             log(`[analyze-profile] URL found (${profileData.profile_url}), attempting hybrid enrichment...`);
             const scrapedData = await auditService.scrapeLinkedInProfile(profileData.profile_url);
@@ -146,7 +118,7 @@ Deno.serve(async (req: Request) => {
       JSON.stringify({ error: err.message || "Internal error" }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }

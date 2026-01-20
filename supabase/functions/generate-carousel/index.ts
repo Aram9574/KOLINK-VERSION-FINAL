@@ -1,4 +1,4 @@
-import { corsHeaders } from "../_shared/cors.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 import { ContentService, CarouselGenerationResult } from "../_shared/services/ContentService.ts";
 import { CreditService } from "../_shared/services/CreditService.ts";
 import { createClient } from "@supabase/supabase-js";
@@ -11,8 +11,10 @@ interface UserContextType {
 }
 
 Deno.serve(async (req) => {
+  const headers = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -98,7 +100,7 @@ Deno.serve(async (req) => {
 
         return new Response(
             JSON.stringify({ slide: refinedSlide }),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            { headers: { ...headers, "Content-Type": "application/json" } }
         );
     }
 
@@ -161,7 +163,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify(responseData),
       {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       }
     );
   } catch (err: unknown) {
@@ -169,7 +171,7 @@ Deno.serve(async (req) => {
     console.error(`[CarouselFunc] Error:`, error.message);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   }
 });

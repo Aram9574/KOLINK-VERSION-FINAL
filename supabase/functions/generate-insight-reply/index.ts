@@ -1,14 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 import { EngagementService } from "../_shared/services/EngagementService.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 Deno.serve(async (req) => {
+  const headers = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -90,7 +88,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ replies: result.suggested_replies }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
 
   } catch (error: unknown) {
@@ -103,7 +101,7 @@ Deno.serve(async (req) => {
         details: "Check function logs for more info"
     }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   }
 });

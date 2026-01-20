@@ -1,10 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { BaseAIService } from "../_shared/services/BaseAIService.ts";
-import { corsHeaders } from "../_shared/cors.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -34,7 +36,7 @@ serve(async (req) => {
     const newSuggestion = await aiService.generateRawText(prompt, systemInstruction);
 
     return new Response(JSON.stringify({ suggestion: newSuggestion }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
 
   } catch (error: unknown) {
@@ -42,7 +44,7 @@ serve(async (req) => {
     console.error("[RegenAudit] Error:", err.message);
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   }
 });
