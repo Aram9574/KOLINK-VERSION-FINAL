@@ -121,26 +121,15 @@ export class ContentService extends BaseAIService {
     ${behaviorContext}
     `;
 
-    const prompt = `
-      ${PostGeneratorBrain.system_instruction}
-
-      ### USER INPUT & CONTEXT
-      TOPIC: ${params.topic}
-      TARGET AUDIENCE: ${params.audience}
-      
-      ### CONFIGURATION (STRICT)
-      FRAMEWORK: ${params.framework} -> ${frameworkInstruction}
-      TONE: ${params.tone}
-      EMOJI DENSITY: ${params.emojiDensity} -> ${emojiInstruction}
-      LENGTH: ${params.length} -> ${lengthInstruction}
-      CREATIVITY: ${params.creativityLevel}/10
-      HASHTAGS: ${params.hashtagCount}
-      CTA: ${params.includeCTA ? "Must include a Call to Conversation" : "No CTA"}
-      LANGUAGE: ${params.outputLanguage || "es"}
-      
-      ### AUTHOR CONTEXT
-      ${userProfileFull}
-    `;
+    const prompt = PostGeneratorBrain.generatePostPrompt(params, {
+        ...userContext,
+        industry: userContext.industry || "General",
+        xp: userContext.xp || 0,
+        headline: userContext.headline || "",
+        frameworkInstruction,
+        emojiInstruction,
+        lengthInstruction
+    });
 
     return await this.retryWithBackoff(async () => {
       // SDK-free Payload Construction for Gemini 1.5/3 Flash
