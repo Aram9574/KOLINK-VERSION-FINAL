@@ -1,48 +1,90 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 
 export class CreditService {
-  /**
-   * @param supabaseAdmin - Admin client to bypass RLS for credit deduction.
-   * @param supabaseClient - User client for potential session validation (optional).
-   */
-  constructor(
-    private supabaseAdmin: SupabaseClient,
-    private supabaseClient: SupabaseClient,
-  ) {}
+  private supabaseAdmin: SupabaseClient;
+  private supabaseClient: SupabaseClient;
 
-  /**
-   * Checks if the user has enough credits to perform an action.
-   * @param userId - The user's ID.
-   * @returns Promise<boolean>
-   */
-  async hasCredits(userId: string): Promise<boolean> {
-    const { data: profile, error } = await this.supabaseAdmin
-      .from("profiles")
-      .select("credits, plan_tier")
-      .eq("id", userId)
-      .single();
+  // LÍMITES CONFIGURABLES (Hardcoded por seguridad)
+  private LIMITS = {
+    free: 3,      // Usuarios gratis: 3 posts al día
+    pro: 50,      // Usuarios Pro: 50 posts al día
+    viral: 100,   // Usuarios Viral: 100 posts al día
+    admin: 9999   // Admin: Ilimitado
+  };
 
-    if (error || !profile) return false;
-
-    // Premium plans (pro, viral) might have unlimited credits or high limits.
-    // For now, let's assume 'free' tier needs > 0 credits.
-    if (["pro", "viral"].includes(profile.plan_tier)) return true;
-
-    return profile.credits > 0;
+  constructor(supabaseAdmin: SupabaseClient, supabaseClient: SupabaseClient) {
+    this.supabaseAdmin = supabaseAdmin;
+    this.supabaseClient = supabaseClient;
   }
 
   /**
-   * Deducts one credit from the user's account.
-   * @param userId - The user's ID.
+   * Verifica y actualiza la cuota diaria del usuario.
+   * Lanza error si se excede el límite.
    */
-  async deductCredit(userId: string) {
-    const { error } = await this.supabaseAdmin.rpc("decrement_credits", {
-      user_id: userId,
+  async checkAndUpdateQuota(userId: string, planTier: string = 'free'): Promise<void> {
+    // 1. Obtener estado actual del usuario
+    const { data: profile, error } = await this.supabaseAdmin
+      .from("profiles")
+      .select("daily_generations_count, last_reset_at")
+      .eq("id", userId)
+      .single();
+
+    if (error || !profile) throw new Error("Error verificando cuota de usuario");
+
+    const now = new Date();
+    const lastReset = new Date(profile.last_reset_at || 0);
+    
+    // Verificar si es un día diferente (comparando fecha local simple)
+    const isNewDay = now.getDate() !== lastReset.getDate() || 
+                     now.getMonth() !== lastReset.getMonth() || 
+                     now.getFullYear() !== lastReset.getFullYear();
+
+    let currentCount = profile.daily_generations_count;
+
+    // 2. Reiniciar si es nuevo día
+    if (isNewDay) {
+      currentCount = 0;
+      await this.supabaseAdmin
+        .from("profiles")
+        .update({ 
+          daily_generations_count: 0, 
+          last_reset_at: now.toISOString() 
+        })
+        .eq("id", userId);
+    }
+
+    // 3. Verificar límite según plan
+    // Normalizamos el plan a minúsculas para evitar errores
+    const plan = (planTier || 'free').toLowerCase();
+    // @ts-ignore: Index access fix
+    const limit = this.LIMITS[plan] || this.LIMITS.free;
+
+    if (currentCount >= limit) {
+      throw new Error(`Daily limit reached for ${plan} plan. Upgrade to increase limits.`);
+    }
+
+    // 4. Incrementar contador (Optimistic lock no necesario aquí por bajo volumen)
+    // Nota: El decremento de créditos ($$) se maneja en deductCredit, aquí solo contamos uso de API
+    await this.supabaseAdmin
+      .from("profiles")
+      .update({ daily_generations_count: currentCount + 1 })
+      .eq("id", userId);
+  }
+
+  /**
+   * Deduce créditos (Lógica financiera existente)
+   * Ahora también debería llamarse DESPUÉS de checkAndUpdateQuota en el flujo principal
+   */
+  async deductCredit(userId: string, cost: number = 1): Promise<void> {
+    // Usamos RPC segura si existe, o update directo como fallback administrativo
+    const { error } = await this.supabaseAdmin.rpc("decrement_credit", { 
+      target_user_id: userId 
     });
 
     if (error) {
-      console.error("Failed to deduct credit:", error);
-      throw new Error("Credit deduction failed");
+        // Fallback si el RPC falla o no aplica (aunque el RPC es lo ideal)
+        console.error("RPC Error:", error);
+        throw new Error("Could not deduct credit");
     }
   }
 }

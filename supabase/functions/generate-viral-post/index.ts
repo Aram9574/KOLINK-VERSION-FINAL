@@ -150,6 +150,8 @@ Deno.serve(async (req: Request) => {
       language: profile.language,
       behavioral_dna: profile.behavioral_dna ? JSON.stringify(profile.behavioral_dna) : "",
     };
+    // 2. CHECK DAILY QUOTA (WAF/Resource protection)
+    await creditService.checkAndUpdateQuota(user.id, profile.plan_tier);
 
     const generatedContent = await aiService.generatePost(safeParams, userContext) as GeneratedPost;
     const insertedPost = await postRepository.savePost(user.id, generatedContent, params);
