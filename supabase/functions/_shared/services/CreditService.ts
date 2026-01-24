@@ -1,4 +1,4 @@
-import { SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 export class CreditService {
   private supabaseAdmin: SupabaseClient;
@@ -75,16 +75,35 @@ export class CreditService {
    * Deduce créditos (Lógica financiera existente)
    * Ahora también debería llamarse DESPUÉS de checkAndUpdateQuota en el flujo principal
    */
+  /**
+   * Deduce créditos usando el cliente Admin para evitar restricciones RLS/RPC de usuario.
+   */
   async deductCredit(userId: string, cost: number = 1): Promise<void> {
-    // Usamos RPC segura si existe, o update directo como fallback administrativo
-    const { error } = await this.supabaseAdmin.rpc("decrement_credit", { 
-      target_user_id: userId 
-    });
+    // 1. Fetch current credits
+    const { data: profile, error: fetchError } = await this.supabaseAdmin
+      .from("profiles")
+      .select("credits")
+      .eq("id", userId)
+      .single();
 
-    if (error) {
-        // Fallback si el RPC falla o no aplica (aunque el RPC es lo ideal)
-        console.error("RPC Error:", error);
-        throw new Error("Could not deduct credit");
+    if (fetchError || !profile) {
+      console.error("Credit Deduct Error (Fetch):", fetchError);
+      throw new Error("Could not fetch user profile for credit deduction");
+    }
+
+    if (profile.credits < cost) {
+       throw new Error("Insufficient credits");
+    }
+
+    // 2. Update credits
+    const { error: updateError } = await this.supabaseAdmin
+      .from("profiles")
+      .update({ credits: profile.credits - cost })
+      .eq("id", userId);
+
+    if (updateError) {
+        console.error("Credit Deduct Error (Update):", updateError);
+        throw new Error("Could not deduct credit (DB Update failed)");
     }
   }
 }

@@ -47,19 +47,13 @@ export const executePostGeneration = async (
 
     // 5. Process Gamification
     // PRIORITY: Use server-validated gamification result
-    let gamificationResult;
-
-    if (result.gamification) {
-        gamificationResult = result.gamification;
-    } else {
-        // FALLBACK: Local calculation (legacy support or offline dev)
-        const updatedPosts = [newPost, ...allPosts];
-        gamificationResult = processGamification(
-            { ...user, credits: newCreditCount }, // Pass updated credits state
-            newPost,
-            updatedPosts
-        );
-    }
+    const gamificationResult = result.gamification || {
+        newXP: user.xp,
+        newLevel: user.level,
+        newStreak: user.currentStreak,
+        newAchievements: [],
+        leveledUp: false
+    };
 
     // 6. Construct Updated User State
     const updatedUser: UserProfile = {

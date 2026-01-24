@@ -1,4 +1,3 @@
-// import { GoogleGenerativeAI } from "@google/generative-ai"; // REMOVED: SDK incompatibility
 
 export interface GeminiCandidate {
   content?: {
@@ -11,7 +10,7 @@ export interface GeminiResponse {
 }
 
 export class BaseAIService {
-  protected readonly MODEL = "gemini-3.0-flash";
+  protected readonly MODEL = "gemini-2.0-flash-001";
   protected get model() { return this.MODEL; }
   protected geminiApiKey: string;
 
@@ -48,18 +47,23 @@ export class BaseAIService {
    */
   protected extractJson(text: string): Record<string, unknown> {
     try {
-      // Using gemini-3.0-flash for SOTA speed/multimodal
-      // Find the first { and last }
-      const start = text.indexOf('{');
-      const end = text.lastIndexOf('}');
+      // 1. Remove markdown code blocks if present
+      let cleanText = text.replace(/```json/g, "").replace(/```/g, "").trim();
+      
+      // 2. Find the first '{' and last '}' to handle any preamble/postscript
+      const start = cleanText.indexOf('{');
+      const end = cleanText.lastIndexOf('}');
+      
       if (start === -1 || end === -1) {
-          throw new Error("No JSON object found in response: " + text);
+          throw new Error("No JSON object found in response: " + text.substring(0, 100) + "...");
       }
-      const jsonStr = text.substring(start, end + 1);
-      return JSON.parse(jsonStr);
-    } catch (_error) {
-      console.error("[BaseAIService] Failed to parse JSON:", text);
-      throw new Error("INTERNAL_JSON_PARSE_ERROR");
+      
+      cleanText = cleanText.substring(start, end + 1);
+      return JSON.parse(cleanText);
+    } catch (error) {
+      console.error("[BaseAIService] Failed to parse JSON:", error);
+      console.error("[BaseAIService] Original Text:", text); // Log the full text for debugging
+      throw new Error("AI returned invalid JSON. Please try again.");
     }
   }
 
@@ -72,6 +76,9 @@ export class BaseAIService {
   ): Promise<unknown> {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.geminiApiKey}`;
     
+    // Log intent (masked)
+    console.log(`[BaseAIService] Calling Gemini API (${model})...`);
+
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -81,8 +88,12 @@ export class BaseAIService {
     if (!response.ok) {
         const errText = await response.text();
         const maskedUrl = url.replace(this.geminiApiKey, "***");
-        console.error(`Gemini API Error (${response.status}) at ${maskedUrl}:`, errText);
-        throw new Error(`Gemini API Error: ${response.status} at ${maskedUrl} - ${errText}`);
+        
+        // Detailed logging of the error
+        console.error(`[BaseAIService] API Error ${response.status} at ${maskedUrl}`);
+        console.error(`[BaseAIService] Error Body: ${errText}`);
+        
+        throw new Error(`Gemini API Error: ${response.status} - ${errText}`);
     }
 
     return await response.json();
@@ -93,7 +104,6 @@ export class BaseAIService {
    */
   async generateRawText(prompt: string, systemInstruction: string = "Generate ONLY the raw text requested. No introduction, no markdown.") {
     return await this.retryWithBackoff(async () => {
-      // Construct payload manually for fetch
       const payload = {
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         system_instruction: { parts: [{ text: systemInstruction }] },
@@ -103,10 +113,8 @@ export class BaseAIService {
       };
 
       const data = await this.generateViaFetch(this.MODEL, payload) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
-      
-      // Extract text from REST response structure
-      // { candidates: [ { content: { parts: [ { text: "..." } ] } } ] }
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      
       if (!text) throw new Error("No text returned from Gemini API");
 
       return text.trim().replace(/\*\*/g, "");

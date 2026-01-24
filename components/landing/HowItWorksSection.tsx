@@ -1,5 +1,5 @@
 import React from 'react';
-import { PenTool as _PenTool, Cpu as _Cpu, Rocket as _Rocket, TrendingUp as _TrendingUp } from 'lucide-react';
+import { PenTool as _PenTool, Cpu as _Cpu, Rocket as _Rocket, TrendingUp as _TrendingUp, Zap, BookOpen, BarChart, HelpCircle, Sparkles } from 'lucide-react';
 import { translations } from '../../translations.ts';
 import { AppLanguage } from '../../types.ts';
 
@@ -30,7 +30,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ language }) => {
 
                     {/* Step 1: Input */}
                     <div className="relative group">
-                        <div className="card-premium p-8 rounded-3xl h-full flex flex-col group-hover:-translate-y-1 transition-transform duration-300">
+                        <div className="card-nexus p-8 rounded-3xl h-full flex flex-col group-hover:-translate-y-1 transition-transform duration-300">
                             {/* Visual Mockup: Input UI */}
                             <div className="h-48 bg-slate-50 rounded-2xl mb-8 flex items-center justify-center relative overflow-hidden border border-slate-100 group-hover:border-brand-100 transition-colors">
                                 <div className="absolute inset-x-6 top-10 bottom-0 bg-white rounded-t-xl border border-slate-200 shadow-sm p-4">
@@ -46,8 +46,8 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ language }) => {
                                                 Cómo la IA revoluciona el copy...
                                             </div>
                                         </div>
-                                        <div className="h-8 w-full bg-brand-600 rounded flex items-center justify-center text-white text-xs font-bold shadow-md shadow-brand-500/20 hover:bg-brand-700 transition-colors cursor-pointer">
-                                            Generar Ideas ✨
+                                        <div className="h-8 w-full bg-brand-600 rounded flex items-center justify-center text-white text-xs font-bold shadow-md shadow-brand-500/20 hover:bg-brand-700 transition-colors cursor-pointer gap-2">
+                                            Generar Ideas <Sparkles className="w-3 h-3 text-white/80" />
                                         </div>
                                     </div>
                                 </div>
@@ -55,16 +55,20 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ language }) => {
 
                             <div className="absolute top-8 right-8 text-6xl font-black text-slate-100 -z-10 select-none font-display">01</div>
 
-                            <h3 className="text-2xl font-bold text-slate-900 mb-3">{t.howItWorks.step1Title}</h3>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                                {language === 'es' ? "1. Semilla de Idea" : "1. Idea Seed"}
+                            </h3>
                             <p className="text-slate-500 leading-relaxed">
-                                {t.howItWorks.step1Desc}
+                                {language === 'es' 
+                                    ? "Nunca más te quedes mirando la página en blanco. Genera 50 ideas de alto impacto en segundos."
+                                    : "Never stare at a blank page again. Generate 50 high-impact ideas in seconds."}
                             </p>
                         </div>
                     </div>
 
                     {/* Step 2: Process */}
                     <div className="relative group">
-                        <div className="card-premium p-8 rounded-3xl h-full flex flex-col group-hover:-translate-y-1 transition-transform duration-300">
+                        <div className="card-nexus p-8 rounded-3xl h-full flex flex-col group-hover:-translate-y-1 transition-transform duration-300">
                             {/* Visual Mockup: Framework Selection */}
                             <div className="h-48 bg-indigo-50/50 rounded-2xl mb-8 flex items-center justify-center relative overflow-hidden border border-indigo-100/50 group-hover:border-indigo-200 transition-colors">
                                 <div className="absolute inset-x-6 top-10 bottom-0 bg-white rounded-t-xl border border-slate-200 shadow-sm p-4">
@@ -74,19 +78,27 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ language }) => {
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="bg-indigo-50 border-2 border-indigo-500 rounded p-2 flex flex-col items-center justify-center gap-1 cursor-pointer">
-                                            <div className="w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[8px]">⚡</div>
+                                            <div className="w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                                                <Zap className="w-2.5 h-2.5 fill-current" />
+                                            </div>
                                             <div className="text-[8px] font-bold text-indigo-700">Viral</div>
                                         </div>
                                         <div className="bg-white border border-slate-100 rounded p-2 flex flex-col items-center justify-center gap-1 opacity-60 hover:opacity-100 hover:border-slate-200 transition-all cursor-pointer">
-                                            <div className="w-4 h-4 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-[8px]">📖</div>
+                                            <div className="w-4 h-4 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center">
+                                                <BookOpen className="w-2.5 h-2.5" />
+                                            </div>
                                             <div className="text-[8px] font-bold text-slate-500">Historia</div>
                                         </div>
                                         <div className="bg-white border border-slate-100 rounded p-2 flex flex-col items-center justify-center gap-1 opacity-60">
-                                            <div className="text-[8px]">🤔</div>
+                                            <div className="w-4 h-4 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center">
+                                                <HelpCircle className="w-2.5 h-2.5" />
+                                            </div>
                                             <div className="text-[8px] font-bold text-slate-500">Mito</div>
                                         </div>
                                         <div className="bg-white border border-slate-100 rounded p-2 flex flex-col items-center justify-center gap-1 opacity-60">
-                                            <div className="text-[8px]">📊</div>
+                                            <div className="w-4 h-4 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center">
+                                                <BarChart className="w-2.5 h-2.5" />
+                                            </div>
                                             <div className="text-[8px] font-bold text-slate-500">Guía</div>
                                         </div>
                                     </div>
@@ -95,16 +107,20 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ language }) => {
 
                             <div className="absolute top-8 right-8 text-6xl font-black text-slate-100 -z-10 select-none font-display">02</div>
 
-                            <h3 className="text-2xl font-bold text-slate-900 mb-3">{t.howItWorks.step2Title}</h3>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                                {language === 'es' ? "2. Arquitectura Viral" : "2. Viral Architecture"}
+                            </h3>
                             <p className="text-slate-500 leading-relaxed">
-                                {t.howItWorks.step2Desc}
+                                {language === 'es'
+                                    ? "Estructuras probadas por el Top 1% (AIDA, PAS, Storytelling). Escribe como un experto, al instante."
+                                    : "Frameworks proven by the Top 1%. Write like an expert, instantly."}
                             </p>
                         </div>
                     </div>
 
                     {/* Step 3: Result */}
                     <div className="relative group">
-                        <div className="card-premium p-8 rounded-3xl h-full flex flex-col group-hover:-translate-y-1 transition-transform duration-300">
+                        <div className="card-nexus p-8 rounded-3xl h-full flex flex-col group-hover:-translate-y-1 transition-transform duration-300">
                             {/* Visual Mockup: Final Post */}
                             <div className="h-48 bg-green-50/30 rounded-2xl mb-8 flex items-center justify-center relative overflow-hidden border border-green-100/50 group-hover:border-green-200 transition-colors">
                                 <div className="absolute inset-x-8 top-8 bottom-0 bg-white rounded-t-xl border border-slate-200 shadow-sm p-4">
@@ -129,16 +145,20 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ language }) => {
 
                                 {/* Viral Badge */}
                                 <div className="absolute bottom-4 right-4 bg-white px-2 py-1 rounded-full shadow-md border border-green-100 flex items-center gap-1 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-300">
-                                    <span className="text-[10px]">🚀</span>
+                                    <Sparkles className="w-3 h-3 text-green-500" />
                                     <span className="text-[10px] font-bold text-green-600">Listo para Viralizar</span>
                                 </div>
                             </div>
 
                             <div className="absolute top-8 right-8 text-6xl font-black text-slate-100 -z-10 select-none font-display">03</div>
 
-                            <h3 className="text-2xl font-bold text-slate-900 mb-3">{t.howItWorks.step3Title}</h3>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                                {language === 'es' ? "3. Lanzamiento y Escala" : "Launch & Scale"}
+                            </h3>
                             <p className="text-slate-500 leading-relaxed">
-                                {t.howItWorks.step3Desc}
+                                {language === 'es'
+                                    ? "Publica con absoluta confianza. Convierte los likes en leads y los leads en ingresos."
+                                    : "Publish with total confidence. Turn likes into leads and leads into revenue."}
                             </p>
                         </div>
                     </div>

@@ -23,59 +23,66 @@ export interface GeneratedPostResult {
   }
 }
 
+// --- Shared Contract Definition (Ideally imported from a shared package, but defined here for now) ---
+export enum ErrorCode {
+  INSUFFICIENT_CREDITS = 'INSUFFICIENT_CREDITS',
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  AUTH_ERROR = 'AUTH_ERROR',
+  AI_SERVICE_ERROR = 'AI_SERVICE_ERROR',
+  INTERNAL_ERROR = 'INTERNAL_ERROR'
+}
+
+interface APIResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: ErrorCode | string;
+    message: string;
+    details?: any;
+  };
+}
+
 export const generateViralPost = async (params: GenerationParams, user: UserProfile): Promise<GeneratedPostResult> => {
-  // 1. Get current session
-  // @ts-ignore
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
   
   if (sessionError || !session) {
-    console.error("[GEMINI SERVICE] No active session found.", sessionError);
     throw new Error("User not authenticated. Please log in again.");
   }
 
-  // 2. Prepare headers explicitly
-  const token = session.access_token;
-  console.log("[DEBUG CLIENT] Target Function URL:", `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-viral-post`);
-  console.log("[DEBUG CLIENT] Token being sent manually:", token.substring(0, 15) + "...");
-
-  // 3. Invoke with explicit Authorization header
+  // Invoke with strict contract
   const { data, error } = await supabase.functions.invoke('generate-viral-post', {
-    body: { params },
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
+    body: { params }
   });
 
+  // Network/System Level Errors
   if (error) {
-    console.error("[GEMINI SERVICE] Invocation Error:", error);
-    if (error instanceof Error && error.message.includes("401")) {
-         throw new Error("Session expired. Please refresh the page and try again.");
-    }
-    if (error.status === 406) {
-      console.error("Server API returned 406 Not Acceptable. This usually means the function crashed or returned invalid content types.");
-      throw new Error("Server configuration error (406). Please try again or contact support.");
-    }
-    // Handle specific Supabase Function non-200 responses wrapped in error
-    try {
-        // sometimes error is a blob or complex object
-        const text = await (error.context?.json?.() || Promise.resolve(JSON.stringify(error)));
-        console.error("Detailed Error Context:", text);
-    } catch(e) { /* ignore */ }
-    
-    throw new Error(error.message || "Failed to connect to generation service.");
+    console.error("[GEMINI SERVICE] Network Error:", error);
+    throw new Error("Connection failed. Please check your internet.");
   }
 
-  if (data?.error) {
-       console.error("[GEMINI SERVICE] Backend Logic Error:", data.error);
-       throw new Error(`Generation Failed: ${data.details || data.error}`);
+  // Logical Contract
+  const response = data as APIResponse<any>;
+
+  if (!response.success) {
+      console.error("[GEMINI SERVICE] Server Error:", response.error);
+      
+      const code = response.error?.code;
+      const msg = response.error?.message || "Unknown error";
+
+      if (code === ErrorCode.INSUFFICIENT_CREDITS) {
+          throw new Error("Insufficient credits");
+      }
+      
+      throw new Error(`Generation Failed: ${msg}`);
   }
 
+  const resultData = response.data;
   return {
-    id: data.id,
-    content: data.postContent,
-    viralScore: data.viralScore,
-    viralAnalysis: data.viralAnalysis,
-    gamification: data.gamification
+    id: resultData.id,
+    content: resultData.postContent,
+    viralScore: resultData.viralScore,
+    viralAnalysis: resultData.viralAnalysis,
+    gamification: resultData.gamification
   };
 };
 

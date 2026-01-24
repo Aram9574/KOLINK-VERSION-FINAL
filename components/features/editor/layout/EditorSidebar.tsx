@@ -8,14 +8,18 @@ import {
     ChevronRight, 
     Plus, 
     RefreshCcw,
-    Quote
+    Quote,
+    Rocket,
+    Brain,
+    Loader2
 } from 'lucide-react';
 import { hapticFeedback } from '../../../../lib/animations';
 import LinkedInPreview from '../../generation/LinkedInPreview';
+import { ViralResultCard } from './ViralResultCard';
 
 interface EditorSidebarProps {
-    activeTab: "preview" | "hooks" | "endings" | "snippets";
-    setActiveTab: (tab: "preview" | "hooks" | "endings" | "snippets") => void;
+    activeTab: "preview" | "hooks" | "endings" | "snippets" | "viral";
+    setActiveTab: (tab: "preview" | "hooks" | "endings" | "snippets" | "viral") => void;
     previewContent: string;
     user: any;
     hooks: string[];
@@ -25,6 +29,10 @@ interface EditorSidebarProps {
     onInjectText: (text: string) => void;
     onGenerateHook: () => void;
     onGenerateEnding: () => void;
+    // Viral Analysis Props
+    isAnalyzingViral: boolean;
+    viralResult: any | null;
+    onAnalyzeViral: () => void;
     language: string;
     labels: {
         tabs: any;
@@ -32,6 +40,7 @@ interface EditorSidebarProps {
         hooks: any;
         endings: any;
         snippets: any;
+        viral?: any;
     };
 }
 
@@ -47,6 +56,9 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
     onInjectText,
     onGenerateHook,
     onGenerateEnding,
+    isAnalyzingViral,
+    viralResult,
+    onAnalyzeViral,
     language,
     labels
 }) => {
@@ -54,7 +66,8 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
         { id: "preview", icon: Eye, label: labels.tabs.preview },
         { id: "hooks", icon: Sparkles, label: labels.tabs.hooks },
         { id: "endings", icon: Zap, label: labels.tabs.endings },
-        { id: "snippets", icon: Bookmark, label: labels.tabs.snippets }
+        { id: "snippets", icon: Bookmark, label: labels.tabs.snippets },
+        { id: "viral", icon: Rocket, label: "Viral" }
     ];
 
     return (
@@ -125,6 +138,71 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                                         {labels.preview.tipDesc}
                                     </p>
                                 </div>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {activeTab === "viral" && (
+                        <motion.div
+                            key="viral"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="space-y-6"
+                        >
+                            <div className="flex flex-col gap-4">
+                                {!viralResult && !isAnalyzingViral && (
+                                    <div className="bg-white border-2 border-dashed border-slate-200 rounded-3xl p-8 text-center">
+                                        <Brain className="w-12 h-12 text-slate-300 mx-auto mb-4" strokeWidth={1} />
+                                        <h3 className="text-base font-bold text-slate-800 mb-2">
+                                            {language === 'es' ? 'Analizador Viral' : 'Viral Analyzer'}
+                                        </h3>
+                                        <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+                                            {language === 'es' 
+                                                ? 'Deja que nuestra IA 2026 analice tu borrador y descubra tu potencial real.' 
+                                                : 'Let our 2026 AI analyze your draft and discover your real potential.'}
+                                        </p>
+                                        <motion.button
+                                            whileHover={{ y: -2 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            onClick={onAnalyzeViral}
+                                            disabled={!previewContent.trim()}
+                                            className="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl shadow-lg shadow-brand-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                        >
+                                            <Zap size={18} fill="currentColor" />
+                                            <span>{language === 'es' ? 'Analizar Post' : 'Analyze Post'}</span>
+                                        </motion.button>
+                                    </div>
+                                )}
+
+                                {isAnalyzingViral && (
+                                    <div className="bg-slate-50 border border-slate-200 rounded-3xl p-12 text-center animate-pulse">
+                                        <Loader2 className="w-10 h-10 text-brand-500 mx-auto mb-4 animate-spin" />
+                                        <p className="text-sm font-medium text-slate-600">
+                                            {language === 'es' ? 'Escaneando marcos virales...' : 'Scanning viral frameworks...'}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {viralResult && !isAnalyzingViral && (
+                                    <div className="space-y-6">
+                                        <ViralResultCard 
+                                            result={viralResult} 
+                                            language={language} 
+                                            onClose={() => onAnalyzeViral()} // can be used to re-analyze or clear
+                                        />
+                                        
+                                        <motion.button
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            onClick={onAnalyzeViral}
+                                            className="w-full py-2.5 text-slate-400 hover:text-brand-600 text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+                                        >
+                                            <RefreshCcw size={14} />
+                                            {language === 'es' ? 'Volver a Analizar' : 'Analyze Again'}
+                                        </motion.button>
+                                    </div>
+                                )}
                             </div>
                         </motion.div>
                     )}

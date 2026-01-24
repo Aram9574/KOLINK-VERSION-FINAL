@@ -53,13 +53,13 @@ const VideoDemoSection: React.FC<VideoDemoSectionProps> = ({ language }) => {
             <div className="max-w-7xl mx-auto px-6 relative z-10">
                 <div className="text-center mb-12" ref={containerRef}>
                     <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 mb-6">
-                        {isEs ? 'Mira a Kolink en acción' : 'See Kolink in Action'}
+                        {isEs ? 'De Idea a Viral en 60 Segundos' : 'From Idea to Viral in 60 Seconds'}
                     </h2>
                     
                     <p className="text-lg text-slate-500 max-w-2xl mx-auto">
                         {isEs 
-                            ? 'Descubre cómo puedes crear meses de contenido en minutos con nuestra plataforma impulsada por IA.' 
-                            : 'Discover how you can create months of content in minutes with our AI-powered platform.'}
+                            ? 'Mira cómo el motor de IA hace el trabajo pesado por ti. Tú solo pones la chispa, nosotros encendemos el fuego.' 
+                            : 'Watch the AI engine do the heavy lifting. You provide the spark, we light the fire.'}
                     </p>
                 </div>
 

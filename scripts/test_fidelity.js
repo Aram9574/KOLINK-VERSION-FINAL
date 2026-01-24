@@ -44,11 +44,11 @@ Framework: PAS (Problem-Agitate-Solution).
 `;
 
 async function runTest() {
-    console.log("🧪 Starting Fidelity Test with model: gemini-3-pro-preview...");
+    console.log("🧪 Starting Fidelity Test with model: gemini-3-flash-preview...");
 
     try {
         const ai = new GoogleGenAI({ apiKey: API_KEY });
-        const model = 'gemini-3-pro-preview';
+        const model = 'gemini-3-flash-preview';
 
         const response = await ai.models.generateContent({
             model: model,

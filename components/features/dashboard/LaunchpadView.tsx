@@ -90,8 +90,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         // ... tools definitions
         {
             id: 'carousel',
-            name: 'Estudio de Carruseles',
-            description: 'Diseña carruseles virales con IA en segundos.',
+            name: 'Storyteller Visual',
+            description: 'Convierte ideas complejas en carruseles irresistibles.',
             icon: Sparkles,
             color: 'from-brand-500 to-brand-600',
             bg: 'bg-brand-50/50',
@@ -101,8 +101,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         },
         {
             id: 'create',
-            name: 'Redactor de Posts',
-            description: 'Escribe contenido de alto impacto optimizado para LinkedIn.',
+            name: 'Arquitecto Viral',
+            description: 'Construye autoridad con frameworks virales de IA.',
             icon: PenSquare,
             color: 'from-blue-500 to-blue-600',
             bg: 'bg-blue-50/50',
@@ -112,8 +112,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         },
         {
             id: 'editor',
-            name: 'Editor de Posts',
-            description: 'Refina, optimiza y da formato a tus borradores con herramientas avanzadas.',
+            name: 'Pulido y Formato',
+            description: 'Refina tus borradores para máxima legibilidad.',
             icon: FileEdit,
             color: 'from-pink-500 to-pink-600',
             bg: 'bg-pink-50/50',
@@ -122,8 +122,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         },
         {
             id: 'autopost',
-            name: 'Programador Inteligente',
-            description: 'Automatiza tu calendario de publicaciones y maximiza tu alcance.',
+            name: 'Piloto Automático',
+            description: 'Pon tu crecimiento en auto-piloto. Publicamos cuando ellos miran.',
             icon: Calendar,
             color: 'from-emerald-500 to-emerald-600',
             bg: 'bg-emerald-50/50',
@@ -132,8 +132,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         },
         {
             id: 'insight-responder',
-            name: 'Asistente de Engagement',
-            description: 'Responde comentarios y mensajes con la voz de tu marca.',
+            name: 'Constructor de Comunidad',
+            description: 'Responde comentarios más rápido y con más inteligencia.',
             icon: MessageSquare,
             color: 'from-amber-500 to-amber-600',
             bg: 'bg-amber-50/50',
@@ -142,8 +142,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         },
         {
             id: 'chat',
-            name: 'Estratega Personal IA',
-            description: 'Tu consultor experto 24/7 para estrategia y crecimiento.',
+            name: 'Socio Estratégico IA',
+            description: 'Tu consultor 24/7 para dominar tu marca personal.',
             icon: BrainCircuit,
             color: 'from-purple-500 to-purple-600',
             bg: 'bg-purple-50/50',
@@ -153,8 +153,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         },
         {
             id: 'voice-lab',
-            name: 'Laboratorio de Voz',
-            description: 'Clona tu voz y genera contenido de audio hiper-realista.',
+            name: 'Clon de ADN de Marca',
+            description: 'Entrena a la IA para que suene exactamente como tú (o mejor).',
             icon: Mic,
             color: 'from-cyan-500 to-cyan-600',
             bg: 'bg-cyan-50/50',
@@ -212,6 +212,37 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
     return (
         <div className="min-h-screen flex flex-col p-6 lg:p-12">
             {/* Hero Section */}
+            
+            {/* SMART NUDGE (Added via Copywriting Skill) */}
+            <div className="mb-8">
+                 <div className="bg-gradient-to-r from-indigo-50 to-brand-50 w-full rounded-2xl p-1 shadow-sm border border-indigo-100 flex">
+                    <div className="bg-white/60 w-full rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 backdrop-blur-sm">
+                        <div className="flex items-center gap-4">
+                            <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-slate-100 ring-1 ring-blue-50">
+                                <Sparkles className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-bold text-slate-900">
+                                    {language === 'es' ? 'Sugerencia del Día' : 'Daily Insight'}
+                                </h4>
+                                <p className="text-sm text-slate-600">
+                                    {language === 'es' 
+                                        ? 'Tu audiencia está activa. Es el momento perfecto para publicar.' 
+                                        : 'Your audience is active. Perfect time to draft a post.'}
+                                </p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={() => onSelectTool('create')}
+                            className="w-full md:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-all shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center justify-center gap-2"
+                        >
+                            <PenSquare className="w-4 h-4" />
+                            {language === 'es' ? 'Crear Ahora' : 'Draft Now'}
+                        </button>
+                    </div>
+                 </div>
+            </div>
+
             {/* Launch Grid */}
             <div className="flex flex-col gap-6">
                 <div className="flex items-center justify-between">
@@ -259,27 +290,11 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                                 variants={item}
                                 onClick={tool.disabled ? undefined : tool.onClick}
                                 disabled={tool.disabled}
-                                whileHover={tool.disabled ? {} : { y: -8, scale: 1.02 }}
+                                whileHover={tool.disabled ? {} : { y: -5, scale: 1.01 }}
                                 whileTap={tool.disabled ? {} : { scale: 0.98 }}
-                                className={`group relative text-left p-8 rounded-[2rem] bg-white border border-slate-100 transition-all shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden z-0 ${tool.disabled ? 'opacity-75 cursor-not-allowed grayscale-[0.5]' : 'hover:border-transparent hover:shadow-2xl'}`}
-                                style={{ 
-                                    // Dynamic colored shadow on hover
-                                    '--shadow-color': tool.color.includes('brand') ? 'rgba(37,99,235,0.25)' : 
-                                                      tool.color.includes('purple') ? 'rgba(147,51,234,0.25)' :
-                                                      tool.color.includes('emerald') ? 'rgba(16,185,129,0.25)' :
-                                                      tool.color.includes('amber') ? 'rgba(245,158,11,0.25)' :
-                                                      tool.color.includes('rose') ? 'rgba(244,63,94,0.25)' :
-                                                      tool.color.includes('blue') ? 'rgba(59,130,246,0.25)' : 'rgba(100,116,139,0.25)' 
-                                } as React.CSSProperties}
+                                className={`group relative text-left p-8 rounded-3xl bg-white border border-slate-200/60 shadow-sm hover:shadow-nexus hover:border-brand-500/30 transition-all duration-300 overflow-hidden z-0 ${tool.disabled ? 'opacity-75 cursor-not-allowed grayscale-[0.5]' : ''}`}
                             >
-                                {/* Hover Styles Injection only if not disabled */}
-                                {!tool.disabled && (
-                                    <style>{`
-                                        .group:hover {
-                                            box-shadow: 0 20px 40px -10px var(--shadow-color);
-                                        }
-                                    `}</style>
-                                )}
+
                                 
                                 {/* Gradient Background Wash */}
                                 <div className={`absolute inset-0 bg-gradient-to-br ${tool.bg} opacity-0 ${!tool.disabled && 'group-hover:opacity-100'} transition-opacity duration-500`} />
@@ -289,7 +304,7 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
     
                                 <div className="relative z-10 flex flex-col h-full gap-6">
                                     <div className="flex justify-between items-start">
-                                        <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${tool.color} flex items-center justify-center shadow-lg text-white relative transform ${!tool.disabled && 'group-hover:scale-110 group-hover:rotate-3'} transition-transform duration-500`}>
+                                        <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${tool.color} flex items-center justify-center shadow-lg text-white relative transform ${!tool.disabled && 'group-hover:scale-105 group-hover:rotate-1'} transition-transform duration-500`}>
                                             <tool.icon className="w-8 h-8" />
                                             {tool.premium && !user.isPremium && !tool.disabled && (
                                                 <div className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md">
@@ -351,7 +366,9 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                     <motion.div 
                         variants={item}
                         onClick={() => setIsFeedbackOpen(true)}
-                        className="p-8 rounded-[2rem] bg-slate-50/50 border-2 border-dashed border-slate-200 hover:border-brand-300 hover:bg-brand-50/30 flex flex-col items-center justify-center text-center gap-4 transition-all cursor-pointer group h-full min-h-[240px]"
+                        whileHover={{ y: -5 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="p-8 rounded-3xl bg-slate-50/50 border-2 border-dashed border-slate-200 hover:border-brand-300 hover:bg-brand-50/30 flex flex-col items-center justify-center text-center gap-4 transition-all cursor-pointer group h-full min-h-[240px]"
                     >
                         <div className="w-16 h-16 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:shadow-md transition-all">
                             <Sparkles className="w-6 h-6 text-slate-300 group-hover:text-brand-500 transition-colors" />

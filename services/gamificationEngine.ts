@@ -51,8 +51,10 @@ export const processGamification = (
     currentStreak = 1;
   }
 
-  // 2. Base XP Reward for Generating
-  currentXP += 50;
+  // 2. Base XP Reward with GOAL GRADIENT EFFECT
+  // Rewards increase as you approach major milestones (like Level 3 / 900 XP)
+  const baseReward = user.xp < 900 ? 50 + Math.floor(user.xp / 10) : 50; 
+  currentXP += baseReward;
 
   // 3. Check Achievements
   const existingIds = new Set(user.unlockedAchievements);

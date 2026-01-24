@@ -1,4 +1,4 @@
-import { GenerationParams } from "../services/ContentService.ts";
+import { GenerationParams } from "../schemas.ts";
 
 export class PostGeneratorBrain {
   
@@ -11,6 +11,12 @@ export class PostGeneratorBrain {
     1. NEVER start with "Here is a post..." or "Sure!". Start directly with the hook.
     2. Use short paragraphs (1-2 sentences max) for readability.
     3. Ensure the voice matches the user's Brand Voice description closely.
+    
+    ### ELITE COPYWRITING RULES (Eliminate AI Footprint):
+    - **No Clichés**: Absolutely avoid words like "Explore", "Delve", "Unlock", "Landscape", "Tapestry", or "Unleash".
+    - **Staccato Rhythm**: Break long sentences. Alternate: One punchy sentence. One explanatory sentence. One short closing sentence.
+    - **Invisible AI**: Never summarize at the end with "In conclusion" or "Lastly". End with a provocative thought or a direct action.
+    - **Visual Oxygen**: Use double line breaks between EVERY paragraph/thought.
     
     AUTHOR CONTEXT:
     - Industry: ${userContext.industry}

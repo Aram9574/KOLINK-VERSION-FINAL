@@ -13,7 +13,11 @@ import DNAScanner from './DNAScanner';
 import AuthorityGap from './AuthorityGap';
 import ShadowingPlayground from './ShadowingPlayground';
 
-type LabTab = 'vault' | 'scanner' | 'authority' | 'shadowing';
+
+import AudioGenerator from './AudioGenerator';
+import { Mic2 } from 'lucide-react';
+
+type LabTab = 'vault' | 'scanner' | 'authority' | 'shadowing' | 'audio';
 
 import PremiumLockOverlay from '../../ui/PremiumLockOverlay';
 
@@ -151,6 +155,13 @@ const VoiceLabView: React.FC = () => {
                         <Activity className="w-4 h-4" />
                         Authority Radar
                     </button>
+                    <button 
+                         onClick={() => setActiveTab('audio')}
+                         className={`px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 ${activeTab === 'audio' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+                    >
+                        <Mic2 className="w-4 h-4" />
+                        Audio Gen
+                    </button>
                 </div>
             </div>
 
@@ -195,6 +206,9 @@ const VoiceLabView: React.FC = () => {
                             activeVoice={activeVoice}
                         />
                     </div>
+                 )}
+                 {activeTab === 'audio' && (
+                    <AudioGenerator voices={voices} />
                  )}
             </div>
         </div>

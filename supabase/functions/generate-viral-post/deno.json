@@ -1,13 +1,8 @@
 {
   "imports": {
     "shared/": "../_shared/",
-    "stripe": "npm:stripe@^14.0.0",
     "@supabase/supabase-js": "jsr:@supabase/supabase-js@2",
     "std/": "https://deno.land/std@0.208.0/",
-    "std/": "https://deno.land/std@0.208.0/",
-    "zod": "npm:zod@^3.23.8",
-    "npm:zod": "npm:zod@^3.23.8",
-    "npm:pdf-parse": "npm:pdf-parse@^1.1.1",
-    "node:buffer": "node:buffer"
+    "zod": "https://deno.land/x/zod@v3.22.4/mod.ts"
   }
 }

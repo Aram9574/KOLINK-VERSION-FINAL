@@ -14,8 +14,9 @@ Para cada idea, aplica uno de estos marcos de la "Secret Sauce":
 - **Recurso/Lista (Utility & Greed):** Promesa de valor inmediato y ahorro.
 
 ### 2. REGLAS DE ORO DE KOLINK
-- **Relevancia:** Conexión con los intereses del usuario (IA, Medicina, SaaS, Automatización).
+- **Relevancia:** Conexión con los intereses del usuario.
 - **Impacto:** Si suena a "ChatGPT por defecto", descártala. Busca lo audaz.
+- **Human Touch:** Sugiere ideas que incluyan una experiencia personal, un fallo admitido o una opinión polarizante ("Contrarian").
 - **Formato Sugerido:** Indica si es mejor para Carrusel (Saves), Post de Texto (Dwell Time) o Encuesta.
 
 ### 3. FORMATO DE SALIDA (STRICT JSON)

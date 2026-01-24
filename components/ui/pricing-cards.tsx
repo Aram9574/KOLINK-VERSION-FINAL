@@ -222,12 +222,16 @@ export function Pricing({ onPlanSelect, currentPlanId, isUpgradeView = false }: 
                      <div className="flex flex-row gap-4">
                       <Check className="w-5 h-5 mt-0.5 text-brand-600 flex-shrink-0" />
                       <div className="flex flex-col">
-                        <p className="text-slate-900 font-bold">Nexus Chat 24/7</p>
-                        <p className="text-slate-500 text-sm">
-                          Tu consultor estratégico personal.
-                        </p>
+                        <p className="text-slate-900 font-bold text-lg">Nexus Chat 24/7</p>
+                        <p className="text-brand-700 text-sm font-semibold">Tu consultor estratégico personal.</p>
                       </div>
                     </div>
+                  </div>
+                  <div className="bg-brand-50 p-4 rounded-xl border border-brand-100 mb-2">
+                     <p className="text-brand-800 text-xs font-bold flex items-center gap-2">
+                        <Star size={14} fill="currentColor" />
+                        ELEGIDO POR EL TOP 1% DE CREADORES
+                     </p>
                   </div>
                   <Button 
                     className="gap-4 w-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg shadow-brand-500/20"

@@ -18,6 +18,9 @@ import { InfiniteGrid } from "../ui/infinite-grid-integration.tsx";
 import VideoDemoSection from "./VideoDemoSection.tsx";
 import { motion } from "framer-motion";
 import SmartCursor from "../ui/SmartCursor.tsx";
+import { lazy, Suspense } from "react";
+
+const ViralCalculator = lazy(() => import("../marketing/ViralCalculator").then(m => ({ default: m.ViralCalculator })));
 
 const SectionReveal = ({ children, id }: { children: React.ReactNode; id?: string }) => (
     <motion.div
@@ -141,6 +144,7 @@ const LandingPage: React.FC = () => {
             const sections = [
                 "hero",
                 "demo",
+                "viral-calc",
                 "tools",
                 "how-it-works",
                 "comparison",
@@ -204,6 +208,12 @@ const LandingPage: React.FC = () => {
                     <SectionReveal id="demo">
                         <VideoDemoSection language={language} />
                     </SectionReveal>
+
+                    <Suspense fallback={<div className="h-96 flex items-center justify-center"><div className="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin"></div></div>}>
+                        <SectionReveal id="viral-calc">
+                            <ViralCalculator />
+                        </SectionReveal>
+                    </Suspense>
 
                     <SectionReveal id="tools">
                          <FeaturesBento language={language} />

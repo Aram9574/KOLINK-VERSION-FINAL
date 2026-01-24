@@ -85,7 +85,7 @@ const RoiSection: React.FC<RoiSectionProps> = ({ language }) => {
                         className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold mb-6 tracking-wider uppercase"
                     >
                         <Sparkles className="w-3.5 h-3.5 text-brand-500" />
-                        {language === 'es' ? 'Valor Real' : 'Real Value'}
+                        {language === 'es' ? 'Matemática Simple' : 'Simple Math'}
                     </motion.div>
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
@@ -94,7 +94,7 @@ const RoiSection: React.FC<RoiSectionProps> = ({ language }) => {
                         transition={{ delay: 0.1 }}
                         className="text-4xl md:text-5xl font-display font-bold text-slate-900 mb-6 tracking-tightest"
                     >
-                        {t.roi.title}
+                         {language === 'es' ? "No es un gasto. Es gasolina." : "It's not a cost. It's fuel."}
                     </motion.h2>
                     <motion.p 
                         initial={{ opacity: 0, y: 20 }}
@@ -103,7 +103,9 @@ const RoiSection: React.FC<RoiSectionProps> = ({ language }) => {
                         transition={{ delay: 0.2 }}
                         className="text-slate-500 text-lg max-w-2xl mx-auto"
                     >
-                        {t.roi.subtitle}
+                        {language === 'es'
+                            ? "Contratar una agencia te costaría €2,500/mes. Kolink te da mejores resultados por el precio de una cena."
+                            : "Hiring an agency costs €2,500/mo. Kolink gives you better results for the price of a dinner."}
                     </motion.p>
                 </div>
 
@@ -115,7 +117,7 @@ const RoiSection: React.FC<RoiSectionProps> = ({ language }) => {
                     className="space-y-4"
                 >
                     {/* The Traditional Cost Card */}
-                    <div className="card-premium p-1 bg-white/50 backdrop-blur-xl border-slate-200/60 overflow-hidden shadow-soft-glow">
+                    <div className="card-nexus p-1 bg-white/50 backdrop-blur-xl border-slate-200/60 overflow-hidden shadow-soft-glow">
                         <div className="divide-y divide-slate-100">
                             {costItems.map((item, idx) => (
                                 <motion.div 
@@ -164,7 +166,7 @@ const RoiSection: React.FC<RoiSectionProps> = ({ language }) => {
                     <motion.div 
                         variants={itemVariants}
                         whileHover={{ y: -4 }}
-                        className="card-premium p-1.5 bg-gradient-to-br from-brand-600 via-brand-700 to-indigo-800 shadow-[0_20px_40px_-15px_rgba(37,99,235,0.3)]"
+                        className="card-nexus p-1.5 bg-gradient-to-br from-brand-600 via-brand-700 to-indigo-800 shadow-[0_20px_40px_-15px_rgba(37,99,235,0.3)]"
                     >
                         <div className="bg-white/5 rounded-[0.9rem] p-8 md:p-12 relative overflow-hidden backdrop-blur-sm border border-white/10">
                             {/* Decorative Elements */}

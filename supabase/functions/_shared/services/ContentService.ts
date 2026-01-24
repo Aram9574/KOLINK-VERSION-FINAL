@@ -1,4 +1,4 @@
-// import { SchemaType, Tool, Schema } from "@google/generative-ai"; // REMOVED
+
 import { BaseAIService, GeminiResponse } from "./BaseAIService.ts";
 import { PostGeneratorBrain } from "../prompts/PostGeneratorBrain.ts";
 import { CarouselBrain } from "../prompts/CarouselBrain.ts";
@@ -21,21 +21,7 @@ export interface Idea {
   ai_reasoning: string;
 }
 
-export interface GenerationParams {
-  topic: string;
-  audience: string;
-  tone: string;
-  framework: string;
-  emojiDensity: string;
-  length: string;
-  creativityLevel: number;
-  hashtagCount: number;
-  includeCTA: boolean;
-  outputLanguage?: string;
-  brandVoiceId?: string;
-  hookStyle?: string;
-  generateCarousel?: boolean;
-}
+import { GenerationParams } from "../schemas.ts";
 
 export interface UserProfileContext {
   brand_voice?: string;
@@ -56,15 +42,15 @@ export interface CarouselConfig {
 }
 
 export interface CarouselSlideData {
-    id: string; // Add ID
+    id: string; 
     type: "intro" | "content" | "outro";
-    layout_variant?: string; // Add variant
+    layout_variant?: string; 
     content: {
         title: string;
         subtitle?: string;
         body: string;
         visual_hint?: string;
-        cta_text?: string; // Legacy support or new CTA logic
+        cta_text?: string;
     };
     design_overrides?: {
         swipe_indicator?: boolean;
@@ -72,7 +58,7 @@ export interface CarouselSlideData {
 }
 
 export interface CarouselGenerationResult {
-    carousel_config: CarouselConfig; // Renamed from carousel_metadata
+    carousel_config: CarouselConfig;
     slides: CarouselSlideData[];
     linkedin_post_copy: string;
 }
@@ -93,13 +79,16 @@ export interface EngagementPrediction {
 
 export class ContentService extends BaseAIService {
   
-  // Convertir nivel de creatividad a temperatura (0.0 - 1.0)
-  private getTemperature(level?: string): number {
+  private getTemperature(level?: number | string): number {
+    if (typeof level === 'number') {
+        const normalized = Math.max(0, Math.min(100, level)) / 100;
+        return 0.2 + (normalized * 0.75);
+    }
     switch (level) {
-        case 'high': return 0.95; // Muy creativo, arriesgado
-        case 'low': return 0.3;   // Factual, conservador
+        case 'high': return 0.95; 
+        case 'low': return 0.3;   
         case 'medium': 
-        default: return 0.7;      // Balanceado
+        default: return 0.7;      
     }
   }
 
@@ -123,14 +112,6 @@ export class ContentService extends BaseAIService {
         ? `\nBRAND VOICE:\n${userContext.brand_voice}`
         : "";
 
-    const userProfileFull = `
-    INDUSTRY: ${userContext.industry || "General"}
-    EXPERTISE: ${userContext.xp || 0} XP
-    HEADLINE: ${userContext.headline || ""}
-    ${voiceContext}
-    ${behaviorContext}
-    `;
-
     const systemInstruction = PostGeneratorBrain.getSystemPrompt({
         ...userContext,
         industry: userContext.industry || "General",
@@ -138,18 +119,39 @@ export class ContentService extends BaseAIService {
         company_name: userContext.company_name || "an industry leader"
     });
     
-    const userPrompt = PostGeneratorBrain.getUserPrompt(params, params.topic);
+    // Enforce strict JSON schema in the prompt to help the model
+    const strictSchemaInstruction = `
+    IMPORTANT: You MUST return a valid JSON object. Do not include markdown formatting like \`\`\`json.
+    Structure:
+    {
+      "post_content": "The actual post text...",
+      "auditor_report": {
+        "viral_score": 85,
+        "hook_strength": "High",
+        "hook_score": 90,
+        "readability_score": 88,
+        "value_score": 85,
+        "pro_tip": "Advice...",
+        "retention_estimate": "30s",
+        "flags_triggered": []
+      },
+      "strategy_reasoning": "Reason...",
+      "meta": {
+        "suggested_hashtags": ["#tag"],
+        "character_count": 150
+      }
+    }
+    `;
 
     return await this.retryWithBackoff(async () => {
       // Set temperature based on creativity level
-      const temperature = this.getTemperature(params.creativityLevel as string);
+      const temperature = this.getTemperature(params.creativityLevel);
 
       const payload = {
-        // Build chat-like history for better following of system instructions
         contents: [
-          { role: "user", parts: [{ text: `SYSTEM INSTRUCTIONS:\n${systemInstruction}` }] },
-          { role: "model", parts: [{ text: "Understood. I am ready to write adhering to all style, audience, and formatting constraints." }] },
-          { role: "user", parts: [{ text: userPrompt }] }
+          { role: "user", parts: [{ text: `SYSTEM INSTRUCTIONS:\n${systemInstruction}\n\n${behaviorContext}\n${voiceContext}` }] },
+          { role: "model", parts: [{ text: "Understood. I am the KOLINK AI engine. I will output strictly valid JSON." }] },
+          { role: "user", parts: [{ text: `Generate a post about: ${params.topic}. \nParams: ${JSON.stringify(params)}\n\nExtra Output Rules:\n${strictSchemaInstruction}` }] }
         ],
         generationConfig: {
           temperature: temperature,
@@ -193,50 +195,21 @@ export class ContentService extends BaseAIService {
         },
       };
 
-      try {
-        const data = await this.generateViaFetch(this.model, payload) as GeminiResponse;
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        
-        if (!text) {
-            throw new Error("No text returned from Gemini API (Structured Mode)");
-        }
-  
-        return this.extractJson(text) as unknown as GeneratedPost;
-      } catch (err) {
-        console.error("Critical AI Generation Failure (Returning Mock):", err);
-        
-        // GRACEFUL FALLBACK: Return a high-quality mock post so the app doesn't crash
-        const isSpanish = params.outputLanguage === 'es';
-        
-        const content = isSpanish 
-            ? "🚀 **¡Lanza tu Marca Personal con Confianza!**\n\nDicen que el mejor momento para empezar fue ayer. El segundo mejor es HOY.\n\nTodos nos hemos enfrentado a ese cursor parpadeante, preguntándonos si nuestra voz importa. Pero aquí está la verdad: Tu perspectiva única es exactamente lo que alguien necesita escuchar hoy.\n\nLa constancia no se trata de ser perfecto, se trata de presentarse.\n\n👇 **¿Cómo te estás presentando hoy? ¡Cuéntamelo en los comentarios!**\n\n#MarcaPersonal #CrecimientoLinkedIn #EmpezarAhora #KolinkAI"
-            : "🚀 **Launch Your LinkedIn Journey with Confidence!**\n\nThey say the best time to start was yesterday. The second best time is NOW.\n\nWe've all faced that blinking cursor, wondering if our voice matters. But here's the truth: Your unique perspective is exactly what someone out there needs to hear today.\n\nConsistency isn't about being perfect; it's about showing up.\n\n👇 **How are you showing up today? Let me know in the comments!**\n\n#PersonalBranding #LinkedInGrowth #JustStart #KolinkAI";
-
-        const tips = isSpanish
-            ? "¡Gran comienzo! Intenta agregar una anécdota personal específica la próxima vez para aumentar la conexión."
-            : "Great start! Try adding a specific personal anecdote next time to increase relatability.";
-
-        return {
-          post_content: content,
-          auditor_report: {
-            viral_score: 85,
-            hook_strength: "High",
-            hook_score: 9,
-            readability_score: 9,
-            value_score: 8,
-            pro_tip: tips,
-            retention_estimate: "45s",
-            flags_triggered: []
-          },
-          strategy_reasoning: `FALLBACK GENERATION (AI BLOCKED): ${err instanceof Error ? err.message : JSON.stringify(err)}`,
-          meta: {
-            suggested_hashtags: ["#PersonalBranding", "#LinkedInGrowth", "#JustStart"],
-            character_count: content.length
-          }
-        } as GeneratedPost;
+      const data = await this.generateViaFetch(this.model, payload) as GeminiResponse;
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (!text) {
+          throw new Error("No text returned from KOLINK AI engine.");
       }
+
+      const json = this.extractJson(text);
+       if (!json.post_content || !json.auditor_report) {
+         throw new Error("Invalid AI response structure: Missing post_content or auditor_report");
+      }
+      return json as unknown as GeneratedPost;
     });
   }
+
   
   /**
    * Generates a LinkedIn Carousel JSON.
@@ -264,37 +237,25 @@ export class ContentService extends BaseAIService {
     let finalSource = source;
     let analysisStrategy = "";
 
-    // 1. CONTENT FETCHING PHASE
     try {
       if (sourceType === 'youtube') {
-           console.log(`Fetching YouTube transcript for ${source}...`);
-           let videoId = source;
-           if (source.includes('v=')) videoId = source.split('v=')[1].split('&')[0];
-           else if (source.includes('youtu.be/')) videoId = source.split('youtu.be/')[1].split('?')[0];
-
-           const transcript = await repurposeService.fetchYoutubeTranscript(videoId);
-           finalSource = `[VIDEO TRANSCRIPT]:\n"${transcript}"\n\n(Source Video: ${source})`;
-           analysisStrategy = "CONTENT TYPE: VIDEO TRANSCRIPT. \nSTRATEGY: Extract the core educational value. Ignore conversational filler. \nFRAGMENTATION: Break down the key lessons into atomic steps.";
+           const transcript = await repurposeService.fetchYoutubeTranscript(source); // Simplified call
+           finalSource = `[VIDEO TRANSCRIPT]:\n"${transcript}"`;
       } 
       else if (sourceType === 'url') {
-           console.log(`Scraping URL ${source}...`);
            const webContent = await repurposeService.scrapeUrl(source);
-           finalSource = `[WEB ARTICLE CONTENT]:\n"${webContent}"\n\n(Source URL: ${source})`;
-           analysisStrategy = "CONTENT TYPE: WEB ARTICLE. \nSTRATEGY: Summarize the main points. \nFRAGMENTATION: Turn sections into individual slides. Avoid walls of text.";
+           finalSource = `[WEB ARTICLE CONTENT]:\n"${webContent}"`;
       }
       else if (sourceType === 'pdf') {
-           console.log(`Extracting PDF content...`);
            const pdfContent = await repurposeService.extractPdfText(source);
            finalSource = `[PDF DOCUMENT CONTENT]:\n"${pdfContent}"`;
-           analysisStrategy = "CONTENT TYPE: PDF DOCUMENT. \nSTRATEGY: Extract the core value and structured data. \nFRAGMENTATION: Use 'checklist' or 'comparison' layouts for data-heavy sections.";
       }
       else {
-           // Default TEXT or TOPIC
            analysisStrategy = "CONTENT TYPE: RAW TOPIC/TEXT. \nSTRATEGY: Use your internal knowledge to build a comprehensive guide. \nFRAGMENTATION: 7-10 solid slides.";
       }
     } catch (error) {
        console.error("Repurposing Error:", error);
-       analysisStrategy = `WARNING: Failed to fetch external content (${error instanceof Error ? error.message : 'Unknown'}). Treat the input "${source}" as a topic and use Google Search to find information about it.`;
+       analysisStrategy = `WARNING: Failed to fetch external content. Treat the input "${source}" as a topic.`;
     }
 
     const layoutStrategy = `
@@ -320,7 +281,6 @@ export class ContentService extends BaseAIService {
       ${styleContext}
       ${dnaInstruction}
       ${userVoice}
-      ${styleContext}
       
       PHASE 1: ANALYSIS STRATEGY & SMART FRAGMENTATION
       ${analysisStrategy}
@@ -329,16 +289,12 @@ export class ContentService extends BaseAIService {
       
       PHASE 2: NARRATIVE ARCHITECTURE
       Design a 7-12 slide carousel JSON following the Arc rules.
-      
-      USER DNA: 
-      ${dnaInstruction}
 
       LANGUAGE: ${language === "es" ? "Spanish" : "English"}
     `;
 
     return await this.retryWithBackoff(async () => {
       const payload = {
-        // tools: [{ google_search: {} }], // Optional: Enable if needed and verified supported in v1beta REST
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.2,
@@ -458,7 +414,6 @@ export class ContentService extends BaseAIService {
    */
   async generateDirect(prompt: string, schemaProperties: Record<string, unknown>) {
       return await this.retryWithBackoff(async () => {
-          // Dynamic schema construction for raw fetch
           const responseSchema = {
               type: "OBJECT",
               properties: schemaProperties,
@@ -483,16 +438,13 @@ export class ContentService extends BaseAIService {
   }
 
   /**
-   * Predicts the performance of a post or carousel using the "The Crowd Proxy" approach.
+   * Predicts the performance of a post or carousel approaches.
    */
   async predictPerformance(content: string, language: string = "es"): Promise<EngagementPrediction> {
-    
     const prompt = `
       ${PredictiveSimBrain.system_instruction}
-
       INPUT CONTENT TO ANALYZE:
       ${content}
-
       LANGUAGE OF ANALYSIS: ${language === "es" ? "Spanish" : "English"}
     `;
 
@@ -546,7 +498,7 @@ export class ContentService extends BaseAIService {
   }
 
   /**
-   * Refines a specific carousel slide based on user feedback or general polish.
+   * Refines a specific carousel slide.
    */
   async refineSlide(
     slideContent: { title: string; body: string; subtitle?: string; type: string },

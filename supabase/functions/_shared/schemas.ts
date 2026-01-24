@@ -1,4 +1,4 @@
-import { z } from "npm:zod@3.22.4";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 export const GenerationParamsSchema = z.object({
   topic: z.string().min(1).max(5000),
@@ -15,6 +15,8 @@ export const GenerationParamsSchema = z.object({
   hookStyle: z.string().optional(),
   generateCarousel: z.boolean().optional(),
 });
+
+export type GenerationParams = z.infer<typeof GenerationParamsSchema>;
 
 export const VariationParamsSchema = z.object({
   postId: z.string().uuid(),

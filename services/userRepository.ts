@@ -169,6 +169,8 @@ export const syncUserProfile = async (user: any) => {
         id: user.id,
         email: user.email,
         updated_at: new Date().toISOString(),
+        xp_points: 150, // Endowed Progress EFFECT: Start with 150 XP instead of 0
+        level: 1,
     };
 
     if (metadata.full_name || metadata.name) {

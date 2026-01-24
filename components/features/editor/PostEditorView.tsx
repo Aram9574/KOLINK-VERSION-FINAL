@@ -42,6 +42,7 @@ import {
 } from "../../../services/postRepository";
 import { motion } from "framer-motion";
 import { hapticFeedback } from "../../../lib/animations";
+import { supabase } from "../../../services/supabaseClient";
 
 // Lazy load for performance
 // const LinkedInPreview = React.lazy(() => import("../generation/LinkedInPreview"));
@@ -63,7 +64,7 @@ const PostEditorView: React.FC = () => {
   const [postTitle, setPostTitle] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [sidebarTab, setSidebarTab] = useState<
-    "preview" | "hooks" | "endings" | "snippets"
+    "preview" | "hooks" | "endings" | "snippets" | "viral"
   >("preview");
   const [previewMode, setPreviewMode] = useState<"mobile" | "desktop">(
     "mobile",
@@ -86,12 +87,10 @@ const PostEditorView: React.FC = () => {
   useEffect(() => {
     // Check key location state first
     if (location.state && (location.state as any).initialDraft) {
-        setEditorContent((location.state as any).initialDraft);
-        setPostTitle((location.state as any).initialTitle || "");
-        // Clear state to prevent reload persistence oddities? 
-        // Window.history.replaceState clears it from browser history stack state
-        window.history.replaceState({}, document.title);
-        return;
+      setEditorContent((location.state as any).initialDraft);
+      setPostTitle((location.state as any).initialTitle || "");
+      window.history.replaceState({}, document.title);
+      return;
     }
 
     // Only load if context doesn't have a specific post selected
@@ -139,6 +138,34 @@ const PostEditorView: React.FC = () => {
       );
     }
   }, [contextCurrentPost]);
+
+  // Viral Analysis State
+  const [viralResult, setViralResult] = useState<any | null>(null);
+  const [isAnalyzingViral, setIsAnalyzingViral] = useState(false);
+
+  const handleAnalyzeViral = async () => {
+    if (!editorContent.trim()) {
+      toast.error(language === "es" ? "Escribe algo primero" : "Write something first");
+      return;
+    }
+
+    setIsAnalyzingViral(true);
+    setViralResult(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-viral-score", {
+        body: { topic: editorContent, language },
+      });
+
+      if (error) throw error;
+      setViralResult(data);
+    } catch (err: any) {
+      console.error("Viral analysis error:", err);
+      toast.error(language === "es" ? "Error al analizar" : "Analysis error");
+    } finally {
+      setIsAnalyzingViral(false);
+    }
+  };
 
   // Snippets State
   const [snippets, setSnippets] = useState<
@@ -681,6 +708,9 @@ const PostEditorView: React.FC = () => {
         endings={filteredEndings.slice(0, visibleEndingsCount).map(e => e.text)}
         snippets={snippets.filter(s => s.text.toLowerCase().includes(snippetSearch.toLowerCase())).map(s => ({ id: s.id, title: s.text.substring(0, 20), content: s.text, category: "Fragmento" }))}
         isGenerating={false}
+        isAnalyzingViral={isAnalyzingViral}
+        viralResult={viralResult}
+        onAnalyzeViral={handleAnalyzeViral}
         onInjectText={injectText}
         onGenerateHook={handleShuffleHooks}
         onGenerateEnding={handleShuffleEndings}
@@ -690,7 +720,8 @@ const PostEditorView: React.FC = () => {
           preview: t.preview,
           hooks: t.hooks,
           endings: t.endings,
-          snippets: t.snippets
+          snippets: t.snippets,
+          viral: t.viralAnalysis
         }}
       />
     </div>

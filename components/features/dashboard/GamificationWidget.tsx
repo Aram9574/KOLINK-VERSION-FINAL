@@ -16,7 +16,7 @@ const GamificationWidget: React.FC<GamificationWidgetProps> = ({ user }) => {
   const percent = Math.min(100, Math.max(0, (xpProgress / xpNeeded) * 100));
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl p-4 text-slate-900 dark:text-white relative overflow-hidden group border border-slate-200/60/60 dark:border-slate-800 shadow-sm shadow-slate-200/50">
+    <div className="card-nexus p-6 relative overflow-hidden group">
       {/* Ambient Glow */}
       <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-500/5 dark:bg-indigo-500/20 blur-2xl rounded-full pointer-events-none">
       </div>
@@ -55,7 +55,12 @@ const GamificationWidget: React.FC<GamificationWidgetProps> = ({ user }) => {
             <Star className="w-3 h-3 text-brand-500 dark:text-brand-400" />{" "}
             {Math.floor(user.xp)} XP
           </span>
-          <span>Lvl {nextLevel}</span>
+          <span className="flex items-center gap-1 text-slate-400">
+             <div className="w-3 h-3 rounded-full border border-slate-300 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 bg-slate-300 rounded-full" />
+             </div>
+             Unlock: Carousel Editor (Lvl {nextLevel})
+          </span>
         </div>
         <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/60/50 dark:border-slate-700/50">
           <div
@@ -64,6 +69,13 @@ const GamificationWidget: React.FC<GamificationWidgetProps> = ({ user }) => {
           >
           </div>
         </div>
+        
+        {/* Loss Aversion Micro-copy */}
+        {user.currentStreak > 0 && (
+             <p className="text-[9px] text-center mt-2 text-rose-500/80 font-medium">
+                🔥 Don't lose your {user.currentStreak}-day streak!
+            </p>
+        )}
       </div>
     </div>
   );

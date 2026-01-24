@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Section from "@/components/ui/Section.tsx";
 import { cn } from "@/lib/utils.ts";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, BarChart, Layers, Sparkles, Calendar, TrendingUp } from "lucide-react";
+import { Mic, BarChart, Layers, Sparkles, Calendar, TrendingUp, AlertCircle, CheckCircle, Flame, XCircle } from "lucide-react";
 import { AppLanguage } from "@/types.ts";
 import { es } from "@/translations/es.ts";
 import { en } from "@/translations/en.ts";
@@ -218,15 +218,25 @@ export const FeaturesBento = ({ language }: { language: AppLanguage }) => {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="md:col-span-8 h-[360px] card-premium group/card p-8 flex flex-col md:flex-row gap-8 hover:shadow-soft-glow"
+                    className="md:col-span-8 h-[360px] card-nexus group/card p-8 flex flex-col md:flex-row gap-8 hover:shadow-soft-glow"
                 >
                     <div className="flex-1 flex flex-col justify-center text-left">
                         <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-6 text-blue-600 dark:text-blue-400 ring-1 ring-blue-100 dark:ring-blue-800">
                             <Sparkles size={24} />
                         </div>
-                        <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white tracking-tight">{t.bento.postGenerator.title}</h3>
-                         <p className="text-lg font-medium text-slate-600 dark:text-slate-300 mb-4">{t.bento.postGenerator.desc}</p>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{t.bento.postGenerator.subDesc}</p>
+                        <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white tracking-tight">
+                            {language === 'es' ? "Motor de Contenido Viral" : "Viral Content Engine"}
+                        </h3>
+                         <p className="text-lg font-medium text-slate-600 dark:text-slate-300 mb-4">
+                            {language === 'es' 
+                                ? "Transforma tus ideas en autoridad inmediata." 
+                                : "Transform your ideas into instant authority."}
+                         </p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                            {language === 'es'
+                                ? "Genera borradores virales usando frameworks probados (AIDA, PAS) en segundos."
+                                : "Generate viral drafts using proven frameworks (AIDA, PAS) in seconds."}
+                        </p>
                     </div>
                     <div className="flex-1 h-full relative min-h-[200px] rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-inner bg-slate-50/50">
                         <LiveEditorVisual />
@@ -242,7 +252,7 @@ export const FeaturesBento = ({ language }: { language: AppLanguage }) => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="flex-1 card-premium group/card p-6 flex flex-col justify-between hover:shadow-soft-glow"
+                        className="flex-1 card-nexus group/card p-6 flex flex-col justify-between hover:shadow-soft-glow"
                     >
                         <div className="flex justify-between items-start">
                              <div>
@@ -265,7 +275,7 @@ export const FeaturesBento = ({ language }: { language: AppLanguage }) => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 }}
-                        className="flex-1 card-premium group/card p-5 flex flex-row gap-4 overflow-hidden hover:shadow-soft-glow"
+                        className="flex-1 card-nexus group/card p-5 flex flex-row gap-4 overflow-hidden hover:shadow-soft-glow"
                     >
                          <div className="flex-1">
                              <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-900/20 flex items-center justify-center text-sky-600 dark:text-sky-400 ring-1 ring-sky-100 dark:ring-sky-800 mb-2">
@@ -289,7 +299,7 @@ export const FeaturesBento = ({ language }: { language: AppLanguage }) => {
                      whileInView={{ opacity: 1, y: 0 }}
                      viewport={{ once: true }}
                      transition={{ delay: 0.3 }}
-                     className="md:col-span-4 h-[320px] card-premium p-8 flex flex-col justify-between"
+                     className="md:col-span-4 h-[320px] card-nexus p-8 flex flex-col justify-between"
                 >
                     <div className="mb-auto">
                          <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-6 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-100 dark:ring-emerald-800">
@@ -310,7 +320,7 @@ export const FeaturesBento = ({ language }: { language: AppLanguage }) => {
                      whileInView={{ opacity: 1, y: 0 }}
                      viewport={{ once: true }}
                      transition={{ delay: 0.4 }}
-                     className="md:col-span-4 h-[320px] card-premium p-8 flex flex-col justify-between"
+                     className="md:col-span-4 h-[320px] card-nexus p-8 flex flex-col justify-between"
                 >
                     <div className="mb-auto">
                          <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center mb-6 text-slate-600 dark:text-slate-400 ring-1 ring-slate-100 dark:ring-slate-700">
@@ -331,7 +341,7 @@ export const FeaturesBento = ({ language }: { language: AppLanguage }) => {
                      whileInView={{ opacity: 1, y: 0 }}
                      viewport={{ once: true }}
                      transition={{ delay: 0.5 }}
-                     className="md:col-span-4 h-[320px] card-premium group/card p-6 flex flex-col justify-between hover:shadow-soft-glow"
+                     className="md:col-span-4 h-[320px] card-nexus group/card p-6 flex flex-col justify-between hover:shadow-soft-glow"
                 >
                      <div className="flex-1 w-full h-full relative overflow-visible flex items-center justify-center mb-4">
                         <LiveCarouselVisual />

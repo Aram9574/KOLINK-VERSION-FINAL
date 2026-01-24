@@ -33,7 +33,7 @@ const ComparisonSection: React.FC<ComparisonSectionProps> = ({ language, mockCon
                     </div>
 
                     {/* Generic AI Card */}
-                    <div className="card-premium p-8 lg:p-10 flex flex-col relative overflow-hidden group">
+                    <div className="card-nexus p-8 lg:p-10 flex flex-col relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-slate-200/50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
 
                         <div className="mb-8 relative z-10">
@@ -90,7 +90,7 @@ const ComparisonSection: React.FC<ComparisonSectionProps> = ({ language, mockCon
                     </div>
 
                     {/* Kolink Card - UPDATED: White background with gradient glow instead of dark theme */}
-                    <div className="card-premium p-8 lg:p-10 flex flex-col relative overflow-hidden shadow-2xl shadow-brand-900/10 group ring-4 ring-brand-50">
+                    <div className="card-nexus p-8 lg:p-10 flex flex-col relative overflow-hidden shadow-2xl shadow-brand-900/10 group ring-4 ring-brand-50">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-brand-100/50 to-indigo-100/50 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
                         <div className="mb-8 relative z-10">

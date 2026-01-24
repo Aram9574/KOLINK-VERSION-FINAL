@@ -43,7 +43,7 @@ const StrategicComparison: React.FC<StrategicComparisonProps> = (
                     </p>
                 </div>
 
-                <div className="card-premium rounded-[32px] overflow-hidden">
+                <div className="card-nexus rounded-[32px] overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>

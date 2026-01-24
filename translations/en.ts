@@ -839,7 +839,17 @@ export const en = {
         continueLinkedIn: "Publish on LinkedIn",
         copyText: "Copy text",
         theme: "Theme",
-
+        viralAnalysis: {
+          title: "Viral Analysis",
+          subtitle: "Discover your potential",
+          archetype: "Archetype",
+          score: "Viral Score",
+          coefficient: "Potential",
+          tips: "Premium Tips",
+          share: "Share Result",
+          analyzing: "Scanning viral potential...",
+          error: "Error analyzing potential"
+        }
       },
       ideas: {
         title: "Viral Inspiration",

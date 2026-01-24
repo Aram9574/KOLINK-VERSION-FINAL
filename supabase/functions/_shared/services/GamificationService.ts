@@ -1,4 +1,4 @@
-import { SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 export interface GamificationResult {
   newXP: number;
@@ -10,6 +10,43 @@ export interface GamificationResult {
 
 export class GamificationService {
   constructor(private supabaseAdmin: SupabaseClient) {}
+
+  async processAction(userId: string, action: string): Promise<GamificationResult | null> {
+      // 1. Fetch Profile
+      const { data: profile, error } = await this.supabaseAdmin
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+      
+      if (error || !profile) {
+          console.error("Gamification Error: Profile not found", error);
+          return null;
+      }
+
+      // 2. Count posts for legacy achievements
+      const { count } = await this.supabaseAdmin
+        .from("posts")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId);
+      
+      const postCount = (count || 0) + 1; // Including current one implies strictness, simplified here
+
+      // 3. Run Logic
+      const result = this.processGamification(profile, { tone: "standard" }, postCount);
+
+      // 4. Update Profile
+      if (result.newXP !== profile.xp || result.newLevel !== profile.level) {
+          await this.supabaseAdmin.from("profiles").update({
+              xp: result.newXP,
+              level: result.newLevel,
+              current_streak: result.newStreak,
+              unlocked_achievements: Array.from(new Set([...(profile.unlocked_achievements || []), ...result.newAchievements]))
+          }).eq("id", userId);
+      }
+
+      return result;
+  }
 
   /**
    * Calculates XP, Levels, and Streaks based on user activity.
