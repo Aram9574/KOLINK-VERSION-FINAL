@@ -32,12 +32,20 @@ export interface ElementStyle {
   color?: string;
 }
 
+export interface CarouselElement {
+  id: string;
+  type: 'text' | 'image' | 'shape';
+  content: string; // Text content or Image URL
+  style?: ElementStyle;
+}
+
 export interface CarouselSlide {
   id: string;
   type: SlideType;
   layoutVariant: LayoutVariant;
   layout?: LayoutVariant | string; // Compatibility alias
   content: SlideContent;
+  elements?: CarouselElement[]; // Dynamic elements
   designOverride?: SlideDesignOverride;
   elementOverrides?: Record<string, ElementStyle>; // Map elementId (e.g. 'title') to styles
   isVisible: boolean;

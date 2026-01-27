@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { History, FileText, Check, Loader2, Scan, Save, Fingerprint, Sparkles, AlertCircle, Upload, FileUp, Cpu } from 'lucide-react';
 import { UserProfile, Post } from '../../../types';
-import { analyzeBrandVoice, BrandVoiceAnalysisResult, cloneVoice } from '../../../services/geminiService';
+import { analyzeBrandVoice } from '../../../services/voiceRepository';
 import { toast } from 'sonner';
 
 interface DNAScannerProps {
@@ -59,6 +59,7 @@ const DNAScanner: React.FC<DNAScannerProps> = ({ user, posts, onSave, isSaving }
         try {
             let samples: string[] = [];
             let imageBase64: string | undefined;
+            let pdfBase64: string | undefined;
 
             if (scannerMode === 'history') {
                 if (selectedPostIds.length === 0) {
@@ -80,7 +81,18 @@ const DNAScanner: React.FC<DNAScannerProps> = ({ user, posts, onSave, isSaving }
                     reader.onload = (e) => resolve(e.target?.result as string);
                     reader.readAsDataURL(imageFile);
                 });
-                samples = ["(Visual Analysis Request)"]; // Placeholder content to trigger prompt
+            } else if (scannerMode === 'upload') {
+                if (!file) {
+                    toast.error("Please upload a PDF");
+                    setIsAnalyzing(false);
+                    return;
+                }
+                const reader = new FileReader();
+                const b64 = await new Promise<string>((resolve) => {
+                    reader.onload = (e) => resolve(e.target?.result as string);
+                    reader.readAsDataURL(file);
+                });
+                pdfBase64 = b64.split(',')[1]; // Remove header
             } else {
                 if (manualText.length < 50) { 
                     toast.error("Please provide valid content");
@@ -91,24 +103,20 @@ const DNAScanner: React.FC<DNAScannerProps> = ({ user, posts, onSave, isSaving }
             }
 
             // Cinematic delay for effect
-            await new Promise(r => setTimeout(r, 2500)); 
+            await new Promise(r => setTimeout(r, 2000)); 
 
-            const result = await cloneVoice({
-                text_samples: scannerMode === 'history' || scannerMode === 'manual' ? samples : undefined,
-                url: undefined, // Add URL logic if needed
-                voice_name: scannerMode === 'manual' ? "Manual Voice" : "Analyzed Voice"
+            const result = await analyzeBrandVoice({
+                contentSamples: samples.length > 0 ? samples : undefined,
+                language: user.language || 'es',
+                imageBase64,
+                pdfBase64
             });
 
-            // Normalize result to match UI expectation if keys differ
-            // VoiceBrain returns specific keys, ensure mapping if needed.
-            // VoiceBrain result: { voice_name, stylistic_dna, mimicry_instructions }
-            
             setAnalysisResult({
-                 styleName: result.voice_name,
-                 toneDescription: result.mimicry_instructions,
-                 stylisticDNA: result.stylistic_dna,
-                 // Map patterns if present in DNA or default
-                 hookPatterns: result.stylistic_dna?.hook_patterns || []
+                 styleName: result.styleName,
+                 toneDescription: result.toneDescription,
+                 stylisticDNA: result.stylisticDNA,
+                 hookPatterns: result.hookPatterns || []
             });
         } catch (error) {
             console.error(error);

@@ -51,8 +51,7 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
 }) => {
     const { language, logout } = useUser();
     const { posts } = usePosts(); 
-    // Cast to any to bypass strict type checking if 'dashboard' is missing in type definition but present in runtime
-    const t = (translations[language] as any).dashboard || {}; 
+    const t = translations[language].dashboard.activation;
     const [showHelp, setShowHelp] = React.useState(false);
     const [isFeedbackOpen, setIsFeedbackOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(true);
@@ -87,110 +86,119 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
     const progressToNextLevel = Math.min(100, (user.xp / nextLevelXP) * 100);
 
     const tools = [
-        // ... tools definitions
-        {
-            id: 'carousel',
-            name: 'Storyteller Visual',
-            description: 'Convierte ideas complejas en carruseles irresistibles.',
-            icon: Sparkles,
-            color: 'from-brand-500 to-brand-600',
-            bg: 'bg-brand-50/50',
-            onClick: onCarouselStudioClick,
-            premium: false,
-            badge: 'NUEVO'
-        },
         {
             id: 'create',
-            name: 'Arquitecto Viral',
-            description: 'Construye autoridad con frameworks virales de IA.',
+            name: 'Arquitectura Viral',
+            description: 'Inicia aquí. Diseña posts de alta retención con IA.',
             icon: PenSquare,
             color: 'from-blue-500 to-blue-600',
             bg: 'bg-blue-50/50',
             onClick: () => onSelectTool('create'),
             premium: false,
-            badge: 'POPULAR'
+            badge: 'Acción Principal',
+            colSpan: 'lg:col-span-2'
         },
         {
-            id: 'editor',
-            name: 'Pulido y Formato',
-            description: 'Refina tus borradores para máxima legibilidad.',
-            icon: FileEdit,
-            color: 'from-pink-500 to-pink-600',
-            bg: 'bg-pink-50/50',
-            onClick: () => onSelectTool('editor'),
-            premium: false
-        },
-        {
-            id: 'autopost',
-            name: 'Piloto Automático',
-            description: 'Pon tu crecimiento en auto-piloto. Publicamos cuando ellos miran.',
-            icon: Calendar,
-            color: 'from-emerald-500 to-emerald-600',
-            bg: 'bg-emerald-50/50',
-            onClick: () => onSelectTool('autopilot'),
-            premium: true
-        },
-        {
-            id: 'insight-responder',
-            name: 'Constructor de Comunidad',
-            description: 'Responde comentarios más rápido y con más inteligencia.',
-            icon: MessageSquare,
-            color: 'from-amber-500 to-amber-600',
-            bg: 'bg-amber-50/50',
-            onClick: () => onSelectTool('insight-responder'),
-            premium: true
+            id: 'carousel',
+            name: 'Storyteller Visual',
+            description: 'Convierte texto en carruseles PDF.',
+            icon: LayoutGrid,
+            color: 'from-brand-500 to-brand-600',
+            bg: 'bg-brand-50/50',
+            onClick: onCarouselStudioClick,
+            premium: false,
+            badge: 'NUEVO',
+            colSpan: 'lg:col-span-1'
         },
         {
             id: 'chat',
-            name: 'Socio Estratégico IA',
-            description: 'Tu consultor 24/7 para dominar tu marca personal.',
+            name: 'Consultor Estratégico',
+            description: 'Tu experto 24/7 en Marca Personal.',
             icon: BrainCircuit,
             color: 'from-purple-500 to-purple-600',
             bg: 'bg-purple-50/50',
             onClick: () => onSelectTool('chat'),
             premium: true,
-            badge: 'RECOMENDADO'
+            badge: 'MENTOR IA',
+            colSpan: 'lg:col-span-1'
         },
         {
-            id: 'voice-lab',
-            name: 'Clon de ADN de Marca',
-            description: 'Entrena a la IA para que suene exactamente como tú (o mejor).',
-            icon: Mic,
-            color: 'from-cyan-500 to-cyan-600',
-            bg: 'bg-cyan-50/50',
-            onClick: () => onSelectTool('voice-lab'),
-            premium: true
+            id: 'autopost',
+            name: 'Piloto Automático',
+            description: 'Programa tu consistencia. Crece mientras duermes.',
+            icon: Calendar,
+            color: 'from-emerald-500 to-emerald-600',
+            bg: 'bg-emerald-50/50',
+            onClick: () => onSelectTool('autopilot'),
+            premium: true,
+            colSpan: 'lg:col-span-1'
+        },
+        {
+            id: 'insight-responder',
+            name: 'Comunidad & Leads',
+            description: 'Responde comentarios. Convierte fans en clientes.',
+            icon: MessageSquare,
+            color: 'from-amber-500 to-amber-600',
+            bg: 'bg-amber-50/50',
+            onClick: () => onSelectTool('insight-responder'),
+            premium: true,
+            colSpan: 'lg:col-span-1'
         },
         {
             id: 'audit',
             name: 'Auditor de Perfil',
-            description: 'Próximamente: Análisis profundo con IA. Disponible Q1 2026.',
+            description: 'Optimiza tu biografía y foto para máxima autoridad.',
             icon: Fingerprint,
             color: 'from-rose-500 to-rose-600',
             bg: 'bg-rose-50/50',
-            onClick: () => {}, // Disabled for now
+            onClick: () => onSelectTool('audit'),
             premium: true,
-            disabled: true
+            disabled: false,
+            colSpan: 'lg:col-span-1'
+        },
+        {
+            id: 'voice-lab',
+            name: 'Clon de Voz',
+            description: 'Entrena a la IA para escribir como tú.',
+            icon: Mic,
+            color: 'from-cyan-500 to-cyan-600',
+            bg: 'bg-cyan-50/50',
+            onClick: () => onSelectTool('voice-lab'),
+            premium: true,
+            colSpan: 'lg:col-span-1'
+        },
+        {
+            id: 'editor',
+            name: 'Perfeccionador',
+            description: 'Formato, negritas y ganchos finales.',
+            icon: FileEdit,
+            color: 'from-pink-500 to-pink-600',
+            bg: 'bg-pink-50/50',
+            onClick: () => onSelectTool('editor'),
+            premium: false,
+            colSpan: 'lg:col-span-1'
         },
         {
             id: 'history',
-            name: 'Biblioteca de Contenido',
-            description: 'Accede y gestiona todas tus creaciones anteriores.',
+            name: 'Biblioteca',
+            description: 'Tu archivo de activos digitales.',
             icon: History,
             color: 'from-slate-500 to-slate-600',
             bg: 'bg-slate-50/50',
             onClick: () => onSelectTool('history'),
-            premium: false
+            premium: false,
+            colSpan: 'lg:col-span-1'
         },
         {
             id: 'settings',
-            name: 'Configuración',
-            description: 'Personaliza tu experiencia y preferencias de marca.',
+            name: 'Ajustes',
+            description: 'Preferencias de cuenta.',
             icon: SettingsIcon,
             color: 'from-slate-400 to-slate-500',
             bg: 'bg-slate-50/50',
             onClick: () => onSelectTool('settings'),
-            premium: false
+            premium: false,
+            colSpan: 'lg:col-span-1'
         }
     ];
 
@@ -213,22 +221,44 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         <div className="min-h-screen flex flex-col p-6 lg:p-12">
             {/* Hero Section */}
             
-            {/* SMART NUDGE (Added via Copywriting Skill) */}
-            <div className="mb-8">
-                 <div className="bg-gradient-to-r from-indigo-50 to-brand-50 w-full rounded-2xl p-1 shadow-sm border border-indigo-100 flex">
-                    <div className="bg-white/60 w-full rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 backdrop-blur-sm">
+            {/* Personal Mission Control Header */}
+            <div className="mb-10">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6">
+                    <div>
+                        <h1 className="font-display font-bold text-3xl md:text-4xl text-slate-900 mb-2 tracking-tight">
+                            Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-indigo-600">{user.name?.split(' ')[0] || 'Experto'}</span>.
+                        </h1>
+                        <p className="text-slate-500 font-medium text-lg">
+                            {language === 'es' ? 'Tu audiencia está activa. Es hora de liderar.' : 'Your audience is active. Time to lead.'}
+                        </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                         <div className="px-4 py-2 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                             <Grid size={14} />
+                             {language === 'es' ? 'Semana 4' : 'Week 4'}
+                         </div>
+                         <div className="px-4 py-2 rounded-full bg-amber-50 border border-amber-100 text-amber-600 text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                             <Zap size={14} fill="currentColor" />
+                             {user.currentStreak || 0} Días Racha
+                         </div>
+                    </div>
+                </div>
+
+                 <div className="glass-premium w-full rounded-2xl p-1 flex">
+                    <div className="w-full rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                             <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-slate-100 ring-1 ring-blue-50">
                                 <Sparkles className="w-6 h-6" />
                             </div>
                             <div>
                                 <h4 className="text-sm font-bold text-slate-900">
-                                    {language === 'es' ? 'Sugerencia del Día' : 'Daily Insight'}
+                                    {language === 'es' ? 'Oportunidad Detectada' : 'Opportunity Detected'}
                                 </h4>
                                 <p className="text-sm text-slate-600">
                                     {language === 'es' 
-                                        ? 'Tu audiencia está activa. Es el momento perfecto para publicar.' 
-                                        : 'Your audience is active. Perfect time to draft a post.'}
+                                        ? 'El tema "IA en Real Estate" es tendencia. Crea un post ahora.' 
+                                        : 'Topic "AI in Real Estate" is trending. Draft a post now.'}
                                 </p>
                             </div>
                         </div>
@@ -237,10 +267,19 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                             className="w-full md:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-all shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center justify-center gap-2"
                         >
                             <PenSquare className="w-4 h-4" />
-                            {language === 'es' ? 'Crear Ahora' : 'Draft Now'}
+                            {language === 'es' ? 'Aprovechar Tendencia' : 'Ride the Trend'}
                         </button>
                     </div>
                  </div>
+            </div>
+
+            {/* Activation Checklist */}
+            <div className="mb-10">
+                <OnboardingChecklist 
+                    user={user} 
+                    onSelectTool={onSelectTool} 
+                    onCarouselStudioClick={onCarouselStudioClick}
+                />
             </div>
 
             {/* Launch Grid */}
@@ -270,7 +309,7 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                     variants={container}
                     initial="hidden"
                     animate="show"
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
                 >
                     {isLoading ? (
                         [...Array(6)].map((_, i) => (
@@ -292,8 +331,10 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                                 disabled={tool.disabled}
                                 whileHover={tool.disabled ? {} : { y: -5, scale: 1.01 }}
                                 whileTap={tool.disabled ? {} : { scale: 0.98 }}
-                                className={`group relative text-left p-8 rounded-3xl bg-white border border-slate-200/60 shadow-sm hover:shadow-nexus hover:border-brand-500/30 transition-all duration-300 overflow-hidden z-0 ${tool.disabled ? 'opacity-75 cursor-not-allowed grayscale-[0.5]' : ''}`}
+                                className={`group relative text-left p-8 rounded-3xl glass-premium hover:shadow-[0_0_40px_-10px_rgba(37,99,235,0.3)] transition-all duration-500 overflow-hidden z-0 cursor-pointer ${tool.colSpan || 'col-span-1'} ${tool.disabled ? 'opacity-75 cursor-not-allowed grayscale-[0.5]' : ''}`}
                             >
+                                {/* Shine Effect */}
+                                <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent z-20 pointer-events-none" />
 
                                 
                                 {/* Gradient Background Wash */}
@@ -391,26 +432,49 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="lg:col-span-2 card-nexus p-8"
+                    className="lg:col-span-2 glass-premium rounded-3xl p-8"
                 >
                     <div className="flex items-center justify-between mb-8">
                         <h3 className="text-xl font-bold text-slate-900 flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
                                 <Clock className="w-5 h-5" />
                             </div>
-                            Proyectos Recientes
+                            Registro de Misión
                         </h3>
-                        <button onClick={() => onSelectTool('history')} className="px-4 py-2 rounded-full bg-slate-50 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors uppercase tracking-wider">Ver Todos</button>
+                        <button onClick={() => onSelectTool('history')} className="px-4 py-2 rounded-full bg-slate-50 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors uppercase tracking-wider">Ver Historial</button>
                     </div>
 
-                    <div className="flex flex-col gap-3">
-                        {/* Empty State Placeholder - In real app we'd map history */}
-                        {/* Start Journey Onboarding */}
-                        <OnboardingChecklist 
-                            user={user} 
-                            onSelectTool={onSelectTool} 
-                            onCarouselStudioClick={onCarouselStudioClick} 
-                        />
+                    <div className="relative pl-4 space-y-8 before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:bg-slate-200 before:content-['']">
+                        {/* Timeline Item 1: Current Focus */}
+                        <div className="relative">
+                            <span className="absolute -left-[21px] flex h-3 w-3 items-center justify-center rounded-full bg-brand-500 ring-4 ring-white" />
+                            <div className="flex flex-col gap-1">
+                                <span className="text-xs font-bold text-brand-600 uppercase tracking-wider">En Progreso</span>
+                                <h4 className="text-sm font-bold text-slate-900">Configuración de Marca Personal</h4>
+                                <p className="text-sm text-slate-500">Completa tu biografía para desbloquear el modo Experto.</p>
+                            </div>
+                        </div>
+                        
+                        {/* Timeline Item 2: Completed */}
+                        <div className="relative opacity-60">
+                             <span className="absolute -left-[21px] flex h-3 w-3 items-center justify-center rounded-full bg-slate-300 ring-4 ring-white" />
+                             <div className="flex flex-col gap-1">
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Completado ayer</span>
+                                <h4 className="text-sm font-bold text-slate-900">Registro en Plataforma</h4>
+                                <p className="text-sm text-slate-500">Bienvenido al ecosistema Kolink.</p>
+                             </div>
+                        </div>
+
+                         {/* Call to Action Wrapper */}
+                        <div className="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-4">
+                            <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center shadow-sm text-brand-500">
+                                <ArrowRight className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-bold text-slate-900">Siguiente Paso: Crea tu primer Post</p>
+                                <p className="text-xs text-slate-500">Gana +50 XP</p>
+                            </div>
+                        </div>
                     </div>
                 </motion.div>
 

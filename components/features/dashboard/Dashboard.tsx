@@ -68,6 +68,8 @@ interface DashboardLayoutProps {
     onDeletePost: (id: string, e: React.MouseEvent) => void;
 }
 
+import { InfiniteGrid } from "../../ui/infinite-grid-integration";
+
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ 
     children, 
     activeTab, 
@@ -82,8 +84,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 
     return (
-        <div className="flex h-screen w-full bg-white font-sans overflow-hidden">
-            <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        <div className="flex h-screen w-full bg-slate-50 font-sans overflow-hidden relative">
+            {/* Ambient Background Grid */}
+            <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+                <InfiniteGrid />
+            </div>
+
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
                 <main className="flex-1 overflow-hidden relative">
                     {children}
                 </main>
@@ -95,6 +102,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 const DashboardContent: React.FC = () => {
     const navigate = useNavigate();
     const { user, refreshUser, setUser, language, setLanguage } = useUser();
+    const t = translations[language];
     const toast = useToast();
     const {
         posts,
@@ -198,30 +206,63 @@ const DashboardContent: React.FC = () => {
     // Handle Keyboard Shortcuts
     useKeyboardShortcuts({ onNavigate: setActiveTab });
 
-    // Handle Stripe Success Redirect
+    // Handle Stripe Success Redirect and Onboarding Actions
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search);
+        
+        // Handle Stripe
         if (queryParams.has("session_id")) {
             console.log("Stripe session detected, refreshing user...");
             refreshUser().then(() => {
                 toast.success(
-                    language === "es"
-                        ? "¡Suscripción actualizada!"
-                        : "Subscription updated!",
+                    t.preview.scheduled,
                     "Éxito"
                 );
-                // Clean up URL to prevent multiple refreshes on re-render
                 window.history.replaceState({}, "", window.location.pathname);
             });
         }
-    }, [refreshUser, language]);
+
+        // Handle Onboarding "First Post" Action
+        if (queryParams.get("action") === "first-post") {
+            const topic = queryParams.get("topic");
+            if (topic) {
+                // Pre-fill the generator
+                setCurrentPost({
+                    id: "draft-onboarding-" + Date.now(),
+                    content: "",
+                    params: {
+                        topic: decodeURIComponent(topic),
+                        // Default options for a quick win
+                        tone: "Professional",
+                        length: "MEDIUM",
+                        framework: "PAS", 
+                    },
+                    createdAt: Date.now(),
+                    likes: 0,
+                    views: 0
+                });
+                
+                // Navigate to create tab
+                setActiveTab("create");
+                
+                // Show success toast
+                toast.success(
+                    language === 'es' ? '¡Perfil listo! Creemos tu primer post.' : 'Profile ready! Let\'s draft your first post.',
+                    language === 'es' ? 'Bienvenido a bordo' : 'Welcome aboard'
+                );
+                
+                // Clean URL
+                window.history.replaceState({}, "", window.location.pathname);
+            }
+        }
+    }, [refreshUser, language, t]);
 
     // Handlers
     const handleDeletePost = (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (window.confirm("Are you sure you want to delete this post?")) {
+        if (window.confirm(t.common.confirmDelete)) {
             removePost(id);
-            toast.success("Post deleted", "Success");
+            toast.success(t.common.postDeleted, t.common.success);
         }
     };
 
@@ -266,9 +307,13 @@ const DashboardContent: React.FC = () => {
                             <div className="w-full">
                                 <Suspense
                                     fallback={
-                                        <div className="flex justify-center items-center h-64">
-                                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-500 border-t-transparent">
+                                        <div className="flex flex-col gap-6 p-8 w-full max-w-4xl mx-auto">
+                                            <Skeleton className="h-12 w-3/4" />
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <Skeleton className="h-64 rounded-xl" />
+                                                <Skeleton className="h-64 rounded-xl" />
                                             </div>
+                                            <Skeleton className="h-12 w-full rounded-xl" />
                                         </div>
                                     }
                                 >

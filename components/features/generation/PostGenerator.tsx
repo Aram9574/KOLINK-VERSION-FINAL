@@ -22,12 +22,15 @@ import {
   LENGTH_OPTIONS,
   TONES,
 } from "../../../constants";
-import { fetchBrandVoices } from "../../../services/userRepository";
+import { fetchBrandVoices } from "../../../services/voiceRepository";
 
 // Import V4 INVISIBLE COMPONENTS
 import { StudioLayout } from "./v4/StudioLayout";
 import LinkedInPreview from "./LinkedInPreview";
 import { useCredits } from "../../../hooks/useCredits";
+import { GamificationService } from "../../../services/gamificationService";
+import { CreditService } from "../../../services/creditService";
+import LevelUpModal from "../gamification/LevelUpModal";
 
 // Helper to pick random from array
 const pickRandom = <T extends { value: string }>(options: T[]): string => {
@@ -62,7 +65,9 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
   onGoToCarousel,
   onEdit,
 }) => {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [newLevel, setNewLevel] = useState(1);
   const { params, updateParams } = useGeneratorForm({
     initialTopic,
     initialParams,
@@ -88,6 +93,25 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
     if (prevIsGenerating.current && !isGenerating && currentPost?.content) {
         Haptics.notification({ type: NotificationType.Success }).catch(() => {});
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, zIndex: 1000 });
+        
+        // GAMIFICATION: Award XP
+        if (user?.id) {
+            GamificationService.awardXP(user.id, 'post_generated').then(res => {
+                if (res.leveledUp) {
+                    setNewLevel(res.newLevel || (user.level || 1) + 1);
+                    setShowLevelUp(true);
+                }
+                // Update local state with new XP/Level
+                if (setUser) {
+                    setUser(prev => ({ 
+                        ...prev, 
+                        xp: (prev.xp || 0) + res.xpAdded, 
+                        level: res.newLevel || prev.level 
+                    }));
+                }
+            });
+        }
+
         if (params.generateCarousel && onGoToCarousel) {
             setTimeout(() => {
                 onGoToCarousel(currentPost.content);
@@ -99,8 +123,17 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
     return () => clearInterval(interval);
   }, [isGenerating, currentPost?.id]);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!checkCredits(1)) return;
+    
+    // Secure Deduction
+    if (user?.id) {
+        const success = await CreditService.deductCredits(user.id, 1, 'generation');
+        if (!success) {
+            toast.error(language === 'es' ? 'Error de créditos' : 'Credit error', "Error");
+            return;
+        }
+    }
     try {
       const isFreeUser = user?.planTier === "free";
       // Auto-resolve randoms
@@ -133,30 +166,37 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
 
   // V4 INVISIBLE ASSEMBLY
   return (
-    <StudioLayout
-        params={params}
-        onUpdateParams={updateParams}
-        onGenerate={handleGenerate}
-        isGenerating={isGenerating}
-        credits={credits}
-        language={language}
-    >
-        {/* Only pass children if there is content to show */}
-        {(currentPost?.content || isGenerating) && (
-             <LinkedInPreview
-                content={currentPost?.content || ""}
-                user={user}
-                isLoading={isGenerating}
-                language={language}
-                onUpdate={handleUpdateContent}
-                onSchedule={handleSchedule}
-                viralScore={currentPost?.viralScore}
-                viralAnalysis={currentPost?.viralAnalysis}
-                onEdit={onEdit ? () => onEdit(currentPost) : undefined}
-                isMobilePreview={false} 
-            />
-        )}
-    </StudioLayout>
+    <>
+        <LevelUpModal 
+            isOpen={showLevelUp} 
+            newLevel={newLevel} 
+            onClose={() => setShowLevelUp(false)} 
+        />
+        <StudioLayout
+            params={params}
+            onUpdateParams={updateParams}
+            onGenerate={handleGenerate}
+            isGenerating={isGenerating}
+            credits={credits}
+            language={language}
+        >
+            {/* Only pass children if there is content to show */
+            ((currentPost?.content && currentPost.content.replace(/<[^>]*>/g, '').trim().length > 0) || isGenerating) && (
+                <LinkedInPreview
+                    content={currentPost?.content || ""}
+                    user={user}
+                    isLoading={isGenerating}
+                    language={language}
+                    onUpdate={handleUpdateContent}
+                    onSchedule={handleSchedule}
+                    viralScore={currentPost?.viralScore}
+                    viralAnalysis={currentPost?.viralAnalysis}
+                    onEdit={onEdit ? () => onEdit(currentPost) : undefined}
+                    isMobilePreview={false} 
+                />
+            )}
+        </StudioLayout>
+    </>
   );
 };
 

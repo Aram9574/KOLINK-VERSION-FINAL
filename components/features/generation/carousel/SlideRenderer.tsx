@@ -16,6 +16,7 @@ interface SlideRendererProps {
   };
   scale?: number;
   isActive?: boolean;
+  isExportMode?: boolean;
 }
 
 export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({ 
@@ -23,7 +24,8 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
   design, 
   author,
   scale = 1,
-  isActive = false 
+  isActive = false,
+  isExportMode = false
 }) => {
   // Dimensions based on aspect ratio
   const dimensions = {
@@ -333,15 +335,23 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
            </div>
         );
       
-       default: // 'content' (Default Layout)
+       const isVertical = design.aspectRatio === '9:16';
+       
+       case 'default': // 'content' (Default Layout)
           return (
-             <div className="flex flex-col h-full p-20 relative z-10 w-full overflow-hidden">
-                 <div className="mb-10 pb-10 border-b border-slate-100/10">
+             <div className={cn(
+                 "flex flex-col h-full relative z-10 w-full overflow-hidden",
+                 isVertical ? "pt-48 px-16 pb-32" : "p-20"
+             )}>
+                 <div className={cn(
+                     "mb-10 pb-10 border-b border-slate-100/10",
+                     isVertical && "mt-12"
+                 )}>
                      <InteractiveElement elementId="title" slideId={slide.id} isActiveSlide={isActive}>
                          <AutoTypography 
                              content={slide.content.title || ""}
                              fontFamily={heading}
-                             baseSize={52}
+                             baseSize={isVertical ? 64 : 52}
                              color={slide.elementOverrides?.['title']?.color || primary}
                              className="font-bold leading-tight"
                              overrideFontSize={slide.elementOverrides?.['title']?.fontSize}
@@ -350,17 +360,20 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
                  </div>
                  
                  {slide.content.image_url && (
-                    <div className="w-full h-[350px] mb-10 rounded-2xl overflow-hidden shadow-lg bg-slate-100 flex-shrink-0">
+                    <div className={cn(
+                        "w-full rounded-2xl overflow-hidden shadow-lg bg-slate-100 flex-shrink-0",
+                        isVertical ? "h-[500px] mb-10" : "h-[350px] mb-10"
+                    )}>
                        <img src={slide.content.image_url} alt="Slide Visual" className="w-full h-full object-cover" />
                     </div>
                  )}
                  
-                 <div className="flex-1 flex flex-col justify-center">
+                 <div className={cn("flex-1 flex flex-col", isVertical ? "justify-start" : "justify-center")}>
                       <InteractiveElement elementId="body" slideId={slide.id} isActiveSlide={isActive}>
                           <AutoTypography 
                               content={slide.content.body || ""}
                               fontFamily={body}
-                              baseSize={36}
+                              baseSize={isVertical ? 42 : 36}
                               color={slide.elementOverrides?.['body']?.color || text}
                               className="font-medium leading-relaxed opacity-90"
                               overrideFontSize={slide.elementOverrides?.['body']?.fontSize}
@@ -437,6 +450,28 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
       )}
 
       {renderContent()}
+      
+      {/* Dynamic Elements Layer */}
+      {slide.elements?.map((el) => (
+          <InteractiveElement key={el.id} elementId={el.id} slideId={slide.id} isActiveSlide={isActive}>
+             <div 
+                className="absolute"
+                style={{
+                     left: '50%', 
+                     top: '50%',
+                     transform: `translate(-50%, -50%) translate(${el.style?.x || slide.elementOverrides?.[el.id]?.x || 0}px, ${el.style?.y || slide.elementOverrides?.[el.id]?.y || 0}px) rotate(${el.style?.rotation || slide.elementOverrides?.[el.id]?.rotation || 0}deg) scale(${el.style?.scale || 1})`,
+                     zIndex: 50
+                }}
+             >
+                 <AutoTypography 
+                     content={el.content} 
+                     fontFamily={design.fonts.body} 
+                     baseSize={el.style?.fontSize || 32}
+                     color={el.style?.color || design.colorPalette.text}
+                 />
+             </div>
+          </InteractiveElement>
+      ))}
 
       {/* Creator Profile Header/Footer */}
       {design.layout.showCreatorProfile && (

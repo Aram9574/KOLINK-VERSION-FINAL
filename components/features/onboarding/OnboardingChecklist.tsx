@@ -1,5 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useUser } from '../../../context/UserContext';
+import { translations } from '../../../translations';
 import { 
     CheckCircle2, 
     Circle, 
@@ -23,16 +25,18 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
     onSelectTool,
     onCarouselStudioClick 
 }) => {
+    const { language } = useUser();
+    const t = translations[language].dashboard.activation;
+
     // Determine completion statuses
     const hasBrandVoice = !!user.brandVoice;
-    const hasPosts = user.xp > 0; // Rough proxy for having created content
+    const hasPosts = user.xp > 0;
     
-    // In a real app, these would come from specific user metadata or DB flags
     const steps = [
         {
             id: 'brand-voice',
-            title: { es: "Define tu Voz de Marca", en: "Define your Brand Voice" },
-            desc: { es: "Entrena a la IA con tu estilo único.", en: "Train AI with your unique style." },
+            title: t.steps.brandVoice.title,
+            desc: t.steps.brandVoice.desc,
             icon: BrainCircuit,
             color: "text-purple-500",
             bg: "bg-purple-50",
@@ -41,8 +45,8 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
         },
         {
             id: 'first-post',
-            title: { es: "Crea tu Primer Post", en: "Create your First Post" },
-            desc: { es: "Redacta contenido viral en segundos.", en: "Draft viral content in seconds." },
+            title: t.steps.firstPost.title,
+            desc: t.steps.firstPost.desc,
             icon: PenSquare,
             color: "text-blue-500",
             bg: "bg-blue-50",
@@ -51,29 +55,30 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
         },
         {
             id: 'first-carousel',
-            title: { es: "Diseña un Carrusel", en: "Design a Carousel" },
-            desc: { es: "Visuales impactantes sin esfuerzo.", en: "Effortless high-impact visuals." },
+            title: t.steps.firstCarousel.title,
+            desc: t.steps.firstCarousel.desc,
             icon: Sparkles,
             color: "text-brand-500",
             bg: "bg-brand-50",
-            completed: false, // Could track via user metadata if needed
+            completed: false, 
             onClick: onCarouselStudioClick
         }
     ];
 
     const completedCount = steps.filter(s => s.completed).length;
     const progress = (completedCount / steps.length) * 100;
-    const lang = user.language || 'es';
+
+    if (completedCount === steps.length) return null;
 
     return (
         <div className="bg-slate-50/50 rounded-[2rem] border border-slate-200 p-8 shadow-sm">
             <div className="flex justify-between items-center mb-8 px-1">
                 <div>
                     <h4 className="text-lg font-bold text-slate-900">
-                        {lang === 'es' ? 'Tu Viaje en Kolink' : 'Your Kolink Journey'}
+                        {t.title}
                     </h4>
                     <p className="text-sm text-slate-500 font-medium mt-1">
-                        {lang === 'es' ? 'Completa estos pasos para despegar 🚀' : 'Complete these steps to lift off 🚀'}
+                        {t.subtitle}
                     </p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
@@ -125,18 +130,16 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                                 "font-bold text-sm mb-1",
                                 step.completed ? "text-slate-900" : "text-slate-600"
                             )}>
-                                {step.title[lang]}
+                                {step.title}
                             </p>
                             <p className="text-xs text-slate-400 font-medium leading-relaxed">
-                                {step.desc[lang]}
+                                {step.desc}
                             </p>
                         </div>
 
                         <div className="mt-auto pt-2 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
                             <span className={step.completed ? "text-brand-500" : "text-slate-400"}>
-                                {step.completed 
-                                    ? (lang === 'es' ? 'Completado' : 'Completed')
-                                    : (lang === 'es' ? 'Pendiente' : 'Pending')}
+                                {step.completed ? t.completed : t.pending}
                             </span>
                             {!step.completed && <ArrowRight className="w-3 h-3 text-slate-300" />}
                         </div>

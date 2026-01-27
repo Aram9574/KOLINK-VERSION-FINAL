@@ -6,15 +6,18 @@ import OnboardingStep2 from './OnboardingStep2';
 import OnboardingStep3 from './OnboardingStep3';
 import { useUser } from '../../../context/UserContext';
 import { translations } from '../../../translations';
+import { useNavigate } from 'react-router-dom';
+import { updateUserProfile } from '../../../services/userRepository';
 
 interface OnboardingFlowProps {
   user: UserProfile;
-  onComplete: (updatedUser: Partial<UserProfile>) => void;
+  onComplete?: (updatedUser: Partial<UserProfile>) => void;
 }
 
 const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => {
   const [step, setStep] = useState(1);
-  const { language } = useUser();
+  const { language, setUser } = useUser(); // Get setUser to update context immediately
+  const navigate = useNavigate();
   const t = translations[language].onboarding;
 
   // Step 1 Data
@@ -28,7 +31,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
   // Step 3 Data
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (step === 1) {
       if (!firstName || !lastName || !jobTitle) return;
       setStep(2);
@@ -37,11 +40,29 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
       setStep(3);
     } else {
       // Finish
-      onComplete({
+      const updates = {
         name: `${firstName} ${lastName}`,
-        headline: jobTitle, // Using job title as initial headline
-        hasOnboarded: true
-      });
+        headline: jobTitle,
+        hasOnboarded: true,
+        // Optional: save usage intent/sources in metadata if schema supports it
+      };
+
+      try {
+        // 1. Update DB
+        if (user.id) {
+           await updateUserProfile(user.id, updates);
+        }
+        
+        // 2. Update Local Context
+        setUser(prev => ({ ...prev, ...updates }));
+
+        // 3. Redirect to "Aha Moment"
+        navigate(`/dashboard?action=first-post&topic=${encodeURIComponent(jobTitle)}&ref=onboarding`);
+        
+      } catch (error) {
+        console.error("Onboarding Save Error:", error);
+        // Fallback or show error
+      }
     }
   };
 

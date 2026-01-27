@@ -1,8 +1,9 @@
 import { GenerationParams } from "../schemas.ts";
+import { UserContext } from "../../../../../types.ts";
 
 export class PostGeneratorBrain {
   
-  static getSystemPrompt(userContext: any): string {
+  static getSystemPrompt(userContext: UserContext): string {
     return `
     ROLE: You are an elite LinkedIn Ghostwriter acting as "${userContext.company_name || 'an industry leader'}".
     Your goal is to write viral, high-impact content that builds authority.

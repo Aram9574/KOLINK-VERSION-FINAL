@@ -146,3 +146,5 @@ export const ViralCalculator: React.FC = () => {
         </section>
     );
 };
+
+export default ViralCalculator;

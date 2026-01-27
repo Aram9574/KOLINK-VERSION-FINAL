@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, ArrowLeft, Linkedin } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, Linkedin, ShieldCheck, CreditCard, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // --- HELPER COMPONENTS (ICONS) ---
@@ -156,6 +156,28 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                 {isLoginMode ? 'Regístrate Gratis' : 'Inicia Sesión'}
               </button>
             </p>
+
+            {/* Trust Badges Section */}
+            <div className="animate-element animate-delay-1000 mt-10 pt-8 border-t border-slate-100 flex items-center justify-between">
+                <div className="flex flex-col items-center gap-2 group cursor-default">
+                    <div className="p-2 bg-slate-50 rounded-lg text-slate-400 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
+                        <ShieldCheck className="w-5 h-5" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">100% Seguro</span>
+                </div>
+                <div className="flex flex-col items-center gap-2 group cursor-default">
+                    <div className="p-2 bg-slate-50 rounded-lg text-slate-400 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
+                        <CreditCard className="w-5 h-5" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Sin Tarjeta</span>
+                </div>
+                <div className="flex flex-col items-center gap-2 group cursor-default">
+                    <div className="p-2 bg-slate-50 rounded-lg text-slate-400 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
+                        <Users className="w-5 h-5" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">+2k Usuarios</span>
+                </div>
+            </div>
           </div>
         </div>
       </section>

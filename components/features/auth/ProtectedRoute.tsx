@@ -20,6 +20,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
+    // Force onboarding for new users
+    // Skip this check if we are already on the /onboarding page to avoid infinite loop
+    if (!user.hasOnboarded && location.pathname !== '/onboarding') {
+        return <Navigate to="/onboarding" replace />;
+    }
+
     return children;
 };
 

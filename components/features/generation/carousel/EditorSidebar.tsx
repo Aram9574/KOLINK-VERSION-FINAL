@@ -15,7 +15,9 @@ import { translations } from '@/translations';
 // Sub-panels
 import { InputSourcePanel } from './InputSourcePanel';
 import TemplatesPanel from './panels/TemplatesPanel';
+import ElementsPanel from './panels/ElementsPanel';
 import { DesignPanel } from './panels/DesignPanel';
+import { Plus } from 'lucide-react';
 
 export const EditorSidebar = () => {
   const { language } = useUser();
@@ -100,7 +102,7 @@ export const EditorSidebar = () => {
       
       <Tabs value={mainTab} onValueChange={setMainTab} className="flex-1 flex flex-col h-full overflow-hidden">
         <div className="px-5 pt-4">
-          <TabsList className="w-full grid grid-cols-3 mb-2 p-1 bg-slate-100/80">
+          <TabsList className="w-full grid grid-cols-4 mb-2 p-1 bg-slate-100/80">
             <TabsTrigger value="generate" className="text-xs font-semibold">
                 <Sparkles className="w-3.5 h-3.5 mr-2" />
                 {t.tabs.ai}
@@ -109,6 +111,10 @@ export const EditorSidebar = () => {
                 <LayoutTemplate className="w-3.5 h-3.5 mr-2" />
                 {t.tabs.templates}
             </TabsTrigger>
+              <TabsTrigger value="elements" className="text-xs font-semibold">
+                <Plus className="w-3.5 h-3.5 mr-2" />
+                {t.tabs.elements || "Elements"}
+              </TabsTrigger>
             <TabsTrigger value="design" className="text-xs font-semibold">
                 <Sparkles className="w-3.5 h-3.5 mr-2" />
                 {t.tabs.design}
@@ -127,6 +133,10 @@ export const EditorSidebar = () => {
                     setSlides(slides);
                     toast.success(t.toasts?.templateApplied || "Template applied successfully!");
                 }} />
+            </TabsContent>
+
+            <TabsContent value="elements" className="mt-0">
+                <ElementsPanel />
             </TabsContent>
 
             <TabsContent value="design" className="mt-0">

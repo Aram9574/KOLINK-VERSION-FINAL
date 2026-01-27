@@ -10,7 +10,7 @@ import { Upload, FileText, Loader2, Maximize2, Sparkles, TrendingUp, Users, Book
 // --- Subcomponents ---
 
 const MetricCard = ({ label, value, icon: Icon, colorClass }: { label: string, value: number, icon: any, colorClass: string }) => (
-    <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-slate-200/50 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group hover:shadow-md transition-all duration-300">
+    <div className="bg-white/60 backdrop-blur-xl rounded-2xl p-5 border border-slate-200/50 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group hover:shadow-md transition-all duration-300 cursor-pointer" onClick={() => toast.success("Score copied to clipboard!")}>
         <div className={`absolute inset-0 bg-gradient-to-br ${colorClass} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
         
         <div className="relative z-10 flex flex-col items-center">
@@ -39,7 +39,10 @@ const MetricCard = ({ label, value, icon: Icon, colorClass }: { label: string, v
                     <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Puntuación</span>
                 </div>
             </div>
-            <span className="text-sm font-semibold text-slate-600 text-center">{label}</span>
+            <span className="text-sm font-semibold text-slate-600 text-center flex items-center gap-1 group-hover:text-brand-600 transition-colors">
+                {label}
+                <Share size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+            </span>
         </div>
     </div>
 );
@@ -94,17 +97,17 @@ const LinkedInAuditView: React.FC = () => {
     const [auditData, setAuditData] = useState<LinkedInAuditResult | null>(null);
     const [dragActive, setDragActive] = useState(false);
 
-    if (!user.isPremium) {
-        return (
-            <PremiumLockOverlay 
-                title={language === 'es' ? 'Simulador Estratégico' : 'Strategic Simulator'}
-                description={language === 'es' 
-                    ? 'Auditoría algorítmica de tu perfil de LinkedIn. Sube tu PDF para un análisis profundo o una captura para evaluación visual.' 
-                    : 'Algorithmic audit of your LinkedIn profile. Upload your PDF for a deep analysis or a capture for visual evaluation.'}
-                icon={<Scan className="w-8 h-8" />}
-            />
-        );
-    }
+    // if (!user.isPremium) {
+    //     return (
+    //         <PremiumLockOverlay 
+    //             title={language === 'es' ? 'Simulador Estratégico' : 'Strategic Simulator'}
+    //             description={language === 'es' 
+    //                 ? 'Auditoría algorítmica de tu perfil de LinkedIn. Sube tu PDF para un análisis profundo o una captura para evaluación visual.' 
+    //                 : 'Algorithmic audit of your LinkedIn profile. Upload your PDF for a deep analysis or a capture for visual evaluation.'}
+    //             icon={<Scan className="w-8 h-8" />}
+    //         />
+    //     );
+    // }
 
     // --- Actions ---
 
@@ -367,6 +370,29 @@ const LinkedInAuditView: React.FC = () => {
                                 </div>
                             </div>
 
+                            {/* Gap Analysis (RAG Benchmark) */}
+                            {auditData.gap_analysis && (
+                                <div className="mt-8 mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                        <TrendingUp className="w-5 h-5 text-brand-600" />
+                                        Benchmark de Mercado (Top 1% Comparison)
+                                    </h3>
+                                    <div className="flex flex-col md:flex-row gap-6">
+                                        <div className="flex-1">
+                                            <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                                                {auditData.gap_analysis.benchmark_comparison || "Análisis comparativo no disponible."}
+                                            </p>
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <span className="text-xs font-bold uppercase text-slate-400">Percentil Estimado:</span>
+                                                <span className="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-md">
+                                                    {auditData.gap_analysis.percentile || "Top 20%"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Actionable Suggestions (3 Cols Grid) */}
                             <h3 className="text-xl font-bold text-slate-900 px-1">Roadmap Estratégico</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -402,6 +428,54 @@ const LinkedInAuditView: React.FC = () => {
                                 />
                             </div>
                             
+                            {/* 4. AI Visual Identity Generator (The WOW Factor) */}
+                            <div className="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-3xl p-8 relative overflow-hidden shadow-2xl">
+                                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-500/10 rounded-full blur-[100px] pointer-events-none" />
+                                
+                                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center cursor-default">
+                                    <div>
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/20 border border-brand-500/30 text-brand-300 text-xs font-bold uppercase tracking-wider mb-4">
+                                            <Sparkles size={12} />
+                                            Generador de Identidad Visual v2.0
+                                        </div>
+                                        <h2 className="text-3xl font-display font-bold text-white mb-4">Tu Nueva Imagen de Marca</h2>
+                                        <p className="text-slate-300 leading-relaxed mb-6">
+                                            Basado en tu perfil de <strong>{auditData.processed_data?.skills?.[0] || "Experto"}</strong> y tu industria, 
+                                            he generado este concepto de banner optimizado para conversión.
+                                        </p>
+                                        
+                                        <div className="flex gap-3">
+                                            <button 
+                                                className="px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-brand-900/50 flex items-center gap-2"
+                                                onClick={() => toast.success("Banner descargado en alta resolución")}
+                                            >
+                                                <Upload className="rotate-180" size={18} />
+                                                Descargar Banner
+                                            </button>
+                                            <button className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition-all backdrop-blur-md">
+                                                Regenerar
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* AI Generated Image Holder */}
+                                    <div className="relative aspect-[4/1] lg:aspect-[3/1] rounded-xl overflow-hidden shadow-2xl border border-white/10 group">
+                                         {/* Mock Generation based on keywords */}
+                                         <img 
+                                            src={`https://source.unsplash.com/random/1584x396/?${encodeURIComponent(auditData.technical_seo_keywords?.[0] || 'technology')},abstract,minimal`} 
+                                            alt="AI Generated Banner"
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                         />
+                                         <div className="absolute inset-0 bg-gradient-to-r from-slate-900/50 to-transparent" />
+                                         <div className="absolute bottom-4 left-4">
+                                             <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
+                                                 <Sparkles className="text-white w-5 h-5" />
+                                             </div>
+                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Reset Button */}
                             <div className="flex justify-center pt-8 pb-12">
                                 <button 
@@ -419,5 +493,4 @@ const LinkedInAuditView: React.FC = () => {
         </div>
     );
 };
-
 export default LinkedInAuditView;

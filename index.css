@@ -49,7 +49,8 @@
   /* Shadows - SOTA Glows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-nexus: 0 0 20px -5px rgba(37, 99, 235, 0.15);
   --shadow-soft-glow: 0 4px 20px -2px rgba(37, 99, 235, 0.08);
 
@@ -67,9 +68,10 @@
   :root {
     @apply border-border tracking-tightest transition-colors duration-200;
   }
-  
+
   body {
-    @apply bg-background text-foreground font-sans antialiased selection:bg-brand-100 selection:text-brand-900 bg-dot-pattern;
+    @apply bg-background text-foreground font-sans antialiased
+      selection:bg-brand-100 selection:text-brand-900 bg-dot-pattern;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -82,8 +84,8 @@
   input, textarea, select {
     @apply px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50
       focus:bg-white focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500
-      outline-none transition-all text-slate-900 placeholder-slate-400 
-      text-sm font-medium hover:border-slate-300;
+      outline-none transition-all text-slate-900 placeholder-slate-400 text-sm
+      font-medium hover:border-slate-300;
   }
 }
 
@@ -91,7 +93,8 @@
 
 @utility card-nexus {
   @apply bg-white/70 backdrop-blur-md border border-slate-200/60 rounded-xl
-    shadow-sm hover:shadow-nexus hover:border-brand-500/30 transition-all duration-300;
+    shadow-sm hover:shadow-nexus hover:border-brand-500/30 transition-all
+    duration-300;
 }
 
 @utility btn-nexus-primary {
@@ -116,10 +119,35 @@
   @apply bg-white/40 backdrop-blur-xl border border-white/40;
 }
 
+@utility glass-premium {
+  @apply bg-white/70 backdrop-blur-2xl border border-white/50 shadow-2xl
+    shadow-slate-200/50 relative overflow-hidden;
+}
+
+.glass-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+@utility text-editorial {
+  @apply font-serif tracking-tight text-slate-900;
+}
+
 /* Animations (Strict SOTA) */
 @keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @utility animate-nexus-in {

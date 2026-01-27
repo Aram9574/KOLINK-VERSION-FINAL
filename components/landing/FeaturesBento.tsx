@@ -218,11 +218,11 @@ export const FeaturesBento = ({ language }: { language: AppLanguage }) => {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="md:col-span-8 h-[360px] card-nexus group/card p-8 flex flex-col md:flex-row gap-8 hover:shadow-soft-glow"
+                    className="md:col-span-8 h-[360px] glass-premium group/card p-8 flex flex-col md:flex-row gap-8 hover:shadow-soft-glow"
                 >
                     <div className="flex-1 flex flex-col justify-center text-left">
                         <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-6 text-blue-600 dark:text-blue-400 ring-1 ring-blue-100 dark:ring-blue-800">
-                            <Sparkles size={24} />
+                            <Sparkles size={24} strokeWidth={1.5} />
                         </div>
                         <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white tracking-tight">
                             {language === 'es' ? "Motor de Contenido Viral" : "Viral Content Engine"}
@@ -252,7 +252,7 @@ export const FeaturesBento = ({ language }: { language: AppLanguage }) => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="flex-1 card-nexus group/card p-6 flex flex-col justify-between hover:shadow-soft-glow"
+                        className="flex-1 glass-premium group/card p-6 flex flex-col justify-between hover:shadow-soft-glow"
                     >
                         <div className="flex justify-between items-start">
                              <div>
@@ -260,7 +260,7 @@ export const FeaturesBento = ({ language }: { language: AppLanguage }) => {
                                 <p className="text-xs text-slate-500 mt-1">{t.bento.voiceCloning.desc}</p>
                              </div>
                              <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 ring-1 ring-indigo-100 dark:ring-indigo-800">
-                                <Mic size={16} />
+                                <Mic size={16} strokeWidth={1.5} />
                             </div>
                         </div>
                         <div className="h-12 w-full mt-4">
@@ -275,11 +275,11 @@ export const FeaturesBento = ({ language }: { language: AppLanguage }) => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 }}
-                        className="flex-1 card-nexus group/card p-5 flex flex-row gap-4 overflow-hidden hover:shadow-soft-glow"
+                        className="flex-1 glass-premium group/card p-5 flex flex-row gap-4 overflow-hidden hover:shadow-soft-glow"
                     >
                          <div className="flex-1">
                              <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-900/20 flex items-center justify-center text-sky-600 dark:text-sky-400 ring-1 ring-sky-100 dark:ring-sky-800 mb-2">
-                                <Calendar size={16} />
+                                <Calendar size={16} strokeWidth={1.5} />
                             </div>
                              <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{t.bento.scheduling.title}</h3>
                              <p className="text-[10px] text-slate-500 mt-1 leading-tight">{t.bento.scheduling.desc}</p>
@@ -299,11 +299,11 @@ export const FeaturesBento = ({ language }: { language: AppLanguage }) => {
                      whileInView={{ opacity: 1, y: 0 }}
                      viewport={{ once: true }}
                      transition={{ delay: 0.3 }}
-                     className="md:col-span-4 h-[320px] card-nexus p-8 flex flex-col justify-between"
+                     className="md:col-span-4 h-[320px] glass-premium p-8 flex flex-col justify-between"
                 >
                     <div className="mb-auto">
                          <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-6 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-100 dark:ring-emerald-800">
-                            <TrendingUp size={24} />
+                            <TrendingUp size={24} strokeWidth={1.5} />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t.bento.analytics.title}</h3>
                         <p className="text-sm font-medium text-slate-600 dark:text-slate-300">{t.bento.analytics.subDesc}</p>
@@ -320,11 +320,11 @@ export const FeaturesBento = ({ language }: { language: AppLanguage }) => {
                      whileInView={{ opacity: 1, y: 0 }}
                      viewport={{ once: true }}
                      transition={{ delay: 0.4 }}
-                     className="md:col-span-4 h-[320px] card-nexus p-8 flex flex-col justify-between"
+                     className="md:col-span-4 h-[320px] glass-premium p-8 flex flex-col justify-between"
                 >
                     <div className="mb-auto">
                          <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center mb-6 text-slate-600 dark:text-slate-400 ring-1 ring-slate-100 dark:ring-slate-700">
-                            <BarChart size={24} />
+                            <BarChart size={24} strokeWidth={1.5} />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t.bento.audit.title}</h3>
                         <p className="text-sm font-medium text-slate-600 dark:text-slate-300">{t.bento.audit.desc}</p>

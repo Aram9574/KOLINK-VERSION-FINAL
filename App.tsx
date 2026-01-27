@@ -11,6 +11,7 @@ import { useUser } from "./context/UserContext";
 import { useSessionTimeout } from "./hooks/useSessionTimeout";
 import ProtectedRoute from "./components/features/auth/ProtectedRoute";
 import { Toaster } from "sonner";
+import { translations } from "./translations";
 
 // Lazy load components for better performance
 const LandingPage = lazy(() => import("./components/landing/LandingPage"));
@@ -44,9 +45,14 @@ const CookiesPage = lazy(() => import("./components/landing/CookiesPage"));
 const AuthCallback = lazy(() => import("./components/features/auth/AuthCallback"));
 const InfiniteGridDemo = lazy(() => import("./demo"));
 const CookieConsent = lazy(() => import("./components/features/compliance/CookieConsent"));
+const NicheGeneratorPage = lazy(() => import("./components/landing/NicheGeneratorPage"));
+const ToolsIndexPage = lazy(() => import("./components/landing/ToolsIndexPage"));
+const AboutPage = lazy(() => import("./components/landing/AboutPage"));
+const Skeleton = lazy(() => import("./components/ui/Skeleton"));
 
 const App: React.FC = () => {
     const { user, language, loading } = useUser();
+    const t = translations[language];
 
     // Initialize session timeout monitoring
     useSessionTimeout();
@@ -78,15 +84,15 @@ const App: React.FC = () => {
     if (loading && !isTimeout) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin">
+                <div className="flex flex-col items-center gap-6 w-full max-w-xs px-6">
+                    <div className="w-full space-y-3">
+                        <Skeleton className="h-12 w-12 rounded-full mx-auto mb-4" />
+                        <Skeleton className="h-4 w-3/4 mx-auto" />
+                        <Skeleton className="h-4 w-1/2 mx-auto opacity-50" />
                     </div>
-                    <p className="text-slate-500 font-medium animate-pulse">
-                        {language === "es"
-                            ? "Cargando experiencia..."
-                            : "Loading experience..."}
+                    <p className="text-slate-500 font-medium animate-pulse text-sm">
+                        {t.common.loading}
                     </p>
-                    {/* Show a message if it's taking too long */}
                 </div>
             </div>
         );
@@ -99,6 +105,10 @@ const App: React.FC = () => {
             <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/tools/:nicheSlug" element={<NicheGeneratorPage />} />
+                <Route path="/tools" element={<ToolsIndexPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                
                 <Route
                     path="/login"
                     element={
@@ -128,12 +138,24 @@ const App: React.FC = () => {
                 {/* Demo Routes */}
                 <Route path="/grid-demo" element={<InfiniteGridDemo />} />
 
+
                 {/* Protected Routes */}
                 <Route
                     path="/dashboard"
                     element={
                         <ProtectedRoute>
                             <Dashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/onboarding"
+                    element={
+                        <ProtectedRoute>
+                            <OnboardingFlow 
+                                user={user} 
+                                onComplete={() => window.location.href = '/dashboard?action=first-post'} 
+                            />
                         </ProtectedRoute>
                     }
                 />

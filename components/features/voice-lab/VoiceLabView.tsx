@@ -1,9 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Database, Scan, Activity, Fingerprint, Loader2, Bot, Lock } from 'lucide-react';
 import { useUser } from '../../../context/UserContext';
 import { usePosts } from '../../../context/PostContext';
-import { fetchBrandVoices, createBrandVoice, deleteBrandVoice, setBrandVoiceActive, updateUserProfile } from '../../../services/userRepository';
+import { fetchBrandVoices, createBrandVoice, deleteBrandVoice, setBrandVoiceActive } from '../../../services/voiceRepository';
+import { updateUserProfile } from '../../../services/userRepository';
 import { BrandVoice } from '../../../types';
 import { BrandVoiceAnalysisResult } from '../../../services/geminiService';
 import { toast } from 'sonner';
@@ -133,35 +134,43 @@ const VoiceLabView: React.FC = () => {
                 </div>
                 
                 {/* Tab Switcher */}
-                <div className="flex bg-white p-1 rounded-xl border border-slate-200/60 shadow-sm">
-                     <button 
+                <div className="flex bg-white p-1 rounded-xl border border-slate-200/60 shadow-sm gap-1">
+                     <motion.button 
+                         whileHover={{ y: -1 }}
+                         whileTap={{ scale: 0.98 }}
                          onClick={() => setActiveTab('scanner')}
                          className={`px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 ${activeTab === 'scanner' ? 'bg-brand-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
                     >
                         <Scan className="w-4 h-4" />
                         DNA Scanner
-                    </button>
-                    <button 
+                    </motion.button>
+                    <motion.button 
+                        whileHover={{ y: -1 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => setActiveTab('vault')}
                         className={`px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 ${activeTab === 'vault' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
                     >
                         <Database className="w-4 h-4" />
                         Mimic Vault
-                    </button>
-                    <button 
+                    </motion.button>
+                    <motion.button 
+                         whileHover={{ y: -1 }}
+                         whileTap={{ scale: 0.98 }}
                          onClick={() => setActiveTab('authority')}
                          className={`px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 ${activeTab === 'authority' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
                     >
                         <Activity className="w-4 h-4" />
                         Authority Radar
-                    </button>
-                    <button 
+                    </motion.button>
+                    <motion.button 
+                         whileHover={{ y: -1 }}
+                         whileTap={{ scale: 0.98 }}
                          onClick={() => setActiveTab('audio')}
                          className={`px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 ${activeTab === 'audio' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
                     >
                         <Mic2 className="w-4 h-4" />
                         Audio Gen
-                    </button>
+                    </motion.button>
                 </div>
             </div>
 

@@ -1,125 +1,129 @@
 import { createClient } from "@supabase/supabase-js";
-import { AuditService } from "../_shared/services/AuditService.ts";
-import { getCorsHeaders } from "../_shared/cors.ts"; // IMPORTACIÓN ACTUALIZADA
-import { LinkedInProfileData } from "../_shared/types.ts";
-import { BehaviorService } from "../_shared/services/BehaviorService.ts";
+import { GoogleGenerativeAI } from "npm:@google/generative-ai";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
 Deno.serve(async (req: Request) => {
-  // 1. HEADERS DINÁMICOS
-  const headers = getCorsHeaders(req);
-
+  // Handle CORS Preflight
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
     const { pdfBase64, imageBase64 } = await req.json();
-    if (!pdfBase64 && !imageBase64) throw new Error("Missing content");
 
-    const supabaseAdmin = createClient(
+    // 1. Auth Validation
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+        throw new Error("Missing Auth Header");
+    }
+
+    const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
     );
 
-    const authHeader = req.headers.get("Authorization")!;
-    const { data: { user } } = await supabaseAdmin.auth.getUser(authHeader.replace("Bearer ", ""));
-    const { data: profile } = await supabaseAdmin.from("profiles").select("language").eq("id", user?.id).single();
-    
-    const auditService = new AuditService(Deno.env.get("GEMINI_API_KEY")!);
-    const behaviorService = new BehaviorService(
-        Deno.env.get("GEMINI_API_KEY") ?? "",
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
-
-    if (user?.id) {
-        behaviorService.trackEvent(user.id, "audit_started", { hasPdf: !!pdfBase64 }).catch(e => console.error(e));
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+        throw new Error("Unauthorized User");
     }
-    
-    let profileData: LinkedInProfileData = { full_name: "Unknown User", profile_url: null };
+
+    // 2. Setup Gemini via SDK
+    const apiKey = Deno.env.get("GEMINI_API_KEY");
+    if (!apiKey) throw new Error("Missing GEMINI_API_KEY");
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    // 3. Prepare Content
+    // 3. Prepare Content
+    const prompt = `
+      You are an elite LinkedIn Profile Auditor (10+ Years Experience).
+      Analyze the provided profile (PDF or Image). Be BRUTAL, specific, and strategic.
+      
+      RETURN JSON ONLY (No Markdown):
+      {
+        "authority_score": number (0-100),
+        "visual_score": number (0-100),
+        "brutal_diagnosis": "string (2 sentences)",
+        "quick_wins": ["string", "string", "string"],
+        "strategic_roadmap": {
+            "headline": "New Headline Idea",
+            "about": "New About Hook Idea",
+            "experience": "Positioning Tip"
+        },
+        "visual_critique": "string",
+        "technical_seo_keywords": ["keyword1", "keyword2", "keyword3"],
+        "processed_data": {
+            "name": "string",
+            "headline": "string",
+            "skills": ["string"]
+        }
+      }
+    `;
+
+    // Explicitly type array to allow mixed content (String + Part Objects)
+    const parts: any[] = [prompt];
 
     if (pdfBase64) {
-        const pdfData = await auditService.extractLinkedInPDF(pdfBase64);
-        if (pdfData.error) throw new Error(`PDF Extraction failed: ${pdfData.error}`);
-        profileData = { ...profileData, ...pdfData };
-
-        if (!profileData.profile_url) {
-            const deterministicUrl = await auditService.extractPdfUrlDeterministic(pdfBase64);
-            if (deterministicUrl) profileData.profile_url = deterministicUrl;
-        }
-
-        if (profileData.profile_url) {
-            log(`[analyze-profile] URL found (${profileData.profile_url}), attempting hybrid enrichment...`);
-            const scrapedData = await auditService.scrapeLinkedInProfile(profileData.profile_url);
-            
-            if (scrapedData) {
-                log("[analyze-profile] Enriched with scraped data!");
-                profileData = { ...profileData, scraped_data: scrapedData };
-            } else {
-                log("[analyze-profile] Scraping skipped or failed (Result was null).");
+        parts.push({
+            inlineData: {
+                data: pdfBase64,
+                mimeType: "application/pdf"
             }
-        } else {
-            log("[analyze-profile] No URL available for scraping.");
-        }
-    }
-
-    // 3. Fallback / Visual Context
-    // If we only have an image, we treat it as a visual audit primarily
-    if (!pdfBase64 && imageBase64) {
-        profileData.full_name = "Visual Audit";
-        profileData.summary = "Analyzed from provided screenshot";
-    }
-
-    // 4. Unified AI Analysis
-    console.log("[analyze-profile] Performing final analysis...");
-    
-    // Determine Source Type
-    let sourceType: "hybrid" | "pdf" | "visual" = "pdf";
-    if (profileData.scraped_data) sourceType = "hybrid";
-    else if (!pdfBase64 && imageBase64) sourceType = "visual";
-
-    const aiResult = await auditService.analyzeLinkedInProfile(profileData, language, imageBase64);
-    
-    // Inject metadata & raw data for visualization
-    // Inject metadata & raw data for visualization
-    const aboutText = profileData.about || profileData.summary;
-    const result = { 
-        ...aiResult, 
-        source_type: sourceType,
-        debug_trace: debugLogs,
-        processed_data: {
-            name: profileData.full_name || profileData.name || "Usuario Anónimo",
-            headline: profileData.headline || "Sin titular detectado",
-            about: aboutText ? aboutText.substring(0, 150) + "..." : undefined,
-            company: profileData.company || (profileData.experiences && profileData.experiences[0]?.company),
-            location: profileData.location,
-            skills: profileData.skills || [],
-            experiences: profileData.experiences || [],
-            education: profileData.education || []
-        }
-    };
-
-    // 5. Persistence
-    if (user?.id) {
-         await supabaseAdmin.from("audits").insert({
-            user_id: user.id,
-            profile_url: profileData.profile_url || "Manual/Image Upload",
-            results: result,
+        });
+    } else if (imageBase64) {
+        parts.push({
+            inlineData: {
+                data: imageBase64,
+                mimeType: "image/jpeg"
+            }
         });
     }
 
-    return new Response(JSON.stringify(result), {
+    // 4. Generate
+    console.log("Generating via SDK...");
+    const result = await model.generateContent(parts);
+    const responseText = result.response.text();
+
+    console.log("Raw Response:", responseText.substring(0, 100) + "...");
+
+    // 5. Parse
+    let jsonResult;
+    try {
+        const cleaned = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+        jsonResult = JSON.parse(cleaned);
+    } catch(e) {
+        console.error("Parse Error", e);
+        throw new Error("Failed to parse AI response");
+    }
+
+    // 6. Enrich
+    const finalData = {
+        ...jsonResult,
+        source_type: pdfBase64 ? 'pdf' : 'visual'
+    };
+
+    // 7. Store (Async)
+    supabaseClient.from("audits").insert({
+        user_id: user.id,
+        profile_url: "File Upload",
+        results: finalData
+    }).then(() => console.log("Audit saved"));
+
+    return new Response(JSON.stringify(finalData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (error: unknown) {
-    const err = error as Error;
-    console.error("[analyze-profile] Error:", err.message);
-    return new Response(
-      JSON.stringify({ error: err.message || "Internal error" }),
-      {
-        status: 500,
-        headers: { ...headers, "Content-Type": "application/json" },
-      },
-    );
+
+  } catch (error: any) {
+    console.error("Handler Error:", error);
+    return new Response(JSON.stringify({ error: error.message || "Unknown Error" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

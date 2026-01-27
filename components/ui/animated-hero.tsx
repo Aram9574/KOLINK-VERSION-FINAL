@@ -52,17 +52,19 @@ function Hero({ language }: HeroProps) {
             </span>
           </h1>
 
-          <p className="text-xl md:text-2xl leading-relaxed tracking-tight text-muted-foreground max-w-3xl text-center">
+          <p className="text-xl md:text-2xl leading-relaxed tracking-tight text-slate-600 max-w-3xl text-center font-serif italic opacity-90">
             {t.hero.subtitle}
           </p>
         </div>
-        <div className="flex flex-row gap-3">
-            <Button size="lg" className="gap-4 rounded-full" variant="outline">
-            {t.hero.ctaSecondary} <PhoneCall className="w-4 h-4" />
-          </Button>
-          <Button size="lg" className="gap-4 rounded-full shadow-ai hover:shadow-ai-hover">
-            {t.hero.ctaPrimary} <MoveRight className="w-4 h-4" />
-          </Button>
+        <div className="flex flex-col sm:flex-row gap-4 mt-8">
+            <button className="btn-nexus-secondary flex items-center gap-3 group">
+                {t.hero.ctaSecondary} 
+                <PhoneCall className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" strokeWidth={1.5} />
+            </button>
+            <button className="btn-nexus-primary flex items-center gap-3 group">
+                {t.hero.ctaPrimary} 
+                <MoveRight className="w-4 h-4 text-white/70 group-hover:translate-x-1 transition-transform" strokeWidth={1.5} />
+            </button>
         </div>
       </div>
     </Section>

@@ -60,8 +60,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
     return (
         <div className="bg-slate-50 relative selection:bg-brand-200 selection:text-brand-900 h-dvh overflow-hidden pr-safe pl-safe">
-            <div className="absolute inset-0 opacity-40 pointer-events-none z-0">
-                {/* Overriding InfiniteGrid default opacity if needed via extra layer or just trusting className */}
+            <div className="absolute inset-0 z-0 pointer-events-none opacity-30 select-none overflow-hidden">
+                <InfiniteGrid />
             </div>
             <SmartCursor />
             <div className="flex h-full lg:h-screen overflow-hidden">

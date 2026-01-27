@@ -160,7 +160,55 @@ export class AuditService extends BaseAIService {
   }
 
   /**
-   * Performs a comprehensive LinkedIn Profile Audit (Multimodal + Hybrid).
+   * Generates a text embedding vector using Gemini.
+   */
+  async embedText(text: string): Promise<number[]> {
+     return await this.retryWithBackoff(async () => {
+         const payload = {
+             model: "models/text-embedding-004",
+             content: { parts: [{ text }] }
+         };
+         
+         // Note: Using a separate endpoint for embeddings usually, or the same generateContent with specific model
+         // For Google Gen AI REST API: https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent
+         const apiKey = Deno.env.get("GEMINI_API_KEY");
+         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${apiKey}`, {
+             method: "POST",
+             headers: { "Content-Type": "application/json" },
+             body: JSON.stringify(payload)
+         });
+
+         if (!response.ok) throw new Error(`Embedding failed: ${response.statusText}`);
+         const data = await response.json();
+         return data.embedding.values;
+     });
+  }
+
+  /**
+   * Retrieves relevant benchmarks from Supabase pgvector.
+   */
+  async findBenchmarks(text: string, category: string): Promise<string[]> {
+      try {
+          const embedding = await this.embedText(text);
+          
+          // Call the match_benchmarks RPC function
+          // Note: Needs supabase client injection or direct fetch if inside Edge Function
+          // Assuming 'supabase' is available via createClient in the context or passed in.
+          // For now, we'll return empty if no DB access is set up in this class directly, 
+          // but in a real Edge Function, we'd use the specific client.
+          
+          // MOCK IMPLEMENTATION FOR NOW until Supabase Client is injected into Service
+          console.log("[AuditService] Retrieving benchmarks for:", category);
+          return []; 
+
+      } catch (e) {
+          console.error("[AuditService] Benchmark retrieval failed:", e);
+          return [];
+      }
+  }
+
+  /**
+   * Performs a comprehensive LinkedIn Profile Audit (Multimodal + Hybrid + RAG).
    */
   async analyzeLinkedInProfile(
     profileData: LinkedInProfileData,
@@ -171,6 +219,10 @@ export class AuditService extends BaseAIService {
     // NEW SOTA SYSTEM PROMPT (Strict Spanish)
     const systemPrompt = AuditBrain.system_instruction;
 
+    // RAG: Get benchmarks for Headline and About
+    const headline = profileData.headline || "";
+    // const headlineBenchmarks = await this.findBenchmarks(headline, "SaaS Founder"); // Example usage
+    
     let prompt = `
       CONTEXT: Analyzing a LinkedIn Profile using specific Hybrid Data (PDF Extraction + Live Scraping).
       OUTPUT LANGUAGE: STRICTLY SPANISH (Español).
@@ -187,7 +239,7 @@ export class AuditService extends BaseAIService {
       TASK:
       Generate a detailed, high-impact audit. The "summary" should be a substantial paragraph (4-5 sentences) diagnosing the profile's current market position.
       The "feedback" fields must be detailed critiques (Why is it good/bad?).
-      The "suggested" fields must be "Copy-Paste" ready gold-standard examples.
+      The "suggested" fields must be "Copy-Paste" ready gold-standard examples AND explain WHY they are better.
     `;
 
     if (imageBase64) {
@@ -236,6 +288,13 @@ export class AuditService extends BaseAIService {
               technical_seo_keywords: { 
                 type: "ARRAY", 
                 items: { type: "STRING" } 
+              },
+              gap_analysis: {
+                 type: "OBJECT",
+                 properties: {
+                    benchmark_comparison: { type: "STRING" },
+                    percentile: { type: "String" }
+                 }
               }
             },
             required: ["authority_score", "brutal_diagnosis", "quick_wins", "strategic_roadmap", "visual_critique", "technical_seo_keywords"]
@@ -253,8 +312,20 @@ export class AuditService extends BaseAIService {
   /**
    * Analyzes content samples to extract a unique Brand Voice.
    */
-  async analyzeVoice(contentSamples: string[], language: string = "es", imageBase64?: string) {
-    const samples = contentSamples.join("\n---\n");
+  async analyzeVoice(contentSamples: string[], language: string = "es", imageBase64?: string, pdfBase64?: string) {
+    let finalSamples = [...contentSamples];
+
+    if (pdfBase64) {
+      console.log("[AuditService] Extracting text from PDF for voice analysis...");
+      const pdfData = await this.extractLinkedInPDF(pdfBase64);
+      if (pdfData && (pdfData.summary || pdfData.about)) {
+         finalSamples.push(pdfData.summary || pdfData.about || "");
+      }
+      // Also try deterministic extraction of anything else? 
+      // For now, let's just add the summary/about as representative of voice.
+    }
+
+    const samples = finalSamples.join("\n---\n");
     let prompt = `
         Samples to analyze:
         ${samples}
@@ -327,3 +398,4 @@ export class AuditService extends BaseAIService {
     });
   }
 }
+

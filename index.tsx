@@ -26,6 +26,17 @@ if (import.meta.env.VITE_SENTRY_DSN) {
   });
 }
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
+
 const rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error("Could not find root element to mount to");
@@ -35,17 +46,19 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <ErrorBoundary>
-      <PostHogProvider client={posthogClient}>
-        <HelmetProvider>
-          <BrowserRouter>
-            <UserProvider>
-              <ToastProvider>
-                <App />
-              </ToastProvider>
-            </UserProvider>
-          </BrowserRouter>
-        </HelmetProvider>
-      </PostHogProvider>
+      <QueryClientProvider client={queryClient}>
+        <PostHogProvider client={posthogClient}>
+          <HelmetProvider>
+            <BrowserRouter>
+              <UserProvider>
+                <ToastProvider>
+                  <App />
+                </ToastProvider>
+              </UserProvider>
+            </BrowserRouter>
+          </HelmetProvider>
+        </PostHogProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   </React.StrictMode>,
 );

@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import LoginPage from '../components/features/auth/LoginPage';
 import { UserContext } from '../context/UserContext';
 import { supabase } from '../services/supabaseClient';
+import { translations } from '../translations';
 
 // Mock child components to simplify test
 vi.mock('../components/features/auth/SocialLoginButtons', () => ({
@@ -34,10 +35,13 @@ vi.mock('../context/UserProfileContext', () => ({
 describe('LoginPage Integration', () => {
     const mockUserContext = {
         user: {},
+        authUser: null,
+        session: null,
         language: 'en',
         loading: false,
         logout: vi.fn(),
         setUser: vi.fn(),
+        updateProfile: vi.fn(),
         setLanguage: vi.fn(),
         setLoading: vi.fn(),
         refreshUser: vi.fn(),
@@ -56,10 +60,10 @@ describe('LoginPage Integration', () => {
             </BrowserRouter>
         );
 
-        expect(screen.getByText(/Welcome back/i)).toBeInTheDocument();
+        expect(screen.getByText(/Bienvenido/i)).toBeInTheDocument();
         expect(screen.getByPlaceholderText(/tu@email.com/i)).toBeInTheDocument();
-        expect(screen.getByPlaceholderText(/••••••••/i)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/\*\*\*\*\*\*\*\*/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Iniciar Sesión/i })).toBeInTheDocument();
     });
 
     it('handles email login submission', async () => {
@@ -72,8 +76,8 @@ describe('LoginPage Integration', () => {
         );
 
         const emailInput = screen.getByPlaceholderText(/tu@email.com/i);
-        const passwordInput = screen.getByPlaceholderText(/••••••••/i);
-        const submitButton = screen.getByRole('button', { name: /Sign In/i });
+        const passwordInput = screen.getByPlaceholderText(/\*\*\*\*\*\*\*\*/i);
+        const submitButton = screen.getByRole('button', { name: /Iniciar Sesión/i });
 
         fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
         fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -97,10 +101,10 @@ describe('LoginPage Integration', () => {
             </BrowserRouter>
         );
 
-        const toggleButton = screen.getByText(/Sign up for free/i);
+        const toggleButton = screen.getByText(/Regístrate Gratis/i);
         fireEvent.click(toggleButton);
 
-        expect(screen.getByText(/Get started for free/i)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Create Account/i })).toBeInTheDocument();
+        expect(screen.getByText(/Crea tu cuenta/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Crear Cuenta/i })).toBeInTheDocument();
     });
 });

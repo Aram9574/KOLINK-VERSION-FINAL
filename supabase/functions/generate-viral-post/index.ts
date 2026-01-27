@@ -28,6 +28,8 @@ const GenerationParamsSchema = z.object({
   brandVoiceId: z.string().optional(),
   hookStyle: z.string().optional(),
   generateCarousel: z.boolean().optional(),
+  instructions: z.string().optional(),
+  target_audience: z.string().optional(),
 });
 
 enum ErrorCode {
@@ -177,7 +179,10 @@ class ContentService extends BaseAIService {
         contents: [
           { role: "user", parts: [{ text: `SYSTEM INSTRUCTIONS:\n${systemInstruction}` }] },
           { role: "model", parts: [{ text: "Understood. I will output strictly valid JSON." }] },
-          { role: "user", parts: [{ text: `Generate a post about: ${params.topic}. \nParams: ${JSON.stringify(params)}\n\n${strictSchemaInstruction}` }] }
+          { role: "user", parts: [{ text: `Generate a post about: ${params.topic}. 
+Niche context: ${params.instructions || "None provided"}.
+Target Audience: ${params.target_audience || params.audience || "General Professional"}.
+Params: ${JSON.stringify(params)}\n\n${strictSchemaInstruction}` }] }
         ],
         generationConfig: {
           temperature: 0.7,

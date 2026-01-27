@@ -2,6 +2,7 @@ import React from "react";
 import { AppLanguage, GenerationParams } from "../../../../types";
 import { HeroPrompt } from "./HeroPrompt";
 import { FloatingControls } from "./FloatingControls";
+import { HookLibrary } from "./HookLibrary";
 
 interface StudioLayoutProps {
   params: GenerationParams;
@@ -57,6 +58,12 @@ export const StudioLayout: React.FC<StudioLayoutProps> = ({
                         language={language}
                         isGenerating={isGenerating}
                    />
+
+                   {!hasContent && (
+                       <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                           <HookLibrary onSelect={(hook) => onUpdateParams({ topic: params.topic ? params.topic + "\n\n" + hook : hook })} />
+                       </div>
+                   )}
 
                    {/* FLOATING CONTROLS (Always sticky at bottom of editor or viewport) */}
                    <FloatingControls 
