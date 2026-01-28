@@ -20,14 +20,11 @@ import { motion } from "framer-motion";
 import SmartCursor from "../ui/SmartCursor.tsx";
 import { lazy, Suspense } from "react";
 
-import { NicheLinks } from "./NicheLinks.tsx";
 import { translations } from "../../translations";
-import StickyCTA from "../ui/StickyCTA.tsx";
 import { StickyCTAHeader } from "../marketing/StickyCTAHeader.tsx";
 import { CarouselShowcase } from "./CarouselShowcase.tsx";
 import { SchemaMarkup } from "../seo/SchemaMarkup";
 
-const ViralCalculator = lazy(() => import("../marketing/ViralCalculator.tsx"));
 
 const SectionReveal = ({ children, id }: { children: React.ReactNode; id?: string }) => (
     <motion.div
@@ -156,63 +153,83 @@ const LandingPage: React.FC = () => {
                         <AnimatedHero language={language} />
                     </SectionReveal>
 
+                    {/* Logos - Trust */}
                     <SectionReveal>
-                        <CarouselShowcase />
-                    </SectionReveal>
-                    
-                    <SectionReveal>
-                        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 mt-10 relative z-10">
+                        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
                             <LogoCarousel language={language} />
                         </div>
                     </SectionReveal>
 
-                    <SectionReveal id="demo">
-                        <VideoDemoSection language={language} />
-                    </SectionReveal>
-
-                    <Suspense fallback={<div className="h-96 flex items-center justify-center"><div className="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin"></div></div>}>
-                        <SectionReveal id="viral-calc">
-                            <ViralCalculator />
-                        </SectionReveal>
-                    </Suspense>
-
+                    {/* Value Prop - What is it? */}
                     <SectionReveal id="tools">
-                         <FeaturesBento language={language} />
+                         <div className="py-16 lg:py-24">
+                            <FeaturesBento language={language} />
+                         </div>
                     </SectionReveal>
 
-                    <SectionReveal id="solutions">
-                        <NicheLinks language={language} />
+                    {/* Visual Proof - Show me */}
+                    <SectionReveal>
+                        <div className="py-16 lg:py-24">
+                            <CarouselShowcase />
+                        </div>
                     </SectionReveal>
 
+                    {/* Deep Dive - Demo */}
+                    <SectionReveal id="demo">
+                        <div className="py-16 lg:py-24">
+                            <VideoDemoSection language={language} />
+                        </div>
+                    </SectionReveal>
+
+                    {/* How It Works - Logic */}
                     <SectionReveal id="howitworks">
-                        <HowItWorksSection language={language} />
+                        <div className="py-16 lg:py-24">
+                            <HowItWorksSection language={language} />
+                        </div>
                     </SectionReveal>
 
+                    {/* Comparison - Objection Handling */}
                     <SectionReveal id="comparison">
-                        <ComparisonSection
-                            language={language}
-                            mockContent={mockContent}
-                        />
+                        <div className="py-16 lg:py-24">
+                            <ComparisonSection
+                                language={language}
+                                mockContent={mockContent}
+                            />
+                        </div>
                     </SectionReveal>
 
                     <SectionReveal>
-                        <StrategicComparison language={language} />
+                        <div className="pb-16 lg:pb-24">
+                            <StrategicComparison language={language} />
+                        </div>
                     </SectionReveal>
 
-                    <SectionReveal>
-                        <RoiSection language={language} />
-                    </SectionReveal>
-
+                    {/* Social Proof - Verification */}
                     <SectionReveal id="results">
-                        <TestimonialsSection />
+                         <div className="py-16 lg:py-24">
+                            <TestimonialsSection />
+                        </div>
                     </SectionReveal>
 
+                    {/* ROI - Rationalization */}
+                    <SectionReveal>
+                        <div className="py-16 lg:py-24">
+                            <RoiSection language={language} />
+                        </div>
+                    </SectionReveal>
+
+                    {/* Pricing - Conversion */}
                     <SectionReveal id="pricing">
-                        <PricingSection language={language} />
+                        <div className="py-16 lg:py-24">
+                            <PricingSection language={language} />
+                        </div>
                     </SectionReveal>
 
+                    {/* FAQ - Closing */}
                     <SectionReveal id="faq">
-                        <FaqSection language={language} />
+                        <div className="py-16 lg:py-24">
+                            <FaqSection language={language} />
+                        </div>
                     </SectionReveal>
                 </main>
 

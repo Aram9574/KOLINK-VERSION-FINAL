@@ -17,13 +17,11 @@ import { cn } from '../../../lib/utils';
 interface OnboardingChecklistProps {
     user: UserProfile;
     onSelectTool: (tab: AppTab) => void;
-    onCarouselStudioClick: () => void;
 }
 
 export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({ 
     user, 
-    onSelectTool,
-    onCarouselStudioClick 
+    onSelectTool
 }) => {
     const { language } = useUser();
     const t = translations[language].dashboard.activation;
@@ -61,7 +59,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
             color: "text-brand-500",
             bg: "bg-brand-50",
             completed: false, 
-            onClick: onCarouselStudioClick
+            onClick: () => onSelectTool('carousel')
         }
     ];
 

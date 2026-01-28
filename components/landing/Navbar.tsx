@@ -5,7 +5,7 @@ import {
     ArrowRight, Sparkles, Layout, Zap, UserCheck, MessageSquare, 
     Lightbulb, Building2, Scale, Rocket, Megaphone, HeartPulse,
     Rss, HelpCircle, PlayCircle, Info, CreditCard, Users,
-    Globe, TrendingUp
+    Globe, TrendingUp, Briefcase
 } from "lucide-react";
 import { APP_DOMAIN } from "../../constants.ts";
 import { translations } from "../../translations.ts";
@@ -30,46 +30,47 @@ const Navbar: React.FC<NavbarProps> = (
     const [openMenu, setOpenMenu] = useState<string | null>(null);
 
     const featureItems = [
-        { icon: <Sparkles className="w-5 h-5" />, title: t.nav.items.postEditor.title, desc: t.nav.items.postEditor.desc, href: "#hero", onClick: (e: any) => scrollToSection(e, "hero") },
-        { icon: <Layout className="w-5 h-5" />, title: t.nav.items.carouselStudio.title, desc: t.nav.items.carouselStudio.desc, href: "/carousel-studio" }, // Fixed Link
-        { icon: <Zap className="w-5 h-5" />, title: t.nav.items.autoPilot.title, desc: t.nav.items.autoPilot.desc, href: "#howitworks", onClick: (e: any) => scrollToSection(e, "howitworks") },
-        { icon: <UserCheck className="w-5 h-5" />, title: t.nav.items.profileAudit.title, desc: t.nav.items.profileAudit.desc, href: "/tools/profile-auditor" }, // Fixed Link
-        { icon: <MessageSquare className="w-5 h-5" />, title: t.nav.items.insightResponder.title, desc: t.nav.items.insightResponder.desc, href: "#tools", onClick: (e: any) => scrollToSection(e, "tools") },
-        { icon: <Lightbulb className="w-5 h-5" />, title: t.nav.items.ideas.title, desc: t.nav.items.ideas.desc, href: "/hooks" }, // Added Hooks
+        { icon: <Sparkles />, title: t.nav.items.postEditor.title, desc: t.nav.items.postEditor.desc, href: "/features/post-editor" },
+        { icon: <Layout />, title: t.nav.items.carouselStudio.title, desc: t.nav.items.carouselStudio.desc, href: "/features/carousel-studio", badge: "PRO" },
+        { icon: <Zap />, title: t.nav.items.autoPilot.title, desc: t.nav.items.autoPilot.desc, href: "/features/autopilot" },
+        { icon: <UserCheck />, title: t.nav.items.profileAudit.title, desc: t.nav.items.profileAudit.desc, href: "/features/profile-auditor" },
+        { icon: <MessageSquare />, title: t.nav.items.insightResponder.title, desc: t.nav.items.insightResponder.desc, href: "/features/insight-responder" },
+        { icon: <Briefcase />, title: t.nav.items.employmentInsight.title, desc: t.nav.items.employmentInsight.desc, href: "/features/employment-insight" },
+        { icon: <Lightbulb />, title: t.nav.items.ideas.title, desc: t.nav.items.ideas.desc, href: "/features/ideas" },
     ];
 
     const solutionItems = [
-        { icon: <Building2 className="w-5 h-5" />, title: t.nav.items.nicheRealEstate.title, desc: t.nav.items.nicheRealEstate.desc, href: "/tools/agentes-inmobiliarios" },
-        { icon: <Rocket className="w-5 h-5" />, title: t.nav.items.nicheSaaS.title, desc: t.nav.items.nicheSaaS.desc, href: "/tools/fundadores-saas" },
-        { icon: <Scale className="w-5 h-5" />, title: t.nav.items.nicheLawyers.title, desc: t.nav.items.nicheLawyers.desc, href: "/tools/abogados-y-legal" },
-        { icon: <Megaphone className="w-5 h-5" />, title: t.nav.items.nicheMarketing.title, desc: t.nav.items.nicheMarketing.desc, href: "/tools/especialistas-marketing" },
-        { icon: <HeartPulse className="w-5 h-5" />, title: t.nav.items.nicheHealth.title, desc: t.nav.items.nicheHealth.desc, href: "/tools/doctores-y-salud" },
-        { icon: <Globe className="w-5 h-5" />, title: t.nav.items.viewAll.title, desc: t.nav.items.viewAll.desc, href: "/tools" },
+        { icon: <Building2 />, title: t.nav.items.nicheRealEstate.title, desc: t.nav.items.nicheRealEstate.desc, href: "/solutions/agentes-inmobiliarios" },
+        { icon: <Rocket />, title: t.nav.items.nicheSaaS.title, desc: t.nav.items.nicheSaaS.desc, href: "/solutions/fundadores-saas" },
+        { icon: <Scale />, title: t.nav.items.nicheLawyers.title, desc: t.nav.items.nicheLawyers.desc, href: "/solutions/abogados-y-legal" },
+        { icon: <Megaphone />, title: t.nav.items.nicheMarketing.title, desc: t.nav.items.nicheMarketing.desc, href: "/solutions/especialistas-marketing" },
+        { icon: <HeartPulse />, title: t.nav.items.nicheHealth.title, desc: t.nav.items.nicheHealth.desc, href: "/solutions/doctores-y-salud" },
+        { icon: <Globe />, title: t.nav.items.viewAll.title, desc: t.nav.items.viewAll.desc, href: "/tools" },
     ];
 
     const freeToolItems = [
-        { icon: <Zap className="w-5 h-5" />, title: t.nav.items.headlineGenerator.title, desc: t.nav.items.headlineGenerator.desc, href: "/tools/headline-generator" },
-        { icon: <UserCheck className="w-5 h-5" />, title: t.nav.items.bioGenerator.title, desc: t.nav.items.bioGenerator.desc, href: "/tools/bio-generator" },
-        { icon: <TrendingUp className="w-5 h-5" />, title: t.nav.items.viralCalculator?.title || "Viral Calculator", desc: t.nav.items.viralCalculator?.desc || "Predict virality", href: "/tools/viral-calculator" },
-        { icon: <Layout className="w-5 h-5" />, title: t.nav.items.carouselStudio.title, desc: t.nav.items.carouselStudio.desc, href: "/carousel-studio" },
-        { icon: <UserCheck className="w-5 h-5" />, title: t.nav.items.profileAudit.title, desc: t.nav.items.profileAudit.desc, href: "/tools/profile-auditor" },
-        { icon: <TrendingUp className="w-5 h-5" />, title: t.nav.items.bestTime.title, desc: t.nav.items.bestTime.desc, href: "/tools/best-time-to-post" },
-        { icon: <Sparkles className="w-5 h-5" />, title: t.nav.items.viewAll.title, desc: t.nav.items.viewAll.desc, href: "/tools" },
+        { icon: <Zap />, title: t.nav.items.headlineGenerator.title, desc: t.nav.items.headlineGenerator.desc, href: "/tools/headline-generator" },
+        { icon: <UserCheck />, title: t.nav.items.bioGenerator.title, desc: t.nav.items.bioGenerator.desc, href: "/tools/bio-generator" },
+        { icon: <TrendingUp />, title: t.nav.items.viralCalculator?.title || "Viral Calculator", desc: t.nav.items.viralCalculator?.desc || "Predict virality", href: "/tools/viral-calculator" },
+        { icon: <Layout />, title: t.nav.items.carouselStudio.title, desc: t.nav.items.carouselStudio.desc, href: "/tools/carousel-studio", badge: "NUEVO" },
+        { icon: <UserCheck />, title: t.nav.items.profileAudit.title, desc: t.nav.items.profileAudit.desc, href: "/tools/profile-auditor" },
+        { icon: <TrendingUp />, title: t.nav.items.bestTime.title, desc: t.nav.items.bestTime.desc, href: "/tools/best-time-to-post" },
+        { icon: <Sparkles />, title: t.nav.items.viewAll.title, desc: t.nav.items.viewAll.desc, href: "/tools" },
     ];
 
     const resourceItems = [
-        { icon: <Lightbulb className="w-5 h-5" />, title: t.nav.items.hooks.title, desc: t.nav.items.hooks.desc, href: "/hooks" },
-        { icon: <Rss className="w-5 h-5" />, title: t.nav.items.blog.title, desc: t.nav.items.blog.desc, href: "#tools", onClick: (e: any) => scrollToSection(e, "tools") },
-        { icon: <HelpCircle className="w-5 h-5" />, title: t.nav.items.helpCenter.title, desc: t.nav.items.helpCenter.desc, href: "#faq", onClick: (e: any) => scrollToSection(e, "faq") },
-        { icon: <PlayCircle className="w-5 h-5" />, title: t.nav.items.videoDemo.title, desc: t.nav.items.videoDemo.desc, href: "#demo", onClick: (e: any) => scrollToSection(e, "demo") },
-        { icon: <Info className="w-5 h-5" />, title: t.nav.items.commonFaq.title, desc: t.nav.items.commonFaq.desc, href: "#faq", onClick: (e: any) => scrollToSection(e, "faq") },
+        { icon: <Lightbulb />, title: t.nav.items.hooks.title, desc: t.nav.items.hooks.desc, href: "/hooks", badge: "HOT", accentColor: "amber" },
+        { icon: <Rss />, title: t.nav.items.blog.title, desc: t.nav.items.blog.desc, href: "/blog" },
+        { icon: <HelpCircle />, title: t.nav.items.helpCenter.title, desc: t.nav.items.helpCenter.desc, href: "/resources/help-center" },
+        { icon: <PlayCircle />, title: t.nav.items.videoDemo.title, desc: t.nav.items.videoDemo.desc, href: "/resources/video-demo", badge: "NUEVO" },
+        { icon: <Info />, title: t.nav.items.commonFaq.title, desc: t.nav.items.commonFaq.desc, href: "/resources/common-faq" },
     ];
 
     const companyItems = [
-        { icon: <Users className="w-5 h-5" />, title: t.nav.items.about.title, desc: t.nav.items.about.desc, href: "/about" },
-        { icon: <CreditCard className="w-5 h-5" />, title: t.nav.items.prices.title, desc: t.nav.items.prices.desc, href: "#pricing", onClick: (e: any) => scrollToSection(e, "pricing") },
-        { icon: <Rocket className="w-5 h-5" />, title: t.nav.items.affiliate.title, desc: t.nav.items.affiliate.desc, href: "mailto:info@kolink.es?subject=Affiliate Program" },
-        { icon: <Globe className="w-5 h-5" />, title: t.nav.items.socials.title, desc: t.nav.items.socials.desc, href: "https://linkedin.com/company/kolink", external: true },
+        { icon: <Users />, title: t.nav.items.about.title, desc: t.nav.items.about.desc, href: "/about" },
+        { icon: <CreditCard />, title: t.nav.items.prices.title, desc: t.nav.items.prices.desc, href: "/company/pricing" },
+        { icon: <Rocket />, title: t.nav.items.affiliate.title, desc: t.nav.items.affiliate.desc, href: "/company/affiliate" },
+        { icon: <Globe />, title: t.nav.items.socials.title, desc: t.nav.items.socials.desc, href: "https://linkedin.com/company/kolink", external: true },
     ];
 
     return (

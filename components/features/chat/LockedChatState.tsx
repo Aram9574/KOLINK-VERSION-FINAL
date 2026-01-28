@@ -1,6 +1,7 @@
 import React from "react";
 import { Check, Lock, MessageSquare, Sparkles } from "lucide-react";
 import { useUser } from "../../../context/UserContext";
+import { translations } from "../../../translations";
 
 interface LockedChatStateProps {
     onUpgrade: () => void;
@@ -8,31 +9,8 @@ interface LockedChatStateProps {
 
 const LockedChatState: React.FC<LockedChatStateProps> = ({ onUpgrade }) => {
     const { language } = useUser();
+    const t = translations[language].dashboard.lockedStates.chat;
 
-    // Hardcoded translations
-    const t = {
-        title: language === "es"
-            ? "Desbloquea Nexus AI Expert"
-            : "Unlock Nexus AI Expert",
-        subtitle: language === "es"
-            ? "Tu consultor estratégico personal disponible 24/7 para potenciar tu marca."
-            : "Your personal strategic consultant available 24/7 to boost your brand.",
-        features: [
-            language === "es"
-                ? "Consultoría ilimitada de estrategia LinkedIn"
-                : "Unlimited LinkedIn strategy consulting",
-            language === "es"
-                ? "Análisis de tendencias en tiempo real"
-                : "Real-time trend analysis",
-            language === "es"
-                ? "Ideas de contenido personalizadas"
-                : "Personalized content ideas",
-            language === "es"
-                ? "Respuestas instantáneas a dudas técnicas"
-                : "Instant answers to technical questions",
-        ],
-        cta: language === "es" ? "Desbloquear Nexus" : "Unlock Nexus",
-    };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center animate-in fade-in zoom-in duration-500">

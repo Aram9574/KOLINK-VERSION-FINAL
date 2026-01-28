@@ -8,7 +8,11 @@ import { useSearchParams } from 'react-router-dom';
 import { SHOWCASE_TEMPLATES } from '@/lib/data/showcase-templates';
 import { toast } from 'sonner';
 
-export const CarouselStudio = () => {
+interface CarouselStudioProps {
+  initialContent?: string;
+}
+
+export const CarouselStudio: React.FC<CarouselStudioProps> = ({ initialContent }) => {
   const { isFocusMode } = useCarouselStore(state => state.editor);
   const [searchParams] = useSearchParams();
   const templateId = searchParams.get('template');
@@ -28,36 +32,45 @@ export const CarouselStudio = () => {
         }, 500);
     }
     
-    // Handle Hook Injection
+    // Handle Hook Injection (URL)
     const hookTemplate = searchParams.get('hook');
     if (hookTemplate) {
-        setTimeout(() => {
-            useCarouselStore.setState((state) => {
-                const newSlides = [...state.project.slides];
-                if (newSlides.length > 0) {
-                    // Assuming first slide is cover/intro
-                    newSlides[0] = {
-                        ...newSlides[0],
-                        content: {
-                            ...newSlides[0].content,
-                            title: hookTemplate
-                        }
-                    };
-                }
-                return {
-                    project: {
-                        ...state.project,
-                        slides: newSlides
+        applyHook(hookTemplate);
+    }
+
+    // Handle initialContent (Passed via props, e.g. from Dashboard)
+    if (initialContent) {
+        applyHook(initialContent);
+    }
+  }, [templateId, searchParams, initialContent]);
+
+  const applyHook = (hookText: string) => {
+    setTimeout(() => {
+        useCarouselStore.setState((state) => {
+            const newSlides = [...state.project.slides];
+            if (newSlides.length > 0) {
+                // Assuming first slide is cover/intro
+                newSlides[0] = {
+                    ...newSlides[0],
+                    content: {
+                        ...newSlides[0].content,
+                        title: hookText
                     }
                 };
-            });
-            toast.success("Hook template applied!");
-        }, 600); // Slightly after template if both present, though usually exclusive
-    }
-  }, [templateId, searchParams]);
+            }
+            return {
+                project: {
+                    ...state.project,
+                    slides: newSlides
+                }
+            };
+        });
+        toast.success("Content applied to carousel!");
+    }, 600);
+  };
   
   return (
-    <div className="flex h-[calc(100vh-64px)] w-full overflow-hidden bg-slate-100 font-sans">
+    <div className="flex h-full w-full overflow-hidden bg-slate-100 font-sans">
       {!isFocusMode && <EditorSidebar />}
       {!isFocusMode && <ThumbnailSidebar />}
       <EditorCanvas />

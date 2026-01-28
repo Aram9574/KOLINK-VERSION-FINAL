@@ -9,7 +9,8 @@ interface LockedEditorStateProps {
 
 const LockedEditorState: React.FC<LockedEditorStateProps> = ({ onUpgrade }) => {
     const { language } = useUser();
-    const t = translations[language].app.sidebar;
+    const t = translations[language].dashboard.lockedStates.editor;
+    const sidebarT = translations[language].app.sidebar;
 
     return (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white/50 backdrop-blur-sm rounded-xl border border-slate-200/60/60 shadow-xl shadow-slate-200/50 m-4 lg:m-8 overflow-hidden relative group">
@@ -28,55 +29,22 @@ const LockedEditorState: React.FC<LockedEditorStateProps> = ({ onUpgrade }) => {
                 </div>
 
                 <h2 className="text-3xl font-display font-bold text-slate-900 mb-4 tracking-tight">
-                    {language === "es"
-                        ? "Editor de Posts Profesional"
-                        : "Professional Post Editor"}
+                    {t.title}
                 </h2>
 
                 <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                    {language === "es"
-                        ? "Lleva tus posts al siguiente nivel con nuestro editor avanzado. Formato Unicode, ganchos predefinidos y previsualización real de LinkedIn."
-                        : "Take your posts to the next level with our advanced editor. Unicode formatting, predefined hooks, and real LinkedIn previews."}
+                    {t.subtitle}
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10 text-left">
-                    {[
-                        {
-                            es: "Formato Negrita/Cursiva",
-                            en: "Bold/Italic Formatting",
-                            icon: (
-                                <Sparkles className="w-4 h-4 text-brand-500" />
-                            ),
-                        },
-                        {
-                            es: "Biblioteca de Ganchos",
-                            en: "Hooks Library",
-                            icon: (
-                                <Sparkles className="w-4 h-4 text-brand-500" />
-                            ),
-                        },
-                        {
-                            es: "Previsualización Móvil/PC",
-                            en: "Mobile/Desktop Preview",
-                            icon: (
-                                <Sparkles className="w-4 h-4 text-brand-500" />
-                            ),
-                        },
-                        {
-                            es: "Biblioteca de Snippets",
-                            en: "Snippets Library",
-                            icon: (
-                                <Sparkles className="w-4 h-4 text-brand-500" />
-                            ),
-                        },
-                    ].map((feature, i) => (
+                    {t.features.map((feature, i) => (
                         <div
                             key={i}
                             className="flex items-center gap-2 bg-white/80 p-3 rounded-xl border border-slate-200/60/60 shadow-sm"
                         >
-                            {feature.icon}
+                            <Sparkles className="w-4 h-4 text-brand-500" />
                             <span className="text-sm font-semibold text-slate-700">
-                                {language === "es" ? feature.es : feature.en}
+                                {feature}
                             </span>
                         </div>
                     ))}
@@ -87,7 +55,7 @@ const LockedEditorState: React.FC<LockedEditorStateProps> = ({ onUpgrade }) => {
                     className="w-full py-4 px-8 bg-slate-900 text-white rounded-xl font-bold text-lg hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 flex items-center justify-center gap-3 group/btn"
                 >
                     <Crown className="w-5 h-5 text-amber-400 fill-current" />
-                    {t.upgradeNow}
+                    {sidebarT.upgradeNow}
                     <Sparkles className="w-5 h-5 text-amber-400 group-hover/btn:scale-125 transition-transform" />
                 </button>
             </div>

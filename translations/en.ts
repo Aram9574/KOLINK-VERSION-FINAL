@@ -64,6 +64,7 @@ export const en = {
       autoPilot: { title: "AutoPilot", desc: "Automate your LinkedIn presence." },
       profileAudit: { title: "Profile Audit", desc: "Optimize your profile for authority." },
       insightResponder: { title: "Insight Responder", desc: "Turn insights into valuable comments." },
+      employmentInsight: { title: "Employment Insight", desc: "Get hired faster with AI." },
       ideas: { title: "Idea Generator", desc: "Daily inspiration tailored to your niche." },
       headlineGenerator: { title: "Headline Generator", desc: "10 Viral titles in seconds." },
       bioGenerator: { title: "Bio Generator", desc: "Optimize your LinkedIn profile." },
@@ -388,7 +389,7 @@ export const en = {
           links: [
               { label: "Headline Generator", href: "/tools/headline-generator" },
               { label: "Bio Generator", href: "/tools/bio-generator" },
-              { label: "Carousel Studio", href: "/studio" },
+              { label: "Carousel Studio", href: "/tools/carousel-studio" },
           ]
         }
       },
@@ -1444,7 +1445,7 @@ export const en = {
             { label: "Viral Calculator", href: "/tools/viral-calculator" },
             { label: "Profile Audit", href: "/tools/profile-auditor" },
             { label: "Best Time to Post", href: "/tools/best-time-to-post" },
-            { label: "Blog", href: "/#tools" },
+          { label: "Blog", href: "/blog" },
             { label: "News", href: "/#tools" },
             { label: "Roadmap", href: "/#tools" },
             { label: "Help Center", href: "mailto:info@kolink.es" },
@@ -1471,6 +1472,39 @@ export const en = {
     },
   },
   dashboard: {
+    sidebar: {
+      home: "Home",
+      create: "New Post",
+      history: "History",
+      carousel: "Carousel Studio",
+      tools: "Niche Tools",
+      settings: "Settings",
+      upgrade: {
+        title: "Upgrade to Pro",
+        desc: "Unlock infinite AI and viral tools.",
+        btn: "See Plans"
+      },
+      userToken: "User",
+      logoutToast: "Session closed"
+    },
+    header: {
+      dashboard: "Control Panel",
+      create: "Post Composer",
+      history: "Content Library",
+      settings: "Settings",
+      carousel: "Carousel Studio",
+      credits: "Credits",
+      level: "Level",
+      autopost: "Smart Scheduler",
+      responder: "Engagement Assistant",
+      chat: "IA Strategy Personal",
+      audit: "Profile Auditor",
+      voice: "Voice Lab",
+      editor: "Editor",
+      home: "Home",
+      menu: "Menu",
+      upgrade: "Upgrade Plan"
+    },
     activation: {
       title: "Your Kolink Journey",
       subtitle: "Complete these steps to lift off 🚀",
@@ -1491,6 +1525,84 @@ export const en = {
         },
       },
     },
+    launchpad: {
+      tools: {
+        create: { name: "Viral Architecture", desc: "Start here. Design high-retention posts with AI.", badge: "Main Action" },
+        carousel: { name: "Visual Storyteller", desc: "Convert text into PDF carousels.", badge: "NEW" },
+        chat: { name: "Strategic Consultant", desc: "Your 24/7 Personal Brand expert.", badge: "AI MENTOR" },
+        autopost: { name: "AutoPilot", desc: "Schedule your consistency. Grow while you sleep." },
+        responder: { name: "Community & Leads", desc: "Reply to comments. Convert fans into clients." },
+        audit: { name: "Profile Auditor", desc: "Optimize your bio and photo for maximum authority." },
+        voice: { name: "Voice Clone", desc: "Train AI to write just like you." },
+        editor: { name: "Perfectionist", desc: "Formatting, bolding, and final hooks." },
+        history: { name: "Library", desc: "Your best saved posts." },
+        settings: { name: "Settings", desc: "Account preferences." }
+      },
+      shortcuts: {
+        home: "Home",
+        notifications: "Notifications",
+        settings: "Settings",
+        support: "Support",
+        security: "Security"
+      },
+      stats: {
+        weeklyGoal: "Weekly Goal",
+        level: "Level",
+        xpToNext: "XP to next",
+        master: "Content Master",
+        hero: "Your audience is active. Time to lead.",
+        streak: "Streak days",
+        week: "Week"
+      }
+    },
+    expertChat: {
+      initialMessage: "Hello! I'm Nexus, your personal LinkedIn strategist. How can I help you today?",
+      errors: {
+        insufficientCredits: "You don't have enough credits for this query.",
+        generic: "I'm sorry, there was an error processing your query."
+      },
+      sidebar: {
+        activeContext: "Active Context",
+        brandVoice: "Brand Voice",
+        noBrandVoice: "Not defined. Nexus will use a standard professional tone.",
+        userProfile: "User Profile",
+        noHeadline: "No headline",
+        mode: "Mode",
+        ghostwriter: "Ghostwriter",
+        dnaActive: "Active DNA",
+        nexusKnows: "Nexus knows you:"
+      },
+      status: {
+        analyzing: "Analyzing strategy...",
+        sending: "Sending...",
+        send: "Send Message",
+        placeholder: "Type a draft or ask for advice..."
+      }
+    },
+    lockedStates: {
+      history: {
+        title: "Access Unlimited History",
+        subtitle: "Don't lose your best ideas. Retrieve, analyze, and repurpose your past content.",
+        features: ["Complete post archive", "Viral performance analytics", "1-click content repurposing", "Data export"],
+        cta: "View My Stats"
+      },
+      chat: {
+        title: "Unlock Nexus AI Expert",
+        subtitle: "Your personal strategic consultant available 24/7 to boost your brand.",
+        features: ["Unlimited LinkedIn strategy consulting", "Real-time trend analysis", "Personalized content ideas", "Instant answers to technical questions"],
+        cta: "Unlock Nexus"
+      },
+      editor: {
+        title: "Professional Post Editor",
+        subtitle: "Take your posts to the next level with our advanced editor. Unicode formatting, predefined hooks, and real LinkedIn previews.",
+        features: ["Bold/Italic Formatting", "Hooks Library", "Mobile/Desktop Preview", "Snippets Library"]
+      },
+      audit: {
+        title: "Professional Profile Audit",
+        subtitle: "Optimize your LinkedIn profile with our advanced AI. Detect gaps, improve your SEO, and increase your visibility to recruiters.",
+        features: ["SEO Analysis", "Headline Optimization", "Gap Detection", "Content Suggestions"]
+      }
+    }
   },
   landing: {
     meta: {
@@ -1692,7 +1804,23 @@ export const en = {
       bestDaysTitle: "Best Days",
       bestDaysDesc: "Tuesday, Wednesday, and Thursday generally show 25-40% higher engagement rates for B2B industries compared to weekends.",
       worstTimesTitle: "Worst Times",
-      worstTimesDesc: "Mondays before 10 AM and Fridays after 4 PM often see lower retention."
+      worstTimesDesc: "Mondays before 10 AM and Fridays after 4 PM often see lower retention.",
+      days: {
+        Mon: "Mon",
+        Tue: "Tue",
+        Wed: "Wed",
+        Thu: "Thu",
+        Fri: "Fri",
+        Sat: "Sat",
+        Sun: "Sun"
+      },
+      timeSlots: {
+        "8am - 10am": "8am - 10am",
+        "10am - 12pm": "10am - 12pm",
+        "12pm - 2pm": "12pm - 2pm",
+        "2pm - 5pm": "2pm - 5pm",
+        "5pm - 8pm": "5pm - 8pm"
+      }
     },
     hookGallery: {
       seoTitle: "Viral Hooks Library for LinkedIn | +50 Proven Openers",

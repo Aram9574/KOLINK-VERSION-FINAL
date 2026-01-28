@@ -169,7 +169,7 @@ const ToolsIndexPage: React.FC = () => {
                     </motion.div>
                 </Link>
 
-                 <Link to="/carousel-studio" className="group">
+                 <Link to="/tools/carousel-studio" className="group">
                     <motion.div whileHover={{ y: -4 }} className="h-full bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-xl hover:shadow-slate-500/10 transition-all shadow-sm">
                         <div className="flex justify-between items-start mb-4">
                             <div className="p-3 bg-purple-50 rounded-xl text-purple-600">

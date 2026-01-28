@@ -46,6 +46,7 @@ const AuthCallback = lazy(() => import("./components/features/auth/AuthCallback"
 const InfiniteGridDemo = lazy(() => import("./demo"));
 const CookieConsent = lazy(() => import("./components/features/compliance/CookieConsent"));
 const NicheGeneratorPage = lazy(() => import("./components/landing/NicheGeneratorPage"));
+const FeatureLandingPage = lazy(() => import("./components/landing/features/FeatureLandingPage"));
 const ToolsIndexPage = lazy(() => import("./components/landing/ToolsIndexPage"));
 const HeadlineGeneratorTool = lazy(() => import("./components/tools/HeadlineGeneratorTool"));
 const BioGeneratorTool = lazy(() => import("./components/tools/BioGeneratorTool"));
@@ -54,9 +55,12 @@ const BestTimeCalculatorTool = lazy(() => import("./components/tools/BestTimeCal
 const HookGalleryPage = lazy(() => import("./components/tools/HookGalleryPage"));
 const ProfileScorecardTool = lazy(() => import("./components/tools/ProfileScorecardTool"));
 const VsPageTemplate = lazy(() => import("./components/tools/VsPageTemplate"));
+const CarouselStudioTool = lazy(() => import("./components/tools/CarouselStudioTool"));
 const AboutPage = lazy(() => import("./components/landing/AboutPage"));
 const Skeleton = lazy(() => import("./components/ui/Skeleton"));
 const TrustPage = lazy(() => import("./components/landing/TrustPage"));
+const BlogListPage = lazy(() => import("./components/landing/blog/BlogListPage"));
+const BlogPostPage = lazy(() => import("./components/landing/blog/BlogPostPage"));
 import { useExitIntent } from "./hooks/useExitIntent";
 import { ExitIntentModal } from "./components/modals/ExitIntentModal";
 import FomoToast from "./components/ui/FomoToast";
@@ -127,6 +131,12 @@ const App: React.FC = () => {
             <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<LandingPage />} />
+                {/* Feature Pages */}
+                <Route path="/features/:featureSlug" element={<FeatureLandingPage />} />
+                <Route path="/solutions/:featureSlug" element={<FeatureLandingPage />} />
+                <Route path="/resources/:featureSlug" element={<FeatureLandingPage />} />
+                <Route path="/company/:featureSlug" element={<FeatureLandingPage />} />
+
                 <Route path="/tools/:nicheSlug" element={<NicheGeneratorPage />} />
                 <Route path="/tools" element={<ToolsIndexPage />} />
                 <Route path="/tools/headline-generator" element={<HeadlineGeneratorTool />} />
@@ -138,6 +148,8 @@ const App: React.FC = () => {
                 <Route path="/vs/:competitorSlug" element={<VsPageTemplate />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/trust" element={<TrustPage />} />
+                <Route path="/blog" element={<BlogListPage />} />
+                <Route path="/blog/:slug" element={<BlogPostPage />} />
                 
                 <Route
                     path="/login"
@@ -189,7 +201,9 @@ const App: React.FC = () => {
                         </ProtectedRoute>
                     }
                 />
-                <Route path="/carousel-studio" element={<CarouselStudio />} />
+                <Route path="/tools/carousel-studio" element={<CarouselStudioTool />} />
+                <Route path="/carousel-studio" element={<Navigate to="/tools/carousel-studio" replace />} />
+                <Route path="/studio" element={<Navigate to="/tools/carousel-studio" replace />} />
 
                 {/* Catch all */}
                 <Route path="*" element={<Navigate to="/" replace />} />

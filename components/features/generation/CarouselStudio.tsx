@@ -14,9 +14,10 @@ import { useState } from 'react';
 
 interface CarouselStudioProps {
     initialContent?: string;
+    hideHeader?: boolean;
 }
 
-const CarouselStudio: React.FC<CarouselStudioProps> = ({ initialContent }) => {
+const CarouselStudio: React.FC<CarouselStudioProps> = ({ initialContent, hideHeader }) => {
     const { language, user } = useUser();
     const navigate = useNavigate();
     const { project, updateSettings } = useCarouselStore(); // Get project
@@ -71,9 +72,10 @@ const CarouselStudio: React.FC<CarouselStudioProps> = ({ initialContent }) => {
     // if (!user.isPremium) { ... }
 
     return (
-        <div className="h-screen flex flex-col bg-slate-50">
+        <div className={`${hideHeader ? 'h-full' : 'h-screen'} flex flex-col bg-slate-50 overflow-hidden`}>
             {/* Minimalist Header for Standalone Route */}
-            <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-20">
+            {!hideHeader && (
+                <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-20">
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={() => navigate('/dashboard')}
@@ -101,10 +103,11 @@ const CarouselStudio: React.FC<CarouselStudioProps> = ({ initialContent }) => {
                         {isSaving ? 'Saving...' : (language === 'es' ? 'Guardar' : 'Save Project')}
                     </Button>
                 </div>
-            </header>
+                </header>
+            )}
 
             <div className="flex-1 min-h-0 overflow-hidden">
-                <NewCarouselStudio />
+                <NewCarouselStudio initialContent={initialContent} />
             </div>
             {/* Auth Trigger Modal */}
             <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>

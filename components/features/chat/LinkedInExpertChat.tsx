@@ -23,6 +23,7 @@ import { hapticFeedback } from "../../../lib/animations.ts";
 import { toast } from "sonner";
 import { ChatInput } from "../../ui/chat-input";
 import { Button } from "../../ui/button";
+import { translations } from "../../../translations";
 
 interface Message {
   role: "user" | "assistant";
@@ -36,16 +37,14 @@ import BrandVoiceModal from "../../modals/BrandVoiceModal";
 
 const LinkedInExpertChat: React.FC = () => {
   const { user, language } = useUser();
+  const t = translations[language].dashboard.expertChat;
   const { checkCredits } = useCredits(); // Use Hook
 
   // --- 1. State ---
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content:
-        language === "es"
-          ? "¡Hola! Soy Nexus, tu estratega personal de LinkedIn. ¿En qué puedo ayudarte hoy?"
-          : "Hello! I'm Nexus, your personal LinkedIn strategist. How can I help you today?",
+      content: t.initialMessage,
     },
   ]);
   const [input, setInput] = useState("");
@@ -94,15 +93,11 @@ const LinkedInExpertChat: React.FC = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const getErrorMessage = (error: string, lang: string) => {
+  const getErrorMessage = (error: string) => {
     if (error.includes("insufficient_credits")) {
-      return lang === "es"
-        ? "No tienes suficientes créditos para esta consulta."
-        : "You don't have enough credits for this query.";
+      return t.errors.insufficientCredits;
     }
-    return lang === "es"
-      ? "Lo siento, hubo un error procesando tu consulta."
-      : "I'm sorry, there was an error processing your query.";
+    return t.errors.generic;
   };
 
   // --- 5. Gatekeeping ---
@@ -110,9 +105,7 @@ const LinkedInExpertChat: React.FC = () => {
     return (
       <PremiumLockOverlay 
         title="Nexus AI Assistant"
-        description={language === "es" 
-          ? "Tu estratega personal de LinkedIn. Nexus conoce tu estilo, conoce el algoritmo y te ayuda a redactar posts de alta autoridad en segundos." 
-          : "Your personal LinkedIn strategist. Nexus knows your style, knows the algorithm, and helps you write high-authority posts in seconds."}
+        description={translations[language].dashboard.lockedStates.chat.subtitle}
         icon={<BrainCircuit className="w-8 h-8" />}
       />
     );
@@ -176,7 +169,7 @@ const LinkedInExpertChat: React.FC = () => {
       const msg = error.message || "UNKNOWN_ERROR";
       setMessages((prev) => [...prev, {
         role: "assistant",
-        content: getErrorMessage(msg, language),
+        content: getErrorMessage(msg),
       }]);
     } finally {
       setIsLoading(false);
@@ -197,32 +190,32 @@ const LinkedInExpertChat: React.FC = () => {
             >
                 <div className="p-5 border-b border-slate-200/60 flex items-center gap-2">
                     <BrainCircuit className="w-5 h-5 text-brand-600" />
-                    <h3 className="font-bold text-slate-800 text-sm tracking-tight">Active Context</h3>
+                    <h3 className="font-bold text-slate-800 text-sm tracking-tight">{t.sidebar.activeContext}</h3>
                 </div>
                 
                 <div className="flex-1 p-5 space-y-6 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Brand Voice</label>
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t.sidebar.brandVoice}</label>
                         <div className="p-3 bg-brand-50/50 rounded-xl border border-brand-100/50 text-xs text-brand-900 leading-relaxed font-medium">
-                            {user?.brandVoice || (language === "es" ? "No definido. Nexus usará un tono profesional estándar." : "Not defined. Nexus will use a standard professional tone.")}
+                            {user?.brandVoice || t.sidebar.noBrandVoice}
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">User Profile</label>
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t.sidebar.userProfile}</label>
                         <div className="flex items-center gap-3 p-2 bg-white/60 rounded-xl border border-slate-200/50">
                             <img src={getAvatarUrl(user)} className="w-10 h-10 rounded-full border border-white shadow-sm" alt="User" />
                             <div>
                                 <p className="text-sm font-bold text-slate-700 leading-none">{user?.name}</p>
-                                <p className="text-[10px] text-slate-500 truncate max-w-[140px] pt-1">{user?.headline || "No headline"}</p>
+                                <p className="text-[10px] text-slate-500 truncate max-w-[140px] pt-1">{user?.headline || t.sidebar.noHeadline}</p>
                             </div>
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Mode</label>
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t.sidebar.mode}</label>
                         <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200/50">
-                            <span className="text-xs font-medium text-slate-600">Ghostwriter</span>
+                            <span className="text-xs font-medium text-slate-600">{t.sidebar.ghostwriter}</span>
                             <button 
                                 onClick={() => setIsGhostwriter(!isGhostwriter)}
                                 className={`w-10 h-5 rounded-full relative transition-colors ${isGhostwriter ? "bg-brand-600" : "bg-slate-300"}`}
@@ -239,10 +232,10 @@ const LinkedInExpertChat: React.FC = () => {
                         <div className="pt-4 border-t border-slate-100">
                              <div className="flex items-center gap-2 mb-2">
                                 <Fingerprint className="w-3.5 h-3.5 text-brand-600" />
-                                <span className="text-[10px] font-bold text-slate-800 uppercase tracking-widest">DNA Activo</span>
+                                <span className="text-[10px] font-bold text-slate-800 uppercase tracking-widest">{t.sidebar.dnaActive}</span>
                              </div>
                              <div className="p-3 bg-brand-50/40 rounded-xl border border-brand-100/50">
-                                 <p className="text-[10px] text-brand-800 font-bold mb-1">Nexus te conoce:</p>
+                                 <p className="text-[10px] text-brand-800 font-bold mb-1">{t.sidebar.nexusKnows}</p>
                                  <p className="text-[10px] text-slate-500 italic leading-relaxed">
                                      "{user.behavioral_dna.archetype}" • Mimetizando tu voz {user.behavioral_dna.dominant_tone.toLowerCase()}.
                                  </p>
@@ -315,9 +308,9 @@ const LinkedInExpertChat: React.FC = () => {
                             />
                             <Bot className="w-4 h-4 text-brand-500 absolute" />
                          </div>
-                         <span className="text-xs font-semibold text-slate-500 animate-pulse">
-                             {language === "es" ? "Analizando estrategia..." : "Analyzing strategy..."}
-                         </span>
+                          <span className="text-xs font-semibold text-slate-500 animate-pulse">
+                             {t.status.analyzing}
+                          </span>
                     </div>
                 </motion.div>
             )}
@@ -363,7 +356,7 @@ const LinkedInExpertChat: React.FC = () => {
                     handleSend();
                   }
                 }}
-                placeholder={language === "es" ? "Escribe un borrador o pide consejo..." : "Type a draft or ask for advice..."}
+                placeholder={t.status.placeholder}
               />
               
               <div className="flex items-center p-2.5 pt-0">
@@ -399,8 +392,8 @@ const LinkedInExpertChat: React.FC = () => {
                      ? "bg-slate-100 text-slate-300 pointer-events-none"
                      : "bg-slate-900 text-white hover:bg-black"
                   }`}
-                >
-                  {isLoading ? (language === "es" ? "Enviando..." : "Sending...") : (language === "es" ? "Enviar Mensaje" : "Send Message")}
+                 >
+                  {isLoading ? t.status.sending : t.status.send}
                   {!isLoading && <CornerDownLeft className="size-3.5" />}
                 </Button>
               </div>

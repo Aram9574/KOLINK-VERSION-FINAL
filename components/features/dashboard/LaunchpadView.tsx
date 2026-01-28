@@ -41,17 +41,16 @@ import Tooltip from '../../ui/Tooltip';
 interface LaunchpadProps {
     user: UserProfile;
     onSelectTool: (tab: AppTab) => void;
-    onCarouselStudioClick: () => void;
 }
 
 const LaunchpadView: React.FC<LaunchpadProps> = ({ 
     user,
-    onCarouselStudioClick,
     onSelectTool 
 }) => {
     const { language, logout } = useUser();
     const { posts } = usePosts(); 
-    const t = translations[language].dashboard.activation;
+    const t = translations[language].dashboard.launchpad;
+    const commonT = translations[language];
     const [showHelp, setShowHelp] = React.useState(false);
     const [isFeedbackOpen, setIsFeedbackOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(true);
@@ -66,12 +65,12 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
     
     // Define shortcuts ONLY ONCE
     const shortcuts = [
-        { title: "Inicio", icon: Home, onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
-        { title: "Notificaciones", icon: Bell, onClick: () => onSelectTool('history') },
+        { title: t.shortcuts.home, icon: Home, onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
+        { title: t.shortcuts.notifications, icon: Bell, onClick: () => onSelectTool('history') },
         { type: "separator" as const },
-        { title: "Ajustes", icon: SettingsIcon, onClick: () => onSelectTool('settings') },
-        { title: "Soporte", icon: HelpCircle, onClick: () => setShowHelp(true) },
-        { title: "Seguridad", icon: Shield, onClick: () => onSelectTool('audit') },
+        { title: t.shortcuts.settings, icon: SettingsIcon, onClick: () => onSelectTool('settings') },
+        { title: t.shortcuts.support, icon: HelpCircle, onClick: () => setShowHelp(true) },
+        { title: t.shortcuts.security, icon: Shield, onClick: () => onSelectTool('audit') },
     ];
     
     const weeklyGoal = 3;
@@ -79,7 +78,7 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
     const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
     const postsThisWeek = posts.filter(p => new Date(p.createdAt || 0) >= startOfWeek).length;
     
-    const nextMilestone = user.level < 5 ? `Nivel ${user.level + 1}` : "Maestro del Contenido";
+    const nextMilestone = user.level < 5 ? `${t.stats.level} ${user.level + 1}` : t.stats.master;
     const xpToNext = (user.level + 1) ** 2 * 100 - user.xp;
     
     const nextLevelXP = Math.pow(user.level + 1, 2) * 100;
@@ -88,44 +87,44 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
     const tools = [
         {
             id: 'create',
-            name: 'Arquitectura Viral',
-            description: 'Inicia aquí. Diseña posts de alta retención con IA.',
+            name: t.tools.create.name,
+            description: t.tools.create.desc,
             icon: PenSquare,
             color: 'from-blue-500 to-blue-600',
             bg: 'bg-blue-50/50',
             onClick: () => onSelectTool('create'),
             premium: false,
-            badge: 'Acción Principal',
+            badge: t.tools.create.badge,
             colSpan: 'lg:col-span-2'
         },
         {
             id: 'carousel',
-            name: 'Storyteller Visual',
-            description: 'Convierte texto en carruseles PDF.',
+            name: t.tools.carousel.name,
+            description: t.tools.carousel.desc,
             icon: LayoutGrid,
             color: 'from-brand-500 to-brand-600',
             bg: 'bg-brand-50/50',
-            onClick: onCarouselStudioClick,
+            onClick: () => onSelectTool('carousel'),
             premium: false,
-            badge: 'NUEVO',
+            badge: t.tools.carousel.badge,
             colSpan: 'lg:col-span-1'
         },
         {
             id: 'chat',
-            name: 'Consultor Estratégico',
-            description: 'Tu experto 24/7 en Marca Personal.',
+            name: t.tools.chat.name,
+            description: t.tools.chat.desc,
             icon: BrainCircuit,
             color: 'from-purple-500 to-purple-600',
             bg: 'bg-purple-50/50',
             onClick: () => onSelectTool('chat'),
             premium: true,
-            badge: 'MENTOR IA',
+            badge: t.tools.chat.badge,
             colSpan: 'lg:col-span-1'
         },
         {
             id: 'autopost',
-            name: 'Piloto Automático',
-            description: 'Programa tu consistencia. Crece mientras duermes.',
+            name: t.tools.autopost.name,
+            description: t.tools.autopost.desc,
             icon: Calendar,
             color: 'from-emerald-500 to-emerald-600',
             bg: 'bg-emerald-50/50',
@@ -135,8 +134,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         },
         {
             id: 'insight-responder',
-            name: 'Comunidad & Leads',
-            description: 'Responde comentarios. Convierte fans en clientes.',
+            name: t.tools.responder.name,
+            description: t.tools.responder.desc,
             icon: MessageSquare,
             color: 'from-amber-500 to-amber-600',
             bg: 'bg-amber-50/50',
@@ -146,8 +145,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         },
         {
             id: 'audit',
-            name: 'Auditor de Perfil',
-            description: 'Optimiza tu biografía y foto para máxima autoridad.',
+            name: t.tools.audit.name,
+            description: t.tools.audit.desc,
             icon: Fingerprint,
             color: 'from-rose-500 to-rose-600',
             bg: 'bg-rose-50/50',
@@ -158,8 +157,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         },
         {
             id: 'voice-lab',
-            name: 'Clon de Voz',
-            description: 'Entrena a la IA para escribir como tú.',
+            name: t.tools.voice.name,
+            description: t.tools.voice.desc,
             icon: Mic,
             color: 'from-cyan-500 to-cyan-600',
             bg: 'bg-cyan-50/50',
@@ -169,8 +168,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         },
         {
             id: 'editor',
-            name: 'Perfeccionador',
-            description: 'Formato, negritas y ganchos finales.',
+            name: t.tools.editor.name,
+            description: t.tools.editor.desc,
             icon: FileEdit,
             color: 'from-pink-500 to-pink-600',
             bg: 'bg-pink-50/50',
@@ -180,8 +179,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         },
         {
             id: 'history',
-            name: 'Biblioteca',
-            description: 'Tu archivo de activos digitales.',
+            name: t.tools.history.name,
+            description: t.tools.history.desc,
             icon: History,
             color: 'from-slate-500 to-slate-600',
             bg: 'bg-slate-50/50',
@@ -191,8 +190,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
         },
         {
             id: 'settings',
-            name: 'Ajustes',
-            description: 'Preferencias de cuenta.',
+            name: t.tools.settings.name,
+            description: t.tools.settings.desc,
             icon: SettingsIcon,
             color: 'from-slate-400 to-slate-500',
             bg: 'bg-slate-50/50',
@@ -229,18 +228,18 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                             Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-indigo-600">{user.name?.split(' ')[0] || 'Experto'}</span>.
                         </h1>
                         <p className="text-slate-500 font-medium text-lg">
-                            {language === 'es' ? 'Tu audiencia está activa. Es hora de liderar.' : 'Your audience is active. Time to lead.'}
+                            {t.stats.hero}
                         </p>
                     </div>
                     
                     <div className="flex items-center gap-3">
                          <div className="px-4 py-2 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold uppercase tracking-wider flex items-center gap-2">
                              <Grid size={14} />
-                             {language === 'es' ? 'Semana 4' : 'Week 4'}
+                             {t.stats.week} 4
                          </div>
                          <div className="px-4 py-2 rounded-full bg-amber-50 border border-amber-100 text-amber-600 text-xs font-bold uppercase tracking-wider flex items-center gap-2">
                              <Zap size={14} fill="currentColor" />
-                             {user.currentStreak || 0} Días Racha
+                             {user.currentStreak || 0} {t.stats.streak}
                          </div>
                     </div>
                 </div>
@@ -278,7 +277,6 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                 <OnboardingChecklist 
                     user={user} 
                     onSelectTool={onSelectTool} 
-                    onCarouselStudioClick={onCarouselStudioClick}
                 />
             </div>
 

@@ -52,6 +52,7 @@ export const HeadlineBattle = () => {
     };
 
     return (
+        <Card className="p-6 border-slate-200/60 bg-white/50 backdrop-blur-md shadow-sm">
             <div className="flex items-center gap-2 mb-4">
                 <Swords className="w-5 h-5 text-indigo-600" />
                 <h3 className="font-bold text-slate-700">Arena de Titulares</h3>

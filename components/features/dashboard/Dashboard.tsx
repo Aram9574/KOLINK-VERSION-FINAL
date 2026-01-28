@@ -295,7 +295,6 @@ const DashboardContent: React.FC = () => {
                             <LaunchpadView 
                                 user={user} 
                                 onSelectTool={setActiveTab} 
-                                onCarouselStudioClick={() => navigate("/carousel-studio")}
                             />
                         </div>
                     )}
@@ -329,7 +328,7 @@ const DashboardContent: React.FC = () => {
                                         initialTopic={currentPost?.params?.topic}
                                         onGoToCarousel={(content) => {
                                             setCarouselDraftContent(content);
-                                            navigate("/carousel-studio");
+                                            setActiveTab("carousel");
                                         }}
                                         onEdit={(post) => {
                                             setCurrentPost(post);
@@ -475,6 +474,23 @@ const DashboardContent: React.FC = () => {
                                 }
                             >
                                 <VoiceLabView />
+                            </Suspense>
+                        </div>
+                    )}
+
+                    {activeTab === "carousel" && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0">
+                            <Suspense
+                                fallback={
+                                    <div className="flex-1 flex items-center justify-center">
+                                        <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                                    </div>
+                                }
+                            >
+                                <CarouselStudio 
+                                    hideHeader 
+                                    initialContent={carouselDraftContent} 
+                                />
                             </Suspense>
                         </div>
                     )}

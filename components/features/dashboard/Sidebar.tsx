@@ -12,6 +12,7 @@ import {
     Crown
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { translations } from '../../../translations';
 import { AppTab } from '../../../types';
 import { supabase } from '../../../services/supabaseClient'; // Ensure this path is correct or import from context
 import { toast } from 'sonner';
@@ -30,24 +31,25 @@ const Sidebar: React.FC<SidebarProps> = ({
     onUpgrade,
     isCollapsed 
 }) => {
-    const { user, isPro } = useUser();
+    const { user, isPro, language } = useUser();
+    const t = translations[language];
     const navigate = useNavigate();
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
         navigate('/login');
-        toast.success('Sesión cerrada');
+        toast.success(t.dashboard.sidebar.logoutToast);
     };
 
     const navItems = [
-        { id: 'dashboard', label: 'Inicio', icon: <Home size={20} />, type: 'tab' },
-        { id: 'create', label: 'Nuevo Post', icon: <PenTool size={20} />, type: 'tab' },
-        { id: 'history', label: 'Historial', icon: <History size={20} />, type: 'tab' },
+        { id: 'dashboard', label: t.dashboard.sidebar.home, icon: <Home size={20} />, type: 'tab' },
+        { id: 'create', label: t.dashboard.sidebar.create, icon: <PenTool size={20} />, type: 'tab' },
+        { id: 'history', label: t.dashboard.sidebar.history, icon: <History size={20} />, type: 'tab' },
         { type: 'divider' },
-        { id: 'carousel', label: 'Carousel Studio', icon: <Layout size={20} />, type: 'link', path: '/carousel-studio' },
-        { id: 'tools', label: 'Niche Tools', icon: <Sparkles size={20} />, type: 'link', path: '/tools' },
+        { id: 'carousel', label: t.dashboard.sidebar.carousel, icon: <Layout size={20} />, type: 'tab' },
+        { id: 'tools', label: t.dashboard.sidebar.tools, icon: <Sparkles size={20} />, type: 'link', path: '/tools' },
         { type: 'divider' },
-        { id: 'settings', label: 'Configuración', icon: <Settings size={20} />, type: 'tab' },
+        { id: 'settings', label: t.dashboard.sidebar.settings, icon: <Settings size={20} />, type: 'tab' },
     ];
 
     return (
@@ -127,13 +129,13 @@ const Sidebar: React.FC<SidebarProps> = ({
                              <div className="p-1.5 bg-brand-100 text-brand-600 rounded-lg">
                                  <Crown size={16} fill="currentColor" />
                              </div>
-                             <h4 className="font-bold text-sm text-slate-900">Upgrade to Pro</h4>
+                              <h4 className="font-bold text-sm text-slate-900">{t.dashboard.sidebar.upgrade.title}</h4>
                          </div>
                          <p className="text-xs text-slate-500 mb-3 leading-snug">
-                             Desbloquea IA ilimitada y herramientas virales.
+                             {t.dashboard.sidebar.upgrade.desc}
                          </p>
                          <button className="w-full py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg shadow-lg shadow-brand-500/20 transition-all">
-                             Ver Planes
+                             {t.dashboard.sidebar.upgrade.btn}
                          </button>
                     </div>
                 )}
@@ -150,7 +152,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     {!isCollapsed && (
                         <div className="flex-1 overflow-hidden">
                             <p className="text-sm font-bold text-slate-900 truncate">
-                                {user?.name || 'Usuario'}
+                                {user?.name || t.dashboard.sidebar.userToken}
                             </p>
                             <p className="text-xs text-slate-400 truncate">
                                 {user?.email}

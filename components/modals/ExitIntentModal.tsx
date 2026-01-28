@@ -26,8 +26,8 @@ export const ExitIntentModal: React.FC<ExitIntentModalProps> = ({ isOpen, onClos
         setTimeout(() => {
             setIsLoading(false);
             onClose();
-            toast.success("Checklist sent to your inbox!", {
-                description: "redirecting to signup..."
+            toast.success("¡Guía enviada a tu bandeja de entrada!", {
+                description: "redireccionando al registro..."
             });
             // Redirect to signup with email pre-filled intent
             navigate(`/login?email=${encodeURIComponent(email)}&intent=checklist`);
@@ -46,9 +46,9 @@ export const ExitIntentModal: React.FC<ExitIntentModalProps> = ({ isOpen, onClos
                         <div className="inline-flex items-center justify-center p-3 bg-white/20 rounded-full mb-4 backdrop-blur-sm">
                             <FileText className="w-8 h-8 text-white" />
                         </div>
-                        <h2 className="text-2xl font-bold mb-2">Wait! Don't leave empty-handed.</h2>
+                        <h2 className="text-2xl font-bold mb-2">¡Espera! No te vayas con las manos vacías.</h2>
                         <p className="text-brand-100 mb-6">
-                            Get our free <strong>"LinkedIn Growth Checklist"</strong> used by top creators to hit 10k followers.
+                            Obtén nuestra **"Guía de Crecimiento en LinkedIn"** gratuita usada por los mejores creadores para alcanzar 10k seguidores.
                         </p>
                     </div>
                 </div>
@@ -56,9 +56,9 @@ export const ExitIntentModal: React.FC<ExitIntentModalProps> = ({ isOpen, onClos
                 <div className="p-6 bg-white">
                     <div className="space-y-3 mb-6">
                          {[
-                            "The 'Hook-Body-CTA' Formula",
-                            "Best Times to Post (2025 Data)",
-                            "Profile Optimization Audit"
+                            "La Fórmula 'Hook-Body-CTA'",
+                            "Mejores horarios para publicar (Datos 2025)",
+                            "Auditoría de Optimización de Perfil"
                         ].map((item, i) => (
                             <div key={i} className="flex items-center gap-3 text-sm text-slate-600">
                                 <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
@@ -71,7 +71,7 @@ export const ExitIntentModal: React.FC<ExitIntentModalProps> = ({ isOpen, onClos
                         <div className="space-y-2">
                              <Input 
                                 type="email" 
-                                placeholder="Enter your email" 
+                                placeholder="Introduce tu email" 
                                 className="h-11"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -79,7 +79,7 @@ export const ExitIntentModal: React.FC<ExitIntentModalProps> = ({ isOpen, onClos
                             />
                         </div>
                         <Button type="submit" className="w-full h-11 text-base font-bold gap-2" disabled={isLoading}>
-                            {isLoading ? 'Sending...' : 'Send me the Checklist'}
+                            {isLoading ? 'Enviando...' : 'Enviarme la Guía'}
                             <ArrowRight size={18} />
                         </Button>
                     </form>
@@ -88,7 +88,7 @@ export const ExitIntentModal: React.FC<ExitIntentModalProps> = ({ isOpen, onClos
                         onClick={onClose} 
                         className="w-full text-center text-xs text-slate-400 mt-4 hover:text-slate-600 hover:underline"
                     >
-                        No thanks, I don't want to grow.
+                        No gracias, prefiero no crecer.
                     </button>
                 </div>
             </DialogContent>

@@ -53,6 +53,7 @@ export const es = {
       autoPilot: { title: "AutoPilot", desc: "Automatiza tu presencia en LinkedIn." },
       profileAudit: { title: "Auditoría de Perfil", desc: "Optimiza tu perfil para ganar autoridad." },
       insightResponder: { title: "Insight Responder", desc: "Convierte insights en comentarios de valor." },
+      employmentInsight: { title: "Insights Laborales", desc: "Consigue empleo más rápido con IA." },
       ideas: { title: "Generador de Ideas", desc: "Inspiración diaria adaptada a tu nicho." },
       
       nicheRealEstate: { title: "Agentes Inmobiliarios", desc: "Domina tu mercado local." },
@@ -118,7 +119,7 @@ export const es = {
           { label: "Calculadora Viral", href: "/tools/viral-calculator" },
           { label: "Auditoría de Perfil", href: "/tools/profile-auditor" },
           { label: "Mejor Hora Publicar", href: "/tools/best-time-to-post" },
-          { label: "Blog", href: "/#tools" },
+          { label: "Blog", href: "/blog" },
           { label: "Noticias", href: "/#tools" },
           { label: "Hoja de Ruta", href: "/#tools" },
           { label: "Centro de Ayuda", href: "mailto:info@kolink.es" },
@@ -148,7 +149,7 @@ export const es = {
         links: [
             { label: "Generador de Hooks", href: "/tools/headline-generator" },
             { label: "Generador de Bios", href: "/tools/bio-generator" },
-            { label: "Carousel Studio", href: "/studio" },
+            { label: "Carousel Studio", href: "/tools/carousel-studio" },
         ]
       }
     },
@@ -1799,6 +1800,39 @@ export const es = {
     },
   },
   dashboard: {
+    sidebar: {
+      home: "Inicio",
+      create: "Nuevo Post",
+      history: "Historial",
+      carousel: "Carousel Studio",
+      tools: "Niche Tools",
+      settings: "Configuración",
+      upgrade: {
+        title: "Mejorar a Pro",
+        desc: "Desbloquea IA ilimitada y herramientas virales.",
+        btn: "Ver Planes"
+      },
+      userToken: "Usuario",
+      logoutToast: "Sesión cerrada"
+    },
+    header: {
+      dashboard: "Panel de Control",
+      create: "Redactor de Posts",
+      history: "Biblioteca de Contenido",
+      settings: "Configuración",
+      carousel: "Estudio de Carruseles",
+      credits: "Créditos",
+      level: "Nivel",
+      autopost: "Programador Inteligente",
+      responder: "Asistente de Engagement",
+      chat: "Estratega Personal IA",
+      audit: "Auditor de Perfil",
+      voice: "Voice Lab",
+      editor: "Editor",
+      home: "Inicio",
+      menu: "Menú",
+      upgrade: "Mejorar Plan"
+    },
     activation: {
       title: "Tu Viaje en Kolink",
       subtitle: "Completa estos pasos para despegar 🚀",
@@ -1819,6 +1853,84 @@ export const es = {
         },
       },
     },
+    launchpad: {
+      tools: {
+        create: { name: "Arquitectura Viral", desc: "Inicia aquí. Diseña posts de alta retención con IA.", badge: "Acción Principal" },
+        carousel: { name: "Storyteller Visual", desc: "Convierte texto en carruseles PDF.", badge: "NUEVO" },
+        chat: { name: "Consultor Estratégico", desc: "Tu experto 24/7 en Marca Personal.", badge: "MENTOR IA" },
+        autopost: { name: "Piloto Automático", desc: "Programa tu consistencia. Crece mientras duermes." },
+        responder: { name: "Comunidad & Leads", desc: "Responde comentarios. Convierte fans en clientes." },
+        audit: { name: "Auditor de Perfil", desc: "Optimiza tu biografía y foto para máxima autoridad." },
+        voice: { name: "Clon de Voz", desc: "Entrena a la IA para escribir como tú." },
+        editor: { name: "Perfeccionador", desc: "Formato, negritas y ganchos finales." },
+        history: { name: "Biblioteca", desc: "Tus mejores posts guardados." },
+        settings: { name: "Ajustes", desc: "Preferencias de cuenta." }
+      },
+      shortcuts: {
+        home: "Inicio",
+        notifications: "Notificaciones",
+        settings: "Ajustes",
+        support: "Soporte",
+        security: "Seguridad"
+      },
+      stats: {
+        weeklyGoal: "Meta Semanal",
+        level: "Nivel",
+        xpToNext: "XP para el siguiente",
+        master: "Maestro del Contenido",
+        hero: "Tu audiencia está activa. Es hora de liderar.",
+        streak: "Días Racha",
+        week: "Semana"
+      }
+    },
+    expertChat: {
+      initialMessage: "¡Hola! Soy Nexus, tu estratega personal de LinkedIn. ¿En qué puedo ayudarte hoy?",
+      errors: {
+        insufficientCredits: "No tienes suficientes créditos para esta consulta.",
+        generic: "Lo siento, hubo un error procesando tu consulta."
+      },
+      sidebar: {
+        activeContext: "Contexto Activo",
+        brandVoice: "Voz de Marca",
+        noBrandVoice: "No definido. Nexus usará un tono profesional estándar.",
+        userProfile: "Perfil de Usuario",
+        noHeadline: "Sin titular",
+        mode: "Modo",
+        ghostwriter: "Ghostwriter",
+        dnaActive: "DNA Activo",
+        nexusKnows: "Nexus te conoce:"
+      },
+      status: {
+        analyzing: "Analizando estrategia...",
+        sending: "Enviando...",
+        send: "Enviar Mensaje",
+        placeholder: "Escribe un borrador o pide consejo..."
+      }
+    },
+    lockedStates: {
+      history: {
+        title: "Accede a tu Historial Ilimitado",
+        subtitle: "No pierdas tus mejores ideas. Recupera, analiza y reutiliza tu contenido pasado.",
+        features: ["Archivo completo de posts", "Análisis de rendimiento viral", "Reutilización de contenido en 1 clic", "Exportación de datos"],
+        cta: "Ver mis Estadísticas"
+      },
+      chat: {
+        title: "Desbloquea Nexus AI Expert",
+        subtitle: "Tu consultor estratégico personal disponible 24/7 para potenciar tu marca.",
+        features: ["Consultoría ilimitada de estrategia LinkedIn", "Análisis de tendencias en tiempo real", "Ideas de contenido personalizadas", "Respuestas instantáneas a dudas técnicas"],
+        cta: "Desbloquear Nexus"
+      },
+      editor: {
+        title: "Editor de Posts Profesional",
+        subtitle: "Lleva tus posts al siguiente nivel con nuestro editor avanzado. Formato Unicode, ganchos predefinidos y previsualización real de LinkedIn.",
+        features: ["Formato Negrita/Cursiva", "Biblioteca de Ganchos", "Previsualización Móvil/PC", "Biblioteca de Snippets"]
+      },
+      audit: {
+        title: "Auditoría de Perfil Profesional",
+        subtitle: "Optimiza tu perfil de LinkedIn con nuestra IA avanzada. Detecta brechas, mejora tu SEO y aumenta tu visibilidad ante reclutadores.",
+        features: ["Análisis de SEO", "Optimización de Titular", "Detección de Brechas", "Sugerencias de Contenido"]
+      }
+    }
   },
   landing: {
     meta: {
