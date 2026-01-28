@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, HelpCircle, Coins } from 'lucide-react';
+import { Bell, HelpCircle, Coins, Trophy } from 'lucide-react';
 import { AppTab } from '../../../types';
 import { useUser } from '../../context/UserContext';
 
@@ -38,6 +38,12 @@ const DashboardHeader: React.FC<HeaderProps> = ({ activeTab }) => {
                     <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-50/50 border border-slate-200/60 rounded-full">
                         <Coins size={14} className="text-yellow-500 fill-yellow-500" />
                         <span className="text-xs font-bold text-slate-700">{credits || 0} Créditos</span>
+                    </div>
+
+                    {/* Level Badge (New) */}
+                    <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-indigo-50/50 border border-indigo-200/60 rounded-full text-indigo-700">
+                         <Trophy size={14} className="fill-indigo-100" />
+                         <span className="text-xs font-bold">Lvl 5</span>
                     </div>
 
                     <div className="h-6 w-px bg-slate-200/60 mx-1" />

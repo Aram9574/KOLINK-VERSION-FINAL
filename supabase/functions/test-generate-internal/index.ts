@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { serve } from "std/http/server.ts"
+import { createClient } from '@supabase/supabase-js'
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -31,7 +31,7 @@ serve(async (req) => {
         const response = await fetch(functionUrl, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${session.access_token}`,
+                'Authorization': `Bearer ${session?.access_token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -52,7 +52,7 @@ serve(async (req) => {
         let responseJson;
         try {
             responseJson = JSON.parse(responseText);
-        } catch (e) {
+        } catch (_e) {
             responseJson = { error: "Failed to parse JSON", text: responseText };
         }
 
@@ -64,7 +64,8 @@ serve(async (req) => {
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
-    } catch (error) {
+    } catch (err: unknown) {
+        const error = err as Error;
         return new Response(
             JSON.stringify({ error: error.message }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }

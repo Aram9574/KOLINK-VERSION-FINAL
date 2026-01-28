@@ -1,4 +1,4 @@
-import { SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export class CreditService {
   private supabaseAdmin: SupabaseClient;
@@ -72,9 +72,23 @@ export class CreditService {
   }
 
   /**
-   * Deduce créditos (Lógica financiera existente)
-   * Ahora también debería llamarse DESPUÉS de checkAndUpdateQuota en el flujo principal
+   * Verifica si el usuario tiene suficientes créditos.
    */
+  async hasCredits(userId: string, cost: number = 1): Promise<boolean> {
+    const { data: profile, error } = await this.supabaseAdmin
+      .from("profiles")
+      .select("credits")
+      .eq("id", userId)
+      .single();
+
+    if (error || !profile) {
+      console.error("Error checking credits:", error);
+      return false;
+    }
+
+    return (profile.credits || 0) >= cost;
+  }
+
   /**
    * Deduce créditos usando el cliente Admin para evitar restricciones RLS/RPC de usuario.
    */

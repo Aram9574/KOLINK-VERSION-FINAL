@@ -31,33 +31,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
             background: `linear-gradient(to right, rgb(59, 130, 246) 0%, rgb(59, 130, 246) ${percentage}%, rgb(241, 245, 249) ${percentage}%, rgb(241, 245, 249) 100%)`,
           }}
         />
-        <style dangerouslySetInnerHTML={{ __html: `
-          .slider-input::-webkit-slider-thumb {
-            appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 9999px;
-            background: white;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            transition: transform 0.1s ease;
-          }
-          .slider-input::-moz-range-thumb {
-            height: 16px;
-            width: 16px;
-            border-radius: 9999px;
-            background: white;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            transition: transform 0.1s ease;
-          }
-          .slider-input:active::-webkit-slider-thumb {
-            transform: scale(1.1);
-          }
-          .slider-input:active::-moz-range-thumb {
-            transform: scale(1.1);
-          }
-        ` }} />
+
       </div>
     )
   }

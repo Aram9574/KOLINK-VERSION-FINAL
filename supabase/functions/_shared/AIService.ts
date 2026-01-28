@@ -1,4 +1,5 @@
 import { BaseAIService } from "./services/BaseAIService.ts";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { ContentService, GenerationParams, UserProfileContext } from "./services/ContentService.ts";
 import { AuditService } from "./services/AuditService.ts";
 import { NexusService } from "./services/NexusService.ts";
@@ -40,7 +41,12 @@ export class AIService extends BaseAIService {
     return await this.audit.extractLinkedInPDF(pdfBase64);
   }
 
-  async analyzeLinkedInProfile(profileData: LinkedInPDFData & { avatar_url?: string; banner_url?: string | null }, language: string = "es"): Promise<LinkedInAuditResult> {
-    return await this.audit.analyzeLinkedInProfile(profileData, language);
+  async analyzeLinkedInProfile(
+    profileData: LinkedInPDFData & { avatar_url?: string; banner_url?: string | null }, 
+    language: string = "es",
+    imageBase64?: string,
+    supabaseClient?: SupabaseClient
+  ): Promise<LinkedInAuditResult> {
+    return await this.audit.analyzeLinkedInProfile(profileData, language, imageBase64, supabaseClient);
   }
 }

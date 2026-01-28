@@ -13,6 +13,36 @@ export const en = {
       availableOn: "Available on Pro and Viral plans"
     }
   },
+  auth: {
+    welcomeHeadline: "Access Your Viral Command Center",
+    welcomeSub: "Where the top 1% of creators build their audience.",
+    signupSub: "Join the elite of AI-assisted content creators.",
+    joinHeadline: "Claim Your Unfair Advantage",
+    ctaLogin: "Initialize System",
+    ctaSignup: "Unlock Free Access",
+    emailLabel: "Professional Email",
+    passwordLabel: "Access Key",
+    forgotPassword: "Lost your key?",
+    rememberMe: "Keep session secure",
+    continueWith: "Or access with",
+    newHere: "New to the elite?",
+    alreadyMember: "Already a member?",
+    register: "Request Access",
+    login: "Enter",
+    trust: {
+      security: "Military Grade Encryption",
+      noCard: "No Card Required",
+      users: "+2k Creators"
+    },
+    reset: {
+      title: "Recover Access",
+      desc: "We will send a secure link to your email.",
+      button: "Send Rescue Link",
+      back: "Back to Login",
+      success: "Link sent. Check your email.",
+      error: "Could not send link. Try again."
+    }
+  },
   nav: {
     howItWorks: "How it Works",
     demo: "Demo",
@@ -24,6 +54,42 @@ export const en = {
     faq: "FAQ",
     login: "Log In",
     getStarted: "Get Started",
+    freeTools: "Free Tools",
+    solutions: "Solutions",
+    resources: "Resources",
+    company: "Company",
+    items: {
+      postEditor: { title: "Post Editor", desc: "AI content creation engine." },
+      carouselStudio: { title: "Carousel Studio", desc: "Design viral carousels in minutes." },
+      autoPilot: { title: "AutoPilot", desc: "Automate your LinkedIn presence." },
+      profileAudit: { title: "Profile Audit", desc: "Optimize your profile for authority." },
+      insightResponder: { title: "Insight Responder", desc: "Turn insights into valuable comments." },
+      ideas: { title: "Idea Generator", desc: "Daily inspiration tailored to your niche." },
+      headlineGenerator: { title: "Headline Generator", desc: "10 Viral titles in seconds." },
+      bioGenerator: { title: "Bio Generator", desc: "Optimize your LinkedIn profile." },
+      viralCalculator: { title: "Viral Calculator", desc: "Predict your post reach." },
+      
+      nicheRealEstate: { title: "Real Estate Agents", desc: "Dominate your local market." },
+      nicheSaaS: { title: "SaaS Founders", desc: "Growth hacking for tech leaders." },
+      nicheLawyers: { title: "Lawyers & Legal", desc: "Build authority in your practice." },
+      nicheMarketing: { title: "Marketing Specialists", desc: "Stay ahead of AI trends." },
+      nicheHealth: { title: "Doctors & Health", desc: "Educate and connect with patients." },
+      
+      blog: { title: "Blog", desc: "Latest strategies and news." },
+      helpCenter: { title: "Help Center", desc: "Tutorials and technical docs." },
+      videoDemo: { title: "Video Demo", desc: "Watch Kolink in action." },
+      commonFaq: { title: "FAQ", desc: "Answers to common questions." },
+      
+      about: { title: "About Us", desc: "Our mission to humanize AI." },
+      prices: { title: "Pricing", desc: "Plans for every growth stage." },
+      affiliate: { title: "Affiliate Program", desc: "Earn by recommending the future." },
+      socials: { title: "Follow Us", desc: "Join +10k creators on socials." },
+      
+      hooks: { title: "Hook Library", desc: "100+ Proven Viral Hooks." },
+      bestTime: { title: "Best Time", desc: "Calculator based on your niche." },
+      trust: { title: "Trust Center", desc: "Security and compliance." },
+      viewAll: { title: "View All", desc: "Explore all tools available." }
+    }
   },
   hero: {
     badge: "#1 AI Tool for LinkedIn Growth",
@@ -279,7 +345,54 @@ export const en = {
           "Analyze your profile with AI to detect gaps and optimize keywords for maximum visibility.",
       },
     },
-    f1Title: "6 Viral Frameworks",
+    footer: {
+      description:
+      "The ultimate content creation and analytics tool for LinkedIn™.",
+      rights: "© 2025 Kolink Inc. All rights reserved.",
+      disclaimer: "Kolink is not affiliated, associated, authorized, endorsed by, or in any way officially connected with LinkedIn Corporation. LinkedIn is a registered trademark of LinkedIn Corporation.",
+      verifiedLabel: "Verified",
+      compliantLabel: "Compliant",
+      madeWith: "Made with ❤️ for LinkedIn creators",
+      columns: {
+        company: {
+            title: "Company",
+            links: [
+                { label: "About", href: "/about" },
+                { label: "Pricing", href: "/#pricing" },
+                { label: "Made with Kolink", href: "/#carousel" },
+                { label: "Contact", href: "mailto:info@kolink.es" },
+                { label: "Affiliate Program", href: "mailto:info@kolink.es?subject=Affiliate Program" }
+            ]
+        },
+        legal: {
+            title: "Legal",
+            links: [
+                { label: "Cookie Policy", href: "/cookies" },
+                { label: "Privacy Policy", href: "/privacy" },
+                { label: "Terms & Conditions", href: "/terms" }
+            ]
+        },
+        solutions: {
+          title: "Industries",
+          links: [
+            { label: "Real Estate Agents", href: "/tools/agentes-inmobiliarios" },
+            { label: "Lawyers & Legal", href: "/tools/abogados-y-legal" },
+            { label: "SaaS Founders", href: "/tools/fundadores-saas" },
+            { label: "Marketing", href: "/tools/especialistas-marketing" },
+            { label: "Doctors & Health", href: "/tools/doctores-y-salud" },
+            { label: "View all industries →", href: "/tools" },
+          ],
+        },
+        freeTools: {
+          title: "Free Tools",
+          links: [
+              { label: "Headline Generator", href: "/tools/headline-generator" },
+              { label: "Bio Generator", href: "/tools/bio-generator" },
+              { label: "Carousel Studio", href: "/studio" },
+          ]
+        }
+      },
+    },
 
     f1Desc:
       'Don\'t guess. Use structures like "The Contrarian Take" or "The Vulnerable Story" that are proven to stop the scroll.',
@@ -586,8 +699,36 @@ export const en = {
       aiTools: "AI Magic Tools",
       brandKits: "Brand Kits",
       saveKits: "Save Kit",
-      brandKitHint: "Save your brand colors to reuse later.",
+      brandKitHint: "Save your brand colors for reuse.",
+      export: {
+         watermarkNotice: "Free Plan: Watermark added",
+         removeWatermark: "Upgrade to Remove",
+         createdWith: "Created with Kolink.ai"
+      },
+      brandKit: {
+        title: "My Brand Kits",
+        description: "Your saved visual identities.",
+        saveCurrent: "Save Current",
+        saveDialogTitle: "Save Brand Kit",
+        saveDialogDesc: "Save current colors and fonts as a reusable preset.",
+        kitNameLabel: "Kit Name",
+        kitNamePlaceholder: "e.g. Personal Brand 2026",
+        saveButton: "Save Kit",
+        emptyState: "No saved kits yet.",
+        deleteConfirm: "Delete this kit?",
+        deletedSuccess: "Kit deleted",
+        savedSuccess: "Brand kit saved",
+        saveError: "Error saving kit",
+        applied: "Kit \"{{name}}\" applied"
+      },
       primaryFont: "Primary Font",
+      magicTools: {
+        improve: "Improve Writing",
+        shorten: "Shorten",
+        expand: "Expand",
+        punchify: "Viral Hook",
+        emojify: "Add Emojis"
+      },
       layouts: {
         default: "Default",
         fullImg: "Full Img",
@@ -1299,6 +1440,10 @@ export const en = {
         resources: {
           title: "Resources",
           links: [
+            { label: "Bio Generator", href: "/tools/bio-generator" },
+            { label: "Viral Calculator", href: "/tools/viral-calculator" },
+            { label: "Profile Audit", href: "/tools/profile-auditor" },
+            { label: "Best Time to Post", href: "/tools/best-time-to-post" },
             { label: "Blog", href: "/#tools" },
             { label: "News", href: "/#tools" },
             { label: "Roadmap", href: "/#tools" },
@@ -1382,6 +1527,230 @@ export const en = {
       badPost: "I am thrilled to announce that today I have been reflecting on the importance of consistency. Consistency is key because it allows us to build lasting habits. Furthermore, it is fundamental to stay motivated even when results are not immediate in order to achieve long-term success in our professional careers...",
       goodPostHook: "Consistency > Intensity.",
       goodPostBody: "Most people fail because they sprint.\nThe top 1% win because they walk everyday.\n\nHere is my 3-step system: 👇",
+    },
+  },
+  trustPage: {
+    hero: {
+      title: "Trust Center",
+      subtitle: "Your security is our #1 priority. Built for enterprise, secured like a bank.",
+      badge: "MILITARY GRADE SECURITY"
+    },
+    cards: {
+      encryption: {
+        title: "Bank-Grade Encryption",
+        desc: "All data is encrypted in transit (TLS 1.3) and at rest (AES-256). Even we can't see your passwords."
+      },
+      payment: {
+        title: "Secure Payments by Stripe",
+        desc: "We do not store your card. Payments are processed by Stripe, the gold standard in online payments."
+      },
+      privacy: {
+        title: "Data Privacy",
+        desc: "Your data is yours. We never sell your info to third parties or train public models with your private drafts."
+      },
+      uptime: {
+        title: "99.9% Uptime",
+        desc: "Redundant infrastructure distributed globally to ensure you are always online when virality strikes."
+      }
+    },
+    badges: {
+      ssl: "SSL Secure",
+      gdpr: "GDPR Ready",
+      pci: "PCI DSS Compliant"
+    },
+    certifications: "Certifications & Compliance"
+  },
+  toolsPage: {
+    common: {
+      moreTools: "More Tools",
+      home: "Home",
+      tools: "Tools",
+      tryPro: "Try Pro Free",
+      copyToast: "Copied to clipboard!",
+      conversion: "Convert to Post",
+      footer: "Kolink AI © 2026. Made for LinkedIn Creators."
+    },
+    headlineGenerator: {
+      seoTitle: "Free LinkedIn Headline Generator (Viral Hooks) | Kolink AI",
+      seoDesc: "Generate 10 viral LinkedIn headlines in seconds. The #1 Free AI Tool for writing hooks that stop the scroll.",
+      label: "Free Tool",
+      title: "Headline Generator",
+      titleHighlight: "Viral",
+      subtitle: "Stop the scroll. Generate 10 viral hooks optimized for LinkedIn's algorithm in seconds.",
+      roleLabel: "Your Role (e.g. Founder)",
+      industryLabel: "Industry",
+      topicLabel: "What is your post about?",
+      rolePlaceholder: "e.g. CEO, Marketer...",
+      industryPlaceholder: "e.g. SaaS, Real Estate...",
+      topicPlaceholder: "e.g. How to scale a business without burnout...",
+      button: "Get Headlines",
+      generating: "Generating...",
+      resultTitle: "10 Viral Hooks for You",
+      whyTitle: "Why Headlines Matter?",
+      whyDesc: "The first 2 lines of your LinkedIn post determine 80% of your success. If people don't click 'See more', the algorithm assumes your content is irrelevant.",
+      frameworks: [
+        { title: "The Contrarian", desc: "Challenge common beliefs to spark curiosity." },
+        { title: "The Listicle", desc: "Show quantifiable value immediately." },
+        { title: "The Story", desc: "Open with a dramatic or vulnerable moment." }
+      ]
+    },
+    bioGenerator: {
+      seoTitle: "Free LinkedIn Bio Generator | Kolink AI",
+      seoDesc: "Create the perfect LinkedIn profile headline in seconds. Optimize for SEO and authority with our free AI tool.",
+      label: "Profile Optimizer",
+      title: "Bio Generator",
+      titleHighlight: "LinkedIn",
+      subtitle: "The first thing recruiters see is your headline. Make it impossible to ignore.",
+      roleLabel: "Your Role",
+      nicheLabel: "Niche / Audience",
+      keywordsLabel: "Top 3 Keywords (SEO)",
+      styleLabel: "Style",
+      styles: {
+        professional: "Professional",
+        creative: "Creative",
+        minimalist: "Minimalist"
+      },
+      button: "Generate Bios",
+      generating: "Optimizing...",
+      resultTitle: "5 Optimized Headlines",
+      ctaBtn: "Get Audit",
+      ctaBox: {
+        title: "Want a Full Profile Audit?",
+        subtitle: "Optimize every section of your LinkedIn profile.",
+        button: "Start Free Audit"
+      }
+    },
+    viralCalculator: {
+      seoTitle: "LinkedIn Viral Post Calculator | Kolink AI",
+      seoDesc: "Predict the viral potential of your LinkedIn posts before you publish. Free AI calculator based on your engagement rate and content quality.",
+      label: "Predictive Analytics",
+      title: "Will It Go",
+      titleHighlight: "Viral?",
+      subtitle: "Stop guessing. Our AI analyzes your follower count, engagement rate, and content structure to predict reach.",
+      followersLabel: "Followers",
+      followersPlaceholder: "e.g. 5000",
+      avgLikesLabel: "Avg Likes",
+      avgLikesPlaceholder: "e.g. 150",
+      contentLabel: "Paste Your Draft",
+      contentPlaceholder: "Paste your post content here...",
+      button: "Calculate Viral Score",
+      analyzing: "Analyzing...",
+      resultLabel: "Viral Probability",
+      suggestionsLabel: "AI Suggestions",
+      cta: "Improve with AI Studio"
+    },
+    profileScorecard: {
+      seoTitle: "LinkedIn Profile Scorecard | Free AI Audit Tool",
+      seoDesc: "Get an instant score for your LinkedIn profile. Our AI analyzes your headline and summary to reveal hidden opportunities for growth.",
+      label: "Profile Auditor",
+      title: "Rate My",
+      titleHighlight: "Profile",
+      subtitle: "Is your LinkedIn profile repelling high-ticket clients? Get a brutal, honest score in seconds.",
+      headlineLabel: "Your Headline",
+      headlinePlaceholder: "e.g. Helping SaaS Founders scale to $10M...",
+      aboutLabel: "About Summary (Optional)",
+      aboutPlaceholder: "Paste your About section here for deeper analysis...",
+      button: "Get My Score",
+      analyzing: "Auditing...",
+      emptyTitle: "Ready to Audit",
+      emptyDesc: "Enter your details to reveal your authority score.",
+      scoreLabel: "Authority Score",
+      good: "Good",
+      needsWork: "Needs Work",
+      diagnosisLabel: "Diagnosis",
+      cta: "Unlock Full PDF Report",
+      ctaSub: "Get a 20-page deep dive with Kolink Pro."
+    },
+    bestTime: {
+      seoTitle: "LinkedIn Best Time to Post Calculator | Free AI Tool",
+      seoDesc: "Find the perfect time to post on LinkedIn for your specific industry. Maximize engagement and reach with our algorithmic heatmap.",
+      label: "Timing Algorithm",
+      title: "Best Time to",
+      titleHighlight: "Post",
+      subtitle: "Algorithmically determine the highest engagement windows for your specific industry.",
+      industryLabel: "Select Your Industry",
+      industries: {
+        tech: "Technology & SaaS",
+        marketing: "Marketing & Agencies",
+        realEstate: "Real Estate",
+        finance: "Finance & Consulting",
+        healthcare: "Healthcare & Medical",
+        education: "Education & Coaching",
+        general: "General / Personal Brand"
+      },
+      button: "Reveal Best Times",
+      analyzing: "Analyzing Data...",
+      heatmapTitle: "Your Engagement Heatmap",
+      emptyState: "Select your industry and click calculate to see your personalized engagement heatmap.",
+      low: "Low",
+      high: "High",
+      schedCtaTitle: "Want to schedule automatically?",
+      schedCtaDesc: "Kolink Pro auto-schedules for your optimal times.",
+      schedCtaBtn: "Schedule Post",
+      whyTitle: "Why Posting Time Matters on LinkedIn",
+      whyDesc: "The 'Golden Hour' on LinkedIn refers to the first 60 minutes after you post. The algorithm tests your content. If they engage, it gets a boost.",
+      bestDaysTitle: "Best Days",
+      bestDaysDesc: "Tuesday, Wednesday, and Thursday generally show 25-40% higher engagement rates for B2B industries compared to weekends.",
+      worstTimesTitle: "Worst Times",
+      worstTimesDesc: "Mondays before 10 AM and Fridays after 4 PM often see lower retention."
+    },
+    hookGallery: {
+      seoTitle: "Viral Hooks Library for LinkedIn | +50 Proven Openers",
+      seoDesc: "Browse our library of high-converting viral hooks. Copy templates for Contrarian, Data, Story, and Listicle posts. Free resource.",
+      label: "Viral Library",
+      title: "The Ultimate Gallery of",
+      titleHighlight: "Hooks",
+      subtitle: "Stop staring at a blank page. Browse proven opening lines that grab attention and drive engagement.",
+      filters: {
+        all: "All",
+        contrarian: "Contrarian",
+        data: "Data",
+        story: "Story",
+        listicle: "Listicle",
+        question: "Question",
+        direct: "Direct"
+      },
+      card: {
+        useInStudio: "Use in Studio",
+        copy: "Copy",
+        copied: "Copied!",
+        example: "Ex:"
+      },
+      empty: {
+        title: "No hooks found",
+        desc: "Try a different category."
+      },
+      cta: {
+        title: "Need custom hooks for your brand?",
+        desc: "Our AI analyzes your unique voice and generates infinite hooks tailored to your industry.",
+        button: "Try AI Generator"
+      },
+      categories: {
+          Contrarian: "Contrarian",
+          Data: "Data",
+          Story: "Story",
+          Listicle: "Listicle",
+          Question: "Question",
+          Direct: "Direct"
+      }
+    },
+    vsPage: {
+      notFound: "Comparison Not Found",
+      returnTools: "Return to Tools",
+      startTrial: "Start Free Trial",
+      seeAllTools: "See All Tools",
+      switchHeadline: "Switch to the",
+      switchHeadlineHighlight: "Complete Alternative",
+      feature: "Feature",
+      monthlyCost: "Monthly Cost",
+      pricesDisclaimer: "* Prices compared based on monthly Pro plans as of Oct 2025.",
+      whySwitch: "Why creators are switching to Kolink",
+      designedFor: "Designed for the modern LinkedIn algorithm favoring visual content.",
+      theGap: "The Gap:",
+      savings: "Savings / Month",
+      readyHeadline: "Ready to upgrade your workflow?",
+      tryFree: "Try Kolink Free",
+      noCard: "No credit card required for free tools."
     }
   }
 };

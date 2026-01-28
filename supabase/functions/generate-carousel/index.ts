@@ -117,31 +117,92 @@ Deno.serve(async (req) => {
         finalInputSource = `[RAW TEXT]: ${source.substring(0, 15000)}`;
     }
     
-    const generatedContent: CarouselGenerationResult = await contentService.generateCarousel(
-      finalInputSource, 
-      sourceType, 
-      styleFragments,
-      language,
-      userContext
-    );
+    let generatedContent: CarouselGenerationResult;
+    try {
+        generatedContent = await contentService.generateCarousel(
+            finalInputSource, 
+            sourceType, 
+            styleFragments,
+            language,
+            userContext
+        );
+    } catch (genError: any) {
+        console.error("[CarouselFunc] Generation specific error:", genError);
+        // Fallback to a valid carousel response regarding the error
+        generatedContent = {
+            carousel_config: {
+                theme_id: "error",
+                settings: { aspect_ratio: "4:5", dark_mode: false }
+            },
+            slides: [
+                {
+                    id: "error-slide",
+                    type: "intro",
+                    layout: "intro",
+                    content: {
+                        title: "Generation Failed",
+                        subtitle: `${genError.message || "Unknown Error"}`,
+                        body: "Please try again or check your credits.",
+                        cta_text: "Retry",
+                    },
+                    design_overrides: { highlight_color: "#ef4444" }
+                }
+            ],
+            linkedin_post_copy: "Generation failed. Please check logs."
+        };
+    }
+
+    console.log("[CarouselFunc] Generated content received from service. Slides count:", generatedContent.slides?.length);
+    if (!generatedContent.slides || !Array.isArray(generatedContent.slides)) {
+        console.error("[CarouselFunc] Invalid slides data:", JSON.stringify(generatedContent));
+       // Use same fallback if structure is invalid
+       generatedContent = {
+             carousel_config: { theme_id: "error", settings: { aspect_ratio: "4:5", dark_mode: false } },
+             slides: [{ 
+                 id: "structure-error", 
+                 type: "intro", 
+                 layout: "intro",
+                 content: { title: "Invalid Data", body: "AI returned invalid JSON structure." } 
+             }],
+             linkedin_post_copy: "Error"
+       };
+    }
+
+    const slides = generatedContent.slides.map((s, index: number) => {
+        try {
+            return {
+                id: `gen-slide-${index}`,
+                type: s.type || (index === 0 ? 'intro' : index === generatedContent.slides.length - 1 ? 'outro' : 'content'),
+                layout: s.layout ?? "classic",
+                design_overrides: s.design_overrides,
+                content: {
+                    title: s.content?.title || "Untitled",
+                    subtitle: s.content?.subtitle,
+                    body: s.content?.body || "",
+                    cta_text: s.content?.cta_text,
+                    image_prompt: s.content?.image_prompt
+                },
+                isVisible: true
+            };
+        } catch (mapErr) {
+            console.error(`[CarouselFunc] Error mapping slide ${index}:`, mapErr, s);
+            return {
+                id: `gen-slide-${index}`,
+                type: 'content',
+                layout: 'classic',
+                content: { title: "Error", body: "Could not generate slide content." },
+                isVisible: true
+            };
+        }
+    });
 
     const responseData = {
       carousel_config: {
-        slides_count: generatedContent.slides.length,
+        slides_count: slides.length,
         tone: tone || "Professional",
-        analysis: generatedContent.carousel_metadata.topic
+        analysis: "AI Generated Content" 
       },
-      slides: generatedContent.slides.map((s, index: number) => ({
-        id: `gen-slide-${index}`,
-        type: s.type || (index === 0 ? 'intro' : index === generatedContent.slides.length - 1 ? 'outro' : 'content'),
-        content: {
-            title: s.title,
-            subtitle: s.subtitle,
-            body: s.body,
-            cta_text: s.cta_text
-        },
-        isVisible: true
-      })),
+      slides: slides,
       linkedin_post_copy: generatedContent.linkedin_post_copy
     };
 

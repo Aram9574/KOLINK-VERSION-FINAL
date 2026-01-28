@@ -47,8 +47,19 @@ const InfiniteGridDemo = lazy(() => import("./demo"));
 const CookieConsent = lazy(() => import("./components/features/compliance/CookieConsent"));
 const NicheGeneratorPage = lazy(() => import("./components/landing/NicheGeneratorPage"));
 const ToolsIndexPage = lazy(() => import("./components/landing/ToolsIndexPage"));
+const HeadlineGeneratorTool = lazy(() => import("./components/tools/HeadlineGeneratorTool"));
+const BioGeneratorTool = lazy(() => import("./components/tools/BioGeneratorTool"));
+const ViralCalculatorTool = lazy(() => import("./components/tools/ViralCalculatorTool"));
+const BestTimeCalculatorTool = lazy(() => import("./components/tools/BestTimeCalculatorTool"));
+const HookGalleryPage = lazy(() => import("./components/tools/HookGalleryPage"));
+const ProfileScorecardTool = lazy(() => import("./components/tools/ProfileScorecardTool"));
+const VsPageTemplate = lazy(() => import("./components/tools/VsPageTemplate"));
 const AboutPage = lazy(() => import("./components/landing/AboutPage"));
 const Skeleton = lazy(() => import("./components/ui/Skeleton"));
+const TrustPage = lazy(() => import("./components/landing/TrustPage"));
+import { useExitIntent } from "./hooks/useExitIntent";
+import { ExitIntentModal } from "./components/modals/ExitIntentModal";
+import FomoToast from "./components/ui/FomoToast";
 
 const App: React.FC = () => {
     const { user, language, loading } = useUser();
@@ -81,6 +92,11 @@ const App: React.FC = () => {
         }
     }, []);
 
+    // Exit Intent Logic (Action 13)
+    const { isVisible: isExitIntentVisible, setIsVisible: setIsExitIntentVisible } = useExitIntent(
+        !user.id || user.id.startsWith('mock-')
+    );
+
     if (loading && !isTimeout) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -102,12 +118,26 @@ const App: React.FC = () => {
         <>
             <Toaster richColors position="top-center" />
             <CookieConsent />
+            <ExitIntentModal 
+                isOpen={isExitIntentVisible} 
+                onClose={() => setIsExitIntentVisible(false)} 
+            />
+            {/* Social Proof (Action 19) */}
+            {!user.id && <FomoToast />}
             <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/tools/:nicheSlug" element={<NicheGeneratorPage />} />
                 <Route path="/tools" element={<ToolsIndexPage />} />
+                <Route path="/tools/headline-generator" element={<HeadlineGeneratorTool />} />
+                <Route path="/tools/bio-generator" element={<BioGeneratorTool />} />
+                <Route path="/tools/viral-calculator" element={<ViralCalculatorTool />} />
+                <Route path="/tools/best-time-to-post" element={<BestTimeCalculatorTool />} />
+                <Route path="/tools/profile-auditor" element={<ProfileScorecardTool />} />
+                <Route path="/hooks" element={<HookGalleryPage />} />
+                <Route path="/vs/:competitorSlug" element={<VsPageTemplate />} />
                 <Route path="/about" element={<AboutPage />} />
+                <Route path="/trust" element={<TrustPage />} />
                 
                 <Route
                     path="/login"
@@ -159,14 +189,7 @@ const App: React.FC = () => {
                         </ProtectedRoute>
                     }
                 />
-                <Route
-                    path="/carousel-studio"
-                    element={
-                        <ProtectedRoute>
-                            <CarouselStudio />
-                        </ProtectedRoute>
-                    }
-                />
+                <Route path="/carousel-studio" element={<CarouselStudio />} />
 
                 {/* Catch all */}
                 <Route path="*" element={<Navigate to="/" replace />} />

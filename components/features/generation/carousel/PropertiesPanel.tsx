@@ -22,8 +22,16 @@ import { PredictiveModal, EngagementPrediction } from './PredictiveModal';
 import { PolishReviewDialog } from './PolishReviewDialog';
 import { ImageSelector } from './ImageSelector';
 
+import { MagicInputWrapper } from './MagicInputWrapper';
+import { IconPicker } from './IconPicker';
+import { ToneSlider } from './ToneSlider';
+import { ThemeGallery } from './ThemeGallery';
+import { RetentionChart } from '../../analytics/RetentionChart';
+import { HeadlineBattle } from '../../analytics/HeadlineBattle';
+import { Languages } from 'lucide-react';
+
 export const PropertiesPanel = () => {
-  const { language } = useUser();
+  const { language, user } = useUser();
   const t = translations[language || 'en'].carouselStudio;
   
   // Store Hooks
@@ -35,6 +43,7 @@ export const PropertiesPanel = () => {
   const updateDesign = useCarouselStore(state => state.updateDesign);
   /* const updateGlobalDesign = useCarouselStore(state => state.updateGlobalDesign); */
   const updateAuthor = useCarouselStore(state => state.updateAuthor);
+  const updateSettings = useCarouselStore(state => state.updateSettings);
   const updateElementOverride = useCarouselStore(state => state.updateElementOverride);
   const setActiveElement = useCarouselStore(state => state.setActiveElement);
   
@@ -51,11 +60,73 @@ export const PropertiesPanel = () => {
 
   // Local State
   const [brandKitName, setBrandKitName] = useState('');
+  const [isTranslating, setIsTranslating] = useState(false);
+
+    const handleTranslate = async (targetLang: string) => {
+        setIsTranslating(true);
+        const toastId = toast.loading(`Translating entire carousel to ${targetLang}...`);
+        
+        try {
+             // 1. Gather all texts
+             // We pass a very structured prompt to avoid complex parsing if possible, or robust parsing.
+             const allText = slides.map((s, i) => `slide_${i}|${s.content.title}|${s.content.body}`).join("\n---\n");
+
+             // 2. Call AI
+             const { data, error } = await supabase.functions.invoke('generate-viral-post', {
+                body: {
+                    params: {
+                        mode: 'micro_edit',
+                        action: `Translate the content of this carousel to ${targetLang}. 
+                        Input format is: slide_index|TITLE|BODY
+                        Output format MUST be a valid JSON array: [{"title": "...", "body": "..."}, ...]
+                        Maintain the exact number of slides. Do not add keys.`,
+                        topic: allText
+                    }
+                }
+             });
+
+             if (error) throw error;
+             
+             // 3. Parse and Apply
+             let translatedContent: any[] = [];
+             try {
+                // Remove markdown code blocks if any
+                const cleaned = (data.post_content as string).replace(/```json/g, '').replace(/```/g, '').trim();
+                translatedContent = JSON.parse(cleaned);
+             } catch (e) {
+                 console.error("JSON Parse fail", e);
+                 throw new Error("Translation structure failed. Please try again.");
+             }
+
+             if (!Array.isArray(translatedContent) || translatedContent.length !== slides.length) {
+                 throw new Error(`Translation count mismatch. Sent ${slides.length}, got ${translatedContent.length}`);
+             }
+
+             // 4. Update Store
+             const newSlides = slides.map((s, i) => ({
+                 ...s,
+                 content: {
+                     ...s.content,
+                     title: translatedContent[i].title || s.content.title,
+                     body: translatedContent[i].body || s.content.body
+                 }
+             }));
+
+             useCarouselStore.getState().setSlides(newSlides);
+             toast.success(`Translated to ${targetLang}!`, { id: toastId });
+
+        } catch (err: any) {
+            console.error(err);
+            toast.error("Translation failed: " + err.message, { id: toastId });
+        } finally {
+            setIsTranslating(false);
+        }
+    };
   
   // Brand DNA
   const handleApplyBrandDNA = () => {
-     if (!user.brand_colors) {
-         toast.error(t.properties?.noBrandColors || "No Brand DNA found in profile");
+     if (!user?.brand_colors) {
+         toast.error((t.properties as any)?.noBrandColors || "No Brand DNA found in profile");
          return;
      }
      
@@ -69,7 +140,7 @@ export const PropertiesPanel = () => {
              text: '#000000'
          }
      });
-     toast.success("Brand DNA Injected! 🧬");
+     toast.success("¡ADN de Marca Inyectado! 🧬");
   };
 
   // AI State
@@ -84,8 +155,8 @@ export const PropertiesPanel = () => {
 
   // Load presets on mount
   useEffect(() => {
-     loadPresets();
-  }, []);
+     loadPresets(user?.id || '');
+  }, [user?.id]); // Re-load when user changes
 
   // Handlers
   const handleSaveBrandKit = () => {
@@ -93,8 +164,8 @@ export const PropertiesPanel = () => {
         toast.error(t.properties.brandNamePrompt);
         return;
     }
-    savePreset(brandKitName);
-    toast.success("Brand Kit saved!");
+    savePreset(user?.id || '', brandKitName);
+    toast.success("¡Kit de Marca guardado!");
     setBrandKitName('');
   };
 
@@ -103,7 +174,7 @@ export const PropertiesPanel = () => {
       const fullContent = slides.map(s => `${s.content.title || ''} ${s.content.body || ''} ${s.content.subtitle || ''}`).join('\n\n');
       
       if (!fullContent || fullContent.length < 10) {
-          toast.error("Add more content before predicting performance.");
+          toast.error("Agrega más contenido antes de predecir el rendimiento.");
           return;
       }
 
@@ -132,16 +203,20 @@ export const PropertiesPanel = () => {
       }
   };
 
-  const handlePolishSlide = async () => {
+  const handlePolishSlide = async (customInstruction?: string) => {
       if (!activeSlide) return;
       setIsPolishing(true);
+      
+      const instruction = typeof customInstruction === 'string' ? customInstruction : undefined;
+
       try {
           const { data, error } = await supabase.functions.invoke('polish-slide', {
               body: { 
                   title: activeSlide.content.title,
                   body: activeSlide.content.body,
                   subtitle: activeSlide.content.subtitle,
-                  language: language || 'es'
+                  language: language || 'es',
+                  instruction // Pass custom instruction if present
               }
           });
 
@@ -157,7 +232,7 @@ export const PropertiesPanel = () => {
           }
       } catch (error: any) {
           console.error("Polish failed:", error);
-          toast.error(t.toasts?.captionFailed || "Failed to polish slide");
+          toast.error(t.toasts?.captionFailed || "Error al pulir slide");
       } finally {
           setIsPolishing(false);
       }
@@ -174,7 +249,7 @@ export const PropertiesPanel = () => {
               subtitle: polishedData.subtitle || activeSlide.content.subtitle
           }
       });
-      toast.success(t.toasts?.captionGenerated || "Updated!");
+      toast.success(t.toasts?.captionGenerated || "¡Actualizado!");
       setPolishedData(null);
   };
 
@@ -182,7 +257,7 @@ export const PropertiesPanel = () => {
       return (
         <div className="h-full flex flex-col items-center justify-center text-center p-8 text-slate-400 bg-white border-l border-slate-200 w-80">
             <Sparkles className="w-12 h-12 mb-4 opacity-20" />
-            <p className="text-sm font-medium">Select a slide to edit its properties</p>
+            <p className="text-sm font-medium">Selecciona un slide para editar</p>
         </div>
       );
   }
@@ -280,7 +355,7 @@ export const PropertiesPanel = () => {
                                           <div className="space-y-2 pt-2 border-t border-indigo-100/50">
                                               <Label className="text-[10px] text-indigo-600 font-bold uppercase flex items-center gap-1">
                                                   <Wand2 className="w-3 h-3" />
-                                                  AI Magic
+                                                  Magia IA
                                               </Label>
                                               <div className="grid grid-cols-3 gap-1.5">
                                                   {['Rewrite', 'Shorten', 'Emojify'].map((action) => (
@@ -320,7 +395,7 @@ Return ONLY the transformed text.
                                                                   updateSlide(activeSlide.id, { 
                                                                       content: { ...activeSlide.content, [key]: result } 
                                                                   });
-                                                                  toast.success("Magic applied! ✨");
+                                                                  toast.success("¡Magia aplicada! ✨");
                                                               } catch (e) {
                                                                   toast.error("AI execution failed");
                                                                   console.error(e);
@@ -357,7 +432,7 @@ Return ONLY the transformed text.
                                      </Button>
                                      <Button 
                                         variant="outline" 
-                                        onClick={handlePolishSlide}
+                                        onClick={() => handlePolishSlide()}
                                         disabled={isPolishing}
                                         className="h-auto py-3 justify-start flex-col items-start gap-1 border-slate-200 hover:border-violet-300 hover:bg-violet-50 group"
                                      >
@@ -365,6 +440,18 @@ Return ONLY the transformed text.
                                          <span className="text-xs font-semibold text-slate-700">{t.ai.polish}</span>
                                          <span className="text-[9px] text-slate-400 font-normal leading-tight text-left">
                                             {t.ai.polishSubtitle.substring(0, 30)}...
+                                         </span>
+                                     </Button>
+                                     <Button 
+                                        variant="outline" 
+                                        onClick={() => handlePolishSlide("Format as a concise checklist with bullet points.")} // Overloaded usage
+                                        disabled={isPolishing}
+                                        className="h-auto py-3 justify-start flex-col items-start gap-1 border-slate-200 hover:border-blue-300 hover:bg-blue-50 group col-span-2"
+                                     >
+                                         {isPolishing ? <Loader2 className="w-4 h-4 text-blue-500 mb-1 animate-spin" /> : <List className="w-4 h-4 text-blue-500 mb-1" />}
+                                         <span className="text-xs font-semibold text-slate-700">Auto Formato (Lista)</span>
+                                         <span className="text-[9px] text-slate-400 font-normal leading-tight text-left">
+                                            Transforma texto en checklist
                                          </span>
                                      </Button>
                                 </div>
@@ -425,13 +512,20 @@ Return ONLY the transformed text.
                                     return (
                                         <div key={key} className="space-y-1.5">
                                             <Label className="text-xs text-slate-500 capitalize">{(t.properties as any)[key] || key}</Label>
-                                            <Textarea 
+                                            <MagicInputWrapper
                                                 value={typeof value === 'string' ? value : ''}
-                                                onChange={(e) => updateSlide(activeSlide.id, { 
-                                                    content: { ...activeSlide.content, [key]: e.target.value } 
+                                                onAiUpdate={(newValue) => updateSlide(activeSlide.id, { 
+                                                    content: { ...activeSlide.content, [key]: newValue } 
                                                 })}
-                                                className="min-h-[80px] text-sm bg-slate-50 border-slate-200 focus:bg-white resize-none"
-                                            />
+                                            >
+                                                <Textarea 
+                                                    value={typeof value === 'string' ? value : ''}
+                                                    onChange={(e) => updateSlide(activeSlide.id, { 
+                                                        content: { ...activeSlide.content, [key]: e.target.value } 
+                                                    })}
+                                                    className="min-h-[80px] text-sm bg-slate-50 border-slate-200 focus:bg-white resize-none pr-8"
+                                                />
+                                            </MagicInputWrapper>
                                         </div>
                                     );
                                 })}
@@ -445,7 +539,7 @@ Return ONLY the transformed text.
                                 <div className="grid grid-cols-4 gap-2">
                                     {[
                                         { id: 'default', icon: Layout, label: t.properties.layouts.default },
-                                        { id: 'full-image', icon: ImageIcon, label: t.properties.layouts.fullImg },
+                                        { id: 'image-full', icon: ImageIcon, label: t.properties.layouts.fullImg },
                                         { id: 'quote', icon: Quote, label: t.properties.layouts.quote },
                                         { id: 'number', icon: Hash, label: t.properties.layouts.number },
                                         { id: 'list', icon: List, label: t.properties.layouts.list },
@@ -454,10 +548,10 @@ Return ONLY the transformed text.
                                     ].map((layout) => (
                                          <button
                                             key={layout.id}
-                                            onClick={() => updateSlide(activeSlide.id, { layout: layout.id as any })}
+                                            onClick={() => updateSlide(activeSlide.id, { layoutVariant: layout.id as any })}
                                             className={cn(
                                                 "flex flex-col items-center justify-center p-2 rounded-lg border transition-all duration-200",
-                                                activeSlide.layout === layout.id
+                                                activeSlide.layoutVariant === layout.id
                                                     ? 'border-brand-500 bg-brand-50 text-brand-700 ring-2 ring-brand-500 shadow-sm transform scale-[1.02]'
                                                     : 'border-slate-200 hover:border-brand-300 hover:bg-slate-50 text-slate-500 hover:text-slate-700'
                                             )}
@@ -470,7 +564,7 @@ Return ONLY the transformed text.
                             </div>
 
                             {/* Helper for specific layouts (e.g., Image URL for Full Image) */}
-                            {activeSlide.layout === 'full-image' && (
+                            {activeSlide.layoutVariant === 'image-full' && (
                                 <div className="space-y-1.5">
                                      <Label className="text-xs text-slate-500">{t.properties.imageUrl}</Label>
                                       <div className="flex gap-2">
@@ -513,6 +607,23 @@ Return ONLY the transformed text.
                                 </div>
                             </div>
 
+                            {/* Icon Picker for relevant layouts */}
+                            {['quote', 'checklist', 'comparison'].includes(activeSlide.layoutVariant as string) && (
+                                <div className="space-y-1.5 pt-2">
+                                    <Label className="text-xs text-slate-500">Icono del Slide</Label>
+                                    <div className="flex gap-2 items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                         <IconPicker
+                                             selectedIcon={activeSlide.content.icon || (activeSlide.layoutVariant === 'quote' ? 'quote' : 'check-circle')}
+                                             onSelect={(icon) => updateSlide(activeSlide.id, { content: { ...activeSlide.content, icon } })}
+                                         />
+                                         <div className="flex flex-col">
+                                            <span className="text-xs font-semibold text-slate-700">Cambiar Icono</span>
+                                            <span className="text-[10px] text-slate-400">Selecciona un icono de la librería</span>
+                                         </div>
+                                    </div>
+                                </div>
+                            )}
+
                         </div>
                     </ScrollArea>
                 </TabsContent>
@@ -528,7 +639,7 @@ Return ONLY the transformed text.
                                    <h3 className="text-sm font-semibold text-slate-800">{t.properties.globalDesign}</h3>
                                 </div>
                                 <div className="grid grid-cols-3 gap-2">
-                                   {['1:1', '4:5', '9:16'].map((ratio) => (
+                                    {['1:1', '4:5', '9:16'].map((ratio) => (
                                        <button 
                                          key={ratio}
                                          onClick={() => updateDesign({ aspectRatio: ratio as any })}
@@ -545,7 +656,38 @@ Return ONLY the transformed text.
                                 </div>
                             </div>
 
+                            {/* THEME GALLERY (NEW) */}
+                            <div className="space-y-4 pt-2 border-t border-slate-100">
+                                <div className="flex items-center gap-2 mb-1">
+                                   <Sparkles className="w-4 h-4 text-brand-500" />
+                                   <h3 className="text-sm font-semibold text-slate-800">Temas y Estilos</h3>
+                                </div>
+                                <ThemeGallery />
+                            </div>
+
+                            <div className="h-px bg-slate-100" />
+
                             {/* Creator Profile */}
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Sparkles className="w-4 h-4 text-brand-500" />
+                                    <Sparkles className="w-4 h-4 text-brand-500" />
+                                    <h3 className="text-sm font-semibold text-slate-800">Personalidad IA</h3>
+                                </div>
+                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <ToneSlider 
+                                        value={project.settings?.tone ?? 50}
+                                        onChange={(val) => updateSettings({ tone: val })}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* RETENTION CHART (NEW) */}
+                            <div className="space-y-4 pt-4 border-t border-slate-100">
+                               <RetentionChart slides={project.slides} />
+                               <HeadlineBattle />
+                            </div>
+
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 mb-1">
                                     <User className="w-4 h-4 text-brand-500" />

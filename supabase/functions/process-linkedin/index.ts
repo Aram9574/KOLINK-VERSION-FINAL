@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
         console.warn("[process-linkedin] Language fetch failed");
     }
 
-    const analysis = await aiService.analyzeLinkedInProfile(consolidatedProfile, language);
+    const analysis = await aiService.analyzeLinkedInProfile(consolidatedProfile, language, undefined, supabaseAdmin);
     console.log("[process-linkedin] AI Analysis successful");
 
     // Phase 4: Persistence Layer

@@ -178,6 +178,8 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
                                 <span className="text-slate-300">•</span>
                                 <Link to="/terms" className="hover:text-brand-600 transition-colors">Terms</Link>
                                 <span className="text-slate-300">•</span>
+                                <Link to="/trust" className="hover:text-brand-600 transition-colors">Trust</Link>
+                                <span className="text-slate-300">•</span>
                                 <p className="font-medium">
                                     {footer.madeWith}
                                 </p>

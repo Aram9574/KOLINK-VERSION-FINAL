@@ -13,14 +13,22 @@ import {
     XCircle,
     Scan,
     Minus,
-    Plus
+    Plus,
+    Copy,
+    Undo,
+    Redo,
+    Eye,
+    Maximize2,
+    Languages
 } from 'lucide-react';
+import { TranslateDialog } from './TranslateDialog';
 import { FullscreenPreview } from './FullscreenPreview';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { exportToPDF } from '@/lib/utils/export';
 import { toast } from 'sonner';
 import { supabase } from '@/services/supabaseClient';
+import { LinkedInPreviewModal } from './LinkedInPreviewModal';
 import { 
     Dialog, 
     DialogContent, 
@@ -32,6 +40,7 @@ import {
 import { ExportModal } from './ExportModal';
 import { useUser } from '@/context/UserContext';
 import { translations } from '@/translations';
+import { ViralGauge } from './ViralGauge';
 
 export const EditorCanvas = () => {
   const { language } = useUser();
@@ -44,6 +53,8 @@ export const EditorCanvas = () => {
   const resetProject = useCarouselStore(state => state.resetProject);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isLinkedInPreviewOpen, setIsLinkedInPreviewOpen] = useState(false);
+  const [isTranslateOpen, setIsTranslateOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [slideToDelete, setSlideToDelete] = useState<string | null>(null);
@@ -60,6 +71,7 @@ export const EditorCanvas = () => {
 
         const currentIndex = slides.findIndex(s => s.id === activeSlideId);
         
+        // Navigation
         if (e.key === 'ArrowRight') {
             if (currentIndex < slides.length - 1) {
                 setActiveSlide(slides[currentIndex + 1].id);
@@ -67,6 +79,35 @@ export const EditorCanvas = () => {
         } else if (e.key === 'ArrowLeft') {
             if (currentIndex > 0) {
                 setActiveSlide(slides[currentIndex - 1].id);
+            }
+        }
+
+        // Deletion
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+            if (activeSlideId && slides.length > 1) {
+                setSlideToDelete(activeSlideId);
+            }
+        }
+
+        // Undo/Redo
+        if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+            e.preventDefault();
+            if (e.shiftKey) {
+                useCarouselStore.getState().redo();
+            } else {
+                useCarouselStore.getState().undo();
+            }
+        }
+        if ((e.metaKey || e.ctrlKey) && e.key === 'y') {
+            e.preventDefault();
+            useCarouselStore.getState().redo();
+        }
+
+        // Duplicate (Ctrl+D)
+        if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
+            e.preventDefault();
+            if (activeSlideId) {
+                useCarouselStore.getState().duplicateSlide(activeSlideId);
             }
         }
     };
@@ -90,6 +131,7 @@ export const EditorCanvas = () => {
       {/* Toolbar */}
       <div className="h-14 border-b border-slate-200 bg-white/80 backdrop-blur-sm flex items-center justify-between px-6 z-10">
         <div className="flex items-center gap-4">
+             {/* New Button */}
              <Button
                 variant="outline"
                 size="sm"
@@ -99,6 +141,37 @@ export const EditorCanvas = () => {
                 <Repeat className="w-3.5 h-3.5 mr-2" />
                 {t.new}
              </Button>
+
+             {/* Viral Gauge - Action 9 */}
+             <div className="hidden md:block">
+                 <ViralGauge />
+             </div>
+
+             {/* Undo/Redo Group */}
+             <div className="flex items-center rounded-md border border-slate-200 bg-white ml-2">
+                 <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => useCarouselStore.getState().undo()} 
+                    disabled={useCarouselStore.getState().history?.past?.length === 0}
+                    className="h-8 w-8 text-slate-500 hover:text-slate-900"
+                    title="Undo (Ctrl+Z)"
+                 >
+                     <Undo className="w-4 h-4" />
+                 </Button>
+                 <div className="w-px h-4 bg-slate-200" />
+                 <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => useCarouselStore.getState().redo()}
+                    disabled={useCarouselStore.getState().history?.future?.length === 0}
+                    className="h-8 w-8 text-slate-500 hover:text-slate-900"
+                    title="Redo (Ctrl+Y)"
+                 >
+                     <Redo className="w-4 h-4" />
+                 </Button>
+             </div>
+
             <div className="text-sm font-medium text-slate-500 border-l border-slate-200 pl-4">
                {slides.length} {t.slides} ({design.aspectRatio})
             </div>
@@ -112,20 +185,61 @@ export const EditorCanvas = () => {
            <Button variant="ghost" size="icon" onClick={() => setZoom(Math.min(3, zoomLevel + 0.1))} title={t.zoomIn}>
              <Plus className="w-4 h-4" />
            </Button>
-           <Button variant="ghost" size="icon" onClick={() => setZoom(1)} title={t.fit}>
-             <Maximize className="w-4 h-4" />
+           
+           {/* Smart Fit */}
+           <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => {
+                    const availableHeight = window.innerHeight - 180;
+                    const fitZoom = availableHeight / (baseHeight * 0.3);
+                    setZoom(Math.min(Math.max(fitZoom, 0.2), 2));
+                }} 
+                title={t.fit}
+            >
+             <Scan className="w-4 h-4" />
            </Button>
 
            <div className="w-px h-4 bg-slate-300 mx-2" />
 
-           {/* Fullscreen Trigger */}
+           {/* Translate */}
+           <Button
+             variant="ghost"
+             size="icon"
+             onClick={() => setIsTranslateOpen(true)}
+             title="Translate Carousel"
+           >
+             <Languages className="w-4 h-4 text-slate-600" />
+           </Button>
+            
+            {/* Focus Mode */}
+           <Button
+             variant={useCarouselStore(state => state.editor.isFocusMode) ? "secondary" : "ghost"}
+             size="icon"
+             onClick={() => useCarouselStore.getState().setFocusMode(!useCarouselStore.getState().editor.isFocusMode)}
+             title={useCarouselStore(state => state.editor.isFocusMode) ? "Exit Focus Mode" : "Focus Mode"}
+             className={cn(useCarouselStore(state => state.editor.isFocusMode) && "bg-brand-100 text-brand-700")}
+           >
+             <Maximize className="w-4 h-4" />
+           </Button>
+
            <Button
              variant="ghost"
              size="icon"
              onClick={() => setIsFullscreen(true)}
              title={t.fullscreen}
            >
-             <Maximize className="w-4 h-4 text-slate-600" />
+             <Maximize2 className="w-4 h-4 text-slate-600" />
+           </Button>
+
+           {/* LinkedIn Preview Trigger */}
+           <Button
+             variant="ghost"
+             size="icon"
+             onClick={() => setIsLinkedInPreviewOpen(true)}
+             title="LinkedIn Preview"
+           >
+             <Eye className="w-4 h-4 text-slate-600" />
            </Button>
 
            <div className="w-px h-4 bg-slate-300 mx-2" />
@@ -141,20 +255,29 @@ export const EditorCanvas = () => {
 
       {/* Main Scrollable Canvas */}
       <div className="flex-1 overflow-auto flex items-center justify-start p-20 custom-scrollbar">
-         <div className="flex gap-12 px-20">
+         {/* Reorder Group needs to wrap the items */}
+         <Reorder.Group 
+            axis="x" 
+            values={slides} 
+            onReorder={(newSlides) => useCarouselStore.getState().setSlides(newSlides)}
+            className="flex gap-12 px-20 list-none"
+            as="div"
+         >
             <AnimatePresence mode="popLayout">
              {slides.map((slide, index) => (
-                <motion.div
+                <Reorder.Item
                   key={slide.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9, x: -20 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  value={slide}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                  className="relative group cursor-pointer flex-shrink-0"
+                  // Prevent drag when interacting with inputs inside - usually handled by listeners but strict Drag controls help
+                  dragListener={true} 
+                  className="relative group cursor-grab active:cursor-grabbing flex-shrink-0 focus:outline-none"
                   style={{
                      width: baseWidth * visualScale,
                      height: baseHeight * visualScale,
+                     listStyle: 'none'
                   }}
                   onClick={() => setActiveSlide(slide.id)}
                 >
@@ -162,7 +285,7 @@ export const EditorCanvas = () => {
                   <div
                      data-slide-id={slide.id}
                      className={cn(
-                         "rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 bg-white",
+                         "rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 bg-white pointer-events-none select-none", // Disable pointer events on children during drag if needed, usually fine
                          activeSlideId === slide.id ? "ring-[8px] ring-brand-500 ring-offset-8" : "ring-1 ring-slate-200"
                      )}
                      style={{
@@ -170,54 +293,40 @@ export const EditorCanvas = () => {
                          height: baseHeight,
                          transform: `scale(${visualScale})`,
                          transformOrigin: 'top left',
-                         // Allow interactions for drag/drop
-                         pointerEvents: 'auto'
+                         // We disable pointer events on the renderer to prevent text selection during drag 
+                         // unless we want editing. 
+                         // For now, let's keep pointer-events-auto but handle Drag properly.
+                         pointerEvents: 'none' // Usually better for drag handles. But we want to edit.
                      }}
                   >
-                     <SlideRenderer
-                         slide={slide}
-                         design={design}
-                         author={author}
-                         isActive={activeSlideId === slide.id}
-                     />
+                     <div className="pointer-events-auto h-full w-full"> 
+                         <SlideRenderer
+                             slide={slide}
+                             design={design}
+                             author={author}
+                             isActive={activeSlideId === slide.id}
+                         />
+                     </div>
                   </div>
 
-                 {/* Quick Actions Overlay (Appears on Hover) */}
-                 <div className="absolute -top-12 left-0 right-0 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    <div className="flex gap-1 pointer-events-auto">
+                 {/* Quick Actions Overlay (Appears on Hover) - Floating above */}
+                 <div className="absolute -top-14 left-0 right-0 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
+                    <div className="bg-white/90 backdrop-blur shadow-lg rounded-full p-1 flex items-center border border-slate-200">
                         <Button
-                            variant="secondary"
+                            variant="ghost"
                             size="icon"
-                            className="h-8 w-8 rounded-full shadow-md bg-white border-slate-200"
-                            disabled={index === 0}
-                            onClick={(e) => { e.stopPropagation(); useCarouselStore.getState().reorderSlides(index, index - 1); }}
+                            className="h-7 w-7 rounded-full hover:bg-slate-100 text-slate-600"
+                            title="Duplicate"
+                            onClick={(e) => { e.stopPropagation(); useCarouselStore.getState().duplicateSlide(slide.id); }}
                         >
-                            <ChevronLeft className="w-4 h-4" />
+                            <Copy className="w-3.5 h-3.5" />
                         </Button>
+                        <div className="w-px h-3 bg-slate-200 mx-1" />
                         <Button
-                            variant="secondary"
+                            variant="ghost"
                             size="icon"
-                            className="h-8 w-8 rounded-full shadow-md bg-white border-slate-200"
-                            disabled={index === slides.length - 1}
-                            onClick={(e) => { e.stopPropagation(); useCarouselStore.getState().reorderSlides(index, index + 1); }}
-                        >
-                            <ChevronRight className="w-4 h-4" />
-                        </Button>
-                    </div>
-
-                    <div className="flex gap-1 pointer-events-auto">
-                        <Button
-                            variant="secondary"
-                            size="icon"
-                            className="h-8 w-8 rounded-full shadow-md bg-white border-slate-200 hover:text-brand-500"
-                            onClick={(e) => { e.stopPropagation(); useCarouselStore.getState().addSlide(slide.type, index + 1); }}
-                        >
-                            <Repeat className="w-4 h-4" />
-                        </Button>
-                        <Button
-                            variant="secondary"
-                            size="icon" 
-                            className="h-8 w-8 rounded-full shadow-md bg-white border-slate-200 hover:text-red-500"
+                            className="h-7 w-7 rounded-full hover:bg-red-50 text-slate-500 hover:text-red-500"
+                            title="Delete"
                             onClick={(e) => { 
                                 e.stopPropagation(); 
                                 if (slides.length <= 1) {
@@ -227,28 +336,37 @@ export const EditorCanvas = () => {
                                 setSlideToDelete(slide.id); 
                             }}
                         >
-                            <XCircle className="w-4 h-4" />
+                            <XCircle className="w-3.5 h-3.5" />
                         </Button>
                     </div>
                  </div>
 
-                 {/* Slide Index Badge */}
-                 <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-sm text-[10px] font-black text-slate-400 border border-slate-200 uppercase tracking-widest">
-                    Slide {index + 1}
+                 {/* Slide Index Badge & Drag Handle Hint */}
+                 <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+                     <div className="bg-white px-3 py-1 rounded-full shadow-sm text-[10px] font-black text-slate-400 border border-slate-200 uppercase tracking-widest cursor-grab active:cursor-grabbing">
+                        Slide {index + 1}
+                     </div>
+                     <div className="w-1 h-1 rounded-full bg-slate-300 group-hover:bg-slate-400" />
                  </div>
-               </motion.div>
+               </Reorder.Item>
             ))}
             </AnimatePresence>
+            
             {/* Add Slide Button Placeholder */}
-            <div 
-                className="w-24 flex items-center justify-center opacity-50 hover:opacity-100 cursor-pointer transition-opacity"
+            {/* Note: Reorder.Group expects children to be Reorder.Item. We should put this outside or Wrap it? 
+               Reorder.Group treats direct children as draggable. We should put the Add Button OUTSIDE the group 
+               or make it a non-draggable item. Best strictly outside.
+             */}
+         </Reorder.Group>
+         
+         <div 
+                className="w-24 ml-12 flex-shrink-0 flex items-center justify-center opacity-50 hover:opacity-100 cursor-pointer transition-opacity"
                 style={{ height: baseHeight * visualScale }}
                 onClick={() => useCarouselStore.getState().addSlide()}
             >
                 <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-300 hover:text-slate-700 transition-colors">
-                    +
+                    <Plus className="w-6 h-6" />
                 </div>
-            </div>
          </div>
       </div>
 
@@ -266,6 +384,19 @@ export const EditorCanvas = () => {
       <ExportModal 
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
+      />
+
+      <LinkedInPreviewModal
+        isOpen={isLinkedInPreviewOpen}
+        onClose={() => setIsLinkedInPreviewOpen(false)}
+        slides={slides}
+        design={design}
+        author={author}
+      />
+
+      <TranslateDialog 
+        isOpen={isTranslateOpen} 
+        onClose={() => setIsTranslateOpen(false)} 
       />
 
       {/* Confirmation Dialog for New Project */}

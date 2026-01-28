@@ -1,6 +1,36 @@
 import { EmojiDensity, PostLength, ViralFramework, ViralTone } from "../types.ts";
 
 export const es = {
+  auth: {
+    welcomeHeadline: "Accede a tu Centro de Comando Viral",
+    welcomeSub: "Donde el 1% de los creadores construye su audiencia.",
+    signupSub: "Únete a la élite de creadores de contenido asistidos por IA.",
+    joinHeadline: "Reclama tu Ventaja Injusta",
+    ctaLogin: "Iniciar Sistema",
+    ctaSignup: "Desbloquear Acceso Gratuito",
+    emailLabel: "Correo Profesional",
+    passwordLabel: "Llave de Acceso",
+    forgotPassword: "¿Perdiste tu llave?",
+    rememberMe: "Mantener sesión segura",
+    continueWith: "O accede con",
+    newHere: "¿Nuevo en la elité?",
+    alreadyMember: "¿Ya eres miembro?",
+    register: "Solicitar Acceso",
+    login: "Entrar",
+    trust: {
+      security: "Encriptación Militar",
+      noCard: "Sin Tarjeta",
+      users: "+2k Creadores"
+    },
+    reset: {
+      title: "Recuperar Acceso",
+      desc: "Te enviaremos un enlace seguro a tu correo.",
+      button: "Enviar Enlace de Rescate",
+      back: "Volver al Login",
+      success: "Enlace enviado. Revisa tu correo.",
+      error: "No pudimos enviar el enlace. Intenta de nuevo."
+    }
+  },
   nav: {
     features: "Funciones",
     solutions: "Casos de Uso",
@@ -8,6 +38,7 @@ export const es = {
     company: "Empresa",
     login: "Comenzar Gratis",
     getStarted: "Empezar",
+    freeTools: "Herramientas Gratuitas",
     howItWorks: "Cómo Funciona",
     demo: "Demo",
     tools: "Herramientas",
@@ -35,10 +66,18 @@ export const es = {
       videoDemo: { title: "Demo en Vídeo", desc: "Mira Kolink en acción." },
       commonFaq: { title: "FAQ", desc: "Respuestas a dudas comunes." },
       
+      headlineGenerator: { title: "Generador de Hooks", desc: "10 Títulos virales en segundos." },
+      bioGenerator: { title: "Generador de Bios", desc: "Optimiza tu perfil LinkedIn." },
+      viralCalculator: { title: "Calculadora Viral", desc: "Predice el alcance de tus posts." },
+      hooks: { title: "Librería de Ganchos", desc: "100+ Hooks Virales probados." },
+      profileAuditor: { title: "Auditor de Perfil", desc: "Score gratuito de tu perfil." },
+      bestTime: { title: "Mejor Hora", desc: "Calculadora basada en tu sector." },
+      trust: { title: "Centro de Confianza", desc: "Seguridad y cumplimiento." },
       about: { title: "Sobre Nosotros", desc: "Nuestra misión para humanizar la IA." },
       prices: { title: "Precios", desc: "Planes para cada etapa de crecimiento." },
       affiliate: { title: "Programa de Afiliados", desc: "Gana recomendando el futuro." },
       socials: { title: "Síguenos", desc: "Únete a +10k creadores en redes." },
+      viewAll: { title: "Ver todas", desc: "Explora todas las herramientas" }
     }
   },
   footer: {
@@ -75,6 +114,10 @@ export const es = {
       resources: {
         title: "Recursos",
         links: [
+          { label: "Generador de Bios", href: "/tools/bio-generator" },
+          { label: "Calculadora Viral", href: "/tools/viral-calculator" },
+          { label: "Auditoría de Perfil", href: "/tools/profile-auditor" },
+          { label: "Mejor Hora Publicar", href: "/tools/best-time-to-post" },
           { label: "Blog", href: "/#tools" },
           { label: "Noticias", href: "/#tools" },
           { label: "Hoja de Ruta", href: "/#tools" },
@@ -100,6 +143,14 @@ export const es = {
           { label: "Ver todos los sectores →", href: "/tools" },
         ],
       },
+      freeTools: {
+        title: "Herramientas Gratuitas",
+        links: [
+            { label: "Generador de Hooks", href: "/tools/headline-generator" },
+            { label: "Generador de Bios", href: "/tools/bio-generator" },
+            { label: "Carousel Studio", href: "/studio" },
+        ]
+      }
     },
   },
   hero: {
@@ -646,7 +697,15 @@ export const es = {
         { label: "Ciudades", value: "150+" },
         { label: "Idiomas Agente", value: "25+" },
         { label: "Posts/Día", value: "12k" }
-      ]
+      ],
+      magicTools: {
+        improve: "Mejorar Escritura",
+        shorten: "Acortar Texto",
+        expand: "Expandir / Detallar",
+        punchify: "Dar Punch / Gancho",
+        emojify: "Añadir Emojis"
+      },
+      noBrandColors: "No se encontró ADN de marca en tu perfil. Configúralo en Configuración."
     },
     press: {
       title: "Visto En",
@@ -655,6 +714,246 @@ export const es = {
         { name: "Forbes", quote: "'Kolink está redefiniendo la marca personal ejecutiva.'" },
         { name: "ProductHunt", quote: "'#1 Producto de la Semana: Imprescindible.'" }
       ]
+    }
+  },
+  trustPage: {
+    hero: {
+      title: "Centro de Confianza",
+      subtitle: "Tu seguridad es nuestra prioridad #1. Construimos para empresas, protegemos como bancos.",
+      badge: "SEGURIDAD DE GRADO MILITAR"
+    },
+    cards: {
+      encryption: {
+        title: "Encriptación de Grado Bancario",
+        desc: "Todos los datos están encriptados en tránsito (TLS 1.3) y en reposo (AES-256). Ni nosotros podemos ver tus contraseñas."
+      },
+      payment: {
+        title: "Pagos Seguros por Stripe",
+        desc: "No almacenamos tu tarjeta. Los pagos son procesados por Stripe, el estándar de oro en pagos online."
+      },
+      privacy: {
+        title: "Privacidad de Datos",
+        desc: "Tus datos son tuyos. Nunca vendemos tu información a terceros ni entrenamos modelos públicos con tus borradores privados."
+      },
+      uptime: {
+        title: "99.9% Uptime",
+        desc: "Infraestructura redundante distribuida globalmente para garantizar que siempre estés online cuando la viralidad golpea."
+      }
+    },
+    badges: {
+      ssl: "SSL Seguro",
+      gdpr: "Listo para GDPR",
+      pci: "PCI DSS Compliant"
+    },
+    certifications: "Certificaciones y Cumplimiento"
+  },
+  toolsPage: {
+    common: {
+      moreTools: "Más Herramientas",
+      home: "Inicio",
+      tools: "Herramientas",
+      tryPro: "Prueba Pro Gratis",
+      copyToast: "¡Copiado al portapapeles!",
+      conversion: "Convertir a Post",
+      footer: "Kolink AI © 2026. Hecho para Creadores de LinkedIn."
+    },
+    headlineGenerator: {
+      seoTitle: "Generador de Headlines Virales para LinkedIn (Ganchos) | Kolink AI",
+      seoDesc: "Genera 10 titulares virales en segundos para LinkedIn. La herramienta gratuita #1 para escribir ganchos que detienen el scroll.",
+      label: "Herramienta Gratuita",
+      title: "Generador de Headlines",
+      titleHighlight: "Virales",
+      subtitle: "Detén el scroll. Genera 10 ganchos virales optimizados para el algoritmo de LinkedIn en segundos.",
+      roleLabel: "Tu Rol (ej. Fundador)",
+      industryLabel: "Industria",
+      topicLabel: "¿De qué trata tu post?",
+      rolePlaceholder: "ej. CEO, Marketer...",
+      industryPlaceholder: "ej. SaaS, Real Estate...",
+      topicPlaceholder: "ej. Cómo escalar un negocio sin burnout...",
+      button: "Obtener Headlines",
+      generating: "Generando...",
+      resultTitle: "10 Ganchos Virales para Ti",
+      whyTitle: "¿Por qué importan los Headlines?",
+      whyDesc: "Las primeras 2 líneas de tu post determinan el 80% de tu éxito. Si no hacen clic en 'Ver más', el algoritmo asume que tu contenido es irrelevante.",
+      frameworks: [
+        { title: "El Contrario", desc: "Desafía creencias comunes para generar curiosidad." },
+        { title: "La Lista", desc: "Muestra valor cuantificable inmediatamente." },
+        { title: "La Historia", desc: "Abre con un momento dramático o vulnerable." }
+      ]
+    },
+    bioGenerator: {
+      seoTitle: "Generador de Bios de LinkedIn | Kolink AI",
+      seoDesc: "Crea el titular de perfil perfecto en segundos. Optimiza para SEO y autoridad con nuestra herramienta gratuita de IA.",
+      label: "Optimizador de Perfil",
+      title: "Generador de Bios",
+      titleHighlight: "LinkedIn",
+      subtitle: "Lo primero que ven los reclutadores es tu titular. Hazlo imposible de ignorar.",
+      roleLabel: "Tu Rol",
+      nicheLabel: "Nichode / Audiencia",
+      keywordsLabel: "Top 3 Palabras Clave (SEO)",
+      styleLabel: "Estilo",
+      styles: {
+        professional: "Profesional",
+        creative: "Creativo",
+        minimalist: "Minimalista"
+      },
+      button: "Generar Bios",
+      generating: "Optimizando...",
+      resultTitle: "5 Titulares Optimizados",
+      ctaBtn: "Obtener Auditoría",
+      ctaBox: {
+        title: "¿Quieres un Perfil Completo?",
+        subtitle: "Audita tu perfil completo gratis.",
+        button: "Auditoría Gratis"
+      }
+    },
+    viralCalculator: {
+      seoTitle: "Calculadora de Viralidad de LinkedIn | Kolink AI",
+      seoDesc: "Predice el potencial viral de tus posts antes de publicar. Calculadora IA gratuita basada en tu engagement y calidad de contenido.",
+      label: "Analítica Predictiva",
+      title: "Calculadora de",
+      titleHighlight: "Viralidad",
+      subtitle: "Deja de adivinar. Nuestra IA analiza tus seguidores, tasa de engagement y estructura de contenido para predecir el alcance.",
+      followersLabel: "Seguidores",
+      followersPlaceholder: "ej. 5000",
+      avgLikesLabel: "Promedio de Likes",
+      avgLikesPlaceholder: "ej. 150",
+      contentLabel: "Pega tu Borrador (Draft)",
+      contentPlaceholder: "Pega el contenido de tu post aquí...",
+      button: "Calcular Puntaje Viral",
+      analyzing: "Analizando...",
+      resultLabel: "Probabilidad Viral",
+      suggestionsLabel: "Sugerencias de IA",
+      cta: "Mejorar con AI Studio"
+    },
+    profileScorecard: {
+      seoTitle: "Puntuación de Perfil LinkedIn | Herramienta de Auditoría Gratuita",
+      seoDesc: "Obtén una puntuación instantánea para tu perfil de LinkedIn. Nuestra IA analiza tu titular y resumen para revelar oportunidades ocultas de crecimiento.",
+      label: "Auditor de Perfiles",
+      title: "Califica mi",
+      titleHighlight: "Perfil",
+      subtitle: "¿Tu perfil de LinkedIn está ahuyentando a clientes de alto valor? Obtén una puntuación brutal y honesta en segundos.",
+      headlineLabel: "Tu Titular (Headline)",
+      headlinePlaceholder: "ej. Ayudando a Fundadores SaaS a escalar a $10M...",
+      aboutLabel: "Resumen (About) (Opcional)",
+      aboutPlaceholder: "Pega tu sección 'Acerca de' aquí para un análisis más profundo...",
+      button: "Obtener mi Puntuación",
+      analyzing: "Auditando...",
+      emptyTitle: "Listo para Auditar",
+      emptyDesc: "Ingresa tus detalles para revelar tu puntuación de autoridad.",
+      scoreLabel: "Puntuación de Autoridad",
+      good: "Bueno",
+      needsWork: "Necesita Mejora",
+      diagnosisLabel: "Diagnóstico",
+      cta: "Desbloquear Informe PDF Completo",
+      ctaSub: "Obtén un análisis profundo de 20 páginas con Kolink Pro."
+    },
+    bestTime: {
+      seoTitle: "Mejor Hora para Publicar en LinkedIn | Herramienta IA Gratuita",
+      seoDesc: "Encuentra el momento perfecto para publicar en LinkedIn y maximizar tu alcance. Mapa de calor algorítmico personalizado por industria.",
+      label: "Algoritmo de Tiempo",
+      title: "Mejor Hora para",
+      titleHighlight: "Publicar",
+      subtitle: "Determina algorítmicamente las ventanas de mayor engagement para tu industria específica.",
+      industryLabel: "Selecciona tu Industria",
+      industries: {
+        tech: "Tecnología y SaaS",
+        marketing: "Marketing y Agencias",
+        realEstate: "Bienes Raíces",
+        finance: "Finanzas y Consultoría",
+        healthcare: "Salud y Medicina",
+        education: "Educación y Coaching",
+        general: "Marca Personal / General"
+      },
+      button: "Revelar Mejores Horas",
+      analyzing: "Analizando Datos...",
+      heatmapTitle: "Tu Mapa de Calor de Engagement",
+      emptyState: "Selecciona tu industria y haz clic en calcular para ver tu mapa de calor personalizado.",
+      low: "Bajo",
+      high: "Alto",
+      schedCtaTitle: "¿Quieres programar automáticamente?",
+      schedCtaDesc: "Kolink Pro programa tus posts en tus horas óptimas.",
+      schedCtaBtn: "Programar Post",
+      whyTitle: "¿Por qué importa la hora de publicación?",
+      whyDesc: "La 'Hora Dorada' en LinkedIn se refiere a los primeros 60 minutos. El algoritmo prueba tu contenido. Si interactúan, se impulsa.",
+      bestDaysTitle: "Mejores Días",
+      bestDaysDesc: "Martes, Miércoles y Jueves suelen tener un 25-40% más de engagement en B2B.",
+      worstTimesTitle: "Peores Horas",
+      worstTimesDesc: "Lunes antes de las 10 AM y Viernes después de las 4 PM suelen tener menor retención.",
+      days: {
+        Mon: "Lun",
+        Tue: "Mar",
+        Wed: "Mié",
+        Thu: "Jue",
+        Fri: "Vie",
+        Sat: "Sáb",
+        Sun: "Dom"
+      },
+      timeSlots: {
+        "8am - 10am": "8am - 10am",
+        "10am - 12pm": "10am - 12pm",
+        "12pm - 2pm": "12pm - 2pm",
+        "2pm - 5pm": "2pm - 5pm",
+        "5pm - 8pm": "5pm - 8pm"
+      }
+    },
+    hookGallery: {
+      seoTitle: "Librería de Ganchos Virales para LinkedIn | +50 Openers Probados",
+      seoDesc: "Explora nuestra librería de ganchos de alta conversión. Copia plantillas para posts Contreras, de Datos, Historias y Listas. Recurso gratuito.",
+      label: "Librería Viral",
+      title: "La Galería Definitiva de",
+      titleHighlight: "Ganchos",
+      subtitle: "Deja de mirar la página en blanco. Explora líneas de apertura probadas que captan la atención y generan engagement.",
+      filters: {
+        all: "Todos",
+        contrarian: "Contreras",
+        data: "Datos",
+        story: "Historia",
+        listicle: "Lista",
+        question: "Pregunta",
+        direct: "Directo"
+      },
+      card: {
+        useInStudio: "Usar en Studio",
+        copy: "Copiar",
+        copied: "¡Copiado!",
+        example: "Ej:"
+      },
+      empty: {
+        title: "No se encontraron ganchos",
+        desc: "Intenta con otra categoría."
+      },
+      cta: {
+        title: "¿Necesitas ganchos personalizados para tu marca?",
+        desc: "Nuestra IA analiza tu voz única y genera ganchos infinitos adaptados a tu industria.",
+        button: "Probar Generador IA"
+      },
+      categories: {
+          Contrarian: "Contreras",
+          Data: "Datos",
+          Story: "Historia",
+          Listicle: "Lista",
+          Question: "Pregunta",
+          Direct: "Directo"
+      }
+    },
+    vsPage: {
+      notFound: "Comparación No Encontrada",
+      returnTools: "Volver a Herramientas",
+      startTrial: "Empezar Prueba Gratis",
+      seeAllTools: "Ver Todas las Herramientas",
+      switchHeadline: "Cámbiate a la Alternativa",
+      switchHeadlineHighlight: "Completa",
+      feature: "Característica",
+      monthlyCost: "Costo Mensual",
+      pricesDisclaimer: "* Precios comparados basados en planes Pro mensuales a Oct 2025.",
+      whySwitch: "Por qué los creadores se cambian a Kolink",
+      designedFor: "Diseñado para el algoritmo moderno de LinkedIn que favorece el contenido visual.",
+      theGap: "La Brecha de",
+      savings: "Ahorro / Mes",
+      readyHeadline: "¿Listo para mejorar tu flujo de trabajo?",
+      tryFree: "Prueba Kolink Gratis",
+      noCard: "No se requiere tarjeta de crédito para herramientas gratuitas."
     }
   },
   cro: {
@@ -789,7 +1088,35 @@ export const es = {
       brandKits: "Kits de Marca",
       saveKits: "Guardar Kit",
       brandKitHint: "Guarda tus colores de marca para reusarlos.",
+      export: {
+         watermarkNotice: "Plan Gratis: Marca de agua añadida",
+         removeWatermark: "Mejorar para Eliminar",
+         createdWith: "Creado con Kolink.ai"
+      },
+      brandKit: {
+        title: "Mis Brand Kits",
+        description: "Tus identidades visuales guardadas.",
+        saveCurrent: "Guardar Actual",
+        saveDialogTitle: "Guardar Kit de Marca",
+        saveDialogDesc: "Guarda los colores y fuentes actuales como un preset reutilizable.",
+        kitNameLabel: "Nombre del Kit",
+        kitNamePlaceholder: "Ej. Marca Personal 2026",
+        saveButton: "Guardar Kit",
+        emptyState: "No tienes kits guardados aún.",
+        deleteConfirm: "¿Borrar este kit?",
+        deletedSuccess: "Kit eliminado",
+        savedSuccess: "Kit de marca guardado",
+        saveError: "Error al guardar el kit",
+        applied: "Kit \"{{name}}\" aplicado"
+      },
       primaryFont: "Fuente Principal",
+      magicTools: {
+        improve: "Mejorar Escrita",
+        shorten: "Acortar",
+        expand: "Expandir",
+        punchify: "Gancho Viral",
+        emojify: "Añadir Emojis"
+      },
       layouts: {
         default: "Default",
         fullImg: "Img Completa",

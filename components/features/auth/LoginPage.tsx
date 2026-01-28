@@ -6,6 +6,7 @@ import { useToast } from "../../../context/ToastContext";
 import { Helmet } from "react-helmet-async";
 import { useUser } from "../../../context/UserContext";
 import { SignInPage, Testimonial } from "../../ui/sign-in";
+import { translations } from "../../../translations";
 
 const sampleTestimonials: Testimonial[] = [
     // Row 1
@@ -72,7 +73,11 @@ const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const [isLoginMode, setIsLoginMode] = useState(true);
+    const [isResetMode, setIsResetMode] = useState(false); // New State for Reset Password
     const [isLoading, setIsLoading] = useState(false);
+
+    // Translations
+    const t = translations[language]?.auth || translations['en'].auth;
 
     // Reset loading state if session is established or component re-mounts
     useEffect(() => {
@@ -94,8 +99,28 @@ const LoginPage: React.FC = () => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const email = formData.get('email') as string;
-        const password = formData.get('password') as string;
+        
+        // Handle Password Reset
+        if (isResetMode) {
+            setIsLoading(true);
+            try {
+                // @ts-ignore
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${window.location.origin}/auth/update-password`,
+                });
+                if (error) throw error;
+                toast.success(t.reset?.success || "Link sent check email.", "Email Sent");
+                setIsResetMode(false); // Go back to login
+            } catch (error: any) {
+                console.error("Reset Error:", error);
+                toast.error(error.message || t.reset?.error || "Error", "Error");
+            } finally {
+                setIsLoading(false);
+            }
+            return;
+        }
 
+        const password = formData.get('password') as string;
         setIsLoading(true);
 
         try {
@@ -162,44 +187,73 @@ const LoginPage: React.FC = () => {
         }
     };
 
-    const handleResetPassword = () => {
-        toast.info(
-            language === "es"
-                ? "Función de recuperación en mantenimiento. Por favor contacta a soporte."
-                : "Reset password feature in maintenance. Please contact support.",
-            "Info"
-        );
-    };
-
     return (
         <>
             <Helmet>
                 <title>
-                    {isLoginMode
-                        ? (language === "es" ? "Iniciar Sesión - Kolink" : "Login - Kolink")
-                        : (language === "es" ? "Crear Cuenta - Kolink" : "Sign Up - Kolink")}
+                    {isResetMode
+                        ? (language === "es" ? "Recuperar Password - Kolink" : "Recover Password - Kolink") 
+                        : isLoginMode
+                            ? (language === "es" ? "Iniciar Sesión - Kolink" : "Login - Kolink")
+                            : (language === "es" ? "Crear Cuenta - Kolink" : "Sign Up - Kolink")}
                 </title>
+                <meta name="description" content={language === "es" ? "Accede a tu cuenta de Kolink y gestiona tu crecimiento en LinkedIn con IA." : "Login to your Kolink account and manage your LinkedIn growth with AI."} />
             </Helmet>
 
-            <SignInPage
-                title={
-                    isLoginMode 
-                        ? "Bienvenido de nuevo"
-                        : "Crea tu cuenta"
-                }
-                description={
-                    isLoginMode
-                        ? "Accede a tu workspace de creación y lleva tu LinkedIn al siguiente nivel."
-                        : "Únete a la élite de creadores de contenido asistidos por IA."
-                }
-                heroImageSrc="https://images.unsplash.com/photo-1642615835477-d303d7dc9ee9?w=2160&q=80"
-                testimonials={sampleTestimonials}
-                onSignIn={handleAuth}
-                onLinkedInSignIn={handleSocialLogin}
-                onResetPassword={handleResetPassword}
-                onCreateAccount={() => setIsLoginMode(!isLoginMode)}
-                isLoginMode={isLoginMode}
-            />
+            {isResetMode ? (
+                 <div className="h-[100dvh] flex items-center justify-center bg-slate-50 font-sans p-6">
+                    <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl">
+                        <h2 className="text-2xl font-bold text-slate-900 mb-2">{t.reset?.title || "Recover Access"}</h2>
+                        <p className="text-slate-500 mb-6">{t.reset?.desc || "We'll send a link to your email."}</p>
+                        <form onSubmit={handleAuth} className="space-y-4">
+                            <div>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 block mb-2">{t.emailLabel}</label>
+                                <input name="email" type="email" required placeholder="tu@email.com" className="w-full bg-slate-50 border border-slate-200 text-sm p-4 rounded-2xl focus:outline-none focus:border-brand-500 font-medium text-slate-900" />
+                            </div>
+                            <button type="submit" className="w-full rounded-2xl bg-brand-600 py-4 font-black uppercase tracking-widest text-[11px] text-white hover:bg-brand-500 transition-all shadow-lg shadow-brand-500/20">
+                                {t.reset?.button || "Send Link"}
+                            </button>
+                            <button type="button" onClick={() => setIsResetMode(false)} className="w-full text-center text-slate-400 text-sm font-bold hover:text-slate-600 mt-4">
+                                {t.reset?.back || "Back"}
+                            </button>
+                        </form>
+                    </div>
+                 </div>
+            ) : (
+                <SignInPage
+                    title={
+                        isLoginMode 
+                            ? t.welcomeHeadline
+                            : t.joinHeadline
+                    }
+                    description={
+                        isLoginMode
+                            ? t.welcomeSub
+                            : t.signupSub
+                    }
+                    heroImageSrc="https://images.unsplash.com/photo-1642615835477-d303d7dc9ee9?w=2160&q=80"
+                    testimonials={sampleTestimonials}
+                    onSignIn={handleAuth}
+                    onLinkedInSignIn={handleSocialLogin}
+                    onResetPassword={() => setIsResetMode(true)}
+                    onCreateAccount={() => setIsLoginMode(!isLoginMode)}
+                    isLoginMode={isLoginMode}
+                    // Dynamic Props
+                    emailLabel={t.emailLabel}
+                    passwordLabel={t.passwordLabel}
+                    forgotPasswordLabel={t.forgotPassword}
+                    rememberMeLabel={t.rememberMe}
+                    loginButtonLabel={t.login}
+                    signupButtonLabel={t.register}
+                    orContinueLabel={t.continueWith}
+                    linkedinButtonLabel={language === "es" ? "Continuar con LinkedIn" : "Continue with LinkedIn"}
+                    newHereLabel={t.newHere}
+                    alreadyMemberLabel={t.alreadyMember}
+                    registerLinkText={t.ctaSignup}
+                    loginLinkText={t.ctaLogin}
+                    trustBadges={t.trust}
+                />
+            )}
             
             {/* Loading Overlay */}
             {isLoading && (

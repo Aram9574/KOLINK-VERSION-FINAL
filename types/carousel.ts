@@ -3,7 +3,7 @@ export type AspectRatio = '1:1' | '4:5' | '9:16';
 export type Platform = 'linkedin' | 'instagram' | 'tiktok' | 'twitter';
 
 export type PatternType = 'dots' | 'grid' | 'waves' | 'none' | 'noise' | 'checkers' | 'horizontal-lines' | 'half-tone' | 'leaves';
-export type LayoutVariant = 'default' | 'big-number' | 'quote' | 'checklist' | 'comparison' | 'code' | 'image-full';
+export type LayoutVariant = 'default' | 'classic' | 'big-number' | 'quote' | 'checklist' | 'comparison' | 'code' | 'image-full' | 'intro' | 'outro';
 
 export interface SlideContent {
   title?: string;
@@ -11,6 +11,7 @@ export interface SlideContent {
   body?: string; // Main text / bullet points
   image_url?: string;
   image?: string; // Alias for image_url or specific slide image
+  icon?: string; // Icon name from Lucide
   backgroundImage?: string; // For full background images
   cta_text?: string;
   visual_hint?: string; // Suggestion for icon/graphic
@@ -91,6 +92,28 @@ export interface CarouselProject {
   };
   slides: CarouselSlide[];
   design: CarouselDesign;
+  settings?: {
+    tone: number; // 0 (Serious) to 100 (Viral/Casual)
+    language?: string;
+  };
   createdAt: number;
   updatedAt: number;
+}
+
+export interface BrandKit {
+  id: string;
+  name: string;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    text: string;
+  };
+  fonts: {
+    heading: string;
+    body: string;
+  };
+  logos?: string[]; // URLs
+  created_at?: string;
 }

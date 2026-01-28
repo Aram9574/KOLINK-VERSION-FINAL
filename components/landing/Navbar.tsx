@@ -5,7 +5,7 @@ import {
     ArrowRight, Sparkles, Layout, Zap, UserCheck, MessageSquare, 
     Lightbulb, Building2, Scale, Rocket, Megaphone, HeartPulse,
     Rss, HelpCircle, PlayCircle, Info, CreditCard, Users,
-    Globe
+    Globe, TrendingUp
 } from "lucide-react";
 import { APP_DOMAIN } from "../../constants.ts";
 import { translations } from "../../translations.ts";
@@ -31,11 +31,11 @@ const Navbar: React.FC<NavbarProps> = (
 
     const featureItems = [
         { icon: <Sparkles className="w-5 h-5" />, title: t.nav.items.postEditor.title, desc: t.nav.items.postEditor.desc, href: "#hero", onClick: (e: any) => scrollToSection(e, "hero") },
-        { icon: <Layout className="w-5 h-5" />, title: t.nav.items.carouselStudio.title, desc: t.nav.items.carouselStudio.desc, href: "#tools", onClick: (e: any) => scrollToSection(e, "tools") },
+        { icon: <Layout className="w-5 h-5" />, title: t.nav.items.carouselStudio.title, desc: t.nav.items.carouselStudio.desc, href: "/carousel-studio" }, // Fixed Link
         { icon: <Zap className="w-5 h-5" />, title: t.nav.items.autoPilot.title, desc: t.nav.items.autoPilot.desc, href: "#howitworks", onClick: (e: any) => scrollToSection(e, "howitworks") },
-        { icon: <UserCheck className="w-5 h-5" />, title: t.nav.items.profileAudit.title, desc: t.nav.items.profileAudit.desc, href: "#tools", onClick: (e: any) => scrollToSection(e, "tools") },
+        { icon: <UserCheck className="w-5 h-5" />, title: t.nav.items.profileAudit.title, desc: t.nav.items.profileAudit.desc, href: "/tools/profile-auditor" }, // Fixed Link
         { icon: <MessageSquare className="w-5 h-5" />, title: t.nav.items.insightResponder.title, desc: t.nav.items.insightResponder.desc, href: "#tools", onClick: (e: any) => scrollToSection(e, "tools") },
-        { icon: <Lightbulb className="w-5 h-5" />, title: t.nav.items.ideas.title, desc: t.nav.items.ideas.desc, href: "#tools", onClick: (e: any) => scrollToSection(e, "tools") },
+        { icon: <Lightbulb className="w-5 h-5" />, title: t.nav.items.ideas.title, desc: t.nav.items.ideas.desc, href: "/hooks" }, // Added Hooks
     ];
 
     const solutionItems = [
@@ -44,10 +44,21 @@ const Navbar: React.FC<NavbarProps> = (
         { icon: <Scale className="w-5 h-5" />, title: t.nav.items.nicheLawyers.title, desc: t.nav.items.nicheLawyers.desc, href: "/tools/abogados-y-legal" },
         { icon: <Megaphone className="w-5 h-5" />, title: t.nav.items.nicheMarketing.title, desc: t.nav.items.nicheMarketing.desc, href: "/tools/especialistas-marketing" },
         { icon: <HeartPulse className="w-5 h-5" />, title: t.nav.items.nicheHealth.title, desc: t.nav.items.nicheHealth.desc, href: "/tools/doctores-y-salud" },
-        { icon: <Globe className="w-5 h-5" />, title: "Ver todos", desc: "Explora todos los sectores disponibles", href: "/tools" },
+        { icon: <Globe className="w-5 h-5" />, title: t.nav.items.viewAll.title, desc: t.nav.items.viewAll.desc, href: "/tools" },
+    ];
+
+    const freeToolItems = [
+        { icon: <Zap className="w-5 h-5" />, title: t.nav.items.headlineGenerator.title, desc: t.nav.items.headlineGenerator.desc, href: "/tools/headline-generator" },
+        { icon: <UserCheck className="w-5 h-5" />, title: t.nav.items.bioGenerator.title, desc: t.nav.items.bioGenerator.desc, href: "/tools/bio-generator" },
+        { icon: <TrendingUp className="w-5 h-5" />, title: t.nav.items.viralCalculator?.title || "Viral Calculator", desc: t.nav.items.viralCalculator?.desc || "Predict virality", href: "/tools/viral-calculator" },
+        { icon: <Layout className="w-5 h-5" />, title: t.nav.items.carouselStudio.title, desc: t.nav.items.carouselStudio.desc, href: "/carousel-studio" },
+        { icon: <UserCheck className="w-5 h-5" />, title: t.nav.items.profileAudit.title, desc: t.nav.items.profileAudit.desc, href: "/tools/profile-auditor" },
+        { icon: <TrendingUp className="w-5 h-5" />, title: t.nav.items.bestTime.title, desc: t.nav.items.bestTime.desc, href: "/tools/best-time-to-post" },
+        { icon: <Sparkles className="w-5 h-5" />, title: t.nav.items.viewAll.title, desc: t.nav.items.viewAll.desc, href: "/tools" },
     ];
 
     const resourceItems = [
+        { icon: <Lightbulb className="w-5 h-5" />, title: t.nav.items.hooks.title, desc: t.nav.items.hooks.desc, href: "/hooks" },
         { icon: <Rss className="w-5 h-5" />, title: t.nav.items.blog.title, desc: t.nav.items.blog.desc, href: "#tools", onClick: (e: any) => scrollToSection(e, "tools") },
         { icon: <HelpCircle className="w-5 h-5" />, title: t.nav.items.helpCenter.title, desc: t.nav.items.helpCenter.desc, href: "#faq", onClick: (e: any) => scrollToSection(e, "faq") },
         { icon: <PlayCircle className="w-5 h-5" />, title: t.nav.items.videoDemo.title, desc: t.nav.items.videoDemo.desc, href: "#demo", onClick: (e: any) => scrollToSection(e, "demo") },
@@ -87,6 +98,13 @@ const Navbar: React.FC<NavbarProps> = (
                         items={featureItems} 
                         isOpen={openMenu === "features"}
                         onMouseEnter={() => setOpenMenu("features")}
+                        onMouseLeave={() => setOpenMenu(null)}
+                    />
+                    <MegaMenu 
+                        title={t.nav.freeTools} 
+                        items={freeToolItems} 
+                        isOpen={openMenu === "freeTools"}
+                        onMouseEnter={() => setOpenMenu("freeTools")}
                         onMouseLeave={() => setOpenMenu(null)}
                     />
                     <MegaMenu 

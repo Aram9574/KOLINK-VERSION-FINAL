@@ -31,7 +31,7 @@ ${brandContext}
 
     return await this.retryWithBackoff(async () => {
       // Construct parts manually
-      const parts: any[] = [];
+      const parts: { text?: string; inline_data?: { mime_type: string; data: string } }[] = [];
       if (textContext) parts.push({ text: `POST TEXT CONTENT:\n${textContext}` });
       if (imageBase64) {
         // Extract real mime type if present in data URL, default to png
@@ -79,7 +79,7 @@ ${brandContext}
       console.log("[EngagementService] Sending payload to Gemini (Image present:", !!imageBase64, ")");
       // console.log("Payload:", JSON.stringify(payload, null, 2)); // Too verbose with image
 
-      const data = await this.generateViaFetch(this.model, payload);
+      const data = await this.generateViaFetch(this.model, payload) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
       
       console.log("[EngagementService] Received data from Gemini");
 
@@ -92,13 +92,13 @@ ${brandContext}
       
       try {
         return JSON.parse(textResult);
-      } catch (parseError) {
+      } catch (_parseError) {
         console.error("[EngagementService] JSON Parse Error. Raw Text:", textResult);
         // Attempt to clean markdown code blocks if present (BaseAIService helper might be useful or direct regex)
         const cleanText = textResult.replace(/```json/g, "").replace(/```/g, "").trim();
         try {
             return JSON.parse(cleanText);
-        } catch (retryError) {
+        } catch (_retryError) {
             throw new Error("Failed to parse AI response as JSON: " + textResult.substring(0, 100) + "...");
         }
       }

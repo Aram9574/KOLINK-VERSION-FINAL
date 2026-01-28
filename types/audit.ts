@@ -6,6 +6,15 @@ export interface AuditSection {
   missing_critical_skills?: string[];
 }
 
+export interface ExperienceItem {
+  company: string;
+  position: string;
+  duration: string;
+  description: string;
+  analysis?: string;
+  suggestions?: string[];
+}
+
 export interface LinkedInAuditResult {
   authority_score: number;
   visual_score: number;
@@ -26,9 +35,16 @@ export interface LinkedInAuditResult {
     company?: string;
     location?: string;
     skills?: string[];
-    experiences?: { company: string; position: string; duration: string; description: string }[];
+    experiences?: ExperienceItem[];
     education?: string[];
   };
+  // Add direct experience property if intended by AuditResults usage
+  experience?: ExperienceItem[]; // AuditResults uses .experience directly on results
+  headline?: { analysis: string; current: string; suggested: string };
+  about?: { analysis: string; missingKeywords: string[]; suggested: string };
+  skills?: { analysis: string; missing: string[]; current: string[] };
+  summary?: string;
+  score?: number; // AuditResults uses results.score directly
 }
 
 export type AuditResult = LinkedInAuditResult;

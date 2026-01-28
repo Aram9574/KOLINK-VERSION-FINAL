@@ -5,6 +5,7 @@ import { useUser } from "../../../context/UserContext";
 import { PostProvider, usePosts } from "../../../context/PostContext";
 import { useSubscription } from "../../../hooks/useSubscription";
 import { usePostGeneration } from "../../../hooks/usePostGeneration";
+import { ViralTone } from "../../../types";
 
 import { useUserSync } from "../../../hooks/useUserSync";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -233,7 +234,7 @@ const DashboardContent: React.FC = () => {
                     params: {
                         topic: decodeURIComponent(topic),
                         // Default options for a quick win
-                        tone: "Professional",
+                        tone: ViralTone.PROFESSIONAL,
                         length: "MEDIUM",
                         framework: "PAS", 
                     },

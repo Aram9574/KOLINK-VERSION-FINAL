@@ -97,8 +97,10 @@ export interface UserSubscription {
     updated_at: string;
 }
 
+export type ToneArchetype = 'Educator' | 'Challenger' | 'Storyteller' | 'Analyst';
+
 export interface ExpertiseProfile {
-  archetype: string;
+  archetype: ToneArchetype;
   keywords: string[];
   negativeKeywords: string[];
   bioSummary?: string;

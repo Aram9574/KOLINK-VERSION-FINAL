@@ -1,3 +1,4 @@
+import { z, ZodSchema } from "npm:zod";
 
 export interface GeminiCandidate {
   content?: {
@@ -23,18 +24,19 @@ export class BaseAIService {
 
   protected async retryWithBackoff<T>(
     operation: () => Promise<T>,
-    retries = 3,
-    delay = 2000,
+    retries = 5,
+    delay = 4000,
   ): Promise<T> {
     try {
       return await operation();
     } catch (error: unknown) {
       const err = error as { status?: number; message?: string };
+      // Handle 429 (Too Many Requests) and 503 (Service Unavailable)
       if (
         retries > 0 &&
-        (err.status === 503 || err.status === 429 || err.message?.includes("overloaded"))
+        (err.status === 503 || err.status === 429 || err.message?.includes("overloaded") || err.message?.includes("Resource exhausted"))
       ) {
-        console.log(`[BaseAIService] Service overloaded. Retrying in ${delay}ms... (${retries} left)`);
+        console.log(`[BaseAIService] Service overloaded/exhausted. Retrying in ${delay}ms... (${retries} left)`);
         await new Promise((r) => setTimeout(r, delay));
         return this.retryWithBackoff(operation, retries - 1, delay * 2);
       }
@@ -118,6 +120,59 @@ export class BaseAIService {
       if (!text) throw new Error("No text returned from Gemini API");
 
       return text.trim().replace(/\*\*/g, "");
+    });
+  }
+
+  /**
+   * Generates content and validates it against a Zod schema.
+   * Retries automatically if validation fails.
+   */
+  async generateWithSchema<T>(
+    model: string,
+    input: string | { text?: string; inline_data?: { mime_type: string; data: string } }[],
+    schema: ZodSchema<T>,
+    systemInstruction: string = "You are a helpful AI assistant. Output strictly valid JSON.",
+    responseSchema?: Record<string, unknown>
+  ): Promise<T> {
+    return await this.retryWithBackoff(async () => {
+      const config: Record<string, unknown> = {
+          temperature: 0.2,
+          response_mime_type: "application/json"
+      };
+      if (responseSchema) {
+          config.response_schema = responseSchema;
+      }
+
+      const parts = typeof input === 'string' ? [{ text: input }] : input;
+
+      const payload = {
+        contents: [{ role: "user", parts: parts }],
+        system_instruction: { parts: [{ text: systemInstruction }] },
+        generationConfig: config
+      };
+
+      try {
+        const data = await this.generateViaFetch(model, payload) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!text) throw new Error("No text returned from Gemini API");
+
+        // Parse JSON
+        const json = this.extractJson(text);
+
+        // Validate with Zod
+        const parsed = schema.parse(json);
+        return parsed;
+
+      } catch (err: unknown) {
+        // Enhance error message for debugging
+        const error = err as Error;
+        if (error instanceof z.ZodError) {
+             console.error(`[BaseAIService] Schema Validation Failed:`, JSON.stringify(error.errors, null, 2));
+             throw new Error(`AI Response failed schema validation: ${error.message}`);
+        }
+        throw error;
+      }
     });
   }
 }

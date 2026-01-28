@@ -30,6 +30,11 @@ const GenerationParamsSchema = z.object({
   generateCarousel: z.boolean().optional(),
   instructions: z.string().optional(),
   target_audience: z.string().optional(),
+  generation_type: z.enum(["carousel", "post", "thread"]).optional(),
+  mode: z.enum(["generate", "micro_edit", "compare_hooks"]).optional().default("generate"),
+  action: z.string().optional(),
+  hook_a: z.string().optional(),
+  hook_b: z.string().optional(),
 });
 
 enum ErrorCode {
@@ -162,6 +167,104 @@ class ContentService extends BaseAIService {
         xp: userContext.xp || 0,
         company_name: userContext.company_name || "an industry leader"
     });
+
+    // COMPARE HOOKS MODE
+    if (params.mode === 'compare_hooks') {
+        const compareInstruction = `
+        ROLE: Viral Content Analyst.
+        TASK: Compare two LinkedIn headlines (hooks) and declare a winner based on: curiosity gap, emotional impact, and clarity.
+        
+        HOOK A: "${params.hook_a}"
+        HOOK B: "${params.hook_b}"
+        
+        OUTPUT FORMAT: Return a valid JSON object.
+        {
+            "winner": "A" or "B",
+            "scoreA": 85 (0-100),
+            "scoreB": 70 (0-100),
+            "reason": "Brief explanation why the winner is better..."
+        }
+        `;
+
+        return await this.retryWithBackoff(async () => {
+             const payload = {
+                contents: [{ role: "user", parts: [{ text: compareInstruction }] }],
+                generationConfig: {
+                    temperature: 0.2, // Low temp for analytical consistency
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: { 
+                            winner: { type: "STRING", enum: ["A", "B"] },
+                            scoreA: { type: "NUMBER" },
+                            scoreB: { type: "NUMBER" },
+                            reason: { type: "STRING" }
+                        },
+                        required: ["winner", "scoreA", "scoreB", "reason"]
+                    }
+                }
+             };
+             const data: any = await this.generateViaFetch(this.model, payload);
+             const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+             if (!text) throw new Error("No text returned from AI");
+             const json = this.extractJson(text);
+
+             // Return simplified object compatible with GeneratedPost interface (abusing fields slightly or we could extend the interface, 
+             // but for now we'll pack it into a predictable structure or just return as is if the caller handles it.
+             // The caller expects `GeneratedPost` but for this mode we might want to return raw data or pack it.
+             // Let's allow returning the raw result in the 'data' field of API response, 
+             // but strictly here we need to return GeneratedPost.
+             // Actually, looking at main server, it returns `result.post_content` etc.
+             // We should adapt.
+             
+             return {
+                 post_content: "Comparison Complete", 
+                 auditor_report: { viral_score: 0, hook_strength: "N/A", hook_score: 0, readability_score: 0, value_score: 0, pro_tip: "", retention_estimate: "", flags_triggered: [] },
+                 strategy_reasoning: JSON.stringify(json), // Pack the result here
+                 meta: { suggested_hashtags: [], character_count: 0 }
+             };
+        });
+    }
+
+    // MICRO-EDIT MODE
+    if (params.mode === 'micro_edit') {
+        const editInstruction = `
+        ROLE: Expert Copy Editor & Viral Ghostwriter.
+        TASK: Perform the following action: "${params.action || 'Improve'}" on the text below.
+        TARGET TEXT: "${params.topic}" (Treat this as the raw text to edit).
+        CONTEXT: Tone: ${params.tone || 'Professional'}. Audience: ${params.audience}.
+        
+        OUTPUT FORMAT: Return a valid JSON object with ONLY the result.
+        { "post_content": "The edited text result..." }
+        `;
+
+        return await this.retryWithBackoff(async () => {
+             const payload = {
+                contents: [{ role: "user", parts: [{ text: editInstruction }] }],
+                generationConfig: {
+                    temperature: 0.4, // Lower temp for precise editing
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: { post_content: { type: "STRING" } },
+                        required: ["post_content"]
+                    }
+                }
+             };
+             const data: any = await this.generateViaFetch(this.model, payload);
+             const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+             if (!text) throw new Error("No text returned from AI");
+             
+             const json = this.extractJson(text);
+             // Return simplified object compatible with GeneratedPost interface
+             return {
+                 post_content: json.post_content as string,
+                 auditor_report: { viral_score: 0, hook_strength: "N/A", hook_score: 0, readability_score: 0, value_score: 0, pro_tip: "", retention_estimate: "", flags_triggered: [] },
+                 strategy_reasoning: "Micro-edit",
+                 meta: { suggested_hashtags: [], character_count: (json.post_content as string).length }
+             };
+        });
+    }
     
     const strictSchemaInstruction = `
     IMPORTANT: You MUST return a valid JSON object.
@@ -280,6 +383,7 @@ class GamificationService {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const headers = { ...corsHeaders, "Content-Type": "application/json" };
+  console.log("FUNCTION INVOKED: generate-viral-post");
 
   try {
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !GEMINI_API_KEY) {
@@ -335,7 +439,10 @@ Deno.serve(async (req) => {
             viralScore: result.auditor_report.viral_score,
             viralAnalysis: result.auditor_report,
             gamification: null, 
-            credits: (profile.credits || 0) - 1
+            credits: (profile.credits || 0) - 1,
+            // Special handling for compare_hooks
+            ...(validatedParams.mode === 'compare_hooks' ? JSON.parse(result.strategy_reasoning) : {})
+        }
         }
     };
 

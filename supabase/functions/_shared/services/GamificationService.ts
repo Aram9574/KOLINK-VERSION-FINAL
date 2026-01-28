@@ -1,4 +1,4 @@
-import { SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export interface GamificationResult {
   newXP: number;
@@ -11,7 +11,7 @@ export interface GamificationResult {
 export class GamificationService {
   constructor(private supabaseAdmin: SupabaseClient) {}
 
-  async processAction(userId: string, action: string): Promise<GamificationResult | null> {
+  async processAction(userId: string, _action: string): Promise<GamificationResult | null> {
       // 1. Fetch Profile
       const { data: profile, error } = await this.supabaseAdmin
         .from("profiles")

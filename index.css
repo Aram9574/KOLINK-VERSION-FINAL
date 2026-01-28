@@ -87,6 +87,22 @@
       outline-none transition-all text-slate-900 placeholder-slate-400 text-sm
       font-medium hover:border-slate-300;
   }
+
+  /* Custom Range Slider Thumb */
+  .slider-input::-webkit-slider-thumb {
+    @apply h-4 w-4 rounded-full bg-white border border-slate-200 shadow-sm
+      appearance-none cursor-pointer transition-transform duration-100 ease-out;
+  }
+  .slider-input::-moz-range-thumb {
+    @apply h-4 w-4 rounded-full bg-white border border-slate-200 shadow-sm
+      appearance-none cursor-pointer transition-transform duration-100 ease-out;
+  }
+  .slider-input:active::-webkit-slider-thumb {
+    @apply scale-110;
+  }
+  .slider-input:active::-moz-range-thumb {
+    @apply scale-110;
+  }
 }
 
 /* Premium Unified Utilities (Nexus System) */
@@ -153,3 +169,62 @@
 @utility animate-nexus-in {
   animation: fadeSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+@utility animate-element {
+  opacity: 0;
+  animation: fadeSlideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@utility animate-delay-100 { animation-delay: 100ms; }
+@utility animate-delay-200 { animation-delay: 200ms; }
+@utility animate-delay-300 { animation-delay: 300ms; }
+@utility animate-delay-400 { animation-delay: 400ms; }
+@utility animate-delay-500 { animation-delay: 500ms; }
+@utility animate-delay-600 { animation-delay: 600ms; }
+@utility animate-delay-700 { animation-delay: 700ms; }
+@utility animate-delay-800 { animation-delay: 800ms; }
+@utility animate-delay-900 { animation-delay: 900ms; }
+@utility animate-delay-1000 { animation-delay: 1000ms; }
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.translate-z-10 {
+  transform: translateZ(30px);
+}
+
+.shimmer-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-bg::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.1) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2s infinite;
+  will-change: transform;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateZ(30px) translateY(0); }
+  50% { transform: translateZ(30px) translateY(-10px); }
+}
+
+@utility animate-float {
+  animation: float 6s ease-in-out infinite;
+  will-change: transform;
+}
+

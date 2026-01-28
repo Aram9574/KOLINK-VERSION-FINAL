@@ -359,6 +359,38 @@ export function Pricing({ onPlanSelect, currentPlanId, isUpgradeView = false }: 
 
 
           </div>
+
+          {/* Trust Indicators (Action 22) */}
+          <div className="mt-16 pt-8 border-t border-slate-200 w-full max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              <div className="flex flex-col items-center gap-2">
+                  <div className="p-2 bg-green-50 rounded-full text-green-600">
+                      <Shield className="w-5 h-5" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-700">{language === 'es' ? 'Pago Seguro' : 'Secure Payment'}</p>
+                  <p className="text-xs text-slate-500">Encrypted by Stripe</p>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                  <div className="p-2 bg-blue-50 rounded-full text-blue-600">
+                      <Star className="w-5 h-5" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-700">{language === 'es' ? 'Garantía 30 Días' : '30-Day Guarantee'}</p>
+                  <p className="text-xs text-slate-500">100% Money Back</p>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                  <div className="p-2 bg-purple-50 rounded-full text-purple-600">
+                      <Zap className="w-5 h-5" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-700">{language === 'es' ? 'Cancela Cuando Quieras' : 'Cancel Anytime'}</p>
+                  <p className="text-xs text-slate-500">No long-term contracts</p>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                   <div className="p-2 bg-amber-50 rounded-full text-amber-600">
+                      <PhoneCall className="w-5 h-5" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-700">{language === 'es' ? 'Soporte Humano' : 'Human Support'}</p>
+                  <p className="text-xs text-slate-500">We actually reply</p>
+              </div>
+          </div>
         </div>
       </div>
     </div>

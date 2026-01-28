@@ -1,65 +1,75 @@
-export interface LinkedInPDFData {
-  full_name: string;
-  profile_url?: string;
-  headline?: string;
-  summary?: string;
-  occupation?: string;
-  experiences?: Array<{
+export interface UserContext {
+    industry?: string;
+    xp?: number | string;
+    brand_voice?: string;
+    company_name?: string;
+}
+
+export interface CarouselSlideData {
+    title: string;
+    subtitle?: string;
+    body: string;
+    cta_text?: string;
+    image_prompt?: string;
+    layout?: "classic" | "image-focused" | "minimal" | "split" | "quote" | "big-number" | "checklist" | "code" | "comparison" | "intro" | "outro";
+    design_overrides?: {
+        swipe_indicator?: boolean;
+        highlight_color?: string;
+    };
+}
+
+export interface CarouselGenerationResult {
+    topic_slug: string;
+    carousel_data: CarouselSlideData[];
+    carousel_metadata: {
+        title: string;
+        hook: string;
+        tone: string;
+    };
+}
+export interface LinkedInExperience {
     company: string;
     position: string;
     duration: string;
     description: string;
-  }>;
-  skills?: string[];
-  education?: string[];
-  error?: string;
 }
 
-export interface LinkedInAuditResult {
-  authority_score: number;
-  brutal_diagnosis: string;
-  quick_wins: string[];
-  strategic_roadmap: {
+export interface LinkedInPDFData {
+    full_name: string;
+    profile_url: string | null;
     headline: string;
-    about: string;
-    experience: string;
-  };
-  visual_critique: string;
-  technical_seo_keywords: string[];
-}
-
-export interface Profile {
-  id: string;
-  email?: string;
-  plan_tier: string;
-  credits: number;
-  subscription_status?: string;
-  subscription_end_date?: string;
-  stripe_customer_id?: string;
-  referred_by?: string;
-  created_at: string;
-  brand_voice?: string;
-  company_name?: string;
-  industry?: string;
-  headline?: string;
-  xp?: number;
-  level?: number;
-  current_streak?: number;
-  last_post_date?: string;
+    summary: string;
+    about?: string;
+    error?: string;
+    occupation: string;
+    experiences: LinkedInExperience[];
+    skills: string[];
+    education: string[];
 }
 
 export interface LinkedInProfileData {
-  full_name?: string;
-  name?: string;
-  profile_url?: string | null;
-  headline?: string;
-  summary?: string;
-  about?: string;
-  occupation?: string;
-  company?: string;
-  location?: string;
-  experiences?: { company: string; position: string; duration: string; description: string }[];
-  skills?: string[];
-  education?: string[];
-  scraped_data?: Record<string, unknown>;
+    full_name: string;
+    headline: string;
+    summary?: string;
+    about?: string;
+    experience?: string | LinkedInExperience[];
+    experiences?: LinkedInExperience[];
+    skills?: string | string[];
+}
+
+export interface LinkedInAuditResult {
+    authority_score: number;
+    brutal_diagnosis: string;
+    quick_wins: string[];
+    strategic_roadmap: {
+        headline: string;
+        about: string;
+        experience: string;
+    };
+    visual_critique: string;
+    technical_seo_keywords: string[];
+    gap_analysis: {
+        benchmark_comparison: string;
+        percentile: string;
+    };
 }

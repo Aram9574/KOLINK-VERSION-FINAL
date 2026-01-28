@@ -4,6 +4,7 @@ import { AutoTypography } from './AutoTypography';
 import { Quote, MessageCircle, Heart, Repeat, Share, CheckCircle, Terminal, ArrowRight, XCircle, User, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { DynamicIcon } from './DynamicIcon';
 import { InteractiveElement } from './InteractiveElement';
 
 interface SlideRendererProps {
@@ -40,11 +41,15 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
 
   // Render content based on slide type & layout variant
   const renderContent = () => {
+    // Normalize layout: Prefer 'layout' from API, fallback to 'layoutVariant'
+    const minimalLayout = (slide.layout || slide.layoutVariant || 'default') as string;
+    const layout = minimalLayout === 'classic' ? 'default' : minimalLayout;
+
     // ----------------------------------------------------------------------
     // GLOBAL VARIANTS (Explicit Layout Choice)
     // ----------------------------------------------------------------------
 
-    if (slide.layoutVariant === 'big-number') {
+    if (layout === 'big-number') {
        return (
            <div className="flex flex-col h-full items-center justify-center p-16 text-center relative z-10 w-full overflow-hidden">
                <InteractiveElement elementId="title" slideId={slide.id} isActiveSlide={isActive}>
@@ -85,10 +90,16 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
        );
     }
 
-    if (slide.layoutVariant === 'quote') {
+    if (layout === 'quote') {
         return (
            <div className="flex flex-col h-full justify-center p-20 text-center relative z-10 w-full overflow-hidden">
-               <Quote className="w-20 h-20 mx-auto mb-12 text-brand-500 opacity-20" style={{ color: accent }} />
+               <div className="mx-auto mb-12 opacity-20">
+                   <DynamicIcon 
+                        name={slide.content.icon || 'quote'} 
+                        className="w-20 h-20" 
+                        style={{ color: accent }} 
+                   />
+               </div>
                <InteractiveElement elementId="body" slideId={slide.id} isActiveSlide={isActive}>
                    <AutoTypography 
                        content={`"${slide.content.body || slide.content.title}"`}
@@ -114,7 +125,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
         );
     }
 
-    if (slide.layoutVariant === 'checklist') {
+    if (layout === 'checklist') {
         const items = slide.content.body?.split('\n').filter(line => line.trim().length > 0) || [];
         return (
            <div className="flex flex-col h-full p-16 relative z-10 w-full overflow-hidden">
@@ -131,7 +142,11 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
                    {items.map((item, i) => (
                        <div key={i} className="flex items-start gap-4">
                            <div className="mt-1 flex-shrink-0">
-                                <CheckCircle className="w-8 h-8" style={{ color: accent }} />
+                                <DynamicIcon 
+                                    name={slide.content.icon || 'check-circle'} 
+                                    className="w-8 h-8" 
+                                    style={{ color: accent }} 
+                                />
                            </div>
                            <AutoTypography 
                                content={item.replace(/^[-*•]\s*/, '')}
@@ -146,7 +161,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
         );
     }
 
-    if (slide.layoutVariant === 'comparison') {
+    if (layout === 'comparison') {
         return (
            <div className="flex flex-col h-full relative z-10 w-full overflow-hidden">
                <div className="p-10 pb-6 text-center border-b border-slate-100/10">
@@ -186,7 +201,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
         );
     }
     
-    if (slide.layoutVariant === 'image-full' && slide.content.image_url) {
+    if (layout === 'image-full' && slide.content.image_url) {
         return (
             <div className="absolute inset-0 z-10 overflow-hidden group">
                 <img src={slide.content.image_url} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
@@ -212,7 +227,7 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
         );
     }
     
-    if (slide.layoutVariant === 'code') {
+    if (layout === 'code') {
          return (
             <div className="flex flex-col h-full p-16 relative z-10 w-full overflow-hidden">
                 <div className="mb-8">
@@ -335,9 +350,10 @@ export const SlideRenderer: React.FC<SlideRendererProps> = React.memo(({
            </div>
         );
       
-       const isVertical = design.aspectRatio === '9:16';
        
-       case 'default': // 'content' (Default Layout)
+       case 'content':
+       default: // Fallback for 'content' type or unknown types
+          const isVertical = design.aspectRatio === '9:16';
           return (
              <div className={cn(
                  "flex flex-col h-full relative z-10 w-full overflow-hidden",

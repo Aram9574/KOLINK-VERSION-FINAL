@@ -1,3 +1,22 @@
+export type TrendCategory = 'news' | 'social' | 'regulatory' | 'search';
+
+export interface Trend {
+  id: string;
+  title: string;
+  summary: string;
+  source: string;
+  category: TrendCategory;
+  timestamp: string;
+  matchScore: number;
+  url?: string;
+}
+
+export interface ContentAngle {
+  title: string;
+  hook: string;
+  description?: string;
+}
+
 export enum ViralTone {
   PROFESSIONAL = "Professional",
   CONTROVERSIAL = "Controversial",

@@ -12,6 +12,12 @@ import {
 } from "../prompts.ts";
 import { RepurposeService } from "./RepurposeService.ts";
 
+/** 
+ * Service for generating content via Gemini 
+ */
+
+// Force refresh service definition
+
 export interface Idea {
   title: string;
   angle: string;
@@ -22,6 +28,7 @@ export interface Idea {
 }
 
 import { GenerationParams } from "../schemas.ts";
+export type { GenerationParams };
 
 export interface UserProfileContext {
   brand_voice?: string;
@@ -44,6 +51,7 @@ export interface CarouselConfig {
 export interface CarouselSlideData {
     id: string; 
     type: "intro" | "content" | "outro";
+    layout?: string;
     layout_variant?: string; 
     content: {
         title: string;
@@ -51,9 +59,11 @@ export interface CarouselSlideData {
         body: string;
         visual_hint?: string;
         cta_text?: string;
+        image_prompt?: string;
     };
     design_overrides?: {
         swipe_indicator?: boolean;
+        highlight_color?: string;
     };
 }
 
@@ -99,9 +109,9 @@ export class ContentService extends BaseAIService {
     params: GenerationParams,
     userContext: UserProfileContext
   ): Promise<GeneratedPost> {
-    const frameworkInstruction = getFrameworkInstructions(params.framework);
-    const emojiInstruction = getEmojiInstructions(params.emojiDensity);
-    const lengthInstruction = getLengthInstructions(params.length);
+    const frameworkInstruction = getFrameworkInstructions(params.framework || '');
+    const emojiInstruction = getEmojiInstructions(params.emojiDensity || 'medium');
+    const lengthInstruction = getLengthInstructions(params.length || 'medium');
     
     // Build context strings
     const behaviorContext = userContext.behavioral_dna 
@@ -112,12 +122,20 @@ export class ContentService extends BaseAIService {
         ? `\nBRAND VOICE:\n${userContext.brand_voice}`
         : "";
 
+    // Append technical instructions to system prompt
+    const technicalRules = `
+    FRAMEWORK: ${frameworkInstruction}
+    EMOJI DENSITY: ${emojiInstruction}
+    LENGTH TARGET: ${lengthInstruction}
+    `;
+
     const systemInstruction = PostGeneratorBrain.getSystemPrompt({
         ...userContext,
         industry: userContext.industry || "General",
         xp: userContext.xp || 0,
         company_name: userContext.company_name || "an industry leader"
-    });
+    }) + "\n" + technicalRules;
+
     
     // Enforce strict JSON schema in the prompt to help the model
     const strictSchemaInstruction = `
@@ -214,6 +232,9 @@ export class ContentService extends BaseAIService {
   /**
    * Generates a LinkedIn Carousel JSON.
    */
+  /**
+   * Generates a LinkedIn Carousel JSON.
+   */
   async generateCarousel(
     source: string,
     sourceType: string,
@@ -230,8 +251,8 @@ export class ContentService extends BaseAIService {
       : "";
 
     const userVoice = profileContext?.brand_voice
-      ? `\nBRAND VOICE INSTRUCTIONS:\n${profileContext.brand_voice}`
-      : "";
+      ? `\nBRAND VOICE INSTRUCTIONS (CRITICAL - YOU MUST ADOPT THIS VOICE):\n${profileContext.brand_voice}`
+      : "Brand Voice: Neutral, Professional.";
 
     const repurposeService = new RepurposeService(this.geminiApiKey);
     let finalSource = source;
@@ -239,7 +260,7 @@ export class ContentService extends BaseAIService {
 
     try {
       if (sourceType === 'youtube') {
-           const transcript = await repurposeService.fetchYoutubeTranscript(source); // Simplified call
+           const transcript = await repurposeService.fetchYoutubeTranscript(source); 
            finalSource = `[VIDEO TRANSCRIPT]:\n"${transcript}"`;
       } 
       else if (sourceType === 'url') {
@@ -254,41 +275,58 @@ export class ContentService extends BaseAIService {
            analysisStrategy = "CONTENT TYPE: RAW TOPIC/TEXT. \nSTRATEGY: Use your internal knowledge to build a comprehensive guide. \nFRAGMENTATION: 7-10 solid slides.";
       }
     } catch (error) {
-       console.error("Repurposing Error:", error);
+       console.error("[ContentService] Repurposing Error:", error);
        analysisStrategy = `WARNING: Failed to fetch external content. Treat the input "${source}" as a topic.`;
     }
 
     const layoutStrategy = `
-    LAYOUT STRATEGY (Use these heavily):
-    - **checklist**: Use for ANY list of 3-5 items (lessons, tools, steps).
+    SMART LAYOUT STRATEGY (Available Variants):
+    - **intro**: MUST be the first slide. High impact title.
+    - **classic**: Standard Body + Title. Use for narrative flow.
+    - **checklist**: Use for ANY list of 3-5 items (lessons, steps, tools).
     - **comparison**: Use when contrasting "Old Way vs New Way" or "Mistake vs Fix".
     - **quote**: Use for high-impact statements, definitions, or contrarian points.
-    - **big_number**: Use for statistics (e.g., "94%") or single powerful words (e.g., "STOP").
+    - **big-number**: Use for statistics (e.g., "94%") or single powerful words (e.g., "STOP").
     - **code**: Use ONLY if the topic involves programming or prompts.
-    - **default**: Use for standard text + image slides.
+    - **outro**: MUST be the last slide. CTA focused.
+    
+    DESIGN RULES (CRITICAL):
+    1. **NO EMPTY SLIDES**: Every single slide MUST have substantial content in the 'body' field (min 30 words) unless it's a cover/quote. NEVER use placeholders like "Insert text here".
+    2. **VARIETY IS KEY**: Do NOT use 'classic' layout more than twice in a row. Use 'checklist' for steps, 'quote' for insights, 'big-number' for stats.
+    3. **CANVA QUALITY**: Imagine each slide is a premium Canva template. The text must be punchy, styled, and complete.
+    4. **DENSITY MATTERS**: Users want value. Don't be vague. Give specific tools, numbers, or frameworks. E.g., instead of "Use AI tools", say "Use ChatGPT (ideation) + Midjourney (visuals)".
+    5. **NO GENERIC HEADERS**: Avoid "Introduction" or "Conclusion". Use "Why this matters" or "The Bottom Line".
     `;
 
     const prompt = `
-      ${CarouselBrain.system_instruction}
-      
-      Act as a Lead Content Strategist & LinkedIn Viral Growth Expert.
-      Your mission is to analyze the provided INPUT SOURCE and transform it into a high-impact LinkedIn Carousel.
+    ${CarouselBrain.system_instruction}
+    
+    Act as a Lead Content Strategist & LinkedIn Viral Growth Expert.
+    Your mission is to analyze the provided INPUT SOURCE and transform it into a high-impact LinkedIn Carousel.
 
-      INPUT SOURCE:
-      ${finalSource}
-      
-      USER STYLE CONTEXT:
-      ${styleContext}
-      ${dnaInstruction}
-      ${userVoice}
-      
-      PHASE 1: ANALYSIS STRATEGY & SMART FRAGMENTATION
-      ${analysisStrategy}
-      
-      ${layoutStrategy}
-      
-      PHASE 2: NARRATIVE ARCHITECTURE
-      Design a 7-12 slide carousel JSON following the Arc rules.
+    INPUT SOURCE:
+    ${finalSource}
+    
+    USER CONTEXT LAYERS:
+    1. ${styleContext}
+    2. ${dnaInstruction}
+    3. ${userVoice}
+    
+    PHASE 1: ANALYSIS STRATEGY & SMART FRAGMENTATION
+    ${analysisStrategy}
+    
+    PHASE 2: LAYOUT SELECTION
+    ${layoutStrategy}
+    
+    PHASE 3: NARRATIVE ARCHITECTURE
+    Design a 8-12 slide carousel JSON following the Arc rules.
+    - Slide 1 (Intro): Magnetic Headline + Subheadline.
+    - Slide 2 (Context): Why this matters now.
+    - Middle Slides: The "Meat" of the content. High value.
+    - Last Slide (Outro): Strong Call to Action.
+    
+    Ensure the Tone and Voice match the USER CONTEXT perfectly.
+    IMPORTANT: Provide FULL sentences and deep value in 'body'. Do not summarize too much.
 
       LANGUAGE: ${language === "es" ? "Spanish" : "English"}
     `;
@@ -297,7 +335,7 @@ export class ContentService extends BaseAIService {
       const payload = {
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.2,
+          temperature: 0.3, 
           responseMimeType: "application/json",
           responseSchema: {
             type: "OBJECT",
@@ -323,25 +361,30 @@ export class ContentService extends BaseAIService {
                   properties: {
                     id: { type: "STRING" },
                     type: { type: "STRING", enum: ["intro", "content", "outro"] },
-                    layout_variant: { type: "STRING" },
+                    layout: { 
+                        type: "STRING", 
+                        enum: ["classic", "image-focused", "minimal", "split", "quote", "big-number", "checklist", "code", "comparison", "intro", "outro"] 
+                    },
                     content: {
                         type: "OBJECT",
                         properties: {
                             title: { type: "STRING" },
                             subtitle: { type: "STRING" },
                             body: { type: "STRING" },
-                            visual_hint: { type: "STRING" }
+                            cta_text: { type: "STRING" },
+                            image_prompt: { type: "STRING" }
                         },
                         required: ["title", "body"]
                     },
                     design_overrides: {
                         type: "OBJECT",
                         properties: {
-                            swipe_indicator: { type: "BOOLEAN" }
+                            swipe_indicator: { type: "BOOLEAN" },
+                            highlight_color: { type: "STRING" }
                         }
                     }
                   },
-                  required: ["type", "layout_variant", "content"]
+                  required: ["type", "layout", "content"]
                 },
               },
               linkedin_post_copy: { type: "STRING" }
@@ -547,6 +590,80 @@ export class ContentService extends BaseAIService {
           if (!text) throw new Error("No refined content returned");
 
           return this.extractJson(text) as unknown as Partial<CarouselSlideData>;
+      });
+  }
+
+  /**
+   * Translates an entire carousel to a target language.
+   */
+  async translateCarousel(
+    slides: CarouselSlideData[],
+    targetLanguage: string
+  ): Promise<{ slides: CarouselSlideData[] }> {
+      const prompt = `
+        You are an expert translator and cultural adapter for LinkedIn content.
+        Translate the following JSON slides content to ${targetLanguage}.
+        
+        INSTRUCTIONS:
+        1. Translate 'title', 'subtitle', 'body', 'cta_text' fields accurately.
+        2. Adapt cultural references or idioms to be natural in ${targetLanguage}.
+        3. Maintain the exact JSON structure and all other fields (id, type, layout, visual_hint).
+        4. Do not translate technical keys or enums (like 'type', 'layout').
+        5. Ensure the tone remains professional yet viral/engaging.
+
+        SLIDES JSON:
+        ${JSON.stringify(slides)}
+      `;
+
+      return await this.retryWithBackoff(async () => {
+        const payload = {
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.2, // Lower temp for translation accuracy
+            responseMimeType: "application/json",
+            responseSchema: {
+               type: "OBJECT",
+               properties: {
+                 slides: {
+                   type: "ARRAY",
+                   items: {
+                     type: "OBJECT",
+                     properties: {
+                       id: { type: "STRING" },
+                       type: { type: "STRING" },
+                       layout: { type: "STRING" },
+                       content: {
+                           type: "OBJECT",
+                           properties: {
+                               title: { type: "STRING" },
+                               subtitle: { type: "STRING" },
+                               body: { type: "STRING" },
+                               cta_text: { type: "STRING" },
+                               visual_hint: { type: "STRING" },
+                               image_prompt: { type: "STRING" }
+                           },
+                           required: ["title", "body"]
+                       },
+                       design_overrides: { type: "OBJECT", properties: {
+                           swipe_indicator: { type: "BOOLEAN" },
+                           highlight_color: { type: "STRING" }
+                       } }
+                     },
+                     required: ["id", "type", "layout", "content"]
+                   }
+                 }
+               },
+               required: ["slides"]
+            }
+          }
+        };
+
+        const data = await this.generateViaFetch(this.model, payload) as GeminiResponse;
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!text) throw new Error("No translation returned");
+
+        return this.extractJson(text) as unknown as { slides: CarouselSlideData[] };
       });
   }
 }

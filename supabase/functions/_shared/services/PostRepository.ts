@@ -1,4 +1,4 @@
-import { SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export interface GeneratedPost {
   post_content: string;
@@ -33,7 +33,7 @@ export class PostRepository {
         viral_score: content.auditor_report.viral_score,
         viral_analysis: content.auditor_report,
         tags: content.meta.suggested_hashtags,
-        is_auto_pilot: (params as any).isAutoPilot || false, // params is still unknown, so cast is needed for now
+        is_auto_pilot: (params as { isAutoPilot?: boolean })?.isAutoPilot || false,
         created_at: new Date().toISOString(),
       })
       .select("id, created_at")

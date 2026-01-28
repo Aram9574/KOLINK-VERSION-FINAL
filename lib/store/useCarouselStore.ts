@@ -1,12 +1,15 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { CarouselProject, CarouselSlide, CarouselDesign, AspectRatio } from '../../types/carousel';
+import { CarouselProject, CarouselSlide, CarouselDesign, AspectRatio, BrandKit } from '../../types/carousel';
+import { BrandKitRepository } from '@/services/brandKitRepository';
+import { toast } from 'sonner';
 
 interface EditorState {
   activeSlideId: string | null;
   activeElementId: string | null;
   zoomLevel: number;
   isSidebarOpen: boolean;
+  isFocusMode: boolean;
   activePanel: 'generator' | 'templates' | 'brand';
   isGenerating: boolean;
 }
@@ -28,24 +31,39 @@ interface CarouselStore {
   setSlides: (slides: CarouselSlide[]) => void;
   setActiveSlide: (id: string) => void;
 
+  // Settings
+  updateSettings: (settings: Partial<CarouselProject['settings']>) => void;
+
   // Design Actions
   updateDesign: (updates: Partial<CarouselDesign> | Partial<CarouselDesign['layout']> | Partial<CarouselDesign['background']>) => void;
+  // History
+  history: {
+      past: CarouselProject[];
+      future: CarouselProject[];
+  };
+  undo: () => void;
+  redo: () => void;
+
   setTheme: (themeId: string) => void; // Will apply a preset of colors/fonts
   updateElementOverride: (slideId: string, elementId: string, styles: any) => void; // Using any to avoid circular deps for now, but should be Partial<ElementStyle>
+  duplicateSlide: (id: string) => void;
+
 
 
   // Editor Actions
   setZoom: (zoom: number) => void;
   toggleSidebar: () => void;
+  setFocusMode: (isOpen: boolean) => void;
   setActivePanel: (panel: EditorState['activePanel']) => void;
   setIsGenerating: (isGenerating: boolean) => void;
   setActiveElement: (id: string | null) => void;
 
-  // Presets
-  savedPresets: any[]; // Using any for simplicity in this phase, ideally defining a Preset type
-  savePreset: (name: string) => void;
-  loadPresets: () => void;
-  deletePreset: (id: string) => void;
+  // Brand Kits (formerly Presets)
+  savedPresets: BrandKit[];
+  isLoadingPresetes: boolean;
+  savePreset: (name: string, userId: string) => Promise<void>;
+  loadPresets: (userId: string) => Promise<void>;
+  deletePreset: (id: string) => Promise<void>;
   resetProject: () => void;
 }
 
@@ -128,6 +146,9 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
     },
     slides: INITIAL_SLIDES,
     design: DEFAULT_DESIGN,
+    settings: {
+        tone: 50, // Balanced
+    },
     createdAt: Date.now(),
     updatedAt: Date.now(),
   },
@@ -136,19 +157,98 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
     activeElementId: null,
     zoomLevel: 1,
     isSidebarOpen: true,
+    isFocusMode: false,
     activePanel: 'generator',
     isGenerating: false,
   },
 
+  // History
+  history: {
+    past: [],
+    future: [],
+  },
+
+  undo: () =>
+    set((state) => {
+      const { past, future } = state.history;
+      if (past.length === 0) return {};
+
+      const previous = past[past.length - 1];
+      const newPast = past.slice(0, past.length - 1);
+      
+      return {
+        project: previous,
+        history: {
+          past: newPast,
+          future: [state.project, ...future],
+        },
+        // Restore active slide validation
+        editor: {
+            ...state.editor,
+            activeSlideId: previous.slides.find(s => s.id === state.editor.activeSlideId) ? state.editor.activeSlideId : previous.slides[0].id
+        }
+      };
+    }),
+
+  redo: () =>
+    set((state) => {
+      const { past, future } = state.history;
+      if (future.length === 0) return {};
+
+      const next = future[0];
+      const newFuture = future.slice(1);
+
+      return {
+        project: next,
+        history: {
+          past: [...past, state.project],
+          future: newFuture,
+        },
+        editor: {
+            ...state.editor,
+            activeSlideId: next.slides.find(s => s.id === state.editor.activeSlideId) ? state.editor.activeSlideId : next.slides[0].id
+        }
+      };
+    }),
+    
+  duplicateSlide: (id) => 
+    set((state) => {
+        const slideIndex = state.project.slides.findIndex(s => s.id === id);
+        if (slideIndex === -1) return {};
+
+        const slideToClone = state.project.slides[slideIndex];
+        const newSlide = {
+            ...slideToClone,
+            id: uuidv4(),
+            content: { ...slideToClone.content } // Deep copy content
+        };
+
+        const newSlides = [...state.project.slides];
+        newSlides.splice(slideIndex + 1, 0, newSlide);
+
+        return {
+            project: { ...state.project, slides: newSlides },
+            history: {
+                past: [...state.history.past, state.project],
+                future: []
+            },
+            editor: { ...state.editor, activeSlideId: newSlide.id }
+        };
+    }),
+
   setProjectTitle: (title) => 
-    set((state) => ({ project: { ...state.project, title } })),
+    set((state) => ({ 
+        project: { ...state.project, title },
+        history: { past: [...state.history.past, state.project], future: [] } 
+    })),
 
   setAspectRatio: (ratio) =>
     set((state) => ({ 
       project: { 
         ...state.project, 
         design: { ...state.project.design, aspectRatio: ratio } 
-      } 
+      },
+      history: { past: [...state.history.past, state.project], future: [] }
     })),
 
   updateAuthor: (updates) =>
@@ -156,7 +256,8 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
       project: {
         ...state.project,
         author: { ...state.project.author, ...updates }
-      }
+      },
+      history: { past: [...state.history.past, state.project], future: [] }
     })),
 
   addSlide: (type = 'content', index) =>
@@ -179,12 +280,17 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
       } else {
         slides.push(newSlide);
       }
-      return { project: { ...state.project, slides }, editor: { ...state.editor, activeSlideId: newSlide.id } };
+      return { 
+          project: { ...state.project, slides }, 
+          editor: { ...state.editor, activeSlideId: newSlide.id },
+          history: { past: [...state.history.past, state.project], future: [] }
+      };
     }),
 
   removeSlide: (id) =>
     set((state) => ({
       project: { ...state.project, slides: state.project.slides.filter((s) => s.id !== id) },
+      history: { past: [...state.history.past, state.project], future: [] }
     })),
 
   updateSlide: (id, updates) =>
@@ -195,6 +301,7 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
           s.id === id ? { ...s, ...updates } : s
         ),
       },
+      history: { past: [...state.history.past, state.project], future: [] }
     })),
 
   reorderSlides: (startIndex, endIndex) =>
@@ -202,14 +309,29 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
       const slides = [...state.project.slides];
       const [removed] = slides.splice(startIndex, 1);
       slides.splice(endIndex, 0, removed);
-      return { project: { ...state.project, slides } };
+      return { 
+          project: { ...state.project, slides },
+          history: { past: [...state.history.past, state.project], future: [] }
+      };
     }),
 
   setSlides: (slides) =>
-    set((state) => ({ project: { ...state.project, slides } })),
+    set((state) => ({ 
+        project: { ...state.project, slides },
+        history: { past: [...state.history.past, state.project], future: [] }
+    })),
 
   setActiveSlide: (id) =>
     set((state) => ({ editor: { ...state.editor, activeSlideId: id } })),
+
+  updateSettings: (settings) =>
+    set((state) => ({
+      project: {
+        ...state.project,
+        settings: { ...state.project.settings, ...settings, tone: settings.tone ?? state.project.settings?.tone ?? 50 }
+      },
+      history: { past: [...state.history.past, state.project], future: [] }
+    })),
 
   updateDesign: (updates) =>
     set((state) => ({
@@ -223,6 +345,7 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
           colorPalette: { ...state.project.design.colorPalette, ...(updates as any).colorPalette }
         },
       },
+      history: { past: [...state.history.past, state.project], future: [] }
     })),
 
   updateElementOverride: (slideId, elementId, styles) =>
@@ -241,57 +364,88 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
              }
            };
         })
-      }
+      },
+      history: { past: [...state.history.past, state.project], future: [] }
     })),
 
-  // Presets
+  // Brand Kits
   savedPresets: [],
+  isLoadingPresetes: false,
   
-  savePreset: (name) =>
-    set((state) => {
-       const newPreset = { ...state.project.design, themeId: uuidv4(), name }; // Add name prop to design type conceptually or just store it
-       // Actually we need a specific type for presets. Let's just store the design object with a name property.
-       const presetWithMeta = { ...state.project.design, id: uuidv4(), name };
-       
-       const updatedPresets = [...state.savedPresets, presetWithMeta];
-       localStorage.setItem('kolink_brand_presets', JSON.stringify(updatedPresets));
-       return { savedPresets: updatedPresets };
-    }),
+  savePreset: async (name, userId) => {
+    // Optimistic update handled by fetch after save, or valid state update
+    const state = useCarouselStore.getState();
+    const currentDesign = state.project.design;
 
-  loadPresets: () =>
-    set((state) => {
-      const stored = localStorage.getItem('kolink_brand_presets');
-      if (stored) {
-          return { savedPresets: JSON.parse(stored) };
-      }
-      return {};
-    }),
+    try {
+        const newKit = {
+            name,
+            colors: currentDesign.colorPalette,
+            fonts: currentDesign.fonts
+        };
+        
+        await BrandKitRepository.createBrandKit(userId, newKit);
+        
+        // Reload list to get the ID and correct state
+        const kits = await BrandKitRepository.fetchBrandKits(userId);
+        set({ savedPresets: kits });
+        
+    } catch (e) {
+        console.error("Failed to save brand kit", e);
+        throw e; // Rethrow for UI to handle toast if needed or handle here
+    }
+  },
 
-  deletePreset: (id) =>
-    set((state) => {
-        const updated = state.savedPresets.filter((p: any) => p.id !== id);
-        localStorage.setItem('kolink_brand_presets', JSON.stringify(updated));
-        return { savedPresets: updated };
-    }),
+  loadPresets: async (userId) => {
+    set({ isLoadingPresetes: true });
+    try {
+        const kits = await BrandKitRepository.fetchBrandKits(userId);
+        set({ savedPresets: kits });
+    } catch (e) {
+        console.error("Failed to load brand kits", e);
+    } finally {
+        set({ isLoadingPresetes: false });
+    }
+  },
+
+  deletePreset: async (id) => {
+     try {
+         const success = await BrandKitRepository.deleteBrandKit(id);
+         if (success) {
+             set((state) => ({
+                 savedPresets: state.savedPresets.filter(k => k.id !== id)
+             }));
+         }
+     } catch (e) {
+         console.error("Failed to delete brand kit", e);
+     }
+  },
 
   setTheme: (themeId) => 
     set((state) => {
        // Check if it's a built-in theme or saved preset
-       const preset = state.savedPresets.find((p: any) => p.id === themeId);
+       const preset = state.savedPresets.find((p) => p.id === themeId);
+       let designUpdates = {};
+       
        if (preset) {
-           return { 
-               project: { 
-                   ...state.project, 
-                   design: { 
-                       ...state.project.design, 
-                       colorPalette: preset.colorPalette,
-                       fonts: preset.fonts,
-                       background: preset.background 
-                   } 
-               } 
+           designUpdates = { 
+               ...state.project.design,
+               colorPalette: preset.colors,
+               fonts: preset.fonts,
            };
+       } else {
+           // Fallback to simpler check or no-op if logic is in DesignPanel
+           // Ideally DesignPanel calculates the new design and calls updateDesign, 
+           // but keeping setTheme for now.
+           // NOTE: DesignPanel already uses updateDesign for master templates.
+           // This method might be deprecated or only used for brand kits.
+           return {};
        }
-       return state; 
+       
+       return { 
+           project: { ...state.project, design: designUpdates },
+           history: { past: [...state.history.past, state.project], future: [] }
+       };
     }),
 
   setZoom: (zoomLevel) =>
@@ -299,6 +453,9 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
 
   toggleSidebar: () =>
     set((state) => ({ editor: { ...state.editor, isSidebarOpen: !state.editor.isSidebarOpen } })),
+
+  setFocusMode: (isFocusMode: boolean) =>
+    set((state) => ({ editor: { ...state.editor, isFocusMode } })),
 
   setActivePanel: (activePanel) =>
     set((state) => ({ editor: { ...state.editor, activePanel } })),
@@ -310,7 +467,7 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
     set((state) => ({ editor: { ...state.editor, activeElementId: id } })),
 
   resetProject: () =>
-    set(() => ({
+    set((state) => ({
       project: {
         id: uuidv4(),
         title: 'Untitled Carousel',
@@ -318,9 +475,11 @@ export const useCarouselStore = create<CarouselStore>((set) => ({
         author: { name: 'User Name', handle: '@username' },
         slides: INITIAL_SLIDES,
         design: DEFAULT_DESIGN,
+        settings: { tone: 50 },
         createdAt: Date.now(),
         updatedAt: Date.now(),
       },
+      history: { past: [...state.history.past, state.project], future: [] },
       editor: {
         activeSlideId: INITIAL_SLIDES[0].id,
         zoomLevel: 1,

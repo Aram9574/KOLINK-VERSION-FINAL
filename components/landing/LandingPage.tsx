@@ -22,9 +22,10 @@ import { lazy, Suspense } from "react";
 
 import { NicheLinks } from "./NicheLinks.tsx";
 import { translations } from "../../translations";
-import ExitIntentModal from "../ui/ExitIntentModal.tsx";
 import StickyCTA from "../ui/StickyCTA.tsx";
-import FomoToast from "../ui/FomoToast.tsx";
+import { StickyCTAHeader } from "../marketing/StickyCTAHeader.tsx";
+import { CarouselShowcase } from "./CarouselShowcase.tsx";
+import { SchemaMarkup } from "../seo/SchemaMarkup";
 
 const ViralCalculator = lazy(() => import("../marketing/ViralCalculator.tsx"));
 
@@ -115,6 +116,20 @@ const LandingPage: React.FC = () => {
     return (
             <div className="font-sans selection:bg-brand-200 selection:text-brand-900 pb-20">
              <div className="relative z-10">
+                <SchemaMarkup 
+                    type="SoftwareApplication"
+                    data={{
+                        "name": "Kolink AI",
+                        "applicationCategory": "BusinessApplication",
+                        "operatingSystem": "Web",
+                        "offers": {
+                            "@type": "Offer",
+                            "price": "0",
+                            "priceCurrency": "USD"
+                        },
+                        "description": "The AI partner for LinkedIn creators. Generate viral carousels, audit profiles, and schedule posts."
+                    }}
+                />
                 <Helmet>
                     <title>{t.landing.meta.title}</title>
                     <meta
@@ -133,13 +148,16 @@ const LandingPage: React.FC = () => {
                 />
 
                 <SmartCursor />
-                <ExitIntentModal />
-                <StickyCTA />
-                <FomoToast />
+                {/* <StickyCTA /> Replaced by Header strategy */}
+                <StickyCTAHeader showAfterScrollY={700} />
 
                 <main className="pt-20">
                     <SectionReveal id="hero">
                         <AnimatedHero language={language} />
+                    </SectionReveal>
+
+                    <SectionReveal>
+                        <CarouselShowcase />
                     </SectionReveal>
                     
                     <SectionReveal>

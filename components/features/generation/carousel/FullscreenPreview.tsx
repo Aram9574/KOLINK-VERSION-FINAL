@@ -37,14 +37,48 @@ export const FullscreenPreview: React.FC<FullscreenPreviewProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex]);
 
+  const [direction, setDirection] = useState(0);
+
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 1000 : -1000,
+      opacity: 0,
+      scale: 0.8
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+          x: { type: "spring", stiffness: 300, damping: 30 },
+          opacity: { duration: 0.2 }
+      }
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? 1000 : -1000,
+      opacity: 0,
+      scale: 0.8,
+      transition: {
+          x: { type: "spring", stiffness: 300, damping: 30 },
+          opacity: { duration: 0.2 }
+      }
+    })
+  };
+
+
+
   const nextSlide = () => {
     if (currentIndex < slides.length - 1) {
+      setDirection(1);
       setCurrentIndex(prev => prev + 1);
     }
   };
 
   const prevSlide = () => {
     if (currentIndex > 0) {
+      setDirection(-1);
       setCurrentIndex(prev => prev - 1);
     }
   };
@@ -79,15 +113,15 @@ export const FullscreenPreview: React.FC<FullscreenPreviewProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center">
+    <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center overflow-hidden">
       {/* Header */}
-      <div className="absolute top-4 right-4 flex gap-2">
+      <div className="absolute top-4 right-4 flex gap-2 z-50">
          <Button variant="ghost" className="text-white hover:bg-white/10" onClick={onClose}>
              <X className="w-6 h-6" />
          </Button>
       </div>
 
-      <div className="absolute top-4 left-4 text-white/50 font-mono text-sm">
+      <div className="absolute top-4 left-4 text-white/50 font-mono text-sm z-50">
           {currentIndex + 1} / {slides.length}
       </div>
 
@@ -117,23 +151,35 @@ export const FullscreenPreview: React.FC<FullscreenPreviewProps> = ({
                 width: fullDimensions.width * screenScale, 
                 height: fullDimensions.height * screenScale 
             }}
-            className="relative shadow-2xl shadow-black/50"
+            className="relative"
          >
-             <div 
-                style={{ 
-                    transform: `scale(${screenScale})`, 
-                    transformOrigin: 'top left',
-                    width: fullDimensions.width,
-                    height: fullDimensions.height
-                }}
-             >
-                 <SlideRenderer 
-                    slide={slides[currentIndex]}
-                    design={design}
-                    author={author}
-                    isActive={true}
-                 />
-             </div>
+             <AnimatePresence initial={false} custom={direction} mode="popLayout">
+                 <motion.div
+                    key={currentIndex}
+                    custom={direction}
+                    variants={variants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    className="absolute inset-0 shadow-2xl shadow-black/50"
+                 >
+                     <div 
+                        style={{ 
+                            transform: `scale(${screenScale})`, 
+                            transformOrigin: 'top left',
+                            width: fullDimensions.width,
+                            height: fullDimensions.height
+                        }}
+                     >
+                         <SlideRenderer 
+                            slide={slides[currentIndex]}
+                            design={design}
+                            author={author}
+                            isActive={true}
+                         />
+                     </div>
+                 </motion.div>
+             </AnimatePresence>
          </div>
 
       </div>

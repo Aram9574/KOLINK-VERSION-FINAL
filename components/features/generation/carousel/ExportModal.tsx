@@ -1,17 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useUser } from '@/context/UserContext';
+import { translations } from '@/translations';
+import { 
+    Lock, 
+    FileText, 
+    FileImage, 
+    Loader2, 
+    Download,
+    Hash,
+    Copy,
+    Check
+} from 'lucide-react';
+import { useCarouselStore } from '@/lib/store/useCarouselStore';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Download, FileImage, FileText, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useCarouselStore } from '@/lib/store/useCarouselStore';
-import { supabase } from '@/services/supabaseClient';
-import { SlideRenderer } from './SlideRenderer';
-import html2canvas from 'html2canvas-pro';
+import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import { SlideRenderer } from './SlideRenderer';
+import { supabase } from '@/services/supabaseClient';
 
 interface ExportModalProps {
     isOpen: boolean;
@@ -20,11 +31,67 @@ interface ExportModalProps {
 
 export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     const { slides, design, author, title } = useCarouselStore(state => state.project);
+    const { user } = useUser();
+    const t = translations[user?.language || 'es'];
+    const isFree = user?.planTier === 'free';
+
     const [format, setFormat] = React.useState<'pdf' | 'png' | 'zip'>('pdf');
     const [quality, setQuality] = React.useState<'standard' | 'high'>('high');
     const [isExporting, setIsExporting] = React.useState(false);
     const [progress, setProgress] = React.useState(0);
     const stagingRef = React.useRef<HTMLDivElement>(null);
+    
+    // Hashtag State
+    const [hashtags, setHashtags] = useState<string[]>([]);
+    const [loadingTags, setLoadingTags] = useState(false);
+    const [copiedTags, setCopiedTags] = useState(false);
+
+    const handleGenerateHashtags = async () => {
+        setLoadingTags(true);
+        try {
+            // Collect text from first few slides to generate context
+            const context = slides.slice(0, 3).map(s => s.content.title + " " + s.content.body).join(" ");
+            
+            const { data, error } = await supabase.functions.invoke('generate-viral-post', {
+                body: {
+                    params: {
+                        mode: 'micro_edit', // Using micro_edit for simple text generation
+                        action: 'Generate 10 viral hashtags for this LinkedIn/Instagram carousel topic. Return ONLY the hashtags separated by spaces.',
+                        topic: context, // Passing context as topic
+                    }
+                }
+            });
+
+            if (error) throw error;
+            
+            // Extract hashtags from response
+            const tagString = data?.post_content || "";
+            const tags = tagString.match(/#[\w\u0590-\u05ff]+/g) || [];
+            
+            if (tags.length > 0) {
+                setHashtags(tags);
+                toast.success("Hashtags generated!");
+            } else {
+                 setHashtags(["#Growth", "#LinkedIn", "#Carousel", "#Marketing", "#Viral"]);
+                 toast.warning("AI didn't return tags, using defaults.");
+            }
+
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to generate hashtags");
+            // Fallback
+            setHashtags(["#Growth", "#LinkedIn", "#Carousel", "#Marketing", "#Viral"]);
+        } finally {
+            setLoadingTags(false);
+        }
+    };
+
+    const copyHashtags = () => {
+        navigator.clipboard.writeText(hashtags.join(' '));
+        setCopiedTags(true);
+        toast.success("Hashtags copied!");
+        setTimeout(() => setCopiedTags(false), 2000);
+    };
 
     const handleExport = async () => {
         setIsExporting(true);
@@ -91,7 +158,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
             }
 
             setProgress(100);
-            toast.success("Export successful!");
+            toast.success("¡Exportación exitosa!");
             setTimeout(() => {
                 onClose();
                 setIsExporting(false);
@@ -108,18 +175,19 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
     return (
         <>
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md overflow-y-auto max-h-[90vh]">
                 <DialogHeader>
-                    <DialogTitle>Export Carousel</DialogTitle>
+                    <DialogTitle>Exportar Carrusel</DialogTitle>
                     <DialogDescription>
-                        Choose format and quality for your download.
+                        Elige formato y calidad de descarga.
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-6 py-4">
+                    {/* Format Selection */}
                     <div className="space-y-2">
-                        <Label>Export Format</Label>
-                        <div className="grid grid-cols-3 gap-2">
+                        <Label>Formato</Label>
+                        <div className="grid grid-cols-2 gap-2">
                             <button
                                 onClick={() => setFormat('pdf')}
                                 className={`flex flex-col items-center justify-center p-3 rounded-xl border text-sm font-medium transition-all ${format === 'pdf' ? 'bg-brand-50 border-brand-500 text-brand-700 ring-1 ring-brand-500' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'}`}
@@ -132,35 +200,76 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
                                 className={`flex flex-col items-center justify-center p-3 rounded-xl border text-sm font-medium transition-all ${format === 'zip' ? 'bg-brand-50 border-brand-500 text-brand-700 ring-1 ring-brand-500' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'}`}
                             >
                                 <FileImage className="w-6 h-6 mb-2 opacity-80" />
-                                Images (ZIP)
-                            </button>
-                             <button // Placeholder for future
-                                disabled
-                                className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-400 cursor-not-allowed"
-                            >
-                                <FileImage className="w-6 h-6 mb-2 opacity-50" />
-                                PNG (Single)
+                                Imágenes (ZIP)
                             </button>
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Quality</Label>
+                        <Label>Calidad</Label>
                         <Select value={quality} onValueChange={(v: any) => setQuality(v)}>
                             <SelectTrigger>
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="standard">Standard (Faster)</SelectItem>
-                                <SelectItem value="high">High Definition (Print ready)</SelectItem>
+                                <SelectItem value="standard">Estándar (Rápido)</SelectItem>
+                                <SelectItem value="high">Alta Definición (Print ready)</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
+                    
+                    {/* Smart Hashtags (New) */}
+                    <div className="space-y-2 pt-2 border-t border-slate-100">
+                        <div className="flex items-center justify-between">
+                            <Label className="flex items-center gap-2">
+                                <Hash className="w-3.5 h-3.5 text-slate-500" />
+                                Hashtags Inteligentes (IA)
+                            </Label>
+                            {!hashtags.length && (
+                                <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-6 text-[10px]"
+                                    onClick={handleGenerateHashtags}
+                                    disabled={loadingTags}
+                                >
+                                    {loadingTags ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Hash className="w-3 h-3 mr-1" />}
+                                    Generar
+                                </Button>
+                            )}
+                        </div>
+                        
+                        {hashtags.length > 0 && (
+                            <div className="bg-slate-50 rounded-lg p-3 border border-slate-200 relative group">
+                                <p className="text-xs text-slate-600 leading-relaxed pr-8 font-mono">
+                                    {hashtags.join(' ')}
+                                </p>
+                                <button 
+                                    onClick={copyHashtags}
+                                    className="absolute top-2 right-2 p-1.5 hover:bg-slate-200 rounded text-slate-400 hover:text-slate-600 transition-colors"
+                                >
+                                    {copiedTags ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {isFree && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Lock className="w-4 h-4 text-amber-600" />
+                                <span className="text-xs text-amber-800 font-medium">{t.carouselStudio.properties?.export?.watermarkNotice || "Free Plan: Watermark added"}</span>
+                            </div>
+                            <Button size="sm" variant="ghost" className="text-amber-700 hover:text-amber-800 hover:bg-amber-100 h-8 text-xs" onClick={() => window.open('/#pricing', '_blank')}>
+                                {t.carouselStudio.properties?.export?.removeWatermark || "Upgrade"}
+                            </Button>
+                        </div>
+                    )}
 
                     {isExporting && (
                         <div className="space-y-2">
                             <div className="flex justify-between text-xs text-slate-500">
-                                <span>Generating files...</span>
+                                <span>Generando archivos...</span>
                                 <span>{progress}%</span>
                             </div>
                             <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
@@ -174,10 +283,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" onClick={onClose} disabled={isExporting}>Cancel</Button>
+                    <Button variant="outline" onClick={onClose} disabled={isExporting}>Cancelar</Button>
                     <Button onClick={handleExport} disabled={isExporting} className="gap-2">
                         {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                        {isExporting ? 'Exporting...' : 'Download Now'}
+                        {isExporting ? 'Exportando...' : 'Descargar Ahora'}
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -203,6 +312,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
                         className="export-slide-node"
                         style={{
                             width: 1080,
+                            position: 'relative', // IMPORTANT for absolute watermark
                             height: design.aspectRatio === '4:5' ? 1350 : design.aspectRatio === '9:16' ? 1920 : 1080,
                             marginBottom: 20
                         }}
@@ -214,7 +324,30 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
                             scale={1} // Helper scales 1:1 to container
                             isActive={false} // Clean mode
                         />
-                        {/* Add Slide Number Overlay if needed, but usually baking it in logic is better */}
+                        
+                        {isFree && (
+                            <div style={{
+                                position: 'absolute',
+                                bottom: '40px',
+                                right: '40px',
+                                background: 'rgba(255, 255, 255, 0.85)',
+                                backdropFilter: 'blur(8px)',
+                                padding: '12px 24px',
+                                borderRadius: '12px',
+                                fontSize: '24px', // Large for 1080p canvas
+                                fontWeight: '600',
+                                color: '#0f172a',
+                                zIndex: 100,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                boxShadow: '0 8px 16px -4px rgba(0, 0, 0, 0.1)',
+                                border: '1px solid rgba(255, 255, 255, 0.5)'
+                            }}>
+                                <span style={{ opacity: 0.7 }}>⚡️</span>
+                                {t.carouselStudio.properties?.export?.createdWith || "Created with Kolink.ai"}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

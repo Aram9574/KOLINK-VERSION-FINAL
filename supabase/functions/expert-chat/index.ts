@@ -87,7 +87,7 @@ Deno.serve(async (req: Request) => {
     );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "UNKNOWN_ERROR";
-    const errorStack = error instanceof Error ? error.stack : "";
+    const errorStack = (error instanceof Error && error.stack) ? error.stack : "";
     console.error("[Nexus] CRITICAL_ERROR:", errorMessage, errorStack);
     
     return new Response(

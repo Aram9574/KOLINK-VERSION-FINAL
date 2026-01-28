@@ -42,19 +42,19 @@ Debes devolver UNICAMENTE un objeto JSON válido con esta estructura exacta, sin
         "dark_mode": false
     }
   },
-  "slides": [
+    "slides": [
     {
       "id": "slide-1",
       "type": "intro | content | outro",
       "layout_variant": "default | big_number | quote | checklist | comparison | code",
       "content": {
-        "title": "Texto del título",
-        "subtitle": "Texto secundario o tagline",
-        "body": "Cuerpo del mensaje (usa markdown **bold** para énfasis)",
-        "visual_hint": "Descripción breve del icono (ej. 'rocket', 'brain')"
+        "title": "Magnetic Title (Max 7 words)",
+        "subtitle": "Compelling Tagline",
+        "body": "MUST CONTAIN DEEP VALUE. Minimum 2 sentences. Use **bold** for key concepts. No generic fluff.",
+        "visual_hint": "Description for background/icon"
       },
       "design_overrides": {
-        "swipe_indicator": true // Solo para intro
+        "swipe_indicator": true // Only for intro
       }
     }
   ],

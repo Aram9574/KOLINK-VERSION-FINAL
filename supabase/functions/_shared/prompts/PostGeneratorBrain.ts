@@ -1,5 +1,5 @@
 import { GenerationParams } from "../schemas.ts";
-import { UserContext } from "../../../../../types.ts";
+import { UserContext } from "../types.ts";
 
 export class PostGeneratorBrain {
   

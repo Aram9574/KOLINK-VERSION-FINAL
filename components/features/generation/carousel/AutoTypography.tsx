@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 interface AutoTypographyProps {
@@ -28,45 +28,82 @@ export const AutoTypography: React.FC<AutoTypographyProps> = ({
   as: Component = 'div',
   overrideFontSize,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [fontSize, setFontSize] = useState(baseSize);
+  const containerRef = useRef<HTMLElement>(null);
+  const [fontSize, setFontSize] = useState(overrideFontSize || baseSize);
 
-  // Heuristic-based calculation to avoid heavy DOM layout thrashing
-  // We estimate based on character count and typical word lengths.
+  // If overrideFontSize changes, update state
   useEffect(() => {
-    if (!content) return;
+    if (overrideFontSize) setFontSize(overrideFontSize);
+  }, [overrideFontSize]);
+
+  // Text Fitting Logic
+  React.useLayoutEffect(() => {
+    // If user manually overrode size, skip auto-fit
+    if (overrideFontSize) return;
+    if (!containerRef.current) return;
+
+    const el = containerRef.current;
     
+    // Reset to base size (or calculated heuristic max) to start measurement
+    // We start large and shrink.
+    // However, to avoid flash, we can start at current state or baseSize.
+    
+    // Heuristic start to save cycles
     const charCount = content.length;
+    let startSize = baseSize;
+    if (charCount < 10) startSize = maxSize;
+    else if (charCount > 150) startSize = baseSize * 0.6;
     
-    // Simple decay function: simpler and faster than binary search loop
-    let calculatedSize = baseSize;
+    // Apply start size to measure
+    el.style.fontSize = `${startSize}px`;
 
-    if (charCount < 10) calculatedSize = maxSize;
-    else if (charCount < 20) calculatedSize = baseSize * 1.5; // Scale up for short catchy phrases
-    else if (charCount < 40) calculatedSize = baseSize;
-    else if (charCount < 80) calculatedSize = baseSize * 0.8;
-    else if (charCount < 150) calculatedSize = baseSize * 0.6;
-    else calculatedSize = baseSize * 0.5;
-
-    // Clamp values
-    calculatedSize = Math.max(minSize, Math.min(calculatedSize, maxSize));
+    // Binary search / Iterative reduction
+    // We only shrink if it overflows.
+    // Detection: scrollHeight > clientHeight (vertical overflow) 
+    // OR scrollWidth > clientWidth (horizontal overflow - though we usually wrap)
     
-    if (calculatedSize !== fontSize) {
-        setFontSize(calculatedSize);
+    // We assume wrapping text (vertical growth).
+    
+    if (el.scrollHeight <= el.clientHeight) {
+        // It fits! Can we grow it? 
+        // Optional: logic to grow text to fill space is risky for layout. 
+        // We focus on "Shrink to Fit" which is safer.
+        setFontSize(Math.max(minSize, startSize));
+        return;
     }
 
-  }, [content, baseSize, minSize, maxSize]);
+    // It overflows, shrink it.
+    let min = minSize;
+    let max = startSize;
+    let bestFit = minSize;
+
+    while (min <= max) {
+        const mid = Math.floor((min + max) / 2);
+        el.style.fontSize = `${mid}px`;
+
+        if (el.scrollHeight <= el.clientHeight) {
+            bestFit = mid;
+            min = mid + 1; // Try larger
+        } else {
+            max = mid - 1; // Too big
+        }
+    }
+
+    if (bestFit !== fontSize) {
+        setFontSize(bestFit);
+    }
+    el.style.fontSize = `${bestFit}px`;
+
+  }, [content, baseSize, minSize, maxSize, fontFamily, lineHeight, overrideFontSize]); // Removed containerRef.current?.clientHeight to prevent loop
 
   // Helper to parse bold markdown **text**
   const parseMarkdown = (text: string) => {
-    // Sanitize input: prevent "undefined" string literal or null/undefined values
     if (!text || text === 'undefined') return "";
-
     const parts = text.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {
         return (
-          <span key={index} className="text-brand-500 opacity-90" style={{ color: 'inherit', opacity: 0.8 }}>
+          <span key={index} className="opacity-90" style={{ fontWeight: 900 }}>
             {part.slice(2, -2)}
           </span>
         );
@@ -77,14 +114,18 @@ export const AutoTypography: React.FC<AutoTypographyProps> = ({
 
   return (
     <Component
-      ref={containerRef}
-      className={cn("whitespace-pre-wrap transition-all duration-300", className)}
+      ref={containerRef as any}
+      className={cn("whitespace-pre-wrap w-full", className)}
       style={{
         fontFamily,
-        fontSize: `${overrideFontSize || fontSize}px`,
+        fontSize: `${fontSize}px`,
         lineHeight: lineHeight,
         color: color,
         fontWeight: weight === 'black' ? 900 : weight === 'bold' ? 700 : weight === 'medium' ? 500 : 400,
+        // Ensure container can report overflow
+        overflow: 'hidden', 
+        display: 'block', // or matching component
+        wordBreak: 'break-word'
       }}
     >
       {parseMarkdown(content)}

@@ -3,10 +3,32 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { NICHES } from "../../data/niches";
-import { ArrowRight, Sparkles, TrendingUp, Users, Shield, Code, PenTool } from "lucide-react";
+import { 
+    ArrowRight, 
+    Sparkles, 
+    TrendingUp, 
+    Users, 
+    Shield, 
+    Code, 
+    PenTool, 
+    Zap,
+    Layout,
+    CheckCircle,
+    Building2,
+    Clock,
+    Scan,
+    Anchor
+} from "lucide-react";
 import { motion } from "framer-motion";
+import { SEO_TOOLS_CONFIG } from "@/lib/data/seo-tools-config";
+
+import { useUser } from "@/context/UserContext";
+import { translations } from "@/translations";
 
 const ToolsIndexPage: React.FC = () => {
+  const { language } = useUser();
+  const t = translations[language];
+
   // Group niches manually for better UX (or you could add a 'category' field to NicheData later)
   const categories = [
     {
@@ -63,6 +85,106 @@ const ToolsIndexPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Featured Tools */}
+      <section className="px-6 mb-12">
+        <div className="max-w-6xl mx-auto">
+             <div className="flex items-center gap-3 mb-6">
+                <Sparkles className="w-5 h-5 text-brand-500" />
+                <h2 className="text-2xl font-bold">{t.toolsPage.common.popularTools || "Herramientas Populares (Gratis)"}</h2>
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Link to="/tools/headline-generator" className="group">
+                    <motion.div whileHover={{ y: -4 }} className="h-full bg-white border border-brand-200 rounded-2xl p-6 hover:shadow-xl hover:shadow-brand-500/10 transition-all shadow-sm">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 bg-brand-50 rounded-xl text-brand-600">
+                                <Zap className="w-6 h-6" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-brand-500 transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-lg text-slate-900 mb-2">{t.nav.items.headlineGenerator.title}</h3>
+                        <p className="text-sm text-slate-500">{t.nav.items.headlineGenerator.desc}</p>
+                    </motion.div>
+                </Link>
+                <Link to="/tools/bio-generator" className="group">
+                    <motion.div whileHover={{ y: -4 }} className="h-full bg-white border border-blue-200 rounded-2xl p-6 hover:shadow-xl hover:shadow-blue-500/10 transition-all shadow-sm">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
+                                <Users className="w-6 h-6" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-lg text-slate-900 mb-2">{t.nav.items.bioGenerator.title}</h3>
+                        <p className="text-sm text-slate-500">{t.nav.items.bioGenerator.desc}</p>
+                    </motion.div>
+                </Link>
+                <Link to="/tools/viral-calculator" className="group">
+                    <motion.div whileHover={{ y: -4 }} className="h-full bg-white border border-purple-200 rounded-2xl p-6 hover:shadow-xl hover:shadow-purple-500/10 transition-all shadow-sm">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 bg-purple-50 rounded-xl text-purple-600">
+                                <TrendingUp className="w-6 h-6" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-purple-500 transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-lg text-slate-900 mb-2">{t.nav.items.viralCalculator.title}</h3>
+                        <p className="text-sm text-slate-500">{t.nav.items.viralCalculator.desc}</p>
+                    </motion.div>
+                </Link>
+                <Link to="/tools/best-time-to-post" className="group">
+                    <motion.div whileHover={{ y: -4 }} className="h-full bg-white border border-green-200 rounded-2xl p-6 hover:shadow-xl hover:shadow-green-500/10 transition-all shadow-sm">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 bg-green-50 rounded-xl text-green-600">
+                                <Clock className="w-6 h-6" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-green-500 transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-lg text-slate-900 mb-2">{t.nav.items.bestTime.title}</h3>
+                        <p className="text-sm text-slate-500">{t.nav.items.bestTime.desc}</p>
+                    </motion.div>
+                </Link>
+                <Link to="/tools/profile-auditor" className="group">
+                    <motion.div whileHover={{ y: -4 }} className="h-full bg-white border border-amber-200 rounded-2xl p-6 hover:shadow-xl hover:shadow-amber-500/10 transition-all shadow-sm">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 bg-amber-50 rounded-xl text-amber-600">
+                                <Scan className="w-6 h-6" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-amber-500 transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-lg text-slate-900 mb-2">{t.nav.items.profileAuditor.title}</h3>
+                        <p className="text-sm text-slate-500">{t.nav.items.profileAuditor.desc}</p>
+                    </motion.div>
+                </Link>
+
+                {/* Second Row */}
+
+                <Link to="/hooks" className="group">
+                    <motion.div whileHover={{ y: -4 }} className="h-full bg-white border border-pink-200 rounded-2xl p-6 hover:shadow-xl hover:shadow-pink-500/10 transition-all shadow-sm">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 bg-pink-50 rounded-xl text-pink-600">
+                                <Anchor className="w-6 h-6" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-pink-500 transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-lg text-slate-900 mb-2">{t.nav.items.hooks.title}</h3>
+                        <p className="text-sm text-slate-500">{t.nav.items.hooks.desc}</p>
+                    </motion.div>
+                </Link>
+
+                 <Link to="/carousel-studio" className="group">
+                    <motion.div whileHover={{ y: -4 }} className="h-full bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-xl hover:shadow-slate-500/10 transition-all shadow-sm">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 bg-purple-50 rounded-xl text-purple-600">
+                                <Code className="w-6 h-6" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-purple-500 transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-lg text-slate-900 mb-2">{t.nav.items.carouselStudio.title}</h3>
+                        <p className="text-sm text-slate-500">{t.nav.items.carouselStudio.desc}</p>
+                    </motion.div>
+                </Link>
+             </div>
+        </div>
+      </section>
+
       {/* Directory Grid */}
       <section className="py-12 px-6 pb-32">
         <div className="max-w-6xl mx-auto space-y-16">
@@ -109,6 +231,47 @@ const ToolsIndexPage: React.FC = () => {
           ))}
         </div>
       </section>
+      {/* All Tools Grid (Programmatic SEO) */}
+      <section className="py-20 max-w-7xl mx-auto px-6">
+          <h2 className="text-2xl font-bold text-slate-900 mb-10 border-b border-slate-100 pb-4">
+              {t.toolsPage.common.moreTools || "Más Herramientas por Industria"}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {SEO_TOOLS_CONFIG.map((tool) => (
+                  <Link to={`/tools/${tool.slug}`} key={tool.slug} className="group">
+                       <div className="h-full bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-xl hover:shadow-slate-500/5 transition-all shadow-sm group-hover:-translate-y-1">
+                          <div className="flex justify-between items-start mb-4">
+                              <div className="p-3 bg-slate-50 rounded-xl text-slate-600 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
+                                  <tool.icon className="w-6 h-6" />
+                              </div>
+                              <div className="px-2 py-1 bg-slate-100 rounded text-[10px] font-bold text-slate-500 uppercase">
+                                  Free
+                              </div>
+                          </div>
+                          <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-brand-600 transition-colors">
+                              {tool.title}
+                          </h3>
+                          <p className="text-sm text-slate-500 line-clamp-2">
+                              {tool.description}
+                          </p>
+                      </div>
+                  </Link>
+              ))}
+          </div>
+      </section>
+
+                {/* Comparisons Section */}
+                <div className="mt-24 border-t border-slate-200 pt-16 mb-20">
+                    <h2 className="text-xl font-bold text-slate-900 mb-8">Compare Kolink</h2>
+                    <div className="flex flex-wrap gap-6">
+                        <Link to="/vs/taplio" className="text-slate-500 hover:text-brand-600 font-medium transition-colors">
+                            Kolink vs Taplio
+                        </Link>
+                        <Link to="/vs/supergrow" className="text-slate-500 hover:text-brand-600 font-medium transition-colors">
+                            Kolink vs Supergrow
+                        </Link>
+                    </div>
+                </div>
     </div>
   );
 };

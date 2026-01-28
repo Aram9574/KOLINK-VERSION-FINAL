@@ -1,9 +1,27 @@
+import { SupabaseClient } from "jsr:@supabase/supabase-js@2";
 import { BaseAIService } from "./BaseAIService.ts";
 import { LinkedInAuditResult, LinkedInPDFData, LinkedInProfileData } from "../types.ts";
 import { AuditBrain } from "../prompts/AuditBrain.ts";
 import { VoiceBrain } from "../prompts/VoiceBrain.ts";
-import pdf from "npm:pdf-parse@^1.1.1";
-import { Buffer } from "node:buffer";
+import { z } from "npm:zod";
+
+// Zod Schema for Validation
+const LinkedInAuditSchema = z.object({
+  authority_score: z.number(),
+  brutal_diagnosis: z.string(),
+  quick_wins: z.array(z.string()),
+  strategic_roadmap: z.object({
+    headline: z.string(),
+    about: z.string(),
+    experience: z.string(),
+  }),
+  visual_critique: z.string(),
+  technical_seo_keywords: z.array(z.string()),
+  gap_analysis: z.object({
+    benchmark_comparison: z.string(),
+    percentile: z.string(),
+  }),
+});
 
 export class AuditService extends BaseAIService {
   /**
@@ -49,56 +67,11 @@ export class AuditService extends BaseAIService {
         },
       };
 
-      const data = await this.generateViaFetch(this.MODEL, payload);
+      const data = await this.generateViaFetch(this.MODEL, payload) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("No text returned from Gemini");
       return JSON.parse(text);
     });
-  }
-
-  /**
-   * Fallback: Deterministic URL extraction using pdf-parse.
-   * AI sometimes misses the URL in the text layer. This is a regex-based safety net.
-   */
-  async extractPdfUrlDeterministic(pdfBase64: string): Promise<string | null> {
-      try {
-          console.log(`[AuditService] Deterministic Extraction: Input PDF Base64 length: ${pdfBase64.length}`);
-          const buffer = Buffer.from(pdfBase64, 'base64');
-          const data = await pdf(buffer);
-          const text = data.text;
-          
-          console.log(`[AuditService] PDF Text extracted (${text.length} chars). Snippet: ${text.substring(0, 100)}...`);
-
-          // Relaxed Regex: Optional protocol, optional www
-          // Matches: linkedin.com/in/username, www.linkedin.com/in/username, https://...
-          const urlRegex = /((https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9%\-_]+)/i;
-          const match = text.match(urlRegex);
-
-          if (match && match[0]) {
-              console.log("[AuditService] Deterministic URL found:", match[0]);
-              // Ensure protocol is present
-              let url = match[0];
-              if (!url.startsWith("http")) {
-                  url = "https://" + url;
-              }
-              return url;
-          }
-          
-          console.log("[AuditService] No URL found deterministically. Searching manually in text dump...");
-          // Fallback: search for "linkedin.com/in" index
-          const idx = text.indexOf("linkedin.com/in/");
-          if (idx !== -1) {
-             // extract until whitespace
-             const potential = text.substring(idx, text.indexOf(" ", idx));
-             console.log("[AuditService] Manual index recovery:", potential);
-             return "https://" + potential.trim();
-          }
-
-          return null;
-      } catch (e) {
-          console.error("[AuditService] Deterministic extraction failed:", e);
-          return null;
-      }
   }
 
   /**
@@ -169,8 +142,6 @@ export class AuditService extends BaseAIService {
              content: { parts: [{ text }] }
          };
          
-         // Note: Using a separate endpoint for embeddings usually, or the same generateContent with specific model
-         // For Google Gen AI REST API: https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent
          const apiKey = Deno.env.get("GEMINI_API_KEY");
          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${apiKey}`, {
              method: "POST",
@@ -180,6 +151,7 @@ export class AuditService extends BaseAIService {
 
          if (!response.ok) throw new Error(`Embedding failed: ${response.statusText}`);
          const data = await response.json();
+         // Handle both structures if needed, but text-embedding-004 usually returns 'embedding.values'
          return data.embedding.values;
      });
   }
@@ -187,19 +159,35 @@ export class AuditService extends BaseAIService {
   /**
    * Retrieves relevant benchmarks from Supabase pgvector.
    */
-  async findBenchmarks(text: string, category: string): Promise<string[]> {
+  async findBenchmarks(text: string, category: string, supabaseClient?: SupabaseClient): Promise<string[]> {
+      if (!supabaseClient) {
+          console.log("[AuditService] No Supabase client provided for RAG. Skipping.");
+          return [];
+      }
+
       try {
+          console.log(`[AuditService] Generating embedding for RAG (Category: ${category})...`);
           const embedding = await this.embedText(text);
           
-          // Call the match_benchmarks RPC function
-          // Note: Needs supabase client injection or direct fetch if inside Edge Function
-          // Assuming 'supabase' is available via createClient in the context or passed in.
-          // For now, we'll return empty if no DB access is set up in this class directly, 
-          // but in a real Edge Function, we'd use the specific client.
-          
-          // MOCK IMPLEMENTATION FOR NOW until Supabase Client is injected into Service
-          console.log("[AuditService] Retrieving benchmarks for:", category);
-          return []; 
+          console.log("[AuditService] Querying vector store...");
+          const { data, error } = await supabaseClient.rpc('match_benchmarks', {
+              query_embedding: embedding,
+              match_threshold: 0.7, // High threshold for relevance
+              match_count: 3
+          });
+
+          if (error) {
+              console.error("[AuditService] match_benchmarks RPC error:", error);
+              return [];
+          }
+
+          if (!data || data.length === 0) {
+              console.log("[AuditService] No relevant benchmarks found.");
+              return [];
+          }
+
+          console.log(`[AuditService] Found ${data.length} benchmarks.`);
+          return data.map((b: any) => `[${b.category}] ${b.text_content}`);
 
       } catch (e) {
           console.error("[AuditService] Benchmark retrieval failed:", e);
@@ -213,15 +201,23 @@ export class AuditService extends BaseAIService {
   async analyzeLinkedInProfile(
     profileData: LinkedInProfileData,
     _language: string = "es",
-    imageBase64?: string
+    imageBase64?: string,
+    supabaseClient?: SupabaseClient
   ): Promise<LinkedInAuditResult> {
     
     // NEW SOTA SYSTEM PROMPT (Strict Spanish)
     const systemPrompt = AuditBrain.system_instruction;
 
     // RAG: Get benchmarks for Headline and About
-    const headline = profileData.headline || "";
-    // const headlineBenchmarks = await this.findBenchmarks(headline, "SaaS Founder"); // Example usage
+    const _headline = profileData.headline || "";
+    const _about = profileData.about || profileData.summary || "";
+    
+    // We combine headline and about for a richer context similarity search
+    const queryText = `${_headline}\n${_about}`;
+    
+    // Assuming context is "SaaS Founder" or generic "Personal Brand" if not specified.
+    // Ideally we'd classify the user first. For now, we search broadly.
+    const benchmarks = await this.findBenchmarks(queryText, "General", supabaseClient);
     
     let prompt = `
       CONTEXT: Analyzing a LinkedIn Profile using specific Hybrid Data (PDF Extraction + Live Scraping).
@@ -229,7 +225,19 @@ export class AuditService extends BaseAIService {
       
       DATA SOURCE:
       ${JSON.stringify(profileData)}
+    `;
 
+    if (benchmarks.length > 0) {
+        prompt += `
+        
+        TOP-TIER BENCHMARKS (RAG CONTEXT):
+        Use these high-performing profile examples to ground your critique and suggestions. 
+        Compare the user's profile against these standards.
+        ${benchmarks.join("\n---\n")}
+        `;
+    }
+
+    prompt += `
       CRITICAL ANALYSIS PILLARS:
       1. **Headline Strategy**: Does it clearly state the UVP (Unique Value Proposition)? Is it searchable? Is it memorable?
       2. **About Section Narrative**: Is it a generic bio or a compelling sales letter? Does it build trust?
@@ -247,7 +255,7 @@ export class AuditService extends BaseAIService {
     }
 
     return await this.retryWithBackoff(async () => {
-      const parts: any[] = [{ text: prompt }];
+      const parts: { text?: string; inline_data?: { mime_type: string; data: string } }[] = [{ text: prompt }];
 
       if (imageBase64) {
           const mimeType = imageBase64.match(/data:(.*?);base64/)?.[1] || "image/png";
@@ -260,52 +268,47 @@ export class AuditService extends BaseAIService {
           });
       }
 
-      const payload = {
-        contents: [{ role: "user", parts: parts }],
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        generationConfig: {
-          temperature: 0.3,
-          response_mime_type: "application/json",
-          response_schema: {
+      const geminiSchema = {
+        type: "OBJECT",
+        properties: {
+          authority_score: { type: "NUMBER" },
+          brutal_diagnosis: { type: "STRING" },
+          quick_wins: { 
+            type: "ARRAY", 
+            items: { type: "STRING" } 
+          },
+          strategic_roadmap: {
             type: "OBJECT",
             properties: {
-              authority_score: { type: "NUMBER" },
-              brutal_diagnosis: { type: "STRING" },
-              quick_wins: { 
-                type: "ARRAY", 
-                items: { type: "STRING" } 
-              },
-              strategic_roadmap: {
-                type: "OBJECT",
-                properties: {
-                  headline: { type: "STRING" },
-                  about: { type: "STRING" },
-                  experience: { type: "STRING" }
-                },
-                required: ["headline", "about", "experience"]
-              },
-              visual_critique: { type: "STRING" },
-              technical_seo_keywords: { 
-                type: "ARRAY", 
-                items: { type: "STRING" } 
-              },
-              gap_analysis: {
-                 type: "OBJECT",
-                 properties: {
-                    benchmark_comparison: { type: "STRING" },
-                    percentile: { type: "String" }
-                 }
-              }
+              headline: { type: "STRING" },
+              about: { type: "STRING" },
+              experience: { type: "STRING" }
             },
-            required: ["authority_score", "brutal_diagnosis", "quick_wins", "strategic_roadmap", "visual_critique", "technical_seo_keywords"]
+            required: ["headline", "about", "experience"]
           },
+          visual_critique: { type: "STRING" },
+          technical_seo_keywords: { 
+            type: "ARRAY", 
+            items: { type: "STRING" } 
+          },
+          gap_analysis: {
+             type: "OBJECT",
+             properties: {
+                benchmark_comparison: { type: "STRING" },
+                percentile: { type: "String" }
+             }
+          }
         },
+        required: ["authority_score", "brutal_diagnosis", "quick_wins", "strategic_roadmap", "visual_critique", "technical_seo_keywords"]
       };
 
-      const data = await this.generateViaFetch(this.MODEL, payload);
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error("No text returned from Gemini");
-      return JSON.parse(text);
+      return await this.generateWithSchema(
+        this.MODEL,
+        parts,
+        LinkedInAuditSchema,
+        systemPrompt,
+        geminiSchema
+      );
     });
   }
 
@@ -313,7 +316,7 @@ export class AuditService extends BaseAIService {
    * Analyzes content samples to extract a unique Brand Voice.
    */
   async analyzeVoice(contentSamples: string[], language: string = "es", imageBase64?: string, pdfBase64?: string) {
-    let finalSamples = [...contentSamples];
+    const finalSamples = [...contentSamples];
 
     if (pdfBase64) {
       console.log("[AuditService] Extracting text from PDF for voice analysis...");
@@ -321,8 +324,6 @@ export class AuditService extends BaseAIService {
       if (pdfData && (pdfData.summary || pdfData.about)) {
          finalSamples.push(pdfData.summary || pdfData.about || "");
       }
-      // Also try deterministic extraction of anything else? 
-      // For now, let's just add the summary/about as representative of voice.
     }
 
     const samples = finalSamples.join("\n---\n");
@@ -339,7 +340,7 @@ export class AuditService extends BaseAIService {
     }
 
     return await this.retryWithBackoff(async () => {
-      const parts: any[] = [{ text: prompt }];
+      const parts: { text?: string; inline_data?: { mime_type: string; data: string } }[] = [{ text: prompt }];
       
       if (imageBase64) {
           const mimeType = imageBase64.match(/data:(.*?);base64/)?.[1] || "image/png";
@@ -391,11 +392,10 @@ export class AuditService extends BaseAIService {
         },
       };
 
-      const data = await this.generateViaFetch(this.MODEL, payload);
+      const data = await this.generateViaFetch(this.MODEL, payload) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("No text returned from Gemini");
       return this.extractJson(text);
     });
   }
 }
-
