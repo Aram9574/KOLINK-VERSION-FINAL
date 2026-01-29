@@ -70,6 +70,8 @@ const FAQPage = lazy(() => import("./components/landing/company/FAQPage"));
 import { useExitIntent } from "./hooks/useExitIntent";
 import { ExitIntentModal } from "./components/modals/ExitIntentModal";
 import FomoToast from "./components/ui/FomoToast";
+import { ClickTracker } from "./components/common/ClickTracker";
+const AnalyticsDashboard = lazy(() => import("./components/admin/AnalyticsDashboard"));
 
 const App: React.FC = () => {
     const { user, language, loading } = useUser();
@@ -135,6 +137,7 @@ const App: React.FC = () => {
                 }}
             />
             <CookieConsent />
+            <ClickTracker />
             <ExitIntentModal 
                 isOpen={isExitIntentVisible} 
                 onClose={() => setIsExitIntentVisible(false)} 
@@ -226,6 +229,17 @@ const App: React.FC = () => {
                         <Route path="/tools/carousel-studio" element={<CarouselStudioTool />} />
                         <Route path="/carousel-studio" element={<Navigate to="/tools/carousel-studio" replace />} />
                         <Route path="/studio" element={<Navigate to="/tools/carousel-studio" replace />} />
+
+                        <Route 
+                            path="/dashboard/admin/analytics" 
+                            element={
+                                <ProtectedRoute>
+                                    <Suspense fallback={null}>
+                                        <AnalyticsDashboard />
+                                    </Suspense>
+                                </ProtectedRoute>
+                            } 
+                        />
 
                         {/* Catch all */}
                         <Route path="*" element={<Navigate to="/" replace />} />

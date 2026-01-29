@@ -44,7 +44,6 @@ interface APIResponse<T> {
 
 // generateViralPost has been migrated to PostService.ts
 // Exporting types only if needed by legacy code, though typically used from types/index.ts
-export type { GeneratedPostResult };
 
 
 export interface IdeaResult {
@@ -176,9 +175,7 @@ export const streamMicroEdit = async (
               stream: true 
           } 
       },
-      options: {
-        responseType: 'arraybuffer' // force binary/blob handling
-      }
+
       // Note: invoke might ignore headers if responseType is set, or vice versa depending on version.
   });
 
@@ -271,6 +268,8 @@ const streamFromEdgeFunction = async (
     return finalResult;
 };
 
+import { analytics } from './analyticsService';
+
 export const generatePostStream = async (
     params: GenerationParams, 
     onChunk: (chunk: string) => void
@@ -279,6 +278,16 @@ export const generatePostStream = async (
     
     if (!result) throw new Error("Stream finished without result");
     
+    // Analytics Tracking
+    analytics.track('post_generated_success', {
+      topic: params.topic,
+      tone: params.tone,
+      mode: params.mode || 'standard',
+      language: params.language,
+      viral_score: result.auditor_report?.viral_score || 0,
+      has_gamification: !!result.gamification
+    });
+
     return {
         id: result.id || 'temp-id',
         content: result.post_content,

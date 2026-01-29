@@ -18,6 +18,8 @@ export interface ExperienceItem {
 export interface LinkedInAuditResult {
   authority_score: number;
   visual_score: number;
+  seo_score: number;
+  total_score: number;
   brutal_diagnosis: string;
   quick_wins: string[];
   strategic_roadmap: {
@@ -27,6 +29,10 @@ export interface LinkedInAuditResult {
   };
   visual_critique: string;
   technical_seo_keywords: string[];
+  gap_analysis?: {
+    benchmark_comparison: string;
+    percentile: string;
+  };
   source_type?: "hybrid" | "pdf" | "visual";
   processed_data?: {
     name?: string;

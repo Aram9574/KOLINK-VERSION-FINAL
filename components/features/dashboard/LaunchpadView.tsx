@@ -8,6 +8,7 @@ import HelpModal from '../../modals/HelpModal';
 import { FeedbackModal } from '../../modals/FeedbackModal';
 import { OnboardingChecklist } from '../onboarding/OnboardingChecklist';
 import { LaunchpadHeader } from './launchpad/LaunchpadHeader';
+import { GamificationCard } from './GamificationCard';
 import { ToolsGrid } from './launchpad/ToolsGrid';
 import { MissionLog } from './launchpad/MissionLog';
 import { InsightWidget } from './launchpad/InsightWidget';
@@ -46,6 +47,11 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                 t={t} 
                 onSelectTool={onSelectTool} 
             />
+
+            {/* Gamification & Progress */}
+            <div className="mb-10">
+                <GamificationCard user={user} language={language} />
+            </div>
 
             {/* Activation Checklist */}
             <div className="mb-10">

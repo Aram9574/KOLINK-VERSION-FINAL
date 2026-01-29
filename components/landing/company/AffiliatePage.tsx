@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { 
     Users, DollarSign, TrendingUp, Sparkles, CheckCircle, ArrowRight, 
-    Wallet, PieChart, Globe, Zap, Target, Briefcase, Mail, Download, 
+    Wallet, Globe, Zap, Briefcase, Mail, Download, 
     Video, Layout
 } from 'lucide-react';
 
@@ -16,12 +17,6 @@ import { useUser } from '../../../context/UserContext';
 import { translations } from '../../../translations';
 import { Card } from '../../ui/card';
 
-// Import image directly if needed, or use absolute path in src.
-// Since we are in browser environment, we'll use the relative path from public or import it.
-// Assuming the image is saved in artifacts, I need to assume it will be moved or I should reference it correctly.
-// For now, I will use the path I know exists in the artifacts directory, but usually these should be in /public.
-// I will use a placeholder logic where I assume the image is available.
-
 const AffiliatePage: React.FC = () => {
     const { language, setLanguage, user } = useUser();
     const t = translations[language].affiliatePage;
@@ -32,30 +27,28 @@ const AffiliatePage: React.FC = () => {
         if(el) el.scrollIntoView({ behavior: 'smooth' });
     };
 
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "AffiliateProgram",
+        "name": "Kolink Partner Program",
+        "description": "Earn 30% recurring commission on all referrals.",
+        "provider": {
+            "@type": "Organization",
+            "name": "Kolink"
+        },
+        "commission": {
+            "@type": "MonetaryAmount",
+            "currency": "EUR",
+            "value": "30%"
+        }
+    };
+
     return (
         <div className="font-sans selection:bg-indigo-100 selection:text-indigo-900 bg-white">
             <Helmet>
                 <title>{language === 'es' ? 'Programa de Afiliados | Kolink Partner' : 'Affiliate Program | Kolink Partner'}</title>
                  <meta name="description" content={language === 'es' ? "Gana un 30% recurrente promocionando Kolink." : "Earn 30% recurring commissions promoting Kolink."} />
-                <script type="application/ld+json">
-                    {`
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "AffiliateProgram",
-                            "name": "Kolink Partner Program",
-                            "description": "Earn 30% recurring commission on all referrals.",
-                            "provider": {
-                                "@type": "Organization",
-                                "name": "Kolink"
-                            },
-                             "commission": {
-                                "@type": "MonetaryAmount",
-                                "currency": "EUR",
-                                "value": "30%"
-                            }
-                        }
-                    `}
-                </script>
+                <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
             </Helmet>
 
             <Navbar 
@@ -318,9 +311,9 @@ const AffiliatePage: React.FC = () => {
 // Keep generic components here to avoid cluttering main file if used only here.
 // In a real refactor, move to separate files.
 
-const OpportunityCard = ({ icon, title, desc, color }: { icon: any, title: string, desc: string, color: string }) => (
+const OpportunityCard = ({ icon, title, desc, color }: { icon: React.ReactNode, title: string, desc: string, color: string }) => (
     <Card className="p-8 border-slate-200 bg-white shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
-        <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-6 shadow-lg`}>
+        <div className={"w-12 h-12 rounded-xl flex items-center justify-center mb-6 shadow-lg " + color}>
             {icon}
         </div>
         <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
@@ -328,7 +321,7 @@ const OpportunityCard = ({ icon, title, desc, color }: { icon: any, title: strin
     </Card>
 );
 
-const AudienceItem = ({ icon, title, desc }: { icon: any, title: string, desc: string }) => (
+const AudienceItem = ({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) => (
     <div className="flex gap-4">
         <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 text-indigo-600">
             {icon}

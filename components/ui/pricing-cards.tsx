@@ -162,19 +162,12 @@ export function Pricing({ onPlanSelect, currentPlanId, isUpgradeView = false, hi
             </Card>
 
             {/* PRO PLAN (Creator) */}
-            <Card className="w-full relative overflow-hidden bg-white shadow-2xl hover:shadow-brand-500/20 transition-all duration-300 transform lg:-translate-y-4 lg:scale-105 border-2 border-brand-500 z-10 rounded-2xl">
-               <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-brand-400 via-brand-500 to-brand-600" />
-               <div className="absolute top-0 right-0 bg-brand-600 text-white text-[10px] font-black tracking-widest px-4 py-1.5 rounded-bl-xl z-20 shadow-lg uppercase">
-                  {t.mostPopular}
-               </div>
-               {/* Ambient Glow */}
-               <div className="absolute inset-0 bg-gradient-to-b from-brand-50/80 to-transparent pointer-events-none z-0" />
-               
-              <CardHeader className="relative z-10 pb-0">
+            <Card className="w-full rounded-2xl border-slate-200 hover:border-brand-200 transition-all shadow-sm hover:shadow-md bg-white opacity-90 hover:opacity-100">
+              <CardHeader className="pb-0">
                 <CardTitle>
-                  <span className="flex flex-row gap-3 items-center font-bold text-2xl text-brand-700">
-                    <div className="p-2 bg-brand-100/50 rounded-lg">
-                        <Zap className="w-6 h-6 fill-brand-500 text-brand-600" />
+                  <span className="flex flex-row gap-3 items-center font-bold text-2xl text-slate-900">
+                    <div className="p-2 bg-slate-100 rounded-lg">
+                        <Zap className="w-6 h-6 text-slate-600" />
                     </div>
                     Pro / Creator
                   </span>
@@ -183,28 +176,22 @@ export function Pricing({ onPlanSelect, currentPlanId, isUpgradeView = false, hi
                   Domina tu nicho con la suite completa de IA.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="relative z-10 pt-6">
+              <CardContent className="pt-6">
                 <div className="flex flex-col gap-8 justify-start">
                   <div className="flex flex-col">
                       <p className="flex flex-row items-baseline gap-2 text-xl">
-                        <span className="text-5xl font-bold text-slate-900 tracking-tight">€{prices.pro[billingCycle]}</span>
+                        <span className="text-4xl font-bold text-slate-900 tracking-tight">€{prices.pro[billingCycle]}</span>
                         <span className="text-slate-400 font-medium">/ {language === 'es' ? 'mes' : 'month'}</span>
                       </p>
-                      {billingCycle === 'yearly' && (
-                          <div className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded w-fit capitalize">
-                              <Shield size={10} />
-                              {t.saveAmount.replace("{{amount}}", "€36")}
-                          </div>
-                      )}
                   </div>
                   
-                  <div className="h-px w-full bg-brand-100/50" />
+                  <div className="h-px w-full bg-slate-100" />
 
                   <div className="flex flex-col gap-4 justify-start">
                     {/* Features */}
                     <div className="flex flex-row gap-4">
-                      <div className="w-6 h-6 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Check className="w-4 h-4 text-brand-700" />
+                      <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-slate-600" />
                       </div>
                       <div className="flex flex-col">
                         <p className="text-slate-900 font-bold text-sm">100 Posts / Mes</p>
@@ -213,8 +200,8 @@ export function Pricing({ onPlanSelect, currentPlanId, isUpgradeView = false, hi
                     </div>
 
                      <div className="flex flex-row gap-4">
-                      <div className="w-6 h-6 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Check className="w-4 h-4 text-brand-700" />
+                      <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-slate-600" />
                       </div>
                       <div className="flex flex-col">
                          <p className="text-slate-900 font-bold text-sm">Voice Lab (Clone de Voz)</p>
@@ -223,145 +210,146 @@ export function Pricing({ onPlanSelect, currentPlanId, isUpgradeView = false, hi
                     </div>
 
                     <div className="flex flex-row gap-4">
-                      <div className="w-6 h-6 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Check className="w-4 h-4 text-brand-700" />
+                      <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-slate-600" />
                       </div>
                       <div className="flex flex-col">
                         <p className="text-slate-900 font-bold text-sm">Auditoría Viral</p>
                         <p className="text-slate-500 text-xs">Puntuación de ganchos en tiempo real.</p>
                       </div>
                     </div>
-                    
-                     <div className="flex flex-row gap-4">
-                      <div className="w-6 h-6 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Check className="w-4 h-4 text-brand-700" />
-                      </div>
-                      <div className="flex flex-col">
-                        <p className="text-slate-900 font-bold text-sm">Carousel Studio</p>
-                        <p className="text-slate-500 text-xs">Exporta PDFs virales al instante.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gradient-to-r from-brand-600 to-indigo-600 p-[1px] rounded-xl overflow-hidden shadow-sm">
-                      <div className="bg-white/95 backdrop-blur-sm p-3 rounded-[11px] flex items-center gap-3">
-                        <div className="p-1.5 bg-brand-100 rounded-lg text-brand-600">
-                             <Gem size={16} />
-                        </div>
-                        <div>
-                             <p className="text-xs font-bold text-slate-800 uppercase tracking-wider">Incluye Nexus Chat</p>
-                             <p className="text-[10px] text-slate-500 font-medium">Tu consultor estratégico de IA 24/7</p>
-                        </div>
-                      </div>
                   </div>
 
                   <motion.button 
                     whileHover={{ y: -1 }}
                     whileTap={{ scale: 0.98 }}
-                    className="gap-2 w-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg shadow-brand-500/30 h-12 text-base rounded-xl font-bold flex items-center justify-center transition-all"
+                    className="gap-2 w-full border border-slate-200 hover:border-brand-500 hover:text-brand-600 transition-colors bg-white h-12 text-sm rounded-xl font-bold flex items-center justify-center"
                     onClick={() => handleSelect('pro')}
                     disabled={currentPlanId === 'pro'}
                   >
                     {isUpgradeView ? (currentPlanId === 'pro' ? t.currentPlan : t.upgradeNow) : t.upgradeNow} 
                     <MoveRight className="w-4 h-4" />
                   </motion.button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* VIRAL PLAN (Authority) - HIGHLIGHTED FOR ANCHORING */}
+            <Card className="w-full relative overflow-hidden bg-white shadow-2xl hover:shadow-indigo-500/20 transition-all duration-300 transform lg:-translate-y-4 lg:scale-105 border-2 border-indigo-500 z-10 rounded-2xl">
+               <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-indigo-400 via-indigo-500 to-indigo-600" />
+               <div className="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-black tracking-widest px-4 py-1.5 rounded-bl-xl z-20 shadow-lg uppercase">
+                  ⭐ {language === 'es' ? 'Mejor Valor' : 'Best Value'}
+               </div>
+               
+               {/* SCARCITY TAG */}
+               <div className="absolute top-8 right-2 rotate-12 z-20">
+                  <div className="bg-rose-500 text-white text-[8px] font-black px-2 py-0.5 rounded shadow-lg animate-bounce">
+                     {language === 'es' ? '¡SOLO 4 CUPOS!' : 'ONLY 4 SLOTS!'}
+                  </div>
+               </div>
+
+               {/* Ambient Glow */}
+               <div className="absolute inset-0 bg-gradient-to-b from-indigo-50/80 to-transparent pointer-events-none z-0" />
+               
+              <CardHeader className="relative z-10 pb-0">
+                <CardTitle>
+                  <span className="flex flex-row gap-3 items-center font-bold text-2xl text-indigo-700">
+                    <div className="p-2 bg-indigo-100/50 rounded-lg">
+                        <Star className="w-6 h-6 fill-indigo-500 text-indigo-600" />
+                    </div>
+                    Viral / Authority
+                  </span>
+                </CardTitle>
+                <CardDescription className="text-slate-600 font-medium mt-2">
+                  Escala tu autoridad en piloto automático con IA Predictiva.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="relative z-10 pt-6">
+                <div className="flex flex-col gap-8 justify-start">
+                  <div className="flex flex-col">
+                      <p className="flex flex-row items-baseline gap-2 text-xl">
+                        <span className="text-5xl font-bold text-slate-900 tracking-tight">€{prices.viral[billingCycle]}</span>
+                        <span className="text-slate-400 font-medium">/ {language === 'es' ? 'mes' : 'month'}</span>
+                      </p>
+                      {billingCycle === 'yearly' && (
+                          <div className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded w-fit capitalize">
+                              <Shield size={10} />
+                              {t.saveAmount.replace("{{amount}}", "€120")}
+                          </div>
+                      )}
+                  </div>
                   
-                  <p className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-[-10px]">
-                      {t.moneyBack}
-                  </p>
+                  <div className="h-px w-full bg-indigo-100/50" />
+
+                  <div className="flex flex-col gap-4 justify-start">
+                    {/* Features */}
+                    <div className="flex flex-row gap-4">
+                      <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-indigo-700" />
+                      </div>
+                      <div className="flex flex-col">
+                        <p className="text-slate-900 font-bold text-sm">Créditos Ilimitados / VIP</p>
+                        <p className="text-slate-500 text-xs">Sin límites de volumen para escalar.</p>
+                      </div>
+                    </div>
+
+                     <div className="flex flex-row gap-4">
+                      <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-indigo-700" />
+                      </div>
+                      <div className="flex flex-col">
+                         <p className="text-slate-900 font-bold text-sm">Smart Autopilot Engine</p>
+                        <p className="text-slate-500 text-xs">Programación estratégica 100% IA.</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-row gap-4">
+                      <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-indigo-700" />
+                      </div>
+                      <div className="flex flex-col">
+                        <p className="text-slate-900 font-bold text-sm">Insight Responder Pro</p>
+                        <p className="text-slate-500 text-xs">Hackea el algoritmo con comentarios AI.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-[1px] rounded-xl overflow-hidden shadow-sm">
+                      <div className="bg-white/95 backdrop-blur-sm p-3 rounded-[11px] flex items-center gap-3">
+                        <div className="p-1.5 bg-indigo-100 rounded-lg text-indigo-600">
+                             <Gem size={16} />
+                        </div>
+                        <div>
+                             <p className="text-xs font-bold text-slate-800 uppercase tracking-wider">Acceso Alpha</p>
+                             <p className="text-[10px] text-slate-500 font-medium">Nuevos algoritmos antes que nadie</p>
+                        </div>
+                      </div>
+                  </div>
+
+                  <motion.button 
+                    whileHover={{ y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="gap-2 w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/30 h-12 text-base rounded-xl font-bold flex items-center justify-center transition-all"
+                    onClick={() => handleSelect('viral')}
+                    disabled={currentPlanId === 'viral'}
+                  >
+                    {isUpgradeView ? (currentPlanId === 'viral' ? t.currentPlan : t.upgradeNow) : t.upgradeNow} 
+                    <MoveRight className="w-4 h-4" />
+                  </motion.button>
                   
-                  <div className="mt-2 pt-4 border-t border-brand-100 flex items-center justify-center gap-3">
+                  <div className="mt-2 pt-4 border-t border-indigo-100 flex items-center justify-center gap-3">
                         <div className="flex -space-x-2">
                             <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-[8px] font-bold text-blue-700 border border-white z-20">AJ</div>
                             <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-[8px] font-bold text-indigo-700 border border-white z-10">MR</div>
                             <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-[8px] font-bold text-emerald-700 border border-white z-0">KS</div>
                         </div>
-                        <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{t.socialProof}</p>
+                        <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">
+                           {language === 'es' ? '12 personas escalaron hoy' : '12 people joined today'}
+                        </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-
-            {/* VIRAL PLAN (Authority) */}
-            <Card className="w-full rounded-2xl border-slate-200 hover:border-indigo-200 transition-all shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 bg-white">
-              <CardHeader>
-                <CardTitle>
-                  <span className="flex flex-row gap-4 items-center font-bold text-2xl text-slate-900">
-                    Viral / Authority
-                  </span>
-                </CardTitle>
-                <CardDescription className="text-slate-500 font-medium">
-                  Escala tu autoridad en piloto automático con inteligencia predictiva.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col gap-8 justify-start">
-                  <div className="flex flex-col">
-                      <p className="flex flex-row items-baseline gap-2 text-xl">
-                        <span className="text-4xl font-bold text-slate-900">€{prices.viral[billingCycle]}</span>
-                        <span className="text-sm text-slate-400 font-medium">
-                          / mes
-                        </span>
-                      </p>
-                      {billingCycle === 'yearly' && (
-                          <p className="text-xs text-indigo-600 font-bold mt-1">
-                              Facturado €{prices.viral.yearly * 12}/año (Ahorras €120)
-                          </p>
-                      )}
-                  </div>
-                  <div className="flex flex-col gap-4 justify-start">
-                    {/* ... features ... */}
-                    <div className="flex flex-row gap-4">
-                      <Check className="w-5 h-5 mt-0.5 text-indigo-500 flex-shrink-0" />
-                      <div className="flex flex-col">
-                        <p className="text-slate-700 font-bold">Créditos Ilimitados / VIP</p>
-                        <p className="text-slate-400 text-sm">
-                          Sin límites de volumen.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-row gap-4">
-                      <Check className="w-5 h-5 mt-0.5 text-indigo-500 flex-shrink-0" />
-                      <div className="flex flex-col">
-                        <p className="text-slate-700 font-bold">Smart Autopilot Engine</p>
-                        <p className="text-slate-400 text-sm">
-                          Programación y automatización total.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-row gap-4">
-                      <Check className="w-5 h-5 mt-0.5 text-indigo-500 flex-shrink-0" />
-                      <div className="flex flex-col">
-                        <p className="text-slate-700 font-bold">Insight Responder</p>
-                        <p className="text-slate-400 text-sm">
-                          Respuestas inteligentes para hackear el algoritmo.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-row gap-4">
-                      <Check className="w-5 h-5 mt-0.5 text-indigo-500 flex-shrink-0" />
-                      <div className="flex flex-col">
-                        <p className="text-slate-700 font-bold">Soporte Prioritario</p>
-                        <p className="text-slate-400 text-sm">
-                          Acceso directo a desarrollo y funciones beta.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <motion.button 
-                    whileHover={{ y: -1 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="gap-4 w-full h-11 rounded-xl border border-slate-200 hover:border-indigo-500 hover:text-indigo-600 transition-colors bg-white font-bold flex items-center justify-center text-sm"
-                    onClick={() => handleSelect('viral')}
-                    disabled={currentPlanId === 'viral'}
-                  >
-                     {currentPlanId === 'viral' ? t.currentPlan : t.upgradeNow} <MoveRight className="w-4 h-4" />
-                  </motion.button>
-                </div>
-              </CardContent>
-            </Card>
-
-
 
           </div>
 

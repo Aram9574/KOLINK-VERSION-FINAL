@@ -40,28 +40,40 @@ Deno.serve(async (req: Request) => {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     // 3. Prepare Content
-    // 3. Prepare Content
     const prompt = `
-      You are an elite LinkedIn Profile Auditor (10+ Years Experience).
-      Analyze the provided profile (PDF or Image). Be BRUTAL, specific, and strategic.
+      ACT AS: Senior LinkedIn SEO Strategist & Conversion Copywriter (Top 1% Voice).
+      CONTEXT: You are auditing a user's LinkedIn profile to turn it into a high-conversion funnel.
       
+      EVALUATION CRITERIA (Strict Technical Grading):
+      1. **Discoverability (SEO - 30%)**: 
+         - Check Headline: Does it have exact match keywords (Role + Industry)?
+         - Check About: Are hard skills mentioned in the first 3 lines?
+      2. **Authority (Social Proof - 30%)**:
+         - Does the Banner prove competence? 
+         - Are there quantitative metrics in Experience?
+      3. **Conversion (CRO - 40%)**:
+         - Is there a clear CTA?
+         - Is the "featured" section used strategically?
+
       RETURN JSON ONLY (No Markdown):
       {
         "authority_score": number (0-100),
         "visual_score": number (0-100),
-        "brutal_diagnosis": "string (2 sentences)",
-        "quick_wins": ["string", "string", "string"],
+        "seo_score": number (0-100),
+        "total_score": number (0-100),
+        "brutal_diagnosis": "string (Direct, professional, no fluff. 2 sentences max)",
+        "quick_wins": ["string (Actionable fix 1)", "string (Actionable fix 2)", "string (Actionable fix 3)"],
         "strategic_roadmap": {
-            "headline": "New Headline Idea",
-            "about": "New About Hook Idea",
-            "experience": "Positioning Tip"
+            "headline": "Rewrite suggestion optimized for SEO",
+            "about": "Rewrite suggestion for the 'Hook' (first 3 lines)",
+            "experience": "Tip to add quantification (e.g., 'Matches 98% of recruiters search')"
         },
-        "visual_critique": "string",
-        "technical_seo_keywords": ["keyword1", "keyword2", "keyword3"],
+        "visual_critique": "string (Feedback on Headshot/Banner)",
+        "technical_seo_keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
         "processed_data": {
             "name": "string",
             "headline": "string",
-            "skills": ["string"]
+            "current_role_match": boolean
         }
       }
     `;

@@ -157,7 +157,20 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
                 saveAs(content, `${title.replace(/\s+/g, '_')}_kolink.zip`);
             }
 
+            // ... (inside the component)
+
             setProgress(100);
+            
+            // Analytics Tracking
+            analytics.track('carousel_exported', {
+                format,
+                quality,
+                slide_count: slides.length,
+                is_free: isFree,
+                has_watermark: isFree,
+                aspect_ratio: design.aspectRatio
+            });
+
             toast.success("¡Exportación exitosa!");
             setTimeout(() => {
                 onClose();

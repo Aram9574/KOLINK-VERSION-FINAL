@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 // ... existing types ...
 
+
+
 export const PostContentSchema = z.object({
     id: z.string().optional(),
     content: z.string(),
@@ -13,7 +15,6 @@ export const PostContentSchema = z.object({
     credits: z.number().optional(),
 });
 
-export type GeneratedPostContent = z.infer<typeof PostContentSchema>;
 
 export interface Trend {
   id: string;
@@ -88,6 +89,8 @@ export interface GenerationParams {
   hookStyle?: ViralHook | "random";
   brandVoiceId?: string;
   outputLanguage?: "en" | "es";
+  language?: string; // For analytics and flexibility
+  mode?: string; // For analytics (e.g. 'micro_edit', 'standard')
   generateCarousel?: boolean;
 }
 

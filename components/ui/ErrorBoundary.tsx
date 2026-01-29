@@ -1,4 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { analytics } from '../../services/analyticsService';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { supabase } from '../../services/supabaseClient';
 
@@ -23,9 +24,18 @@ class ErrorBoundary extends Component<Props, State> {
         return { hasError: true, error };
     }
 
+    // ... (inside class)
+
     public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error('Uncaught error:', error, errorInfo);
         
+        // Analytics Tracking
+        analytics.track('client_error', {
+            message: error.message,
+            stack: error.stack?.substring(0, 500), // Truncate
+            componentStack: errorInfo.componentStack?.substring(0, 500)
+        });
+
         // Fire and forget logging
         this.logErrorToSupabase(error, errorInfo);
     }

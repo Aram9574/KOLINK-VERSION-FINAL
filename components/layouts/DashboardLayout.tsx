@@ -8,6 +8,7 @@ import MobileBottomNav from "./MobileBottomNav.tsx";
 import { AppTab, Post } from "../../types.ts";
 import SmartCursor from "../ui/SmartCursor.tsx";
 import { InfiniteGrid } from "../ui/infinite-grid-integration.tsx";
+import { SocialProofToast } from "../ui/SocialProofToast";
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -105,6 +106,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                     setActiveTab={setActiveTab}
                 />
             </div>
+            <SocialProofToast language={language as 'es' | 'en'} />
         </div>
     );
 };

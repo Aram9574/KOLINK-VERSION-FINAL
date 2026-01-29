@@ -697,19 +697,19 @@ const PostEditorView: React.FC = () => {
         />
 
         <EditorToolbar
-          onUndo={handleUndo}
-          onRedo={handleRedo}
-          onClearAll={handleClearEditor}
-          onFormat={handleFormat}
-          onClearFormatting={handleClearFormatting}
-          onInjectText={injectText}
-          historyIndex={historyIndex}
-          historyLength={history.length}
-          showEmojiPicker={showEmojiPicker}
-          setShowEmojiPicker={setShowEmojiPicker}
-          commonEmojis={commonEmojis}
-          emojiPickerRef={emojiPickerRef}
-          onSmartEdit={handleSmartEdit}
+            onUndo={handleUndo}
+            onRedo={handleRedo}
+            onClearAll={handleClearEditor}
+            onFormat={handleFormat}
+            onClearFormatting={handleClearFormatting}
+            onInjectText={injectText}
+            historyIndex={historyIndex}
+            historyLength={history.length}
+            showEmojiPicker={showEmojiPicker}
+            setShowEmojiPicker={setShowEmojiPicker}
+            commonEmojis={commonEmojis}
+            emojiPickerRef={emojiPickerRef}
+            onSmartEdit={handleSmartEdit}
         />
 
         <EditorCanvas
@@ -746,6 +746,7 @@ const PostEditorView: React.FC = () => {
           metricsMenuRef={metricsMenuRef}
           limitWarningRef={limitWarningRef}
         />
+
       </div>
 
       {/* MIDDLE: Split View Mobile Preview */}

@@ -264,10 +264,10 @@ const LinkedInAuditView: React.FC = () => {
                          >
                             {/* 1. Bento Grid High Level Metrics (MOVED TO TOP) */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <MetricCard label="Impacto Global" value={auditData.authority_score ?? 0} icon={TrendingUp} colorClass="from-blue-500 to-cyan-500" />
+                                <MetricCard label="Puntuación Total" value={auditData.total_score || auditData.authority_score || 0} icon={Target} colorClass="from-brand-500 to-indigo-500" />
+                                <MetricCard label="SEO & Keywords" value={auditData.seo_score || 0} icon={TrendingUp} colorClass="from-emerald-500 to-teal-500" />
+                                <MetricCard label="Autoridad" value={auditData.authority_score ?? 0} icon={Users} colorClass="from-blue-500 to-cyan-500" />
                                 <MetricCard label="Calidad Visual" value={auditData.visual_score ?? 0} icon={UserCircle} colorClass="from-violet-500 to-purple-500" />
-                                <MetricCard label="Palabras Clave" value={auditData.technical_seo_keywords?.length * 10 || 70} icon={BookOpen} colorClass="from-amber-400 to-orange-500" />
-                                <MetricCard label="Quick Wins" value={auditData.quick_wins?.length * 20 || 60} icon={Zap} colorClass="from-emerald-400 to-teal-500" />
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

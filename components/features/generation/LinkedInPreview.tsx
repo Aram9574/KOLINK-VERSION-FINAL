@@ -1,35 +1,22 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState } from "react";
 import Skeleton from "../../ui/Skeleton";
 import { AppLanguage, UserProfile, ViralAnalysis } from "../../../types";
 import { useNavigate } from "react-router-dom";
 import {
-    Activity,
-    AlertCircle,
     Check,
-    ChevronDown,
-    ChevronUp,
-    Clock,
     Globe,
-    Linkedin,
     MessageCircle,
-    MoreHorizontal,
     PenSquare,
     Plus,
     Repeat,
     Send,
     Sparkles,
     ThumbsUp,
-    TrendingUp,
-    Zap,
-    Image as ImageIcon,
-    X
 } from "lucide-react";
 import { translations } from "../../../translations";
 import { supabase } from "../../../services/supabaseClient";
+import { analytics } from "@/services/analyticsService";
 import { useToast } from "../../../context/ToastContext";
-import { Haptics, NotificationType } from "@capacitor/haptics";
-import confetti from "canvas-confetti";
 import ScheduleModal from "../../modals/ScheduleModal";
 import { getAvatarUrl } from "../../../utils";
 import { SmartRefineToolbar } from "./v4/SmartRefineToolbarV2";
@@ -76,27 +63,20 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
         language = "en",
         onUpdate,
         onSchedule,
-        onConvertToCarousel,
         onEdit,
-        showEditButton = true,
-        isMobilePreview = false,
         viralScore,
-        viralAnalysis,
         generationParams,
+        isMobilePreview = false,
     },
 ) => {
-    const [isExpanded, setIsExpanded] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState(content || "");
-    const [showAudit, setShowAudit] = useState(true);
-    const [isPublishing, setIsPublishing] = useState(false);
     const [isScheduling, setIsScheduling] = useState(false);
     const [isRefining, setIsRefining] = useState(false);
-    const [selectedText, setSelectedText] = useState("");
+    const [selectedText] = useState("");
     const toast = useToast();
 
     const t = translations[language].app.preview;
-    const navigate = useNavigate();
 
     // Sync edit content if prop changes
     useEffect(() => {
@@ -120,6 +100,9 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
 
     const handleRefine = async (instruction: string) => {
         setIsRefining(true);
+        // Analytics
+        analytics.track('micro_edit_applied', { instruction, length_before: content.length });
+
         try {
             // Robust Refine Logic: Jailbreak Prompt
             const prompt = `[INSTRUCTION_START]
@@ -159,15 +142,6 @@ Return ONLY the transformed text in the 'post_content' JSON field.
                  if (onUpdate) onUpdate(data.postContent);
                  toast.success("Refined with AI! ✨");
             }
-
-            if (error) throw error;
-            if (data.data?.postContent) {
-                if (onUpdate) onUpdate(data.data.postContent);
-                toast.success("Refined with AI!");
-            } else if (data.postContent) {
-                 if (onUpdate) onUpdate(data.postContent);
-                 toast.success("Refined with AI!");
-            }
         } catch (e) {
             console.error("Refine failed", e);
             toast.error("Refine failed");
@@ -176,8 +150,17 @@ Return ONLY the transformed text in the 'post_content' JSON field.
         }
     };
 
+
     const handlePublish = () => {
         const textToCopy = displayContent || "";
+        
+        // Analytics
+        analytics.track('post_published_linkedin', {
+            length: textToCopy.length,
+            has_media: false, // Update if media support added
+            viral_score: viralScore
+        });
+
         navigator.clipboard.writeText(textToCopy).then(() => {
             toast.success(
                 language === "es"
@@ -197,11 +180,7 @@ Return ONLY the transformed text in the 'post_content' JSON field.
         });
     };
 
-    const getScoreColor = (score: number) => {
-        if (score >= 80) return "text-green-600 bg-green-50 border-green-200";
-        if (score >= 50) return "text-amber-600 bg-amber-50 border-amber-200";
-        return "text-red-600 bg-red-50 border-red-200";
-    };
+
 
     // Show skeleton only if loading AND no content (initial wait)
     // If we have content (streaming), show the content!

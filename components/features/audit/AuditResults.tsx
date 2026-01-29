@@ -72,7 +72,7 @@ const AuditResults = ({ audit, onNewAudit, onRegenerate }: AuditResultsProps) =>
             {/* Top Stats Hero */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Score Hero */}
-                <div className="lg:col-span-1 bg-white dark:bg-slate-800/50 backdrop-blur-md p-8 rounded-[32px] border border-slate-200/60/60 dark:border-slate-700/50 shadow-xl shadow-slate-200/40 dark:shadow-none flex flex-col items-center justify-center text-center space-y-4">
+                <div className="lg:col-span-1 bg-white dark:bg-slate-800/50 backdrop-blur-md p-8 rounded-[32px] border border-slate-200/60 dark:border-slate-700/50 shadow-xl shadow-slate-200/40 dark:shadow-none flex flex-col items-center justify-center text-center space-y-4">
                     <div className="relative">
                         <svg className="w-32 h-32 transform -rotate-90">
                             <circle
@@ -92,14 +92,14 @@ const AuditResults = ({ audit, onNewAudit, onRegenerate }: AuditResultsProps) =>
                                 strokeWidth="8"
                                 fill="transparent"
                                 strokeDasharray={364}
-                                strokeDashoffset={364 - (364 * results.score) / 100}
+                                strokeDashoffset={364 - (364 * (results.total_score || results.score || results.authority_score || 0)) / 100}
                                 strokeLinecap="round"
-                                className={`${getScoreColor(results.score)} transition-all duration-1000 ease-out`}
+                                className={`${getScoreColor(results.total_score || results.score || 0)} transition-all duration-1000 ease-out`}
                             />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className={`text-4xl font-black ${getScoreColor(results.score)}`}>
-                                {results.score}
+                            <span className={`text-4xl font-black ${getScoreColor(results.total_score || results.score || 0)}`}>
+                                {results.total_score || results.score || results.authority_score || 0}
                             </span>
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                                 / 100
@@ -107,13 +107,13 @@ const AuditResults = ({ audit, onNewAudit, onRegenerate }: AuditResultsProps) =>
                         </div>
                     </div>
                     <div className="space-y-1">
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t.results.scoreTitle}</h3>
-                        <div className={`h-1 w-12 mx-auto rounded-full ${getScoreBg(results.score)} opacity-50`} />
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Puntuación SEO Global</h3>
+                        <div className={`h-1 w-12 mx-auto rounded-full ${getScoreBg(results.total_score || results.score || 0)} opacity-50`} />
                     </div>
                 </div>
 
                 {/* AI Summary Hero */}
-                <div className="lg:col-span-2 bg-gradient-to-br from-brand-600 to-indigo-700 p-8 rounded-xl text-white shadow-xl shadow-brand-500/20 relative overflow-hidden group">
+                <div className="lg:col-span-2 bg-gradient-to-br from-brand-600 to-indigo-700 p-8 rounded-[32px] text-white shadow-xl shadow-brand-500/20 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-500">
                         <Zap strokeWidth={1.5} className="w-32 h-32" />
                     </div>
@@ -122,10 +122,10 @@ const AuditResults = ({ audit, onNewAudit, onRegenerate }: AuditResultsProps) =>
                             <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
                                 <TrendingUp strokeWidth={1.5} className="w-5 h-5" />
                             </div>
-                            <h3 className="font-bold text-lg">{t.results.summaryTitle}</h3>
+                            <h3 className="font-bold text-lg">Diagnóstico de Autoridad</h3>
                         </div>
                         <p className="text-xl lg:text-2xl font-display font-bold leading-tight tracking-tight opacity-95">
-                            "{results.summary}"
+                            "{results.brutal_diagnosis || results.summary}"
                         </p>
                         <div className="pt-4 flex gap-4">
                             <button 
