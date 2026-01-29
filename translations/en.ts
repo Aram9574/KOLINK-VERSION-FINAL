@@ -44,6 +44,7 @@ export const en = {
     }
   },
   nav: {
+    home: "Home",
     howItWorks: "How it Works",
     demo: "Demo",
     features: "Features",
@@ -264,6 +265,207 @@ export const en = {
     kolinkLabel: "All of this is included when you join Kolink.",
     kolinkPlan: "Kolink Creator Pro:",
     kolinkPrice: "€15/mo",
+    badge: "Simple Math",
+    mainTitle: "It's not a cost. It's fuel.",
+    mainDesc: "Hiring an agency costs €2,500/mo. Kolink gives you better results for the price of a dinner.",
+    winnerLabel: "Winner's Choice",
+    footerNote: "Prices in Euro (VAT included). Secure payment with Stripe.",
+  },
+  roiCalculator: {
+      title: "ROI Calculator",
+      subtitle: "Discover exactly how much money you are leaving on the table by not optimizing.",
+      hourlyRateLabel: "Your Hourly Rate ($)",
+      hoursLabel: "Creation Hours / Week",
+      calculateButton: "Calculate Savings",
+      resultSavings: "Estimated Monthly Savings",
+      resultRevenue: "Potential New Revenue",
+      annualImpact: "Total Annual Impact",
+      currencySymbol: "$",
+      agencyCostRating: "Market Benchmark",
+      agencyCostLow: "DIY",
+      agencyCostMed: "Freelancer",
+      agencyCostHigh: "Agency",
+      timeSaved: "Hours Saved / Month"
+  },
+  pricingPage: {
+    badge: "Profitable Investment",
+    titleLine1: "Your Personal Brand ROI",
+    titleLine2: "starts here.",
+    subtitle: "Plans designed for professionals who understand LinkedIn is not a social network, it's a sales channel.",
+    logosLabel: "USED BY LEADERS IN",
+    comparisonTitle: "Detailed Comparison",
+    comparisonSubtitle: "Everything you need to know to make the right decision.",
+    table: {
+      feature: "Feature",
+      free: "Free",
+      pro: "Pro (Creator)",
+      viral: "Viral (Authority)",
+      catGeneration: "Content Generation",
+      catGrowth: "Growth & Automation",
+      catSupport: "Support & Extras",
+      credits: "Monthly Credits",
+      model: "AI Model",
+      carousel: "Carousel Studio",
+      voice: "Voice Clone (Your Style)",
+      scheduling: "Post Scheduling",
+      queue: "Smart Auto-Queue",
+      queueTooltip: "Automatically fills gaps in your calendar with your best past posts.",
+      insight: "Insight Responder",
+      insightTooltip: "AI that comments on other leaders' posts for you.",
+      audit: "Profile Audit",
+      community: "Community Access",
+      support: "Support",
+      watermark: "Remove Watermark",
+      creditsFree: "10 / mo",
+      creditsPro: "100 / mo",
+      creditsViral: "Unlimited",
+      modelFree: "GPT-3.5 Turbo",
+      modelPro: "Gemini Flash 3 (Fast)",
+      modelViral: "Gemini Pro (Reasoning)",
+      auditFree: "Basic",
+      auditPro: "Advanced",
+      auditViral: "Advanced + Roadmap",
+      supportFree: "Email",
+      supportPro: "Priority",
+      supportViral: "Dedicated 24/7",
+    },
+    faqTitle: "Frequently Asked Questions",
+    faqSubtitle: "We answer your questions before you take the leap.",
+    cta: {
+      badge: "Launch Offer",
+      title: "Stop paying with your time.\nStart investing in your future.",
+      subtitle: "Join today and get immediate access to all Pro tools. You have 30 days to try it risk-free.",
+      buttonPrimary: "Start Free Now",
+      buttonSecondary: "Read Success Stories",
+      noCard: "No credit card required to start"
+    }
+  },
+  affiliatePage: {
+    hero: {
+      badge: "Partner Program",
+      titleLine1: "Earn 30% Recurring",
+      titleLine2: "Recommending the Future.",
+      subtitle: "Turn your audience into predictable passive income. Promote the most powerful AI tool for LinkedIn and build a monthly cash flow that grows with you.",
+      ctaPrimary: "Apply to Partner Program",
+      ctaSecondary: "See Revenue Potential"
+    },
+    stats: {
+      activePartners: "+500 Partners",
+      payouts: "Paid this month",
+      avgEarnings: "Avg. Earnings",
+      conversionRate: "Conversion Rate"
+    },
+    opportunity: {
+      title: "The Time is Now",
+      subtitle: "The LinkedIn 'Creator Economy' is exploding. Position yourself before the rest.",
+      card1Title: "Massive Demand",
+      card1Desc: "There are 1B users on LinkedIn, but only 1% create content. Everyone wants to start but doesn't know how. Kolink is the answer.",
+      card2Title: "Sticky Product",
+      card2Desc: "Once a user tries our Auto-Poster and Voice Clones, they don't leave. Churn is minimal, ensuring your commissions long-term.",
+      card3Title: "VIP Commissions",
+      card3Desc: "While other programs give you a one-time $10 payout, we share revenue with you for life (30% Lifetime Deal)."
+    },
+    targetAudience: {
+      title: "Who is this program for?",
+      subtitle: "Designed for leaders with professional audiences.",
+      a1Title: "Content Creators",
+      a1Desc: "Monetize your newsletter or LinkedIn following by recommending the tool you already use.",
+      a2Title: "Marketing Agencies",
+      a2Desc: "Add a new revenue line by setting up Kolink for your clients.",
+      a3Title: "Coaches & Consultants",
+      a3Desc: "Help your students succeed on LinkedIn faster with our suite."
+    },
+    assets: {
+      title: "We Give You Everything",
+      subtitle: "No need to be a designer or copywriter. Access our 'Marketing Box'.",
+      asset1: "High-Conversion Banners",
+      asset2: "Email Sequences (Swipes)",
+      asset3: "PDF Lead Magnet Guides",
+      asset4: "Pre-recorded Webinars"
+    },
+    howItWorks: {
+      title: "Your Path to Passive Income",
+      subtitle: "Three simple steps to monetize your influence.",
+      step1Title: "Sign Up",
+      step1Desc: "Apply in 1 minute. Fast approval for qualified profiles.",
+      step2Title: "Share",
+      step2Desc: "Get your unique link and high-conversion marketing assets.",
+      step3Title: "Earn",
+      step3Desc: "Receive 30% of every payment your referrals make. Forever."
+    },
+    calculator: {
+      title: "Commission Calculator",
+      subtitle: "Project your Monthly Recurring Revenue (MRR).",
+      referralsLabel: "Active Referrals",
+      planLabel: "Average Plan",
+      resultMonthly: "Monthly Recurring Revenue",
+      resultYearly: "Yearly Projection",
+      disclaimer: "Estimation based on a 12-month average retention."
+    },
+    benefits: {
+      title: "Why Choose Kolink?",
+      subtitle: "Not just another affiliate program.",
+      b1Title: "High Retention (LTV)",
+      b1Desc: "Our product becomes essential for daily workflows, ensuring commissions for years.",
+      b2Title: "Top 1% Landing Conversion",
+      b2Desc: "We obsessively optimize our pages. Your traffic is not wasted.",
+      b3Title: "60-Day Cookies",
+      b3Desc: "We attribute the sale to you even if the user buys 2 months later.",
+      b4Title: "Priority Support",
+      b4Desc: "Direct line to our marketing team for joint strategies."
+    },
+    faq: {
+      title: "Frequently Asked Questions",
+      q1: "When do I get paid?",
+      a1: "Payments are processed on the 10th of each month via PayPal or Wise, once you exceed the $50 threshold.",
+      q2: "How long do cookies last?",
+      a2: "Our cookie lasts 60 days. If your referral buys within 2 months of their first click, the commission is yours.",
+      q3: "Can I run ads?",
+      a3: "We do not allow search ads for the 'Kolink' brand (SEM) on Google Ads. But you can run social ads to your own content (Bridge Page).",
+      q4: "Is there a follower minimum?",
+      a4: "Not strictly, but we review every application to ensure the audience is legitimate and B2B."
+    },
+    cta: {
+      title: "Ready to Scale Your Income?",
+      subtitle: "Join the thought leaders already monetizing with Kolink.",
+      button: "Become a Partner",
+      secondary: "Read Terms"
+    },
+    terms: {
+      title: "Affiliate Program Terms & Conditions",
+      intro: "By joining the Kolink Partner Program, you agree to comply with the following terms. Failure to comply will result in immediate account termination and forfeiture of pending commissions.",
+      sections: [
+        {
+          title: "1. Commission Structure",
+          content: "You will earn a 30% recurring commission on the net sales price of each referred subscription, for as long as the customer remains active. Commissions are calculated monthly. No commissions are paid for self-purchases (self-referrals)."
+        },
+        {
+          title: "2. Payments & Schedule",
+          content: "Payments are processed on the 10th of each month. A minimum balance of €50 is required for payout. Payments are made exclusively via PayPal or Wise. You are responsible for any payment gateway transaction fees if applicable."
+        },
+        {
+          title: "3. Cookie Policy & Attribution",
+          content: "We use a 60-day cookie duration. A 'last-click' attribution model applies. If a user clicks your link and then another affiliate's link, the commission goes to the last link clicked prior to purchase."
+        },
+        {
+          title: "4. Marketing Restrictions (SEM)",
+          content: "Brand bidding on keywords such as 'Kolink', 'Kolink App', 'Kolink AI', or misspellings is STRICTLY PROHIBITED on Google Ads, Bing Ads, or other search engines (PPC). Paid traffic to your own content (bridge pages) on social media (Facebook, LinkedIn, TikTok) is permitted."
+        },
+        {
+          title: "5. Prohibited Conduct",
+          content: "Spamming, cookie stuffing, hidden iframes, or impersonating Kolink employees is not allowed. Any attempt to manipulate the attribution system will result in a permanent ban without appeal."
+        },
+        {
+          title: "6. Refunds & Chargebacks",
+          content: "If a referred customer requests a refund or initiates a chargeback, the corresponding commission will be deducted from your pending or future balance ('clawback')."
+        },
+        {
+          title: "7. Termination",
+          content: "Kolink reserves the right to terminate your participation in the program at any time if suspicious, fraudulent activity, or brand damage is detected. This decision is final."
+        }
+      ],
+      close: "Understood, close"
+    }
   },
   testimonials: {
     title: "Creators are growing fast",
@@ -1793,7 +1995,8 @@ export const en = {
       button: "Reveal Best Times",
       analyzing: "Analyzing Data...",
       heatmapTitle: "Your Engagement Heatmap",
-      emptyState: "Select your industry and click calculate to see your personalized engagement heatmap.",
+      emptyState: "When is your prime time?",
+      emptyStateDesc: "Select your industry to reveal the high-engagement windows for your specific audience.",
       low: "Low",
       high: "High",
       schedCtaTitle: "Want to schedule automatically?",
@@ -1820,7 +2023,14 @@ export const en = {
         "12pm - 2pm": "12pm - 2pm",
         "2pm - 5pm": "2pm - 5pm",
         "5pm - 8pm": "5pm - 8pm"
-      }
+      },
+      globalIndex: "Global Engagement Index",
+      viralTipTitle: "Viral Tip 💡",
+      tips: [
+        "Post 15 mins before peak time to catch the initial wave.",
+        "Engagement in the first hour determines 80% of reach.",
+        "Reply to all comments within 30 mins for an algorithm boost."
+      ]
     },
     hookGallery: {
       seoTitle: "Viral Hooks Library for LinkedIn | +50 Proven Openers",
@@ -1879,6 +2089,79 @@ export const en = {
       readyHeadline: "Ready to upgrade your workflow?",
       tryFree: "Try Kolink Free",
       noCard: "No credit card required for free tools."
+    }
+  },
+  faqPage: {
+    hero: {
+      badge: "Help Center",
+      title: "Frequently Asked Questions",
+      subtitle: "Have questions about scaling on LinkedIn with AI? We have the answers.",
+      searchPlaceholder: "Search for a question..."
+    },
+    categories: {
+      general: "General",
+      features: "Features",
+      pricing: "Pricing & Plans",
+      safety: "Safety & LinkedIn"
+    },
+    cta: {
+      title: "Can't find your answer?",
+      subtitle: "Our support team is ready to help you.",
+      button: "Contact Support"
+    },
+    questions: {
+      general: [
+        {
+          q: "What makes Kolink different from other tools?",
+          a: "Unlike generic scheduling tools, Kolink is a comprehensive 'Growth Suite'. It doesn't just schedule; it creates content for you using AI trained on LinkedIn's top creators. We integrate voice cloning, carousel design, and competitor analysis into one platform, saving you from subscribing to 3 or 4 separate tools."
+        },
+        {
+          q: "Do I need previous LinkedIn experience?",
+          a: "Not at all. Kolink is designed for both beginners looking for their first viral impression and experts wanting to automate their workflow. Our AI guides you step-by-step, from idea to publication."
+        },
+        {
+          q: "Can I manage multiple accounts?",
+          a: "Yes, depending on your plan. The 'Agency' plan is specifically designed to manage multiple client profiles from a single dashboard, ideal for marketing agencies and freelancers."
+        }
+      ],
+      features: [
+        {
+          q: "How does voice cloning work?",
+          a: "We use proprietary ElevenLabs technology to analyze a 30-second sample of your voice. Then, our AI can generate audio messages for your DMs that sound identical to you, allowing you to personalize outreach at scale."
+        },
+        {
+          q: "Are carousels editable?",
+          a: "Completely. Our 'Carousel Studio' allows you to edit every aspect: colors, fonts, images, and text. Plus, you can start with proven viral templates and adapt them to your brand in seconds."
+        },
+        {
+          q: "Does the AI detect my tone of voice?",
+          a: "Yes. Kolink analyzes your last 10 posts to understand your writing style, emoji usage, and sentence structure. The generated content will maintain your unique essence, avoiding a robotic tone."
+        }
+      ],
+      pricing: [
+        {
+          q: "Do you offer a free trial?",
+          a: "Yes, we offer a permanent free plan with generous limits so you can test the power of the tool. No credit card required to start."
+        },
+        {
+          q: "Can I cancel at any time?",
+          a: "Of course. We don't believe in lock-in contracts. You can cancel your subscription from your user dashboard at any time and retain access until the end of your billing cycle."
+        },
+        {
+          q: "Do you have a refund policy?",
+          a: "We offer a 14-day satisfaction guarantee on our annual plans. If Kolink doesn't help you grow, we'll refund your money, no questions asked."
+        }
+      ],
+      safety: [
+        {
+          q: "Is it safe to use Kolink with my LinkedIn account?",
+          a: "Safety is our #1 priority. Kolink simulates human behavior and strictly respects LinkedIn's API rate limits. We have never had a case of a ban due to normal use of our tool."
+        },
+        {
+          q: "Is my data protected?",
+          a: "Absolutely. We use bank-grade encryption (AES-256) for all your data. We do not sell or share your information with third parties."
+        }
+      ]
     }
   }
 };

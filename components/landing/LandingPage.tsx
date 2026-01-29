@@ -22,7 +22,6 @@ import { lazy, Suspense } from "react";
 
 import { translations } from "../../translations";
 import { StickyCTAHeader } from "../marketing/StickyCTAHeader.tsx";
-import { CarouselShowcase } from "./CarouselShowcase.tsx";
 import { SchemaMarkup } from "../seo/SchemaMarkup";
 
 
@@ -167,12 +166,6 @@ const LandingPage: React.FC = () => {
                          </div>
                     </SectionReveal>
 
-                    {/* Visual Proof - Show me */}
-                    <SectionReveal>
-                        <div className="py-16 lg:py-24">
-                            <CarouselShowcase />
-                        </div>
-                    </SectionReveal>
 
                     {/* Deep Dive - Demo */}
                     <SectionReveal id="demo">

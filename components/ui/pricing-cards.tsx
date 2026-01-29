@@ -15,12 +15,13 @@ interface PricingProps {
   onPlanSelect?: (planId: string) => void;
   currentPlanId?: string;
   isUpgradeView?: boolean;
+  hideHeader?: boolean;
 }
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
-export function Pricing({ onPlanSelect, currentPlanId, isUpgradeView = false }: PricingProps) {
+export function Pricing({ onPlanSelect, currentPlanId, isUpgradeView = false, hideHeader = false }: PricingProps) {
   const { language } = useUser();
   const t = translations[language].app.upgrade;
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly');
@@ -45,17 +46,21 @@ export function Pricing({ onPlanSelect, currentPlanId, isUpgradeView = false }: 
     <div className={`w-full ${isUpgradeView ? 'py-8' : 'py-20 lg:py-40'}`}>
       <div className="container mx-auto">
         <div className="flex text-center justify-center items-center gap-4 flex-col">
-          {!isUpgradeView && <Badge variant="brand" className="px-4 py-1.5 text-sm">Pricing</Badge>}
-          <div className="flex gap-2 flex-col">
-            <h2 className={`tracking-tighter max-w-xl text-center font-bold text-slate-900 font-display ${isUpgradeView ? 'text-2xl' : 'text-3xl md:text-5xl'}`}>
-              {isUpgradeView ? t.title : "Elige el plan perfecto para tu crecimiento"}
-            </h2>
-            {!isUpgradeView && (
-              <p className="text-lg leading-relaxed tracking-tight text-slate-500 max-w-xl text-center font-medium">
-                {t.subtitle}
-              </p>
-            )}
-          </div>
+          {!hideHeader && (
+            <>
+                {!isUpgradeView && <Badge variant="brand" className="px-4 py-1.5 text-sm">Pricing</Badge>}
+                <div className="flex gap-2 flex-col">
+                    <h2 className={`tracking-tighter max-w-xl text-center font-bold text-slate-900 font-display ${isUpgradeView ? 'text-2xl' : 'text-3xl md:text-5xl'}`}>
+                    {isUpgradeView ? t.title : "Elige el plan perfecto para tu crecimiento"}
+                    </h2>
+                    {!isUpgradeView && (
+                    <p className="text-lg leading-relaxed tracking-tight text-slate-500 max-w-xl text-center font-medium">
+                        {t.subtitle}
+                    </p>
+                    )}
+                </div>
+            </>
+          )}
 
           {/* Billing Toggle */}
           <div className="mt-8 flex items-center justify-center gap-4 bg-slate-50 p-1.5 rounded-full border border-slate-200 shadow-inner">

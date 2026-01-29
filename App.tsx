@@ -61,6 +61,9 @@ const Skeleton = lazy(() => import("./components/ui/Skeleton"));
 const TrustPage = lazy(() => import("./components/landing/TrustPage"));
 const BlogListPage = lazy(() => import("./components/landing/blog/BlogListPage"));
 const BlogPostPage = lazy(() => import("./components/landing/blog/BlogPostPage"));
+const PricingPage = lazy(() => import("./components/landing/company/PricingPage"));
+const AffiliatePage = lazy(() => import("./components/landing/company/AffiliatePage"));
+const FAQPage = lazy(() => import("./components/landing/company/FAQPage"));
 import { useExitIntent } from "./hooks/useExitIntent";
 import { ExitIntentModal } from "./components/modals/ExitIntentModal";
 import FomoToast from "./components/ui/FomoToast";
@@ -135,6 +138,7 @@ const App: React.FC = () => {
                 <Route path="/features/:featureSlug" element={<FeatureLandingPage />} />
                 <Route path="/solutions/:featureSlug" element={<FeatureLandingPage />} />
                 <Route path="/resources/:featureSlug" element={<FeatureLandingPage />} />
+                <Route path="/company/pricing" element={<PricingPage />} />
                 <Route path="/company/:featureSlug" element={<FeatureLandingPage />} />
 
                 <Route path="/tools/:nicheSlug" element={<NicheGeneratorPage />} />
@@ -146,8 +150,10 @@ const App: React.FC = () => {
                 <Route path="/tools/profile-auditor" element={<ProfileScorecardTool />} />
                 <Route path="/hooks" element={<HookGalleryPage />} />
                 <Route path="/vs/:competitorSlug" element={<VsPageTemplate />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/trust" element={<TrustPage />} />
+                <Route path="/company/about" element={<AboutPage />} />
+                <Route path="/company/affiliate" element={<AffiliatePage />} />
+                <Route path="/company/trust" element={<TrustPage />} />
+                <Route path="/resources/common-faq" element={<FAQPage />} />
                 <Route path="/blog" element={<BlogListPage />} />
                 <Route path="/blog/:slug" element={<BlogPostPage />} />
                 

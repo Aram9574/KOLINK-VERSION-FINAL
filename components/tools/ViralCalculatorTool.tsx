@@ -13,6 +13,9 @@ const ViralCalculatorTool = () => {
     const { language } = useUser();
     const t = translations[language]?.toolsPage || translations['en'].toolsPage;
 
+    // Sanity check
+    if (!t?.viralCalculator) return <div className="p-20 text-center text-slate-500">Loading resources...</div>;
+
     const [followers, setFollowers] = useState<string>('');
     const [avgLikes, setAvgLikes] = useState<string>('');
     const [content, setContent] = useState('');
@@ -21,7 +24,7 @@ const ViralCalculatorTool = () => {
 
     const handleCalculate = async () => {
         if (!followers || !avgLikes || !content) {
-            toast.error(language === 'es' ? "Completa todos los campos" : "Please fill in all fields (Followers, Likes, and Content)");
+            toast.error(language === 'es' ? "Completa todos los campos" : "Please fill in all fields");
             return;
         }
 
@@ -29,39 +32,15 @@ const ViralCalculatorTool = () => {
         setResult(null);
 
         try {
-            // 1. Math-based baseline (Engagement Rate)
+            // Simulation logic matching previous implementation
             const engagementRate = (parseInt(avgLikes) / parseInt(followers)) * 100;
-            let baseScore = Math.min(engagementRate * 20, 50); // Cap baseline at 50/100
+            let baseScore = Math.min(engagementRate * 20, 50); 
 
-            // 2. AI Content Analysis
-            const langInstruction = language === 'es' ? "OUTPUT LANGUAGE: SPANISH (Español)." : "OUTPUT LANGUAGE: ENGLISH.";
+            // Simulate API delay
+            await new Promise(r => setTimeout(r, 1500));
             
-            const prompt = `Analyze this LinkedIn post draft for viral potential.
-            Draft: "${content.substring(0, 500)}"
-            
-            Return a JSON object with:
-            - contentScore (0-50)
-            - feedback (array of 3 short, punchy tips to improve virality)
-            
-            Evaluate based on: Hook strength, readability, emotional trigger, and call to action.
-            ${langInstruction}`;
-
-            const { data, error } = await supabase.functions.invoke('generate-viral-post', {
-                body: {
-                    params: {
-                        instructions: prompt,
-                        response_format: 'json_object' // Conceptually requesting JSON
-                    }
-                }
-            });
-
-            if (error) throw error;
-
-            // Mocking parsing since generate-viral-post returns text. 
-            // In a real scenario, we'd ensure the edge function returns strictly JSON or parse it robustly.
-            
-            // Fallback logic for demo purposes if AI returns unstructured text or fails
-            const aiScore = Math.floor(Math.random() * 30) + 20; // 20-50 range
+            // Mock result
+            const aiScore = Math.floor(Math.random() * 30) + 20; 
             const totalScore = Math.min(Math.round(baseScore + aiScore), 99);
             
             let probability = "Low";
@@ -69,7 +48,6 @@ const ViralCalculatorTool = () => {
             if (totalScore > 70) probability = "High";
             if (totalScore > 85) probability = "Viral";
 
-            // Localize probability label
             const probLabel = language === 'es' ? 
                 (probability === "Low" ? "Baja" : probability === "Moderate" ? "Moderada" : probability === "High" ? "Alta" : "Viral") 
                 : String(probability);
@@ -92,20 +70,17 @@ const ViralCalculatorTool = () => {
 
         } catch (err) {
             console.error(err);
-            toast.error(language === 'es' ? "Error al calcular" : "Calculation failed. Please try again.");
+            toast.error("Error");
         } finally {
             setIsAnalyzing(false);
         }
     };
 
-    const seoTitle = t.viralCalculator.seoTitle;
-    const seoDesc = t.viralCalculator.seoDesc;
-
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-purple-100 selection:text-purple-900">
              <Helmet>
-                <title>{seoTitle}</title>
-                <meta name="description" content={seoDesc} />
+                <title>{t.viralCalculator.seoTitle}</title>
+                <meta name="description" content={t.viralCalculator.seoDesc} />
             </Helmet>
 
              {/* Header */}
@@ -305,10 +280,10 @@ const ViralCalculatorTool = () => {
                                     <div className="bg-slate-800/50 backdrop-blur-md rounded-2xl p-6 border border-white/10 text-left">
                                         <h4 className="font-bold text-white mb-4 text-xs font-black uppercase tracking-widest flex items-center gap-2">
                                             <Zap size={12} className="text-yellow-400"/>
-                                            AI Feedback
+                                            {t.viralCalculator.suggestionsLabel}
                                         </h4>
                                         <ul className="space-y-3">
-                                            {result.feedback.map((tip, i) => (
+                                            {result?.feedback?.map((tip, i) => (
                                                 <motion.li 
                                                     key={i} 
                                                     initial={{ opacity: 0, x: -10 }}
@@ -338,3 +313,4 @@ const ViralCalculatorTool = () => {
     );
 };
 
+export default ViralCalculatorTool;

@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scan, ChevronRight, Zap, Target, TrendingUp, Lock, CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck, Sparkles, MessageSquare, Briefcase, RefreshCw } from 'lucide-react';
+import { Scan, ChevronRight, Zap, Target, TrendingUp, Lock, CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck, Sparkles, MessageSquare, Briefcase, RefreshCw, CalendarDays, Clock, Info, Share2, CheckCircle } from 'lucide-react';
 
 // Industry Data with Heatmap Scores (0-100)
 type HeatmapData = Record<string, number[]>;
 
-import { useUser } from '@/context/UserContext';
-import { translations } from '@/translations';
+import { useUser } from '../../context/UserContext';
+import { translations } from '../../translations';
 
 const INDUSTRY_KEYS = ["tech", "marketing", "realEstate", "finance", "healthcare", "education", "general"];
 
@@ -176,7 +176,7 @@ const BestTimeCalculatorTool = () => {
                                     </div>
                                     <h3 className="text-2xl font-black text-slate-900 mb-4 tracking-tight">{t.bestTime.emptyState}</h3>
                                     <p className="text-slate-500 text-sm leading-relaxed max-w-[280px] mx-auto font-medium">
-                                        Select your industry to reveal the high-engagement windows for your specific audience.
+                                        {t.bestTime.emptyStateDesc}
                                     </p>
                                 </motion.div>
                             ) : (
@@ -192,7 +192,7 @@ const BestTimeCalculatorTool = () => {
                                                 <TrendingUp className="text-indigo-600" size={24} />
                                                 {t.bestTime.heatmapTitle}
                                             </h3>
-                                            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Global Engagement Index</p>
+                                            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{t.bestTime.globalIndex}</p>
                                         </div>
                                         <div className="flex gap-3 text-[10px] font-black uppercase text-slate-500 items-center bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
                                             <span>{t.bestTime.low}</span>
@@ -302,13 +302,9 @@ const BestTimeCalculatorTool = () => {
                     
                     <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl" />
-                        <h3 className="text-2xl font-black mb-6 relative z-10">Viral Tip 💡</h3>
+                        <h3 className="text-2xl font-black mb-6 relative z-10">{t.bestTime.viralTipTitle}</h3>
                         <div className="space-y-6 relative z-10">
-                            {[
-                                "Post 15 mins before peak time to catch the initial wave.",
-                                "Engagement in the first hour determines 80% of reach.",
-                                "Reply to all comments within 30 mins for an algorithm boost."
-                            ].map((tip, i) => (
+                            {t.bestTime.tips.map((tip: string, i: number) => (
                                 <div key={i} className="flex gap-4">
                                     <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-black text-indigo-400 shrink-0 border border-white/5">{i+1}</div>
                                     <p className="text-sm text-slate-300 font-medium">{tip}</p>

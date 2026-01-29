@@ -94,6 +94,13 @@ const Navbar: React.FC<NavbarProps> = (
                 </div>
 
                 <div className="hidden lg:flex items-center bg-slate-50/50 rounded-full p-1 border border-slate-100">
+                    <Link
+                        to="/"
+                        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        className="px-4 py-2 rounded-full text-[13px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100/50 transition-colors uppercase tracking-wide"
+                    >
+                        {t.nav.home}
+                    </Link>
                     <MegaMenu 
                         title={t.nav.features} 
                         items={featureItems} 
