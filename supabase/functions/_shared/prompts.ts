@@ -18,3 +18,5 @@ export const getLengthInstructions = (length: string): string => {
 
 export const getTemplates = () => PROMPT_DATA.templates;
 
+export const FEW_SHOT_COT = PROMPT_DATA.few_shot_cot;
+

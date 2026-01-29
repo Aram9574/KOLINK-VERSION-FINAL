@@ -23,6 +23,8 @@ import { lazy, Suspense } from "react";
 import { translations } from "../../translations";
 import { StickyCTAHeader } from "../marketing/StickyCTAHeader.tsx";
 import { SchemaMarkup } from "../seo/SchemaMarkup";
+import MetaTags from "../seo/MetaTags";
+import { PageTransition } from "../ui/PageTransition";
 
 
 const SectionReveal = ({ children, id }: { children: React.ReactNode; id?: string }) => (
@@ -110,6 +112,7 @@ const LandingPage: React.FC = () => {
     }, []);
 
     return (
+        <PageTransition>
             <div className="font-sans selection:bg-brand-200 selection:text-brand-900 pb-20">
              <div className="relative z-10">
                 <SchemaMarkup 
@@ -126,14 +129,11 @@ const LandingPage: React.FC = () => {
                         "description": "The AI partner for LinkedIn creators. Generate viral carousels, audit profiles, and schedule posts."
                     }}
                 />
-                <Helmet>
-                    <title>{t.landing.meta.title}</title>
-                    <meta
-                        name="description"
-                        content={t.landing.meta.description}
-                    />
-                    <meta name="keywords" content={t.landing.meta.keywords} />
-                </Helmet>
+                <MetaTags 
+                    title={t.landing.meta.title}
+                    description={t.landing.meta.description}
+                    keywords={t.landing.meta.keywords}
+                />
 
                 <Navbar
                     language={language}
@@ -149,86 +149,91 @@ const LandingPage: React.FC = () => {
 
                 <main className="pt-20">
                     <SectionReveal id="hero">
-                        <AnimatedHero language={language} />
+                        <section aria-label="Hero">
+                            <AnimatedHero language={language} />
+                        </section>
                     </SectionReveal>
 
                     {/* Logos - Trust */}
                     <SectionReveal>
-                        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+                        <section aria-label="Trusted By" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
                             <LogoCarousel language={language} />
-                        </div>
+                        </section>
                     </SectionReveal>
 
                     {/* Value Prop - What is it? */}
                     <SectionReveal id="tools">
-                         <div className="py-16 lg:py-24">
+                         <section aria-label="Features" className="py-16 lg:py-24">
                             <FeaturesBento language={language} />
-                         </div>
+                         </section>
                     </SectionReveal>
 
 
                     {/* Deep Dive - Demo */}
                     <SectionReveal id="demo">
-                        <div className="py-16 lg:py-24">
+                        <section aria-label="Product Demo" className="py-16 lg:py-24">
                             <VideoDemoSection language={language} />
-                        </div>
+                        </section>
                     </SectionReveal>
 
                     {/* How It Works - Logic */}
                     <SectionReveal id="howitworks">
-                        <div className="py-16 lg:py-24">
+                        <section aria-label="How It Works" className="py-16 lg:py-24">
                             <HowItWorksSection language={language} />
-                        </div>
+                        </section>
                     </SectionReveal>
 
                     {/* Comparison - Objection Handling */}
                     <SectionReveal id="comparison">
-                        <div className="py-16 lg:py-24">
+                        <section aria-label="Comparison" className="py-16 lg:py-24">
                             <ComparisonSection
                                 language={language}
                                 mockContent={mockContent}
                             />
-                        </div>
+                        </section>
                     </SectionReveal>
 
                     <SectionReveal>
-                        <div className="pb-16 lg:pb-24">
+                        <section aria-label="Strategy" className="pb-16 lg:pb-24">
                             <StrategicComparison language={language} />
-                        </div>
+                        </section>
                     </SectionReveal>
 
                     {/* Social Proof - Verification */}
                     <SectionReveal id="results">
-                         <div className="py-16 lg:py-24">
+                         <section aria-label="Testimonials" className="py-16 lg:py-24">
                             <TestimonialsSection />
-                        </div>
+                        </section>
                     </SectionReveal>
 
                     {/* ROI - Rationalization */}
                     <SectionReveal>
-                        <div className="py-16 lg:py-24">
+                        <section aria-label="ROI Analysis" className="py-16 lg:py-24">
                             <RoiSection language={language} />
-                        </div>
+                        </section>
                     </SectionReveal>
 
                     {/* Pricing - Conversion */}
                     <SectionReveal id="pricing">
-                        <div className="py-16 lg:py-24">
+                        <section aria-label="Pricing" className="py-16 lg:py-24">
                             <PricingSection language={language} />
-                        </div>
+                        </section>
                     </SectionReveal>
 
                     {/* FAQ - Closing */}
                     <SectionReveal id="faq">
-                        <div className="py-16 lg:py-24">
+                        <section aria-label="FAQ" className="py-16 lg:py-24">
                             <FaqSection language={language} />
-                        </div>
+                        </section>
                     </SectionReveal>
                 </main>
-
-                <Footer language={language} scrollToSection={scrollToSection} />
+                
+                <footer role="contentinfo">
+                    <Footer language={language} scrollToSection={scrollToSection} />
+                </footer>
              </div>
             </div>
+        </PageTransition>
     );
 };
 

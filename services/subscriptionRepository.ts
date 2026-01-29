@@ -1,5 +1,6 @@
 import { supabase } from "./supabaseClient";
 import { UserSubscription, PlanTier } from "../types";
+import { Database } from "../types/supabase";
 
 export const fetchActiveSubscription = async (userId: string): Promise<UserSubscription | null> => {
     const { data, error } = await supabase
@@ -23,8 +24,13 @@ export const fetchActiveSubscription = async (userId: string): Promise<UserSubsc
     return {
         ...data,
         plan_type: data.plan_type as PlanTier,
-        billing_cycle: data.billing_cycle as "mensual" | "anual",
-        status: data.status as "active" | "canceled" | "past_due" | "incomplete"
+        billing_cycle: data.billing_cycle as any, // Cast to internal type
+        status: data.status as any,
+        credits_limit: data.credits_limit ?? 0,
+        price: data.price ?? 0,
+        reset_date: data.reset_date || '',
+        created_at: data.created_at || '',
+        updated_at: data.updated_at || '',
     } as UserSubscription;
 };
 
@@ -44,7 +50,7 @@ export const cancelSubscription = async (subscriptionId: string): Promise<boolea
 // Deprecated: Use this only for dev/testing when you need to force a plan change
 export const upsertSubscription = async (userId: string, planType: PlanTier): Promise<UserSubscription | null> => {
     // In a real app, this would be handled by Stripe webhooks
-    const subscriptionData = {
+    const subscriptionData: Database['public']['Tables']['subscriptions']['Insert'] = {
         user_id: userId,
         plan_type: planType,
         status: 'active',

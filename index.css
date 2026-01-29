@@ -2,21 +2,21 @@
 
 @theme {
   /* Typography */
-  --font-sans: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
   --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
 
   /* SOTA Semantic Colors (Unified on Brand & Slate) */
-  --color-primary: #2563eb;
+  --color-primary: #0a66c2; /* LinkedIn Blue Enhanced */
   --color-primary-foreground: #ffffff;
 
   --color-secondary: #f1f5f9;
   --color-secondary-foreground: #0f172a;
 
-  --color-accent: #2563eb;
+  --color-accent: #0a66c2;
   --color-accent-foreground: #ffffff;
 
   /* Surfaces */
-  --color-background: #ffffff;
+  --color-background: #f8fafc; /* Slater background */
   --color-foreground: #020617;
   --color-card: #ffffff;
   --color-card-foreground: #020617;
@@ -28,20 +28,20 @@
   --color-input: #e2e8f0;
 
   /* Shapes - Strict SOTA */
-  --radius-xl: 12px;
-  --radius-2xl: 12px;
-  --radius-3xl: 12px;
+  --radius-xl: 16px; /* More rounded for premium feel */
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
   --radius-full: 9999px;
 
-  /* Brand Palette - Unified Nexus */
+  /* Brand Palette - Pro LinkedIn Blue (#0A66C2 based) */
   --color-brand-50: #eff6ff;
   --color-brand-100: #dbeafe;
   --color-brand-200: #bfdbfe;
   --color-brand-300: #93c5fd;
   --color-brand-400: #60a5fa;
   --color-brand-500: #3b82f6;
-  --color-brand-600: #2563eb;
-  --color-brand-700: #1d4ed8;
+  --color-brand-600: #0a66c2; /* Main Brand Color */
+  --color-brand-700: #004182;
   --color-brand-800: #1e40af;
   --color-brand-900: #1e3a8a;
   --color-brand-950: #172554;
@@ -51,8 +51,8 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg:
     0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-nexus: 0 0 20px -5px rgba(37, 99, 235, 0.15);
-  --shadow-soft-glow: 0 4px 20px -2px rgba(37, 99, 235, 0.08);
+  --shadow-nexus: 0 0 20px -5px rgba(10, 102, 194, 0.15);
+  --shadow-soft-glow: 0 4px 20px -2px rgba(10, 102, 194, 0.12);
 
   /* Typography Extras */
   --tracking-tightest: -0.02em;
@@ -71,8 +71,16 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased
-      selection:bg-brand-100 selection:text-brand-900 bg-dot-pattern;
+      selection:bg-brand-100 selection:text-brand-900;
+    /* Grid Pattern Background */
+    background-image:
+      linear-gradient(to right, #e2e8f0 1px, transparent 1px),
+      linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center top;
   }
+
+  /* Reset grid on deeply nested elements if needed, but keeping global for now */
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display font-bold text-slate-900;
@@ -82,62 +90,60 @@
 /* Input Standardization */
 @layer components {
   input, textarea, select {
-    @apply px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50
-      focus:bg-white focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500
-      outline-none transition-all text-slate-900 placeholder-slate-400 text-sm
-      font-medium hover:border-slate-300;
+    @apply px-4 py-3 rounded-xl border border-slate-200 bg-white/50
+      backdrop-blur-sm focus:bg-white focus:ring-4 focus:ring-brand-500/10
+      focus:border-brand-500 outline-none transition-all text-slate-900
+      placeholder-slate-400 text-sm font-medium hover:border-slate-300
+      shadow-sm;
   }
 
   /* Custom Range Slider Thumb */
   .slider-input::-webkit-slider-thumb {
-    @apply h-4 w-4 rounded-full bg-white border border-slate-200 shadow-sm
+    @apply h-5 w-5 rounded-full bg-white border border-slate-200 shadow-sm
       appearance-none cursor-pointer transition-transform duration-100 ease-out;
   }
   .slider-input::-moz-range-thumb {
-    @apply h-4 w-4 rounded-full bg-white border border-slate-200 shadow-sm
+    @apply h-5 w-5 rounded-full bg-white border border-slate-200 shadow-sm
       appearance-none cursor-pointer transition-transform duration-100 ease-out;
   }
   .slider-input:active::-webkit-slider-thumb {
-    @apply scale-110;
+    @apply scale-110 ring-2 ring-brand-500/20;
   }
   .slider-input:active::-moz-range-thumb {
-    @apply scale-110;
+    @apply scale-110 ring-2 ring-brand-500/20;
   }
 }
 
 /* Premium Unified Utilities (Nexus System) */
 
 @utility card-nexus {
-  @apply bg-white/70 backdrop-blur-md border border-slate-200/60 rounded-xl
-    shadow-sm hover:shadow-nexus hover:border-brand-500/30 transition-all
-    duration-300;
+  @apply bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl
+    shadow-lg shadow-slate-200/50 hover:shadow-nexus hover:border-brand-500/30
+    transition-all duration-300;
 }
 
 @utility btn-nexus-primary {
-  @apply bg-brand-600 text-white rounded-xl px-6 py-2.5 font-semibold
+  @apply bg-brand-600 text-white rounded-xl px-6 py-3 font-semibold text-sm
     hover:bg-brand-700 hover:shadow-nexus hover:-translate-y-0.5 transition-all
     active:translate-y-0 shadow-lg shadow-brand-600/20 disabled:opacity-50
-    disabled:pointer-events-none;
+    disabled:pointer-events-none disabled:shadow-none;
 }
 
 @utility btn-nexus-secondary {
-  @apply bg-white text-slate-700 border border-slate-200 rounded-xl px-6 py-2.5
-    font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all
-    shadow-sm active:scale-98;
-}
-
-@utility bg-dot-pattern {
-  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-  background-size: 24px 24px;
+  @apply bg-white text-slate-700 border border-slate-200 rounded-xl px-6 py-3
+    text-sm font-semibold hover:bg-slate-50 hover:border-slate-300
+    transition-all shadow-sm active:scale-98 hover:shadow-md
+    hover:shadow-slate-200/50;
 }
 
 @utility glass-panel {
-  @apply bg-white/40 backdrop-blur-xl border border-white/40;
+  @apply bg-white/70 backdrop-blur-xl border border-white/60 shadow-xl
+    shadow-slate-200/40;
 }
 
 @utility glass-premium {
-  @apply bg-white/70 backdrop-blur-2xl border border-white/50 shadow-2xl
-    shadow-slate-200/50 relative overflow-hidden;
+  @apply bg-white/80 backdrop-blur-2xl border border-white/60 shadow-2xl
+    shadow-brand-900/5 relative overflow-hidden;
 }
 
 .glass-premium::before {
@@ -151,7 +157,12 @@
 }
 
 @utility text-editorial {
-  @apply font-serif tracking-tight text-slate-900;
+  @apply font-display tracking-tight text-slate-900;
+}
+
+@utility text-gradient-brand {
+  @apply bg-gradient-to-r from-brand-600 to-indigo-600 bg-clip-text
+    text-transparent;
 }
 
 /* Animations (Strict SOTA) */
@@ -175,19 +186,20 @@
   animation: fadeSlideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@utility animate-delay-100 { animation-delay: 100ms; }
-@utility animate-delay-200 { animation-delay: 200ms; }
-@utility animate-delay-300 { animation-delay: 300ms; }
-@utility animate-delay-400 { animation-delay: 400ms; }
-@utility animate-delay-500 { animation-delay: 500ms; }
-@utility animate-delay-600 { animation-delay: 600ms; }
-@utility animate-delay-700 { animation-delay: 700ms; }
-@utility animate-delay-800 { animation-delay: 800ms; }
-@utility animate-delay-900 { animation-delay: 900ms; }
-@utility animate-delay-1000 { animation-delay: 1000ms; }
-
-.transform-style-3d {
-  transform-style: preserve-3d;
+@utility animate-delay-100 {
+  animation-delay: 100ms;
+}
+@utility animate-delay-200 {
+  animation-delay: 200ms;
+}
+@utility animate-delay-300 {
+  animation-delay: 300ms;
+}
+@utility animate-delay-400 {
+  animation-delay: 400ms;
+}
+@utility animate-delay-500 {
+  animation-delay: 500ms;
 }
 
 .translate-z-10 {
@@ -210,8 +222,8 @@
   background-image: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 0,
-    rgba(255, 255, 255, 0.05) 20%,
-    rgba(255, 255, 255, 0.1) 60%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.4) 60%,
     rgba(255, 255, 255, 0)
   );
   animation: shimmer 2s infinite;
@@ -219,12 +231,15 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateZ(30px) translateY(0); }
-  50% { transform: translateZ(30px) translateY(-10px); }
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 @utility animate-float {
   animation: float 6s ease-in-out infinite;
   will-change: transform;
 }
-

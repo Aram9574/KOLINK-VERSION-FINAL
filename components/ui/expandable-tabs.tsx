@@ -20,7 +20,7 @@ interface Separator {
   onClick?: never;
 }
 
-type TabItem = Tab | Separator;
+export type TabItem = Tab | Separator;
 
 interface ExpandableTabsProps {
   tabs: TabItem[];

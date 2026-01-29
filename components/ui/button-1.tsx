@@ -1,6 +1,6 @@
-import React from "react";
 import { Spinner } from "@/components/ui/spinner-1";
 import clsx from "clsx";
+import { motion } from "framer-motion";
 
 const sizes = [
   {
@@ -86,12 +86,15 @@ export const Button = ({
   ...rest
 }: ButtonProps) => {
   return (
-    <button
+    <motion.button
       ref={ref}
       type={htmlType}
       disabled={disabled || loading}
       onClick={onClick}
       tabIndex={0}
+      whileHover={{ y: -2, boxShadow: "0 10px 20px -10px rgba(0,0,0,0.1)" }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
       className={clsx(
         "flex justify-center items-center gap-0.5 duration-150",
         sizes[+svgOnly][size],
@@ -115,6 +118,6 @@ export const Button = ({
         {children}
       </span>
       {!loading && suffix}
-    </button>
+    </motion.button>
   );
 };

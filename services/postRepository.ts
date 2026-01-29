@@ -1,4 +1,32 @@
 import { supabase } from "./supabaseClient";
+import { z } from "zod";
+import { Post } from "../types";
+import { Database } from "../types/supabase";
+import { PostID, asPostID } from "../types/branded";
+
+// DB Schemas for validation
+const PostDbSchema = z.object({
+    id: z.string(),
+    content: z.string(),
+    params: z.any(),
+    created_at: z.string(),
+    viral_score: z.number().nullable().optional(),
+    viral_analysis: z.any().nullable().optional(),
+    tags: z.array(z.string()).nullable().optional(),
+    is_favorite: z.boolean().nullable().optional(),
+    is_auto_pilot: z.boolean().nullable().optional(),
+    status: z.enum(["draft", "scheduled", "published"]).nullable().optional(),
+    scheduled_date: z.string().nullable().optional(),
+    user_id: z.string(),
+});
+
+const SnippetDbSchema = z.object({
+    id: z.string(),
+    content: z.string(),
+    created_at: z.string(),
+    last_used_at: z.string().nullable().optional(),
+    user_id: z.string(),
+});
 
 export const fetchUserPosts = async (
     userId: string,
@@ -6,7 +34,7 @@ export const fetchUserPosts = async (
     limit: number = 10,
     searchQuery: string = "",
     tone: string = "all",
-): Promise<any[]> => {
+): Promise<Post[]> => {
     const from = page * limit;
     const to = from + limit - 1;
 
@@ -34,31 +62,35 @@ export const fetchUserPosts = async (
         return [];
     }
 
-    return data.map((post) => ({
-        id: post.id,
-        content: post.content,
-        params: post.params,
-        createdAt: new Date(post.created_at).getTime(),
-        likes: post.viral_score || 0,
-        views: 0,
-        isAutoPilot: false,
-        viralScore: post.viral_score,
-        viralAnalysis: post.viral_analysis,
-        tags: post.tags || [],
-        isFavorite: post.is_favorite || false,
-        status: post.status || "published",
-        scheduledDate: post.scheduled_date
-            ? new Date(post.scheduled_date).getTime()
-            : undefined,
-    }));
+    // Validate and transform
+    return (data || []).map((post) => {
+        const validated = PostDbSchema.parse(post);
+        return {
+            id: asPostID(validated.id),
+            content: validated.content,
+            params: validated.params,
+            createdAt: new Date(validated.created_at).getTime(),
+            likes: validated.viral_score || 0,
+            views: 0,
+            isAutoPilot: validated.is_auto_pilot || false,
+            viralScore: validated.viral_score || 0,
+            viralAnalysis: validated.viral_analysis,
+            tags: validated.tags || [],
+            isFavorite: validated.is_favorite || false,
+            status: validated.status || "published",
+            scheduledDate: validated.scheduled_date
+                ? new Date(validated.scheduled_date).getTime()
+                : undefined,
+        };
+    });
 };
 
 export const updatePost = async (
-    postId: string,
-    updates: any,
+    postId: PostID,
+    updates: Partial<Post>,
 ): Promise<boolean> => {
     // Map frontend camelCase to DB snake_case
-    const dbUpdates: any = {};
+    const dbUpdates: Database['public']['Tables']['posts']['Update'] = {};
     if (updates.isFavorite !== undefined) {
         dbUpdates.is_favorite = updates.isFavorite;
     }
@@ -87,8 +119,8 @@ export const updatePost = async (
     return true;
 };
 
-export const createPost = async (post: any): Promise<any | null> => {
-    const dbPost = {
+export const createPost = async (post: Partial<Post> & { userId: string }): Promise<Post | null> => {
+    const dbPost: Database['public']['Tables']['posts']['Insert'] = {
         user_id: post.userId,
         content: post.content,
         params: post.params,
@@ -112,26 +144,28 @@ export const createPost = async (post: any): Promise<any | null> => {
         return null;
     }
 
+    const validated = PostDbSchema.parse(data);
+
     return {
-        id: data.id,
-        content: data.content,
-        params: data.params,
-        createdAt: new Date(data.created_at).getTime(),
-        likes: data.viral_score || 0,
+        id: asPostID(validated.id),
+        content: validated.content,
+        params: validated.params,
+        createdAt: new Date(validated.created_at).getTime(),
+        likes: validated.viral_score || 0,
         views: 0,
-        isAutoPilot: false,
-        viralScore: data.viral_score,
-        viralAnalysis: data.viral_analysis,
-        tags: data.tags || [],
-        isFavorite: data.is_favorite || false,
-        status: data.status || "published",
-        scheduledDate: data.scheduled_date
-            ? new Date(data.scheduled_date).getTime()
+        isAutoPilot: validated.is_auto_pilot || false,
+        viralScore: validated.viral_score,
+        viralAnalysis: validated.viral_analysis,
+        tags: validated.tags || [],
+        isFavorite: validated.is_favorite || false,
+        status: validated.status || "published",
+        scheduledDate: validated.scheduled_date
+            ? new Date(validated.scheduled_date).getTime()
             : undefined,
     };
 };
 
-export const fetchSnippets = async (userId: string): Promise<any[]> => {
+export const fetchSnippets = async (userId: string): Promise<{ id: string, text: string, createdAt: number, lastUsed?: number }[]> => {
     const { data, error } = await supabase
         .from("snippets")
         .select("*")
@@ -143,20 +177,23 @@ export const fetchSnippets = async (userId: string): Promise<any[]> => {
         return [];
     }
 
-    return data.map((snippet) => ({
-        id: snippet.id,
-        text: snippet.content,
-        createdAt: new Date(snippet.created_at).getTime(),
-        lastUsed: snippet.last_used_at
-            ? new Date(snippet.last_used_at).getTime()
-            : undefined,
-    }));
+    return (data || []).map((snippet) => {
+        const validated = SnippetDbSchema.parse(snippet);
+        return {
+            id: validated.id,
+            text: validated.content,
+            createdAt: new Date(validated.created_at).getTime(),
+            lastUsed: validated.last_used_at
+                ? new Date(validated.last_used_at).getTime()
+                : undefined,
+        };
+    });
 };
 
 export const createSnippet = async (
     userId: string,
     content: string,
-): Promise<any | null> => {
+): Promise<{ id: string, text: string, createdAt: number } | null> => {
     const { data, error } = await supabase
         .from("snippets")
         .insert({ user_id: userId, content })
@@ -188,7 +225,14 @@ export const deleteSnippet = async (snippetId: string): Promise<boolean> => {
     return true;
 };
 
-export const fetchHooks = async (): Promise<any[]> => {
+export interface HookSuggestion {
+    id: string;
+    category: string;
+    value: string;
+    label: string;
+}
+
+export const fetchHooks = async (): Promise<HookSuggestion[]> => {
     const { data, error } = await supabase
         .from("hooks")
         .select("*")
@@ -199,7 +243,7 @@ export const fetchHooks = async (): Promise<any[]> => {
         return [];
     }
     
-    return (data || []).map((h: any) => ({
+    return (data || []).map((h) => ({
         id: h.id,
         category: h.category,
         value: h.content, 
@@ -207,7 +251,13 @@ export const fetchHooks = async (): Promise<any[]> => {
     }));
 };
 
-export const fetchClosures = async (): Promise<any[]> => {
+export interface ClosureSuggestion {
+    id: string;
+    category: string;
+    value: string;
+}
+
+export const fetchClosures = async (): Promise<ClosureSuggestion[]> => {
     const { data, error } = await supabase
         .from("closures")
         .select("*")
@@ -218,7 +268,7 @@ export const fetchClosures = async (): Promise<any[]> => {
         return [];
     }
 
-    return (data || []).map((c: any) => ({
+    return (data || []).map((c) => ({
         id: c.id,
         category: c.category,
         value: c.content

@@ -42,6 +42,7 @@ interface EditorSidebarProps {
         snippets: any;
         viral?: any;
     };
+    isSplitView?: boolean;
 }
 
 const EditorSidebar: React.FC<EditorSidebarProps> = ({
@@ -60,7 +61,8 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
     viralResult,
     onAnalyzeViral,
     language,
-    labels
+    labels,
+    isSplitView = false
 }) => {
     const tabs = [
         { id: "preview", icon: Eye, label: labels.tabs.preview },
@@ -68,7 +70,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
         { id: "endings", icon: Zap, label: labels.tabs.endings },
         { id: "snippets", icon: Bookmark, label: labels.tabs.snippets },
         { id: "viral", icon: Rocket, label: "Viral" }
-    ];
+    ].filter(tab => !(isSplitView && tab.id === "preview"));
 
     return (
         <div className="w-[420px] bg-slate-50/50 border-l border-slate-200/60 flex flex-col overflow-hidden">

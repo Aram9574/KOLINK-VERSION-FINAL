@@ -9,6 +9,7 @@ import {
   getEmojiInstructions, 
   getFrameworkInstructions, 
   getLengthInstructions, 
+  FEW_SHOT_COT
 } from "../prompts.ts";
 import { RepurposeService } from "./RepurposeService.ts";
 
@@ -134,8 +135,15 @@ export class ContentService extends BaseAIService {
         industry: userContext.industry || "General",
         xp: userContext.xp || 0,
         company_name: userContext.company_name || "an industry leader"
-    }) + "\n" + technicalRules;
+    });
 
+    const userPrompt = PostGeneratorBrain.getUserPrompt(params, params.topic);
+
+    // Build Few-Shot CoT String
+    const fewShotString = `
+    ### EXAMPLES OF STRATEGIC THINKING & OUTPUT:
+    ${JSON.stringify(FEW_SHOT_COT || [], null, 2)}
+    `;
     
     // Enforce strict JSON schema in the prompt to help the model
     const strictSchemaInstruction = `
@@ -153,7 +161,7 @@ export class ContentService extends BaseAIService {
         "retention_estimate": "30s",
         "flags_triggered": []
       },
-      "strategy_reasoning": "Reason...",
+      "strategy_reasoning": "Detaield Chain of Thought analysis here...",
       "meta": {
         "suggested_hashtags": ["#tag"],
         "character_count": 150
@@ -167,9 +175,9 @@ export class ContentService extends BaseAIService {
 
       const payload = {
         contents: [
-          { role: "user", parts: [{ text: `SYSTEM INSTRUCTIONS:\n${systemInstruction}\n\n${behaviorContext}\n${voiceContext}` }] },
-          { role: "model", parts: [{ text: "Understood. I am the KOLINK AI engine. I will output strictly valid JSON." }] },
-          { role: "user", parts: [{ text: `Generate a post about: ${params.topic}. \nParams: ${JSON.stringify(params)}\n\nExtra Output Rules:\n${strictSchemaInstruction}` }] }
+          { role: "user", parts: [{ text: `SYSTEM INSTRUCTIONS:\n${systemInstruction}\n\n${behaviorContext}\n${voiceContext}\n\n${technicalRules}` }] },
+          { role: "model", parts: [{ text: "Understood. I am the KOLINK AI engine. I will follow the PCTF framework and the Thinking Phase (CoT)." }] },
+          { role: "user", parts: [{ text: `${fewShotString}\n\n${userPrompt}\n\nExtra Output Rules:\n${strictSchemaInstruction}` }] }
         ],
         generationConfig: {
           temperature: temperature,

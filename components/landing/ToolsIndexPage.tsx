@@ -24,6 +24,7 @@ import { SEO_TOOLS_CONFIG } from "@/lib/data/seo-tools-config";
 
 import { useUser } from "@/context/UserContext";
 import { translations } from "@/translations";
+import { ROLES } from "../../config/seoConfig";
 
 const ToolsIndexPage: React.FC = () => {
   const { language } = useUser();
@@ -259,6 +260,25 @@ const ToolsIndexPage: React.FC = () => {
               ))}
           </div>
       </section>
+
+      {/* Dynamic Roles Grid (Programmatic SEO) */}
+       <section className="py-10 max-w-7xl mx-auto px-6 bg-slate-50 rounded-3xl mb-20">
+           <div className="text-center mb-10">
+                <span className="text-blue-600 font-bold text-sm uppercase tracking-wider">Explora por Profesión</span>
+                <h2 className="text-3xl font-bold text-slate-900 mt-2">Soluciones a Medida</h2>
+           </div>
+          
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {ROLES.map((role) => (
+                    <Link to={`/tools/generar-posts-linkedin-para-${role.slug}`} key={role.slug} className="group">
+                            <div className="bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all flex items-center justify-between">
+                            <span className="font-medium text-slate-700 group-hover:text-blue-600 capitalize text-sm">{role.name}</span>
+                            <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500" />
+                            </div>
+                    </Link>
+                ))}
+           </div>
+       </section>
 
                 {/* Comparisons Section */}
                 <div className="mt-24 border-t border-slate-200 pt-16 mb-20">

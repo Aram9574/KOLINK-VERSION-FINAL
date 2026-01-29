@@ -43,6 +43,7 @@ import {
 import { motion } from "framer-motion";
 import { hapticFeedback } from "../../../lib/animations";
 import { supabase } from "../../../services/supabaseClient";
+import { streamMicroEdit } from "../../../services/geminiService";
 
 // Lazy load for performance
 // const LinkedInPreview = React.lazy(() => import("../generation/LinkedInPreview"));
@@ -62,6 +63,7 @@ const PostEditorView: React.FC = () => {
   const location = useLocation();
   const [currentPost, setCurrentPost] = useState<Post | null>(null);
   const [postTitle, setPostTitle] = useState("");
+  const [isSplitView, setIsSplitView] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [sidebarTab, setSidebarTab] = useState<
     "preview" | "hooks" | "endings" | "snippets" | "viral"
@@ -605,6 +607,45 @@ const PostEditorView: React.FC = () => {
     }
   };
 
+
+
+  const handleSmartEdit = async (action: string) => {
+    const selectionStart = editorRef.current?.selectionStart || 0;
+    const selectionEnd = editorRef.current?.selectionEnd || 0;
+    const selectedText = editorContent.substring(selectionStart, selectionEnd);
+
+    if (!selectedText.trim()) {
+        toast.error("Select text to modify");
+        return;
+    }
+
+    const startText = editorContent.substring(0, selectionStart);
+    const endText = editorContent.substring(selectionEnd);
+    
+    // Optimistic UI: Clear selection or show loading? 
+    // We'll replace continuously.
+    let accumulated = "";
+
+    try {
+        await streamMicroEdit({
+            topic: selectedText,
+            action: action, // e.g., "Make shorter", "More professional"
+            tone: currentPost?.params?.tone || "Professional",
+            stream: true
+        }, (chunk) => {
+            accumulated += chunk;
+            setEditorContent(startText + accumulated + endText);
+            
+            // Keep cursor at end of insertion?
+            // This might feel jumpy if not handled carefully, but functional for v1.
+        });
+        toast.success("Text updated with AI");
+    } catch (e) {
+        toast.error("AI Edit failed");
+        console.error(e);
+    }
+  };
+
   const handleClearEditor = () => {
     if (
       globalThis.confirm(language === "es" ? "¿Borrar todo?" : "Clear all?")
@@ -630,7 +671,7 @@ const PostEditorView: React.FC = () => {
   return (
     <div className="flex h-full bg-white overflow-hidden select-none">
       {/* LEFT: Editor Column */}
-      <div className="flex-[1.5] flex flex-col min-w-0 border-r border-slate-200/60 transition-all duration-300">
+      <div className={`flex flex-col min-w-0 border-r border-slate-200/60 transition-all duration-300 ${isSplitView ? 'flex-1' : 'flex-[1.5]'}`}>
         <EditorHeader
           postTitle={postTitle}
           setPostTitle={setPostTitle}
@@ -645,6 +686,14 @@ const PostEditorView: React.FC = () => {
           draftsLabel={t.drafts}
           noDraftsLabel={t.noDrafts}
           language={language}
+          isSplitView={isSplitView}
+          onToggleSplitView={() => {
+              setIsSplitView(!isSplitView);
+              // If enabling split view, ensure sidebar isn't on preview tab
+              if (!isSplitView && sidebarTab === "preview") {
+                  setSidebarTab("hooks");
+              }
+          }}
         />
 
         <EditorToolbar
@@ -660,6 +709,7 @@ const PostEditorView: React.FC = () => {
           setShowEmojiPicker={setShowEmojiPicker}
           commonEmojis={commonEmojis}
           emojiPickerRef={emojiPickerRef}
+          onSmartEdit={handleSmartEdit}
         />
 
         <EditorCanvas
@@ -698,11 +748,50 @@ const PostEditorView: React.FC = () => {
         />
       </div>
 
+      {/* MIDDLE: Split View Mobile Preview */}
+      {isSplitView && (
+          <div className="w-[380px] bg-slate-100/50 border-r border-slate-200/60 flex flex-col relative shrink-0">
+               <div className="p-3 border-b border-slate-200/60 bg-white/50 backdrop-blur-sm sticky top-0 z-10 flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <Eye className="w-3 h-3" />
+                        Mobile Preview
+                    </span>
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" title="Live Sync" />
+               </div>
+               <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
+                    <div className="bg-white rounded-none sm:rounded-md shadow-sm border border-slate-200 overflow-hidden min-h-[500px]">
+                        <LinkedInPreview 
+                            content={editorContent}
+                            user={user}
+                            isLoading={false}
+                            language={language as AppLanguage}
+                            showEditButton={false}
+                            isMobilePreview={true}
+                        />
+                    </div>
+                    
+                    {/* Helper Tip */}
+                     <div className="mt-6 mx-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex gap-3">
+                        <div className="shrink-0 w-8 h-8 rounded-full bg-blue-100/50 flex items-center justify-center text-blue-600">
+                            <Sparkles className="w-4 h-4" />
+                        </div>
+                        <div>
+                            <p className="text-xs text-blue-900 font-semibold mb-0.5">WYSIWYG Mode</p>
+                            <p className="text-[11px] text-blue-700/70 leading-relaxed">
+                                This is exactly how your post will look on a mobile device. Watch out for line breaks!
+                            </p>
+                        </div>
+                    </div>
+               </div>
+          </div>
+      )}
+
       {/* RIGHT: Sidebar Column */}
       <EditorSidebar
         activeTab={sidebarTab}
         setActiveTab={setSidebarTab}
         previewContent={editorContent}
+        isSplitView={isSplitView}
         user={user}
         hooks={filteredHooks.slice(0, visibleHooksCount).map(h => h.text)}
         endings={filteredEndings.slice(0, visibleEndingsCount).map(e => e.text)}

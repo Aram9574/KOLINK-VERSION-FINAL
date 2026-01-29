@@ -28,10 +28,10 @@ const icons = {
 };
 
 const styles = {
-  success: 'bg-white border-l-4 border-l-emerald-500',
-  error: 'bg-white border-l-4 border-l-rose-500',
-  warning: 'bg-white border-l-4 border-l-amber-500',
-  info: 'bg-white border-l-4 border-l-blue-500',
+  success: 'border-emerald-500/50 bg-emerald-50/50 text-emerald-900',
+  error: 'border-rose-500/50 bg-rose-50/50 text-rose-900',
+  warning: 'border-amber-500/50 bg-amber-50/50 text-amber-900',
+  info: 'border-blue-500/50 bg-blue-50/50 text-blue-900',
 };
 
 const Toast: React.FC<ToastProps> = ({ id, type, title, message, duration = 5000, onClose }) => {
@@ -50,18 +50,21 @@ const Toast: React.FC<ToastProps> = ({ id, type, title, message, duration = 5000
       initial="initial"
       animate="animate"
       exit="exit"
-      className={`relative w-full max-w-sm p-4 rounded-lg shadow-xl border border-slate-100 flex gap-3 items-start pointer-events-auto ${styles[type]}`}
+      className={`relative w-full max-w-sm p-4 rounded-2xl shadow-soft-glow backdrop-blur-xl border flex gap-3 items-start pointer-events-auto overflow-hidden ${styles[type]}`}
     >
-      <div className="shrink-0 mt-0.5">{icons[type]}</div>
-      <div className="flex-1">
-        {title && <h4 className="text-sm font-bold text-slate-900">{title}</h4>}
-        <p className="text-sm text-slate-600 leading-relaxed font-medium">{message}</p>
+      {/* Glossy overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
+      
+      <div className="shrink-0 mt-0.5 relative z-10">{icons[type]}</div>
+      <div className="flex-1 relative z-10">
+        {title && <h4 className="text-sm font-bold tracking-tight mb-1">{title}</h4>}
+        <p className="text-sm opacity-90 leading-relaxed font-medium">{message}</p>
       </div>
       <button
         onClick={() => onClose(id)}
-        className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+        className="relative z-10 p-1 rounded-full hover:bg-black/5 transition-colors"
       >
-        <X className="w-4 h-4" />
+        <X className="w-4 h-4 opacity-60" />
       </button>
     </motion.div>
   );

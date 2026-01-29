@@ -45,3 +45,13 @@ export interface ContentAngle {
     hook: string;
     description: string;
 }
+
+export interface AIFeedback {
+    id?: string;
+    user_id: string;
+    input_context: any;
+    output_content: string;
+    rating: 1 | -1;
+    metadata?: any;
+    created_at?: string;
+}

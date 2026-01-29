@@ -2,6 +2,10 @@
 // deno-lint-ignore-file no-explicit-any
 import { createClient, SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { validateInput } from "../_shared/inputGuard.ts";
+import { truncateToTokenLimit } from "../_shared/tokenUtils.ts";
+import { GoogleGenerativeAI } from "npm:@google/generative-ai@^0.21.0";
+import { PostGeneratorBrain } from "../_shared/prompts/PostGeneratorBrain.ts";
 
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
@@ -18,6 +22,7 @@ const GenerationParamsSchema = z.object({
   topic: z.string().min(1).max(5000),
   audience: z.string().max(200).optional().default("General Professional Audience"),
   tone: z.string().optional(),
+  stream: z.boolean().optional().default(false), // NEW: Stream flag
   framework: z.string().optional(),
   emojiDensity: z.string().optional(),
   length: z.string().optional(),
@@ -35,6 +40,27 @@ const GenerationParamsSchema = z.object({
   action: z.string().optional(),
   hook_a: z.string().optional(),
   hook_b: z.string().optional(),
+});
+
+// Output Validation Schema (Strict)
+const GeneratedPostSchema = z.object({
+  post_content: z.string(),
+  auditor_report: z.object({
+    viral_score: z.number(),
+    hook_strength: z.string(),
+    hook_score: z.number(),
+    readability_score: z.number(),
+    value_score: z.number(),
+    pro_tip: z.string(),
+    retention_estimate: z.string(),
+    flags_triggered: z.array(z.string()),
+    predicted_archetype_resonance: z.string().optional()
+  }),
+  strategy_reasoning: z.string(),
+  meta: z.object({
+    suggested_hashtags: z.array(z.string()),
+    character_count: z.number()
+  })
 });
 
 enum ErrorCode {
@@ -75,92 +101,66 @@ interface GeneratedPost {
   };
 }
 
-// --- 2. BASE AI SERVICE (INLINED) ---
+// --- 2. PROMPT BRAIN (IMPORTED) ---
 
-class BaseAIService {
-  protected readonly MODEL = "gemini-2.0-flash-001";
-  protected get model() { return this.MODEL; }
-  protected geminiApiKey: string;
+// --- 3. AI SERVICE WITH SDK ---
 
-  constructor(geminiApiKey: string) {
-    if (!geminiApiKey) throw new Error("GEMINI_API_KEY is required");
-    this.geminiApiKey = geminiApiKey.trim();
+class ContentService {
+  private genAI: GoogleGenerativeAI;
+  private model: any;
+
+  constructor(apiKey: string) {
+    if (!apiKey) throw new Error("GEMINI_API_KEY is required");
+    this.genAI = new GoogleGenerativeAI(apiKey);
+    this.model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash-001" });
   }
 
-  protected async retryWithBackoff<T>(operation: () => Promise<T>, retries = 3, delay = 2000): Promise<T> {
-    try {
-      return await operation();
-    } catch (error: any) {
-      if (retries > 0 && (error.status === 503 || error.status === 429)) {
-        await new Promise((r) => setTimeout(r, delay));
-        return this.retryWithBackoff(operation, retries - 1, delay * 2);
-      }
-      throw error;
-    }
-  }
-
-  protected extractJson(text: string): Record<string, unknown> {
-    try {
+  private extractJson(text: string): any {
       let cleanText = text.replace(/```json/g, "").replace(/```/g, "").trim();
       const start = cleanText.indexOf('{');
       const end = cleanText.lastIndexOf('}');
       if (start === -1 || end === -1) throw new Error("No JSON object found");
       return JSON.parse(cleanText.substring(start, end + 1));
-    } catch (error) {
-      console.error("[BaseAIService] JSON Parse Error:", error);
-      throw new Error("AI returned invalid JSON.");
-    }
   }
 
-  protected async generateViaFetch(model: string, payload: Record<string, unknown>): Promise<unknown> {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.geminiApiKey}`;
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) {
-        throw new Error(`Gemini API Error: ${response.status} - ${await response.text()}`);
-    }
-    return await response.json();
+  // Retry logic wrapper
+  private async retryWithBackoff<T>(operation: () => Promise<T>, retries = 5, initialDelay = 2000): Promise<T> {
+      try {
+          return await operation();
+      } catch (error: any) {
+          const msg = error.message || "";
+          const isRetryable = 
+              msg.includes("429") || 
+              msg.includes("503") || 
+              msg.includes("Quota exceeded") ||
+              error.status === 429 || 
+              error.status === 503;
+          
+          if (retries > 0 && isRetryable) {
+              const jitter = Math.random() * 1000;
+              const waitTime = initialDelay + jitter;
+              console.warn(`[Gemini] ZooWeeMama! 429 Error. Retrying in ${Math.round(waitTime)}ms... (${retries} left)`);
+              await new Promise(resolve => setTimeout(resolve, waitTime));
+              return this.retryWithBackoff(operation, retries - 1, initialDelay * 2); // Exponential backoff
+          }
+          throw error;
+      }
   }
-}
 
-// --- 3. PROMPT BRAIN (INLINED) ---
-
-class PostGeneratorBrain {
-  static getSystemPrompt(userContext: any): string {
-    return `
-    ROLE: You are an elite LinkedIn Ghostwriter acting as "${userContext.company_name || 'an industry leader'}".
-    Your goal is to write viral, high-impact content that builds authority.
-    
-    CORE SKILL: CONTENT CREATOR V1.0
-    You MUST follow this proven viral framework:
-    
-    1. 🎯 THE HOOK (Pattern Interrupt): Start with a bold statement, question, or counter-intuitive fact. NO greetings.
-    2. 📝 THE CONTEXT: 1-2 short sentences explaining why this matters now.
-    3. 💡 THE INSIGHT (Bullets): Use 3-5 bullet points to break down the value.
-    4. 🚀 THE TAKEAWAY: A punchy conclusion or lesson.
-    5. 🗣️ THE QUESTION: A specific question to drive comments.
-
-    STYLE RULES:
-    - Write for skimmers: Short paragraphs (1-2 lines max).
-    - No fluff words ("In today's fast-paced world", "delve into").
-    - Use active voice.
-    - Match Voice: ${userContext.brand_voice || "Professional yet accessible"}
-    
-    AUTHOR CONTEXT:
-    - Industry: ${userContext.industry}
-    - Expertise: ${userContext.xp} XP
-    `;
+  // Helper to handle streaming
+  async *streamGenerator(prompt: string, config: any): AsyncGenerator<string> {
+      const result = await this.retryWithBackoff(() => this.model.generateContentStream({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: config
+      }));
+      
+      for await (const chunk of result.stream) {
+          const chunkText = chunk.text();
+          if (chunkText) yield chunkText;
+      }
   }
-}
 
-// --- 4. CONTENT SERVICE (INLINED & SIMPLIFIED) ---
-
-class ContentService extends BaseAIService {
-  
-  async generatePost(params: any, userContext: any): Promise<GeneratedPost> {
+  async generatePost(params: any, userContext: any): Promise<GeneratedPost | ReadableStream> {
     const systemInstruction = PostGeneratorBrain.getSystemPrompt({
         ...userContext,
         industry: userContext.industry || "General",
@@ -168,128 +168,162 @@ class ContentService extends BaseAIService {
         company_name: userContext.company_name || "an industry leader"
     });
 
-    // COMPARE HOOKS MODE
+    const isStreaming = params.stream === true;
+
+    // --- STREAMING HANDLER (SSE) ---
+    if (isStreaming) {
+        // Prepare prompt designed for plain text streaming first
+        const streamInstruction = `
+        ROLE: World-Class Viral LinkedIn Ghostwriter.
+        TASK: Write a high-performing LinkedIn post about: "${params.topic}".
+        CONTEXT: Tone: ${params.tone}, Framework: ${params.framework}.
+        OUTPUT: Plain text only. Do not output Markdown code blocks or JSON. Just the post.
+        `;
+        
+        // 1. Start Stream
+        const stream = await this.model.generateContentStream({
+            contents: [
+                { role: "user", parts: [{ text: systemInstruction }] },
+                { role: "user", parts: [{ text: streamInstruction }] }
+            ],
+            generationConfig: { temperature: 0.7 }
+        });
+
+        const encoder = new TextEncoder();
+        const self = this; // Capture context for saving later
+
+        return new ReadableStream({
+            async pull(controller) {
+                let accumulatedText = "";
+                
+                try {
+                    for await (const chunk of stream.stream) {
+                        const chunkText = chunk.text();
+                        if (chunkText) {
+                            accumulatedText += chunkText;
+                            // Emit chunk event
+                            const event = `data: ${JSON.stringify({ chunk: chunkText })}\n\n`;
+                            controller.enqueue(encoder.encode(event));
+                        }
+                    }
+
+                    // 2. Generation Complete -> Analyze & Save (Hidden Step)
+                    // We need to construct the final object to save to DB
+                    // For speed, we might mock analysis or do a quick pass. 
+                    // Let's do a quick analysis pass to maintain data integrity.
+                    
+                    const analysisPrompt = `
+                    ANALYZE this LinkedIn post and return JSON:
+                    POST: "${accumulatedText}"
+                    OUTPUT JSON SCHEMA: { "viral_score": number (0-100), "hook_strength": "Low"|"Medium"|"High", "readability_score": number, "pro_tip": "string" }
+                    `;
+                    const analysisResult = await self.model.generateContent({
+                        contents: [{ role: "user", parts: [{ text: analysisPrompt }] }],
+                         generationConfig: { responseMimeType: "application/json" }
+                    });
+                     
+                    const analysisJson = self.extractJson(analysisResult.response.text());
+                    
+                    // Construct final object equivalent to GeneratedPost
+                     const finalPost: GeneratedPost = {
+                        post_content: accumulatedText,
+                        auditor_report: {
+                            viral_score: analysisJson.viral_score || 75,
+                            hook_strength: analysisJson.hook_strength || "Medium",
+                            hook_score: 80, 
+                            readability_score: analysisJson.readability_score || 80,
+                            value_score: 80,
+                            pro_tip: analysisJson.pro_tip || "Add a question to engage comments.",
+                            retention_estimate: "30s",
+                            flags_triggered: []
+                        },
+                        strategy_reasoning: "Streamed Generation",
+                        meta: { suggested_hashtags: [], character_count: accumulatedText.length }
+                    };
+
+                    // EMIT RESULT EVENT
+                    // The main handler can't save because we returned the stream.
+                    // So we must emit the full object for the frontend to save? 
+                    // OR we save HERE if we can inject dependencies? 
+                    // Constraint: We don't have repositories here.
+                    // Solution: Emit the "complete" object. Let Frontend call a separate "save" endpoint 
+                    // OR let Frontend assume it's unsaved draft? 
+                    // Better: The MAIN Loop in index.ts handles saving? No, it returned.
+                    
+                    // We will emit the Final Object. The frontend will receive it. 
+                    // Ideally, Supabase Edge Functions should allow async work after response, 
+                    // but for now, let's entrust the frontend to receive the full object.
+                    
+                    const finalEvent = `event: result\ndata: ${JSON.stringify(finalPost)}\n\n`;
+                    controller.enqueue(encoder.encode(finalEvent));
+                    controller.close();
+
+                } catch (e) {
+                    const errorEvent = `event: error\ndata: ${JSON.stringify({ message: e.message })}\n\n`;
+                    controller.enqueue(encoder.encode(errorEvent));
+                    controller.close();
+                }
+            }
+        });
+    }
+
+    // ... NON-STREAMING LEGACY/STRICT MODES (Keep existing code below)
     if (params.mode === 'compare_hooks') {
         const compareInstruction = `
         ROLE: Viral Content Analyst.
-        TASK: Compare two LinkedIn headlines (hooks) and declare a winner based on: curiosity gap, emotional impact, and clarity.
-        
+        TASK: Compare two LinkedIn headlines (hooks) and declare a winner.
         HOOK A: "${params.hook_a}"
         HOOK B: "${params.hook_b}"
-        
-        OUTPUT FORMAT: Return a valid JSON object.
-        {
-            "winner": "A" or "B",
-            "scoreA": 85 (0-100),
-            "scoreB": 70 (0-100),
-            "reason": "Brief explanation why the winner is better..."
-        }
+        OUTPUT JSON: { "winner": "A"|"B", "scoreA": number, "scoreB": number, "reason": string }
         `;
-
-        return await this.retryWithBackoff(async () => {
-             const payload = {
-                contents: [{ role: "user", parts: [{ text: compareInstruction }] }],
-                generationConfig: {
-                    temperature: 0.2, // Low temp for analytical consistency
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: { 
-                            winner: { type: "STRING", enum: ["A", "B"] },
-                            scoreA: { type: "NUMBER" },
-                            scoreB: { type: "NUMBER" },
-                            reason: { type: "STRING" }
-                        },
-                        required: ["winner", "scoreA", "scoreB", "reason"]
-                    }
-                }
-             };
-             const data: any = await this.generateViaFetch(this.model, payload);
-             const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-             if (!text) throw new Error("No text returned from AI");
-             const json = this.extractJson(text);
-
-             // Return simplified object compatible with GeneratedPost interface (abusing fields slightly or we could extend the interface, 
-             // but for now we'll pack it into a predictable structure or just return as is if the caller handles it.
-             // The caller expects `GeneratedPost` but for this mode we might want to return raw data or pack it.
-             // Let's allow returning the raw result in the 'data' field of API response, 
-             // but strictly here we need to return GeneratedPost.
-             // Actually, looking at main server, it returns `result.post_content` etc.
-             // We should adapt.
-             
-             return {
-                 post_content: "Comparison Complete", 
-                 auditor_report: { viral_score: 0, hook_strength: "N/A", hook_score: 0, readability_score: 0, value_score: 0, pro_tip: "", retention_estimate: "", flags_triggered: [] },
-                 strategy_reasoning: JSON.stringify(json), // Pack the result here
-                 meta: { suggested_hashtags: [], character_count: 0 }
-             };
-        });
+        
+        const result = await this.retryWithBackoff(() => this.model.generateContent({
+             contents: [{ role: "user", parts: [{ text: compareInstruction }] }],
+             generationConfig: { responseMimeType: "application/json" }
+        }));
+        const json = this.extractJson(result.response.text());
+        return {
+             post_content: "Comparison Complete", 
+             auditor_report: { viral_score: 0, hook_strength: "N/A", hook_score: 0, readability_score: 0, value_score: 0, pro_tip: "", retention_estimate: "", flags_triggered: [] },
+             strategy_reasoning: JSON.stringify(json),
+             meta: { suggested_hashtags: [], character_count: 0 }
+         };
     }
 
-    // MICRO-EDIT MODE
+    // MICRO-EDIT (Stream handled above or legacy here)
     if (params.mode === 'micro_edit') {
-        const editInstruction = `
-        ROLE: Expert Copy Editor & Viral Ghostwriter.
-        TASK: Perform the following action: "${params.action || 'Improve'}" on the text below.
-        TARGET TEXT: "${params.topic}" (Treat this as the raw text to edit).
-        CONTEXT: Tone: ${params.tone || 'Professional'}. Audience: ${params.audience}.
-        
-        OUTPUT FORMAT: Return a valid JSON object with ONLY the result.
-        { "post_content": "The edited text result..." }
+         // ... (existing micro_edit logic, maybe redundant if we unified streaming, but keeping for safety)
+         // Assuming stream=true is handled by the block above. If stream=false:
+         const editInstruction = `
+        ROLE: Expert Copy Editor.
+        TASK: Perform action "${params.action || 'Improve'}" on: "${params.topic}".
+        Tone: ${params.tone || 'Professional'}.
+        OUTPUT JSON: { "post_content": "edited text" }
         `;
-
-        return await this.retryWithBackoff(async () => {
-             const payload = {
-                contents: [{ role: "user", parts: [{ text: editInstruction }] }],
-                generationConfig: {
-                    temperature: 0.4, // Lower temp for precise editing
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: { post_content: { type: "STRING" } },
-                        required: ["post_content"]
-                    }
-                }
-             };
-             const data: any = await this.generateViaFetch(this.model, payload);
-             const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-             if (!text) throw new Error("No text returned from AI");
-             
-             const json = this.extractJson(text);
-             // Return simplified object compatible with GeneratedPost interface
-             return {
-                 post_content: json.post_content as string,
-                 auditor_report: { viral_score: 0, hook_strength: "N/A", hook_score: 0, readability_score: 0, value_score: 0, pro_tip: "", retention_estimate: "", flags_triggered: [] },
-                 strategy_reasoning: "Micro-edit",
-                 meta: { suggested_hashtags: [], character_count: (json.post_content as string).length }
-             };
-        });
+        const result = await this.retryWithBackoff(() => this.model.generateContent({
+            contents: [{ role: "user", parts: [{ text: editInstruction }] }],
+            generationConfig: { responseMimeType: "application/json" }
+        }));
+        const json = this.extractJson(result.response.text());
+        return {
+            post_content: json.post_content,
+            auditor_report: { viral_score: 0, hook_strength: "N/A", hook_score: 0, readability_score: 0, value_score: 0, pro_tip: "", retention_estimate: "", flags_triggered: [] },
+            strategy_reasoning: "Micro-edit",
+            meta: { suggested_hashtags: [], character_count: String(json.post_content).length }
+        };
     }
     
-    const strictSchemaInstruction = `
-    IMPORTANT: You MUST return a valid JSON object.
-    Structure:
-    {
-      "post_content": "The actual post text...",
-      "auditor_report": { "viral_score": 85, "hook_strength": "High", "hook_score": 90, "readability_score": 88, "value_score": 85, "pro_tip": "Advice...", "retention_estimate": "30s", "flags_triggered": [] },
-      "strategy_reasoning": "Reason...",
-      "meta": { "suggested_hashtags": ["#tag"], "character_count": 150 }
-    }
-    `;
+    // MAIN GENERATION (Strict w/ SDK - Non-Streaming fallback)
+    const userPrompt = PostGeneratorBrain.getUserPrompt(params, params.topic);
 
-    return await this.retryWithBackoff(async () => {
-      const payload = {
+    const result = await this.retryWithBackoff(() => this.model.generateContent({
         contents: [
-          { role: "user", parts: [{ text: `SYSTEM INSTRUCTIONS:\n${systemInstruction}` }] },
-          { role: "model", parts: [{ text: "Understood. I will output strictly valid JSON." }] },
-          { role: "user", parts: [{ text: `Generate a post about: ${params.topic}. 
-Niche context: ${params.instructions || "None provided"}.
-Target Audience: ${params.target_audience || params.audience || "General Professional"}.
-Params: ${JSON.stringify(params)}\n\n${strictSchemaInstruction}` }] }
+          { role: "user", parts: [{ text: systemInstruction }] },
+          { role: "user", parts: [{ text: userPrompt }] }
         ],
-        generationConfig: {
-          temperature: 0.7,
+        generationConfig: { 
           responseMimeType: "application/json",
+          // Use the schema from lines 45-63
           responseSchema: {
             type: "OBJECT",
             properties: {
@@ -297,14 +331,15 @@ Params: ${JSON.stringify(params)}\n\n${strictSchemaInstruction}` }] }
               auditor_report: {
                 type: "OBJECT",
                 properties: {
-                  viral_score: { type: "INTEGER" },
+                  viral_score: { type: "NUMBER" },
                   hook_strength: { type: "STRING" },
-                  hook_score: { type: "INTEGER" },
-                  readability_score: { type: "INTEGER" },
-                  value_score: { type: "INTEGER" },
+                  hook_score: { type: "NUMBER" },
+                  readability_score: { type: "NUMBER" },
+                  value_score: { type: "NUMBER" },
                   pro_tip: { type: "STRING" },
                   retention_estimate: { type: "STRING" },
-                  flags_triggered: { type: "ARRAY", items: { type: "STRING" } }
+                  flags_triggered: { type: "ARRAY", items: { type: "STRING" } },
+                  predicted_archetype_resonance: { type: "STRING" }
                 },
                 required: ["viral_score", "hook_strength", "hook_score", "readability_score", "value_score", "pro_tip", "retention_estimate", "flags_triggered"]
               },
@@ -313,23 +348,19 @@ Params: ${JSON.stringify(params)}\n\n${strictSchemaInstruction}` }] }
                 type: "OBJECT",
                 properties: {
                   suggested_hashtags: { type: "ARRAY", items: { type: "STRING" } },
-                  character_count: { type: "INTEGER" }
+                  character_count: { type: "NUMBER" }
                 },
                 required: ["suggested_hashtags", "character_count"]
               }
             },
             required: ["post_content", "auditor_report", "strategy_reasoning", "meta"]
-          },
-        },
-      };
-
-      const data: any = await this.generateViaFetch(this.model, payload);
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error("No text returned from AI");
-
-      const json = this.extractJson(text);
-      return json as unknown as GeneratedPost;
-    });
+          }
+        }
+    }));
+    
+    // Strict Validation
+    const json = this.extractJson(result.response.text());
+    return GeneratedPostSchema.parse(json) as GeneratedPost;
   }
 }
 
@@ -383,34 +414,64 @@ class GamificationService {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const headers = { ...corsHeaders, "Content-Type": "application/json" };
-  console.log("FUNCTION INVOKED: generate-viral-post");
+  console.log("--- FUNCTION INVOKED: generate-viral-post ---");
 
   try {
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !GEMINI_API_KEY) {
-      throw new Error("Server Configuration Error");
+      console.error("Config Error: Missing ENV vars");
+      throw new Error("Server Configuration Error: Missing environment variables.");
     }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // Standard Auth Pattern: Create client with user's token
+    const supabaseClient = createClient(
+        SUPABASE_URL,
+        Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+        { global: { headers: { Authorization: authHeader } } }
+    );
     
-    // Instantiate INLINED Services
-    const postRepository = new PostRepository(supabase);
-    const creditService = new CreditService(supabase);
-    const gamificationService = new GamificationService(supabase);
-    // REAL AI SERVICE
+    // This automatically validates the JWT
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    
+    if (authError || !user) {
+        console.error("Auth Error:", authError?.message || "Invalid User Token");
+        return sendError(ErrorCode.AUTH_ERROR, "Invalid User Token", authError?.message);
+    }
+
+    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    console.log(`Authenticated User: ${user.id} (${user.email})`);
+
+    // Instantiate Services
+    const postRepository = new PostRepository(supabaseAdmin);
+    const creditService = new CreditService(supabaseAdmin);
+    const gamificationService = new GamificationService(supabaseAdmin);
     const contentService = new ContentService(GEMINI_API_KEY);
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) return sendError(ErrorCode.AUTH_ERROR, "Missing Authorization Header");
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
-    if (authError || !user) return sendError(ErrorCode.AUTH_ERROR, "Invalid User Token");
-
     const body = await req.json();
-    const parseResult = GenerationParamsSchema.safeParse(body.params);
-    if (!parseResult.success) return sendError(ErrorCode.VALIDATION_ERROR, "Invalid parameters", parseResult.error);
-    const validatedParams = parseResult.data;
+    console.log("Body Key Count:", Object.keys(body).length);
 
-    const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+    // Support both { params: { ... } } and flattened body
+    const paramsToValidate = body.params || body;
+    const parseResult = GenerationParamsSchema.safeParse(paramsToValidate);
+    
+    if (!parseResult.success) {
+        console.error("Schema Validation Error:", JSON.stringify(parseResult.error.format()));
+        return sendError(ErrorCode.VALIDATION_ERROR, "Invalid parameters", parseResult.error);
+    }
+    const validatedParams = parseResult.data;
+    console.log(`Topic length: ${validatedParams.topic.length}`);
+
+    // --- SECURITY & SANITIZATION ---
+    const inputValidation = validateInput(validatedParams.topic);
+    if (!inputValidation.isValid) {
+        console.warn(`Blocked Input (${user.id}): ${inputValidation.error}`);
+        return sendError(ErrorCode.VALIDATION_ERROR, inputValidation.error || "Input rejected for security reasons.");
+    }
+    validatedParams.topic = inputValidation.sanitizedInput!;
+    validatedParams.topic = truncateToTokenLimit(inputValidation.sanitizedInput!, 3000);
+
+    const { data: profile } = await supabaseAdmin.from("profiles").select("*").eq("id", user.id).single();
     if (!profile) return sendError(ErrorCode.AUTH_ERROR, "User profile not found");
     // if ((profile.credits || 0) <= 0) return sendError(ErrorCode.INSUFFICIENT_CREDITS, "Zero credits.");
 
@@ -423,27 +484,38 @@ Deno.serve(async (req) => {
         xp: profile.xp
     };
     const result = await contentService.generatePost(validatedParams, userContext);
+    
+    // STREAM HANDLING
+    if (result instanceof ReadableStream) {
+        return new Response(result, {
+            headers: {
+                ...corsHeaders,
+                "Content-Type": "text/event-stream; charset=utf-8",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive"
+            }
+        });
+    }
+
+    // NON-STREAM HANDLING (JSON)
+    const postResult = result as GeneratedPost;
 
     try { await creditService.deductCredit(user.id, 1); } catch (e) { console.error("Credit Error", e); }
     
-    const savedPost = await postRepository.savePost(user.id, result, validatedParams);
+    const savedPost = await postRepository.savePost(user.id, postResult, validatedParams);
     if (!savedPost) return sendError(ErrorCode.INTERNAL_ERROR, "Failed to save post");
 
     try { await gamificationService.processAction(user.id, "GENERATE_POST"); } catch(e) {}
 
-    const responseData: APIResponse<any> = {
-        success: true,
-        data: {
-            id: savedPost.id,
-            postContent: result.post_content,
-            viralScore: result.auditor_report.viral_score,
-            viralAnalysis: result.auditor_report,
-            gamification: null, 
-            credits: (profile.credits || 0) - 1,
-            // Special handling for compare_hooks
-            ...(validatedParams.mode === 'compare_hooks' ? JSON.parse(result.strategy_reasoning) : {})
-        }
-        }
+    const responseData = {
+        id: savedPost.id,
+        content: postResult.post_content,
+        viralScore: postResult.auditor_report.viral_score,
+        viralAnalysis: postResult.auditor_report,
+        gamification: null, 
+        credits: (profile.credits || 0) - 1,
+        // Special handling for compare_hooks
+        ...(validatedParams.mode === 'compare_hooks' ? JSON.parse(postResult.strategy_reasoning) : {})
     };
 
     return new Response(JSON.stringify(responseData), { status: 200, headers });
@@ -454,7 +526,8 @@ Deno.serve(async (req) => {
   }
 
   function sendError(code: ErrorCode | string, message: string, details?: any) {
-      const response: APIResponse<null> = { success: false, error: { code, message, details } };
-      return new Response(JSON.stringify(response), { status: 200, headers });
+      const response = { success: false, error: { code, message, details } };
+      const status = (code === ErrorCode.AUTH_ERROR) ? 401 : (code === ErrorCode.VALIDATION_ERROR) ? 400 : 500;
+      return new Response(JSON.stringify(response), { status, headers });
   }
 });

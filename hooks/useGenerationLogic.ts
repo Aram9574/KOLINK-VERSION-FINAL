@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useToast } from "../context/ToastContext";
-import { AppTab, GenerationParams, Post, UserProfile } from "../types";
+import { AppTab, GenerationParams, Post, UserProfile, LevelUpData } from "../types";
 import { executePostGeneration } from "../services/postWorkflow";
 import { supabase } from "../services/supabaseClient";
 import { fetchUserProfile } from "../services/userRepository";
@@ -15,7 +15,7 @@ interface UseGenerationLogicProps {
     handleUpdateUser: (updates: Partial<UserProfile>) => Promise<void>;
     setShowUpgradeModal: (show: boolean) => void;
     setShowCreditDeduction: (show: boolean) => void;
-    setLevelUpData: (data: any) => void;
+    setLevelUpData: (data: LevelUpData) => void;
     isGenerating: boolean;
     setIsGenerating: (isGenerating: boolean) => void;
     savePostToHistory: (post: Post) => void;
@@ -145,6 +145,9 @@ export const useGenerationLogic = ({
         if (!isAutoPilot) setShowCreditDeduction(false);
 
         try {
+            // Ensure we are on the creation tab
+            setActiveTab("create");
+            
             const result = await executePostGeneration(
                 user,
                 params,

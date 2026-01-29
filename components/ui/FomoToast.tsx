@@ -50,14 +50,15 @@ const FomoToast = () => {
                     initial={{ opacity: 0, x: -50, y: 50 }}
                     animate={{ opacity: 1, x: 0, y: 0 }}
                     exit={{ opacity: 0, x: -50, y: 50 }}
-                    className="fixed bottom-6 left-6 z-40 bg-white border border-slate-100 shadow-xl shadow-slate-200/50 rounded-lg p-4 flex items-center gap-4 max-w-xs"
+                    className="fixed bottom-6 left-6 z-50 glass-premium rounded-xl p-4 flex items-center gap-4 max-w-xs cursor-pointer hover:scale-105 transition-transform duration-300"
                 >
-                    <div className="bg-brand-50 p-2 rounded-full text-brand-500">
-                        <event.icon size={20} />
+                    <div className="bg-brand-100/50 p-2.5 rounded-full text-brand-600 relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-brand-500/20 blur-lg group-hover:blur-md transition-all" />
+                        <event.icon size={20} className="relative z-10" />
                     </div>
                     <div>
-                        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wide">{event.title}</h4>
-                        <p className="text-sm text-slate-600 font-medium">{event.desc}</p>
+                        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-widest mb-0.5">{event.title}</h4>
+                        <p className="text-sm text-slate-600 font-medium leading-tight">{event.desc}</p>
                     </div>
                 </motion.div>
             )}

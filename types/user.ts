@@ -105,3 +105,9 @@ export interface ExpertiseProfile {
   negativeKeywords: string[];
   bioSummary?: string;
 }
+
+export interface LevelUpData {
+    leveledUp: boolean;
+    newLevel: number;
+    newAchievements: string[];
+}

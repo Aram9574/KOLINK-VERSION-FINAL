@@ -4,14 +4,13 @@ import { EMPTY_USER, MARKETING_DOMAIN } from '../constants';
 import { supabase } from '../services/supabaseClient';
 import { fetchUserProfile, syncUserProfile } from '../services/userRepository';
 import { useNavigate, useLocation } from 'react-router-dom';
-// @ts-ignore
 import { Session, User } from '@supabase/supabase-js';
 
 // Unified User Context Interface
 interface UserContextType {
     user: UserProfile;
-    authUser: any | null;
-    session: any | null;
+    authUser: User | null;
+    session: Session | null;
     loading: boolean;
     logout: () => Promise<void>;
     setUser: (data: Partial<UserProfile> | ((prev: UserProfile) => Partial<UserProfile>)) => void; // Legacy support
@@ -44,7 +43,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     useEffect(() => {
         const initializeAuth = async () => {
             try {
-                // @ts-ignore
                 const { data: { session } } = await supabase.auth.getSession();
                 setSession(session);
                 setAuthUser(session?.user ?? null);
@@ -57,7 +55,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         initializeAuth();
 
-        // @ts-ignore
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             console.log("Auth state change:", event);
             setSession(session);
@@ -129,7 +126,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // --- 3. Actions ---
     const logout = async () => {
-        // @ts-ignore
         await supabase.auth.signOut();
         setSession(null);
         setAuthUser(null);
@@ -152,8 +148,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (authUser?.id) await fetchProfileData(authUser.id);
     };
 
-    const setLanguage = (lang: AppLanguage) => {
-        // Enforce Spanish strictly. Ignore incoming lang changes to 'en'.
+    const setLanguage = () => {
+        // Enforce Spanish strictly. Ignore incoming lang changes.
         setProfile(prev => ({ ...prev, language: 'es' }));
     };
 

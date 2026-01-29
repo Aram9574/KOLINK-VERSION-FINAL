@@ -33,6 +33,7 @@ import confetti from "canvas-confetti";
 import ScheduleModal from "../../modals/ScheduleModal";
 import { getAvatarUrl } from "../../../utils";
 import { SmartRefineToolbar } from "./v4/SmartRefineToolbarV2";
+import { AIFeedbackButtons } from "../../ui/AIFeedbackButtons";
 
 interface LinkedInPreviewProps {
     content: string;
@@ -47,7 +48,25 @@ interface LinkedInPreviewProps {
     isMobilePreview?: boolean;
     viralScore?: number;
     viralAnalysis?: ViralAnalysis;
+    generationParams?: any;
 }
+
+
+interface NativeActionButtonProps {
+    icon: React.ReactNode;
+    label: string;
+}
+
+const NativeActionButton = ({ icon, label }: NativeActionButtonProps) => {
+    return (
+        <button className="flex flex-col items-center justify-center py-2 px-1 flex-1 active:bg-slate-100 rounded-lg transition-colors group">
+             <div className="text-slate-500 group-hover:text-slate-700 transition-colors">
+                {icon}
+             </div>
+             <span className="text-[10px] font-medium text-slate-500 mt-0.5 group-hover:text-slate-700">{label}</span>
+        </button>
+    );
+};
 
 const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
     {
@@ -63,6 +82,7 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
         isMobilePreview = false,
         viralScore,
         viralAnalysis,
+        generationParams,
     },
 ) => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -183,9 +203,13 @@ Return ONLY the transformed text in the 'post_content' JSON field.
         return "text-red-600 bg-red-50 border-red-200";
     };
 
-    if (isLoading) {
+    // Show skeleton only if loading AND no content (initial wait)
+    // If we have content (streaming), show the content!
+    if (isLoading && (!content || content.length === 0)) {
         return (
-            <div className="bg-white w-full max-w-xl mx-auto p-4 animate-pulse">
+        <div className={`bg-white font-sans text-slate-900 ${isMobilePreview ? 'border-0' : 'rounded-b-none'}`}>
+            {/* Header: User Info */}
+            <div className={`p-4 flex gap-3 ${isMobilePreview ? 'pb-2' : ''}`}>
                 <div className="flex space-x-3 mb-4">
                     <Skeleton className="rounded-full h-12 w-12 bg-slate-100" />
                     <div className="flex-1 space-y-2 py-1">
@@ -199,14 +223,15 @@ Return ONLY the transformed text in the 'post_content' JSON field.
                     <Skeleton className="h-4 w-3/4 bg-slate-100 rounded" />
                 </div>
             </div>
+        </div>
         );
     }
 
     return (
-        <div className="w-full bg-slate-100/50 pb-20"> {/* Wrapper with slight bg for contrast if needed, padding for scrolling */}
+        <div className={`w-full bg-slate-100/50 ${isMobilePreview ? '' : 'pb-20'}`}> {/* Wrapper with slight bg for contrast if needed, padding for scrolling */}
             
             {/* NATIVE FEED ITEM CONTAINER */}
-            <div className="bg-white w-full border-t border-b border-slate-200 mb-2">
+            <div className={`bg-white w-full ${isMobilePreview ? '' : 'border-t border-b border-slate-200'} mb-2`}>
                 
                 {/* 1. Header (Author) */}
                 <div className="px-4 pt-3 flex items-start gap-3">
@@ -250,8 +275,17 @@ Return ONLY the transformed text in the 'post_content' JSON field.
                             </div>
                         </div>
                     ) : (
-                        <div>
+                        <div className="flex flex-col gap-4">
                              <span dir="ltr">{displayContent || "Start writing to see your preview..."}</span>
+                             
+                             {/* AI Feedback Mechanism (Action 4 de AI Product Skill) */}
+                             {!isLoading && displayContent && (
+                                <AIFeedbackButtons 
+                                    inputContext={generationParams}
+                                    outputContent={displayContent}
+                                    className="pt-2 border-t border-slate-50 mt-2"
+                                />
+                             )}
                         </div>
                     )}
                 </div>
@@ -348,43 +382,6 @@ Return ONLY the transformed text in the 'post_content' JSON field.
                 }}
                 language={language}
             />
-        </div>
-    );
-};
-
-const NativeActionButton = ({ icon, label }: { icon: React.ReactNode, label: string }) => (
-    <button className="flex flex-col items-center justify-center py-2 px-1 flex-1 active:bg-slate-100 rounded-lg transition-colors group">
-         <div className="text-slate-500 group-hover:text-slate-700 transition-colors">
-            {icon}
-         </div>
-         <span className="text-[10px] font-medium text-slate-500 mt-0.5 group-hover:text-slate-700">{label}</span>
-    </button>
-);
-
-const ScoreBar: React.FC<{ label: string; score: number }> = (
-    { label, score },
-) => {
-    let colorClass = "bg-red-500";
-    if (score >= 80) colorClass = "bg-green-500";
-    else if (score >= 50) colorClass = "bg-amber-500";
-
-    return (
-        <div className="space-y-1">
-            <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wide">
-                <span>{label}</span>
-                <span
-                    className={score >= 50 ? "text-slate-700" : "text-red-500"}
-                >
-                    {score}
-                </span>
-            </div>
-            <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
-                <div
-                    className={`h-full rounded-full ${colorClass}`}
-                    style={{ width: `${score}%` }}
-                >
-                </div>
-            </div>
         </div>
     );
 };

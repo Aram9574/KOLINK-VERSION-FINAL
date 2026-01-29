@@ -126,7 +126,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ language }) => {
                                 <div className="absolute inset-x-8 top-8 bottom-0 bg-white rounded-t-xl border border-slate-200 shadow-sm p-4">
                                     <div className="flex items-center gap-2 mb-3">
                                         <div className="w-6 h-6 rounded-full bg-slate-200 overflow-hidden">
-                                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&h=64&q=80" className="w-full h-full object-cover opacity-80" alt="avatar" />
+                                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=64&h=64&q=80" className="w-full h-full object-cover opacity-80" alt="User avatar" loading="lazy" />
                                         </div>
                                         <div className="space-y-1">
                                             <div className="h-1.5 w-12 bg-slate-300 rounded"></div>

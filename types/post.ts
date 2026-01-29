@@ -1,4 +1,19 @@
-export type TrendCategory = 'news' | 'social' | 'regulatory' | 'search';
+import { z } from 'zod';
+
+// ... existing types ...
+
+export const PostContentSchema = z.object({
+    id: z.string().optional(),
+    content: z.string(),
+    metadata: z.any().optional(),
+    angle: z.enum(["visionary", "implementer", "analyst"]).optional(),
+    viralScore: z.number().optional(),
+    viralAnalysis: z.any().optional(),
+    gamification: z.any().optional(),
+    credits: z.number().optional(),
+});
+
+export type GeneratedPostContent = z.infer<typeof PostContentSchema>;
 
 export interface Trend {
   id: string;
@@ -83,8 +98,10 @@ export interface ViralAnalysis {
   feedback: string;
 }
 
+import { PostID } from './branded';
+
 export interface Post {
-  id: string;
+  id: PostID;
   content: string;
   params: GenerationParams;
   createdAt: number;

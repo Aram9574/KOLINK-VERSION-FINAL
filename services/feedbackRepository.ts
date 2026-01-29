@@ -1,5 +1,5 @@
 import { supabase } from "./supabaseClient";
-import { UserFeedback } from "../types";
+import { UserFeedback, AIFeedback } from "../types";
 
 export const feedbackRepository = {
   /**
@@ -43,5 +43,22 @@ export const feedbackRepository = {
       return [];
     }
     return data as UserFeedback[];
+  },
+
+  /**
+   * Submits feedback for AI generated content.
+   */
+  async submitAIFeedback(feedback: Omit<AIFeedback, 'id' | 'created_at'>): Promise<{ success: boolean; error?: any }> {
+    try {
+      const { error } = await supabase
+        .from("ai_feedback")
+        .insert([feedback]);
+
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      console.error("Error submitting AI feedback:", error);
+      return { success: false, error };
+    }
   }
 };

@@ -189,14 +189,6 @@ const AffiliatePage: React.FC = () => {
                                 <div className="relative z-10 transform hover:scale-[1.02] transition-transform duration-500">
                                      <div className="absolute inset-0 bg-indigo-500/10 blur-3xl rounded-full" />
                                      <img 
-                                        src="/assets/dashboard-mockup.png" // Placeholder path, we will need to ensure this asset exists or used a valid URL.
-                                        // For now I will use a placeholder from unsplash or similar if I can't move the file. 
-                                        // But actually I have the file at /Users/aramzakzuk/.gemini/antigravity/brain/d3dd29d9-fcd8-466a-8588-194561fcef57/affiliate_dashboard_mockup_1769667615675.png
-                                        // I cannot count on specific paths in production code. I should probably tell the user to move it.
-                                        // However, I can try to use a data URI or just a styled div if I cant move files.
-                                        // Let's use a nice Unsplash image for 'team collaboration' as a fallback if the user hasn't moved the file, 
-                                        // OR better, I'll use the one I generated if I can move it. 
-                                        // I cannot move files easily. I'll use a standard impressive placeholder and tell user to swap.
                                         src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop"
                                         alt="Kolink Partner Dashboard"
                                         className="rounded-2xl shadow-2xl border border-slate-200/50 w-full"

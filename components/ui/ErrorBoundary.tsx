@@ -4,6 +4,8 @@ import { supabase } from '../../services/supabaseClient';
 
 interface Props {
     children: ReactNode;
+    fallback?: ReactNode;
+    variant?: 'full' | 'minimal';
 }
 
 interface State {
@@ -53,6 +55,27 @@ class ErrorBoundary extends Component<Props, State> {
 
     public render() {
         if (this.state.hasError) {
+            if (this.props.fallback) return this.props.fallback;
+
+            if (this.props.variant === 'minimal') {
+                return (
+                    <div className="p-6 rounded-2xl border border-red-100 bg-red-50/30 flex flex-col items-center justify-center text-center gap-3">
+                        <AlertTriangle className="w-6 h-6 text-red-500" />
+                        <div className="space-y-1">
+                            <p className="text-sm font-bold text-slate-900">Algo falló aquí</p>
+                            <p className="text-xs text-slate-500 max-w-[200px] mx-auto leading-relaxed">Este módulo no pudo cargar, pero el resto funciona bien.</p>
+                        </div>
+                        <button 
+                            onClick={() => this.setState({ hasError: false, error: null })}
+                            className="text-xs font-bold text-red-600 hover:text-red-700 flex items-center gap-1"
+                        >
+                            <RefreshCw className="w-3 h-3" />
+                            Reintentar
+                        </button>
+                    </div>
+                );
+            }
+
             return (
                 <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
                     <div className="bg-white p-8 rounded-xl shadow-xl max-w-md w-full text-center border border-slate-100">

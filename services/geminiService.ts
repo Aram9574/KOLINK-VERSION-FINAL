@@ -38,53 +38,14 @@ interface APIResponse<T> {
   error?: {
     code: ErrorCode | string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
 }
 
-export const generateViralPost = async (params: GenerationParams, user: UserProfile): Promise<GeneratedPostResult> => {
-  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-  
-  if (sessionError || !session) {
-    throw new Error("User not authenticated. Please log in again.");
-  }
+// generateViralPost has been migrated to PostService.ts
+// Exporting types only if needed by legacy code, though typically used from types/index.ts
+export type { GeneratedPostResult };
 
-  // Invoke with strict contract
-  const { data, error } = await supabase.functions.invoke('generate-viral-post', {
-    body: { params }
-  });
-
-  // Network/System Level Errors
-  if (error) {
-    console.error("[GEMINI SERVICE] Network Error:", error);
-    throw new Error("Connection failed. Please check your internet.");
-  }
-
-  // Logical Contract
-  const response = data as APIResponse<any>;
-
-  if (!response.success) {
-      console.error("[GEMINI SERVICE] Server Error:", response.error);
-      
-      const code = response.error?.code;
-      const msg = response.error?.message || "Unknown error";
-
-      if (code === ErrorCode.INSUFFICIENT_CREDITS) {
-          throw new Error("Insufficient credits");
-      }
-      
-      throw new Error(`Generation Failed: ${msg}`);
-  }
-
-  const resultData = response.data;
-  return {
-    id: resultData.id,
-    content: resultData.postContent,
-    viralScore: resultData.viralScore,
-    viralAnalysis: resultData.viralAnalysis,
-    gamification: resultData.gamification
-  };
-};
 
 export interface IdeaResult {
   ideas: string[];
@@ -171,20 +132,158 @@ export const generateHooks = async (idea: string, brandVoiceId: string, language
     return data.hooks;
 };
 
-export const generateInsightReply = async (payload: { imageBase64?: string, textContext?: string, userIntent?: string, tone?: string }): Promise<any[]> => {
-    const { data, error } = await supabase.functions.invoke('generate-insight-reply', {
+export interface InsightReplyResult {
+    reply: string;
+    analysis?: string;
+}
+
+export const generateInsightReply = async (payload: { imageBase64?: string, textContext?: string, userIntent?: string, tone?: string }): Promise<InsightReplyResult> => {
+    const { data, error } = await supabase.functions.invoke<InsightReplyResult>('generate-insight-reply', {
         body: payload
     });
 
-    if (error) throw new Error(error.message);
-    return data.replies;
+    if (error || !data) throw new Error(error?.message || "Insight reply failed");
+    return data;
 };
 
-export const cloneVoice = async (payload: { text_samples?: string[], url?: string, voice_name?: string }): Promise<any> => {
-    const { data, error } = await supabase.functions.invoke('clone-voice', {
+export interface CloneVoiceResult {
+    voice_id: string;
+    preview_url?: string;
+}
+
+export const cloneVoice = async (payload: { text_samples?: string[], url?: string, voice_name?: string }): Promise<CloneVoiceResult> => {
+    const { data, error } = await supabase.functions.invoke<CloneVoiceResult>('clone-voice', {
         body: payload
     });
 
-    if (error) throw new Error(error.message);
+    if (error || !data) throw new Error(error?.message || "Voice cloning failed");
     return data;
+};
+
+export const streamMicroEdit = async (
+  options: { topic: string; action: string; tone: string; stream: boolean },
+  onChunk: (chunk: string) => void
+): Promise<void> => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Authentication required");
+
+  // Invoke Supabase Function with responseType: 'blob' to handle streaming correctly
+  const { data, error } = await supabase.functions.invoke('generate-viral-post', {
+      body: { 
+          params: { 
+              ...options, 
+              mode: 'micro_edit',
+              stream: true 
+          } 
+      },
+      options: {
+        responseType: 'arraybuffer' // force binary/blob handling
+      }
+      // Note: invoke might ignore headers if responseType is set, or vice versa depending on version.
+  });
+
+  if (error) throw new Error(error.message || "Stream connection failed");
+  
+  // Handle parsing based on return type
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  const processChunk = (text: string) => {
+      // Simple stream (raw text) or SSE?
+      // Logic for raw text:
+      onChunk(text);
+  };
+
+  if (data) {
+      // If arraybuffer
+      const text = decoder.decode(data);
+      processChunk(text);
+      // NOTE: Supabase invoke waits for full response unless we use raw fetch or specific streaming support.
+      // If we want REAL streaming, we must use fetch directly to the edge function URL.
+  }
+};
+
+// HELPER: Real Streaming via Fetch (Bypassing supabase.functions.invoke buffering)
+const streamFromEdgeFunction = async (
+    functionName: string, 
+    body: { params: Partial<GenerationParams> & { stream: boolean } }, 
+    onChunk: (text: string) => void
+): Promise<any> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error("No session");
+
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'text/event-stream',
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!response.ok) throw new Error(`Stream Error: ${response.statusText}`);
+    if (!response.body) throw new Error("No response body");
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let finalResult = null;
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        buffer += chunk;
+        
+        // Parse SSE
+        const blocks = buffer.split("\n\n");
+        buffer = blocks.pop() || ""; // Keep incomplete block
+
+        for (const block of blocks) {
+            const lines = block.split("\n");
+            let eventType = "message";
+            let data = "";
+
+            for (const line of lines) {
+                if (line.startsWith("event: ")) {
+                    eventType = line.slice(7).trim();
+                } else if (line.startsWith("data: ")) {
+                    data = line.slice(6);
+                }
+            }
+
+            if (data) {
+                try {
+                    const payload = JSON.parse(data);
+                    if (eventType === "result" || payload.post_content) {
+                        finalResult = payload;
+                    } else if (payload.chunk) {
+                        onChunk(payload.chunk);
+                    }
+                } catch (e) {
+                    console.warn("SSE Parse Error", e);
+                }
+            }
+        }
+    }
+    return finalResult;
+};
+
+export const generatePostStream = async (
+    params: GenerationParams, 
+    onChunk: (chunk: string) => void
+): Promise<GeneratedPostResult> => {
+    const result = await streamFromEdgeFunction('generate-viral-post', { params: { ...params, stream: true } }, onChunk);
+    
+    if (!result) throw new Error("Stream finished without result");
+    
+    return {
+        id: result.id || 'temp-id',
+        content: result.post_content,
+        viralScore: result.auditor_report?.viral_score || 0,
+        viralAnalysis: result.auditor_report,
+        gamification: result.gamification
+    };
 };

@@ -1145,6 +1145,14 @@ export const en = {
         redo: "Redo",
         clear: "Clear Formatting",
       },
+      viralAnalysis: {
+        title: "Viral Analysis",
+        analyze: "Analyze Viral Potential",
+        score: "Viral Score",
+        analyzing: "Analyzing...",
+        reanalyze: "Re-analyze",
+        empty: "Write and analyze to see your viral prediction."
+      },
       sidebar: {
         preview: "Preview",
         hooks: "Hooks",
@@ -1173,7 +1181,9 @@ export const en = {
       },
       metrics: {
         characters: "characters",
-        words: "words",
+        splitView: "Split View",
+        focusMode: "Focus Mode",
+        wordCount: "Words",
         paragraphs: "paragraphs",
         sentences: "sentences",
         readingTime: "reading time",

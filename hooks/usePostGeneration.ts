@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AppTab, GenerationParams, Post, UserProfile } from "../types";
+import { AppTab, GenerationParams, Post, UserProfile, LevelUpData } from "../types";
 import { useGenerationLogic } from "./useGenerationLogic";
 import { useLinkedInPublishing } from "./useLinkedInPublishing";
 import { usePostHistory } from "./usePostHistory";
@@ -16,7 +16,7 @@ interface UsePostGenerationProps {
     handleUpdateUser: (updates: Partial<UserProfile>) => Promise<void>;
     setShowUpgradeModal: (show: boolean) => void;
     setShowCreditDeduction: (show: boolean) => void;
-    setLevelUpData: (data: any) => void;
+    setLevelUpData: (data: LevelUpData) => void;
     isGenerating: boolean;
     setIsGenerating: (isGenerating: boolean) => void;
 }

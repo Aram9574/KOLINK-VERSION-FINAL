@@ -1,136 +1,154 @@
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
-import { BillingService } from "../_shared/services/BillingService.ts";
 
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") as string, {
-  apiVersion: "2023-10-16",
-  httpClient: Stripe.createFetchHttpClient(),
+const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", {
+    apiVersion: "2023-10-16",
+    httpClient: Stripe.createFetchHttpClient(),
 });
 
-const supabaseAdmin = createClient(
-  Deno.env.get("SUPABASE_URL") ?? "",
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-);
+const cryptoProvider = Stripe.createSubtleCryptoProvider();
 
-const billingService = new BillingService(supabaseAdmin);
-
-console.log("Stripe Webhook Function (Microservice) Hit!");
+console.log("Stripe Webhook Function Initialized");
 
 Deno.serve(async (req: Request) => {
-  const signature = req.headers.get("Stripe-Signature");
-  if (!signature) return new Response("No signature", { status: 400 });
+    const signature = req.headers.get("Stripe-Signature");
+    const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 
-  try {
+    if (!signature || !webhookSecret) {
+        return new Response("Missing signature or webhook secret", { status: 400 });
+    }
+
     const body = await req.text();
-    const event = await stripe.webhooks.constructEventAsync(
-      body,
-      signature,
-      Deno.env.get("STRIPE_WEBHOOK_SECRET") as string,
+    let event;
+
+    try {
+        event = await stripe.webhooks.constructEventAsync(
+            body,
+            signature,
+            webhookSecret,
+            undefined,
+            cryptoProvider
+        );
+    } catch (err: any) {
+        console.error(`Webhook signature verification failed: ${err.message}`);
+        return new Response(err.message, { status: 400 });
+    }
+
+    // Initialize Admin Client
+    const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    console.log(`Received event: ${event.type}`);
+    console.log(`Processing event: ${event.type}`);
 
-    if (event.type === "invoice.payment_succeeded" || event.type === "checkout.session.completed") {
-      console.log(`Processing payment event: ${event.type}`);
-      let customerId: string;
-      let amountPaid: number;
-      let periodEnd: number;
-      let priceId: string | undefined;
-      let email: string | undefined | null;
+    try {
+        switch (event.type) {
+            case "checkout.session.completed": {
+                const session = event.data.object;
+                const userId = session.client_reference_id || session.metadata?.supabase_uid || session.subscription_data?.metadata?.supabase_uid;
+                const subscriptionId = session.subscription;
 
-      if (event.type === "invoice.payment_succeeded") {
-        const invoice = event.data.object as Stripe.Invoice;
-        customerId = invoice.customer as string;
-        amountPaid = invoice.amount_paid;
-        periodEnd = invoice.lines.data[0].period.end;
-        priceId = invoice.lines.data[0].price?.id;
-        email = invoice.customer_email;
-        console.log(`Invoice Payment Succeeded: Customer: ${customerId}, Amount: ${amountPaid}, Email: ${email}`);
-      } else {
-        const session = event.data.object as Stripe.Checkout.Session;
-        customerId = session.customer as string;
-        amountPaid = session.amount_total ?? 0;
-        // Default to +30 days if coming from session without subscription details expanded
-        periodEnd = Math.floor(Date.now() / 1000) + 2592000; 
-        priceId = session.line_items?.data?.[0]?.price?.id;
-        email = session.customer_details?.email;
-        console.log(`Checkout Session Completed: Customer: ${customerId}, Amount: ${amountPaid}, Email: ${email}`);
-      }
+                if (userId && subscriptionId) {
+                    console.log(`Checkout completed for user ${userId}. Sub ID: ${subscriptionId}`);
+                    
+                    // Retrieve full subscription details to get status and plan
+                    const subscription = await stripe.subscriptions.retrieve(subscriptionId as string);
+                    
+                    await handleSubscriptionUpdate(supabaseAdmin, userId, subscription);
+                }
+                break;
+            }
+            case "customer.subscription.updated":
+            case "customer.subscription.deleted": {
+                const subscription = event.data.object;
+                const userId = subscription.metadata?.supabase_uid;
 
-      // Find profile
-      let { data: profile, error: profileError } = await supabaseAdmin
-        .from("profiles")
-        .select("id, credits, email, referred_by, plan_tier, created_at, stripe_customer_id")
-        .eq("stripe_customer_id", customerId)
-        .single();
-
-      if (profileError || !profile) {
-        // Fallback email lookup logic
-        if (email) {
-          const { data: profileByEmail } = await supabaseAdmin
-            .from("profiles")
-            .select("id, credits, email, referred_by, plan_tier, created_at, stripe_customer_id")
-            .eq("email", email)
-            .single();
-
-          if (profileByEmail) {
-            await supabaseAdmin.from("profiles").update({ stripe_customer_id: customerId }).eq("id", profileByEmail.id);
-            profile = profileByEmail;
-            // Ensure local profile object is updated for downstream usage
-            profile.stripe_customer_id = customerId;
-          }
+                if (userId) {
+                     console.log(`Subscription updated for user ${userId}. Status: ${subscription.status}`);
+                     await handleSubscriptionUpdate(supabaseAdmin, userId, subscription);
+                } else {
+                    // Try to find user by stripe_customer_id if metadata missing
+                    const { data: subRecord } = await supabaseAdmin
+                        .from('subscriptions')
+                        .select('user_id')
+                        .eq('stripe_customer_id', subscription.customer)
+                        .single();
+                        
+                    if (subRecord?.user_id) {
+                         console.log(`Matched customer ${subscription.customer} to user ${subRecord.user_id}`);
+                         await handleSubscriptionUpdate(supabaseAdmin, subRecord.user_id, subscription);
+                    } else {
+                        console.warn(`No user found for subscription update. Customer: ${subscription.customer}`);
+                    }
+                }
+                break;
+            }
+            default:
+                console.log(`Unhandled event type: ${event.type}`);
         }
-      }
-
-      if (profile) {
-        await billingService.processPaymentSuccess(profile, amountPaid, periodEnd, priceId);
-      } else {
-        console.error("User not found for customer:", customerId);
-        return new Response("User not found", { status: 404 });
-      }
-    } else if (event.type === "customer.subscription.deleted") {
-      const subscription = event.data.object as Stripe.Subscription;
-      const customerId = subscription.customer as string;
-
-      console.log(`Deactivating subscription for customer: ${customerId}`);
-
-      // 1. Downgrade Profile
-      await supabaseAdmin.from("profiles").update({
-        subscription_status: "canceled",
-        plan_tier: "free",
-        credits: 50, // Back to free entry credits? Or keep at 0. Let's reset to a base level.
-      }).eq("stripe_customer_id", customerId);
-
-      // 2. Clear Active Subscription in 'subscriptions' table
-      await supabaseAdmin.from("subscriptions").update({
-        status: "canceled",
-        plan_type: "free",
-        updated_at: new Date().toISOString(),
-      }).eq("stripe_customer_id", customerId);
-    } else if (event.type === "customer.subscription.updated") {
-      const subscription = event.data.object as Stripe.Subscription;
-      const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
-      const priceId = subscription.items.data[0].price.id;
-
-      await billingService.updateSubscriptionStatus(
-        customerId,
-        subscription.status,
-        priceId,
-        subscription.current_period_end
-      );
-    } else if (event.type === "invoice.payment_failed") {
-      const invoice = event.data.object as Stripe.Invoice;
-      await supabaseAdmin.from("profiles").update({
-        subscription_status: "past_due",
-      }).eq("stripe_customer_id", invoice.customer);
+    } catch (error: any) {
+        console.error("Error processing webhook:", error);
+        return new Response(`Webhook Error: ${error.message}`, { status: 400 });
     }
 
     return new Response(JSON.stringify({ received: true }), {
-      headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
     });
-  } catch (err: unknown) {
-    const error = err as Error;
-    console.error("Stripe Webhook Error:", error.message);
-    return new Response(JSON.stringify({ error: "Webhook failed" }), { status: 500 });
-  }
 });
+
+async function handleSubscriptionUpdate(supabase: any, userId: string, subscription: any) {
+    const status = subscription.status;
+    const priceId = subscription.items.data[0].price.id;
+    
+    // Map Price ID to Plan Type (You should configure these map based on your Stripe Price IDs)
+    // For now, checking against environment vars or simple logic
+    let planType = 'inicial';
+    
+    // Example mapping - Replace with your actual Price IDs or logic
+    // const PRO_PRICE_ID = "price_...";
+    // const VIRAL_PRICE_ID = "price_...";
+    
+    // Heuristic: If amount > 0 and status active, assume PRO for now if logic not set
+    // Ideally use lookup table or switch
+    if (status === 'active' || status === 'trialing') {
+        const amount = subscription.items.data[0].price.unit_amount;
+         if (amount > 5000) { // e.g. > $50
+            planType = 'viral';
+         } else {
+            planType = 'pro';
+         }
+    }
+
+    const updateData = {
+        user_id: userId,
+        stripe_subscription_id: subscription.id,
+        stripe_customer_id: subscription.customer,
+        status: status,
+        plan_type: planType,
+        billing_cycle: subscription.items.data[0].plan.interval === 'year' ? 'anual' : 'mensual',
+        price: subscription.items.data[0].price.unit_amount / 100,
+        reset_date: new Date(subscription.current_period_end * 1000).toISOString(),
+        updated_at: new Date().toISOString(),
+    };
+
+    if (status === 'canceled') {
+        // @ts-ignore
+        updateData.canceled_at = new Date(subscription.canceled_at * 1000).toISOString();
+        // @ts-ignore
+        updateData.plan_type = 'inicial'; // Revert to free on cancel? Or wait until period end? 
+        // Usually wait for period end, but status 'canceled' implies it's done. 
+        // 'active' with cancel_at_period_end = true is different.
+    }
+
+    const { error } = await supabase
+        .from('subscriptions')
+        .upsert(updateData, { onConflict: 'user_id' });
+
+    if (error) {
+        console.error("Failed to update subscription in DB:", error);
+        throw error;
+    }
+    
+    console.log(`Successfully updated subscription for user ${userId} to ${planType} (${status})`);
+}

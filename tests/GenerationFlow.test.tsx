@@ -146,7 +146,7 @@ describe('Generation Flow Integration', () => {
             }
         };
 
-        (geminiService.generateViralPost as any).mockResolvedValue(mockGeneratedPost);
+        (postService.PostService.generateViralPost as any).mockResolvedValue(mockGeneratedPost);
         // UserRepository is already mocked at top level
 
         render(<TestGenerationFlow />);

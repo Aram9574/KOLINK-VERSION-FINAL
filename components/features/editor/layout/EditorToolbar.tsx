@@ -30,6 +30,7 @@ interface EditorToolbarProps {
     setShowEmojiPicker: (show: boolean) => void;
     commonEmojis: string[];
     emojiPickerRef: React.RefObject<HTMLDivElement>;
+    onSmartEdit?: (action: string) => void;
 }
 
 const EditorToolbar: React.FC<EditorToolbarProps> = ({
@@ -44,7 +45,9 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
     showEmojiPicker,
     setShowEmojiPicker,
     commonEmojis,
-    emojiPickerRef
+
+    emojiPickerRef,
+    onSmartEdit
 }) => {
     return (
         <div className="h-12 border-b border-slate-200/60 flex items-center px-4 bg-white gap-0.5 shrink-0 overflow-x-auto no-scrollbar">
@@ -86,6 +89,20 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
                 title="Clear All"
             >
                 <Eraser className="w-4 h-4" />
+            </motion.button>
+            <div className="w-px h-6 bg-slate-100 mx-2" />
+
+            {/* AI Smart Edit Button */}
+            <motion.button
+                type="button"
+                onClick={() => onSmartEdit && onSmartEdit("Improve")}
+                {...hapticFeedback}
+                className="p-2 hover:bg-brand-50 rounded-lg text-brand-600 font-bold flex items-center gap-1 group relative"
+                title="AI Magic Edit (Streaming)"
+            >
+                <Zap className="w-4 h-4 fill-brand-100" />
+                <span className="text-[10px] uppercase hidden md:inline">Improve</span>
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Streaming Enabled" />
             </motion.button>
             <div className="w-px h-6 bg-slate-100 mx-2" />
 

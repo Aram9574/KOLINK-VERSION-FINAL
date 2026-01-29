@@ -32,3 +32,9 @@ export interface Invoice {
   status: "Paid" | "Pending" | "Failed";
   planName: string;
 }
+
+export interface LevelUpData {
+    leveledUp: boolean;
+    newLevel: number;
+    newAchievements: string[];
+}

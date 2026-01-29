@@ -86,6 +86,7 @@ const Navbar: React.FC<NavbarProps> = (
                             src="/logo.png"
                             alt="Kolink Logo"
                             className="w-full h-full object-cover scale-110 rounded-lg shadow-md shadow-brand-500/10"
+                            loading="lazy"
                         />
                     </div>
                     <span className="font-display font-bold text-lg text-slate-900 tracking-tight ml-1 hidden sm:inline">
@@ -193,7 +194,7 @@ const Navbar: React.FC<NavbarProps> = (
                                 <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 transition-all">{t.nav.features}</h3>
                                 <div className="grid grid-cols-2 gap-3">
                                     {featureItems.map((item, i) => (
-                                        <Link key={i} to={item.href} onClick={(e) => { item.onClick?.(e); setOpenMenu(null); }} className="flex items-center gap-2 p-2 rounded-xl bg-slate-50/50 text-[13px] font-medium text-slate-700">
+                                        <Link key={i} to={item.href} onClick={(e) => setOpenMenu(null)} className="flex items-center gap-2 p-2 rounded-xl bg-slate-50/50 text-[13px] font-medium text-slate-700">
                                             <div className="text-brand-600">{item.icon}</div>
                                             {item.title}
                                         </Link>

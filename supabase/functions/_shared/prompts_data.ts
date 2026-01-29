@@ -218,4 +218,22 @@ You have two simultaneous roles:
     **CRITICAL:** Prioritize "Human Rhythm" and "Visual Breathing Room" over generic listicles.
     `,
   },
+  few_shot_cot: [
+    {
+      user_input: "Topic: Why startups should focus on LinkedIn instead of SEO in the first 6 months.",
+      thinking: "The user wants a comparison or contrarian take. SEO is high effort/slow reward. LinkedIn is low effort/instant reward. Psychological trigger: Opportunity Cost. Strategy: Use the 'Contrarian' framework to disrupt the traditional advice of 'start a blog'.",
+      output: {
+        post_content: "SEO is a trap for early-stage startups.\n\nEveryone tells you to start a blog on Day 1. But blogs take 6 months to rank. You don't have 6 months. You have 6 weeks of runway.\n\nLinkedIn is the only platform where you can reach your ideal customers today, for free, without an ads budget.\n\nStop building for Google. Start building for humans.\n\nInbound is the new outbound.",
+        strategy_reasoning: "Focused on identifying the opportunity cost of slow channels vs fast ones. Used a contrarian hook to stop the scroll of founders who feel 'guilty' for not doing SEO."
+      }
+    },
+    {
+      user_input: "Topic: How I saved 10 hours a week using automation.",
+      thinking: "The user wants to share a productivity win. Framework: BAB (Before-After-Bridge). Before: Overwhelmed. After: 10 hours saved. Bridge: Specific automation tools. Tone: Authority through transparency.",
+      output: {
+        post_content: "I used to spend 10 hours a week on manual data entry. It was soul-crushing.\n\nNow, that same work takes 0 minutes.\n\nThe secret isn't working harder. It's building systems that work for you.\n\nHere are the 3 automations that changed my life:\n\n1. Zapier (Gmail to Notion)\n2. Calendly (Scheduling)\n3. Kolink (Content Generation)\n\nStop being the bottleneck in your own business.",
+        strategy_reasoning: "Leveraged the BAB framework to show a clear transformation. Used a numbered list for high perceived value and scanability."
+      }
+    }
+  ]
 };

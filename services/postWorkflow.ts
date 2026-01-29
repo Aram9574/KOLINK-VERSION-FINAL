@@ -1,5 +1,4 @@
-import { UserProfile, Post, GenerationParams } from '../types';
-import { generateViralPost } from './geminiService';
+import { PostService } from './postService';
 import { processGamification, calculateLevel } from './gamificationEngine';
 
 export interface PostGenerationResult {
@@ -26,7 +25,7 @@ export const executePostGeneration = async (
     }
 
     // 2. Generate Content
-    const result = await generateViralPost(params, user);
+    const result = await PostService.generateViralPost(params, user.id);
 
     // 3. Create Post Object
     const newPost: Post = {

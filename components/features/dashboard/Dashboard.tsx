@@ -35,10 +35,14 @@ import ReferralModal from "../../modals/ReferralModal";
 import { Gift } from "lucide-react";
 
 import { useToast } from "../../../context/ToastContext";
-import { AppTab, Post, UserProfile } from "../../../types";
+import { AppTab, Post, UserProfile, LevelUpData } from "../../../types";
 import { translations } from "../../../translations";
 import { ActionFunctionArgs } from "react-router-dom";
 import Skeleton from "../../ui/Skeleton";
+import { GlassPanel } from "../../ui/GlassPanel";
+import MetaTags from "../../seo/MetaTags";
+import { PageTransition } from "../../ui/PageTransition";
+import ErrorBoundary from "../../ui/ErrorBoundary";
 
 
 // Lazy load PostGenerator to reduce initial Dashboard bundle size
@@ -85,18 +89,20 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 
     return (
-        <div className="flex h-screen w-full bg-slate-50 font-sans overflow-hidden relative">
-            {/* Ambient Background Grid */}
-            <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-                <InfiniteGrid />
-            </div>
+        <PageTransition>
+            <div className="flex h-screen w-full bg-slate-50 font-sans overflow-hidden relative">
+                {/* Ambient Background Grid */}
+                <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+                    <InfiniteGrid />
+                </div>
 
-            <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
-                <main className="flex-1 overflow-hidden relative">
-                    {children}
-                </main>
+                <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
+                    <main className="flex-1 overflow-hidden relative">
+                        {children}
+                    </main>
+                </div>
             </div>
-        </div>
+        </PageTransition>
     );
 };
 
@@ -117,7 +123,30 @@ const DashboardContent: React.FC = () => {
         updatePost,
     } = usePosts();
 
-    // Prefetch PostGenerator for smoother experience
+    // Import MetaTags (ensure this import exists at top of file, if not I will add it in next step or use simple logic here if I can't add imports easily with this tool context window)
+    // Actually I'll rely on the next step to add the import if needed, but here I place the component usage.
+    // Wait, I need to add the import line at the top first. 
+    // I will do two edits. One for import, one for usage.
+    
+    // Dynamic Title Logic
+    const getPageTitle = (tab: AppTab) => {
+        const titles: Record<string, string> = {
+            home: "Command Center",
+            create: "Viral Engine",
+            editor: "Post Editor",
+            history: "Mission Log",
+            settings: "Settings",
+            chat: "Expert Chat",
+            audit: "Profile Audit",
+            "voice-lab": "Voice Lab",
+            "insight-responder": "Insight Responder",
+            autopilot: "Autopilot",
+            carousel: "Carousel Studio"
+        };
+        return titles[tab] || "Dashboard";
+    };
+
+    // ... existing code ...
     useEffect(() => {
         const prefetchPostGenerator = async () => {
             try {
@@ -135,7 +164,7 @@ const DashboardContent: React.FC = () => {
         const saved = localStorage.getItem("kolink_active_tab");
         if (saved === "ideas") return "create"; // Legacy
         if (saved === "create") return "home"; // Migrate create to home
-        return (saved as any) || "home";
+        return (saved as AppTab) || "home";
     });
 
     const setActiveTab = (tab: AppTab) => {
@@ -156,7 +185,7 @@ const DashboardContent: React.FC = () => {
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [showCreditDeduction, setShowCreditDeduction] = useState(false);
     const [showReferralModal, setShowReferralModal] = useState(false);
-    const [levelUpData, setLevelUpData] = useState<any>(null);
+    const [levelUpData, setLevelUpData] = useState<LevelUpData | null>(null);
     const [carouselDraftContent, setCarouselDraftContent] = useState<string>(
         "",
     );
@@ -276,6 +305,10 @@ const DashboardContent: React.FC = () => {
             showCreditDeduction={showCreditDeduction}
             onDeletePost={handleDeletePost}
         >
+            <MetaTags 
+                title={getPageTitle(activeTab)} 
+                noIndex={true} // Dashboard is private
+            />
             <div
                 className="h-full w-full flex flex-col"
             >
@@ -292,10 +325,12 @@ const DashboardContent: React.FC = () => {
                 >
                     {activeTab === "home" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <LaunchpadView 
-                                user={user} 
-                                onSelectTool={setActiveTab} 
-                            />
+                            <ErrorBoundary variant="minimal">
+                                <LaunchpadView 
+                                    user={user} 
+                                    onSelectTool={setActiveTab} 
+                                />
+                            </ErrorBoundary>
                         </div>
                     )}
 
@@ -305,102 +340,108 @@ const DashboardContent: React.FC = () => {
                             className="animate-in fade-in slide-in-from-bottom-4 duration-500"
                         >
                             <div className="w-full">
-                                <Suspense
-                                    fallback={
-                                        <div className="flex flex-col gap-6 p-8 w-full max-w-4xl mx-auto">
-                                            <Skeleton className="h-12 w-3/4" />
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                <Skeleton className="h-64 rounded-xl" />
-                                                <Skeleton className="h-64 rounded-xl" />
+                                <ErrorBoundary variant="full">
+                                    <Suspense
+                                        fallback={
+                                            <div className="flex flex-col gap-6 p-8 w-full max-w-4xl mx-auto">
+                                                <Skeleton className="h-12 w-3/4" />
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <Skeleton className="h-64 rounded-xl" />
+                                                    <Skeleton className="h-64 rounded-xl" />
+                                                </div>
+                                                <Skeleton className="h-12 w-full rounded-xl" />
                                             </div>
-                                            <Skeleton className="h-12 w-full rounded-xl" />
-                                        </div>
-                                    }
-                                >
-                                    <PostCreator
-                                        onGenerate={(params) =>
-                                            generatePost(params)}
-                                        isGenerating={isGenerating}
-                                        credits={user.credits}
-                                        language={user.language || "en"}
-                                        showCreditDeduction={showCreditDeduction}
-                                        initialParams={currentPost?.params}
-                                        initialTopic={currentPost?.params?.topic}
-                                        onGoToCarousel={(content) => {
-                                            setCarouselDraftContent(content);
-                                            setActiveTab("carousel");
-                                        }}
-                                        onEdit={(post) => {
-                                            setCurrentPost(post);
-                                            setActiveTab("editor");
-                                        }}
-                                    />
-                                </Suspense>
+                                        }
+                                    >
+                                        <PostCreator
+                                            onGenerate={(params) =>
+                                                generatePost(params)}
+                                            isGenerating={isGenerating}
+                                            credits={user.credits}
+                                            language={user.language || "en"}
+                                            showCreditDeduction={showCreditDeduction}
+                                            initialParams={currentPost?.params}
+                                            initialTopic={currentPost?.params?.topic}
+                                            onGoToCarousel={(content) => {
+                                                setCarouselDraftContent(content);
+                                                setActiveTab("carousel");
+                                            }}
+                                            onEdit={(post) => {
+                                                setCurrentPost(post);
+                                                setActiveTab("editor");
+                                            }}
+                                        />
+                                    </Suspense>
+                                </ErrorBoundary>
                             </div>
                         </div>
                     )}
 
                     {activeTab === "history" && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full">
-                            {user.planTier === "free"
-                                ? (
-                                    <LockedHistoryState
-                                        onUpgrade={() =>
-                                            setShowUpgradeModal(true)}
-                                    />
-                                )
-                                : (
-                                    <HistoryView
-                                        onSelect={(post) => {
-                                            setCurrentPost(post);
-                                            setActiveTab("editor");
-                                        }}
-                                        onReuse={(params) => {
-                                            setCurrentPost({
-                                                id: "draft-" + Date.now(),
-                                                content: "", // Start clear for new generation
-                                                params: params,
-                                                createdAt: Date.now(),
-                                                likes: 0,
-                                                views: 0,
-                                            });
-                                            setActiveTab("create");
-                                        }}
-                                        onDelete={handleDeletePost}
-                                        language={language}
-                                        onUpgrade={() =>
-                                            setShowUpgradeModal(true)}
-                                    />
-                                )}
-                        </div>
+                        <GlassPanel className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full">
+                            <ErrorBoundary variant="minimal">
+                                {user.planTier === "free"
+                                    ? (
+                                        <LockedHistoryState
+                                            onUpgrade={() =>
+                                                setShowUpgradeModal(true)}
+                                        />
+                                    )
+                                    : (
+                                        <HistoryView
+                                            onSelect={(post) => {
+                                                setCurrentPost(post);
+                                                setActiveTab("editor");
+                                            }}
+                                            onReuse={(params) => {
+                                                setCurrentPost({
+                                                    id: "draft-" + Date.now(),
+                                                    content: "", // Start clear for new generation
+                                                    params: params,
+                                                    createdAt: Date.now(),
+                                                    likes: 0,
+                                                    views: 0,
+                                                });
+                                                setActiveTab("create");
+                                            }}
+                                            onDelete={handleDeletePost}
+                                            language={language}
+                                            onUpgrade={() =>
+                                                setShowUpgradeModal(true)}
+                                        />
+                                    )}
+                            </ErrorBoundary>
+                        </GlassPanel>
                     )}
 
 
 
                     {activeTab === "autopilot" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full overflow-y-auto">
-                             <Suspense fallback={<div className="p-8 text-center text-slate-400">Loading Command Center...</div>}>
-                                <AutoPostStudio
-                                    user={user}
-                                    language={language}
-                                    onViewPost={(post) => {
-                                        setCurrentPost(post);
-                                        setActiveTab("create");
-                                    }}
-                                    onUpgrade={() => setShowUpgradeModal(true)}
-                                />
-                             </Suspense>
+                            <ErrorBoundary variant="full">
+                                <Suspense fallback={<div className="p-8 text-center text-slate-400">Loading Command Center...</div>}>
+                                    <AutoPostStudio
+                                        user={user}
+                                        language={language}
+                                        onViewPost={(post) => {
+                                            setCurrentPost(post);
+                                            setActiveTab("create");
+                                        }}
+                                        onUpgrade={() => setShowUpgradeModal(true)}
+                                    />
+                                </Suspense>
+                            </ErrorBoundary>
                         </div>
                     )}
 
                     {activeTab === "settings" && (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <GlassPanel className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <SettingsView
                                 user={user}
                                 onUpgrade={() => setShowUpgradeModal(true)}
                                 onSave={handleUpdateUser}
                             />
-                        </div>
+                        </GlassPanel>
                     )}
 
 
@@ -411,101 +452,113 @@ const DashboardContent: React.FC = () => {
 
                     {activeTab === "chat" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">
-                            {user.planTier === "free"
-                                ? (
-                                    <LockedChatState
-                                        onUpgrade={() =>
-                                            setShowUpgradeModal(true)}
-                                    />
-                                )
-                                : <LinkedInExpertChat />}
+                            <ErrorBoundary variant="full">
+                                {user.planTier === "free"
+                                    ? (
+                                        <LockedChatState
+                                            onUpgrade={() =>
+                                                setShowUpgradeModal(true)}
+                                        />
+                                    )
+                                    : <LinkedInExpertChat />}
+                            </ErrorBoundary>
                         </div>
                     )}
 
                     {activeTab === "editor" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex-1 h-full flex flex-col min-h-0">
-                            <Suspense
-                                fallback={
-                                    <div className="flex-1 flex items-center justify-center">
-                                        <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
-                                    </div>
-                                }
-                            >
-                                {user.planTier === "free"
-                                    ? (
-                                        <LockedEditorState
-                                            onUpgrade={() =>
-                                                setShowUpgradeModal(true)}
-                                        />
-                                    )
-                                    : <PostEditorView />}
-                            </Suspense>
+                            <ErrorBoundary variant="full">
+                                <Suspense
+                                    fallback={
+                                        <div className="flex-1 flex items-center justify-center">
+                                            <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                                        </div>
+                                    }
+                                >
+                                    {user.planTier === "free"
+                                        ? (
+                                            <LockedEditorState
+                                                onUpgrade={() =>
+                                                    setShowUpgradeModal(true)}
+                                            />
+                                        )
+                                        : <PostEditorView />}
+                                </Suspense>
+                            </ErrorBoundary>
                         </div>
                     )}
 
                     {activeTab === "audit" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">
-                            <Suspense
-                                fallback={
-                                    <div className="flex-1 flex items-center justify-center">
-                                        <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
-                                    </div>
-                                }
-                            >
-                                {user.planTier === "free"
-                                    ? (
-                                        <LockedAuditState
-                                            onUpgrade={() =>
-                                                setShowUpgradeModal(true)}
-                                        />
-                                    )
-                                    : <LinkedInAuditView />}
-                            </Suspense>
+                            <ErrorBoundary variant="full">
+                                <Suspense
+                                    fallback={
+                                        <div className="flex-1 flex items-center justify-center">
+                                            <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                                        </div>
+                                    }
+                                >
+                                    {user.planTier === "free"
+                                        ? (
+                                            <LockedAuditState
+                                                onUpgrade={() =>
+                                                    setShowUpgradeModal(true)}
+                                            />
+                                        )
+                                        : <LinkedInAuditView />}
+                                </Suspense>
+                            </ErrorBoundary>
                         </div>
                     )}
 
                     {activeTab === "voice-lab" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">
-                            <Suspense
-                                fallback={
-                                    <div className="flex-1 flex items-center justify-center">
-                                        <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
-                                    </div>
-                                }
-                            >
-                                <VoiceLabView />
-                            </Suspense>
+                            <ErrorBoundary variant="full">
+                                <Suspense
+                                    fallback={
+                                        <div className="flex-1 flex items-center justify-center">
+                                            <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                                        </div>
+                                    }
+                                >
+                                    <VoiceLabView />
+                                </Suspense>
+                            </ErrorBoundary>
                         </div>
                     )}
 
                     {activeTab === "carousel" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0">
-                            <Suspense
-                                fallback={
-                                    <div className="flex-1 flex items-center justify-center">
-                                        <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
-                                    </div>
-                                }
-                            >
-                                <CarouselStudio 
-                                    hideHeader 
-                                    initialContent={carouselDraftContent} 
-                                />
-                            </Suspense>
+                            <ErrorBoundary variant="full">
+                                <Suspense
+                                    fallback={
+                                        <div className="flex-1 flex items-center justify-center">
+                                            <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                                        </div>
+                                    }
+                                >
+                                    <CarouselStudio 
+                                        hideHeader 
+                                        initialContent={carouselDraftContent} 
+                                    />
+                                </Suspense>
+                            </ErrorBoundary>
                         </div>
                     )}
 
                     {activeTab === "insight-responder" && (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex-1 min-h-0 flex flex-col">
-                            <Suspense
-                                fallback={
-                                    <div className="flex-1 flex items-center justify-center">
-                                        <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
-                                    </div>
-                                }
-                            >
-                                <InsightResponderView />
-                            </Suspense>
+                            <ErrorBoundary variant="full">
+                                <Suspense
+                                    fallback={
+                                        <div className="flex-1 flex items-center justify-center">
+                                            <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+                                        </div>
+                                    }
+                                >
+                                    <InsightResponderView />
+                                </Suspense>
+                            </ErrorBoundary>
                         </div>
                     )}
 
@@ -551,9 +604,7 @@ const DashboardContent: React.FC = () => {
 
 const Dashboard: React.FC = () => {
     return (
-        <PostProvider>
-            <DashboardContent />
-        </PostProvider>
+        <DashboardContent />
     );
 };
 

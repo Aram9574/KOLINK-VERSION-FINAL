@@ -7,7 +7,8 @@
     "dev": "./node_modules/.bin/vite",
     "build": "node scripts/generate-sitemap.js && vite build",
     "build:mobile": "vite build -c vite.mobile.config.ts && mv dist-mobile/mobile.html dist-mobile/index.html",
-    "mobile": "npm run build:mobile && npx cap sync"
+    "mobile": "npm run build:mobile && npx cap sync",
+    "types:gen": "supabase gen types typescript --project-id gwfjojgqzfjakahsopzm > types/supabase.ts"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
@@ -64,7 +65,7 @@
     "tailwind-merge": "^3.4.0",
     "usehooks-ts": "^3.1.1",
     "uuid": "^13.0.0",
-    "zod": "^4.1.13",
+    "zod": "^4.3.6",
     "zustand": "^5.0.9"
   },
   "devDependencies": {

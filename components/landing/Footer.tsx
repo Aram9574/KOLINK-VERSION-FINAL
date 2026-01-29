@@ -26,6 +26,14 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
         { icon: <Facebook className="w-5 h-5" />, href: "#", name: "Facebook" },
         { icon: <Youtube className="w-5 h-5" />, href: "#", name: "YouTube" },
     ];
+    
+    // Programmatic SEO Links (Top Priorities)
+    const roleLinks = [
+        { label: "IA para Inmobiliarias", href: "/tools/generar-posts-linkedin-para-inmobiliaria" },
+        { label: "IA para CEOs", href: "/tools/analisis-perfil-linkedin-para-ceos" },
+        { label: "IA para Recruiters", href: "/tools/ganchos-virales-para-recruiters" },
+        { label: "Ver todos los nichos", href: "/tools" }
+    ];
 
     return (
         <footer className="bg-transparent pt-24 pb-12 border-t border-slate-100 font-sans">
@@ -39,6 +47,7 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
                                     src="/logo.png"
                                     alt="Kolink Logo"
                                     className="w-full h-full object-cover scale-110 rounded-xl shadow-lg shadow-brand-500/10"
+                                    loading="lazy"
                                 />
                             </div>
                             <span>Kolink</span>
@@ -95,6 +104,25 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
 
                     {/* Links Columns */}
                     <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+                         {/* Static SEO Directory Column */}
+                         <div className="flex flex-col gap-6">
+                            <h4 className="font-bold text-slate-900 text-sm uppercase tracking-wider">
+                                Soluciones por Rol
+                            </h4>
+                            <ul className="flex flex-col gap-4">
+                                {roleLinks.map((link, idx) => (
+                                    <li key={idx}>
+                                        <Link
+                                            to={link.href}
+                                            className="text-slate-500 hover:text-brand-600 transition-colors text-sm font-medium"
+                                        >
+                                            {link.label}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
                         {Object.entries(footer.columns).map((
                             [key, column]: [string, any],
                         ) => (

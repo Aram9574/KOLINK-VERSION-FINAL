@@ -38,7 +38,6 @@ export interface FeaturePageData {
         q: string;
         a: string;
     }>;
-    };
 }
 
 export interface BlogPost {

@@ -11,6 +11,7 @@ import {
   ViralFramework,
   ViralHook,
   ViralTone,
+  Post
 } from "../../../types";
 import { useGeneratorForm } from "../../../hooks/useGeneratorForm";
 import { useUser } from "../../../context/UserContext";
@@ -31,6 +32,7 @@ import { useCredits } from "../../../hooks/useCredits";
 import { GamificationService } from "../../../services/gamificationService";
 import { CreditService } from "../../../services/creditService";
 import LevelUpModal from "../gamification/LevelUpModal";
+import { ThinkingState } from "../../ui/ThinkingState";
 
 // Helper to pick random from array
 const pickRandom = <T extends { value: string }>(options: T[]): string => {
@@ -50,7 +52,7 @@ interface PostGeneratorProps {
   initialParams?: GenerationParams | null;
   isCancelled?: boolean;
   onGoToCarousel?: (content: string) => void;
-  onEdit?: (post: any) => void;
+  onEdit?: (post: Post) => void;
 }
 
 const PostGenerator: React.FC<PostGeneratorProps> = ({
@@ -180,9 +182,15 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
             credits={credits}
             language={language}
         >
-            {/* Only pass children if there is content to show */
-            ((currentPost?.content && currentPost.content.replace(/<[^>]*>/g, '').trim().length > 0) || isGenerating) && (
-                <LinkedInPreview
+            {/* Thinking State UX (Action 2 de AI Product Skill) */}
+            {isGenerating && (!currentPost?.content || currentPost.content.trim().length === 0) ? (
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 h-full flex items-center justify-center">
+                    <ThinkingState language={language === 'es' ? 'es' : 'en'} />
+                </div>
+            ) : (
+                /* Only pass children if there is content to show */
+                ((currentPost?.content && currentPost.content.replace(/<[^>]*>/g, '').trim().length > 0) || isGenerating) && (
+                    <LinkedInPreview
                     content={currentPost?.content || ""}
                     user={user}
                     isLoading={isGenerating}
@@ -193,8 +201,9 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
                     viralAnalysis={currentPost?.viralAnalysis}
                     onEdit={onEdit ? () => onEdit(currentPost) : undefined}
                     isMobilePreview={false} 
+                    generationParams={params}
                 />
-            )}
+            ))}
         </StudioLayout>
     </>
   );

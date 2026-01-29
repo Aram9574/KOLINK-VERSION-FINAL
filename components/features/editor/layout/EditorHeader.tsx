@@ -1,6 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Save, History, ChevronDown, FileText } from 'lucide-react';
+import {
+    Save,
+    History,
+    ChevronDown,
+    FileText,
+    Layout
+} from 'lucide-react';
 import { hapticFeedback } from '../../../../lib/animations';
 import { Post } from '../../../../types';
 
@@ -18,6 +24,8 @@ interface EditorHeaderProps {
     draftsLabel: string;
     noDraftsLabel: string;
     language: string;
+    isSplitView: boolean;
+    onToggleSplitView: () => void;
 }
 
 const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -33,18 +41,52 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
     openDraftLabel,
     draftsLabel,
     noDraftsLabel,
-    language
+    language,
+    isSplitView,
+    onToggleSplitView
 }) => {
     return (
-        <div className="h-14 border-b border-slate-200/60 flex items-center justify-between px-6 bg-white shrink-0">
-            <input
-                type="text"
-                value={postTitle}
-                onChange={(e) => setPostTitle(e.target.value)}
-                placeholder={placeholder}
-                className="text-sm text-slate-700 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[300px] outline-none border-b border-transparent hover:border-slate-300 focus:border-brand-500 bg-transparent transition-all placeholder:text-slate-400"
-            />
-            <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200/60 bg-white/50 backdrop-blur-sm sticky top-0 z-20">
+            {/* LEFT: Title & Save Status */}
+            <div className="flex items-center gap-4 flex-1">
+                <div className="relative group">
+                    <input
+                        type="text"
+                        value={postTitle}
+                        onChange={(e) => setPostTitle(e.target.value)}
+                        placeholder={placeholder}
+                        className="text-base font-bold text-slate-900 placeholder:text-slate-400 bg-transparent border-none focus:ring-0 p-0 w-[240px] truncate"
+                    />
+                    <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-500 transition-all duration-300 group-hover:w-full" />
+                </div>
+                
+                <div className="h-4 w-[1px] bg-slate-200" />
+                
+                <span className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                    {/* Replaced unsaved indicator with cleaner auto-save text */}
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    Saved
+                </span>
+            </div>
+
+            {/* RIGHT: Actions */}
+            <div className="flex items-center gap-2">
+                 {/* SPLIT VIEW TOGGLE */}
+                 <button
+                    onClick={onToggleSplitView}
+                    className={`p-2 rounded-lg transition-colors hidden md:flex items-center gap-2 text-xs font-bold ${
+                        isSplitView 
+                        ? "bg-brand-50 text-brand-600" 
+                        : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+                    }`}
+                    title={language === 'es' ? 'Vista Dividida' : 'Split View'}
+                >
+                    <Layout className="w-4 h-4" />
+                    <span className="hidden lg:inline">{language === 'es' ? 'Dividir' : 'Split'}</span>
+                </button>
+
+                <div className="h-4 w-[1px] bg-slate-200 mx-1" />
+
                 <motion.button
                     type="button"
                     onClick={onSave}
