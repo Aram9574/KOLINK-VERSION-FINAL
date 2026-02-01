@@ -27,7 +27,15 @@ export class EngagementService extends BaseAIService {
 ${brandContext}
 `;
 
-    const fullSystemInstruction = `${InsightResponderBrain.system_instruction}\n\n${sessionSpecifics}`;
+    const fullSystemInstruction = `${InsightResponderBrain.system_instruction}\n\n${sessionSpecifics}
+
+### 🎯 MISIÓN CRÍTICA DE ANÁLISIS VISUAL:
+Si se proporciona una imagen (o captura de pantalla de un post), debes actuar como un analista experto. No te limites al texto OCR. 
+- Analiza el diseño, los colores y el "vibe" del post. 
+- Si hay gráficas o datos, interprétalos. 
+- Si hay una cara, describe la expresión y úsala en tu comentario para empatizar. 
+- Tu objetivo es que el autor del post sienta que "realmente viste su creación" y no que solo leíste el texto.
+`;
 
     return await this.retryWithBackoff(async () => {
       // Construct parts manually

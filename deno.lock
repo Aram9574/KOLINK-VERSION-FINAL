@@ -78,7 +78,7 @@
     "npm:vite@^6.2.0": "6.4.1_@types+node@22.19.3_picomatch@4.0.3",
     "npm:vitest@^4.0.15": "4.0.16_@types+node@22.19.3_jsdom@27.3.0_vite@6.4.1__@types+node@22.19.3__picomatch@4.0.3",
     "npm:zod@3.22.4": "3.22.4",
-    "npm:zod@^4.1.13": "4.2.1",
+    "npm:zod@^4.3.6": "4.3.6",
     "npm:zustand@^5.0.9": "5.0.9_@types+react@19.2.7_react@19.2.3"
   },
   "jsr": {
@@ -3943,8 +3943,8 @@
     "zod@3.22.4": {
       "integrity": "sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg=="
     },
-    "zod@4.2.1": {
-      "integrity": "sha512-0wZ1IRqGGhMP76gLqz8EyfBXKk0J2qo2+H3fi4mcUP/KtTocoX08nmIAHl1Z2kJIZbZee8KOpBCSNPRgauucjw=="
+    "zod@4.3.6": {
+      "integrity": "sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg=="
     },
     "zustand@5.0.9_@types+react@19.2.7_react@19.2.3": {
       "integrity": "sha512-ALBtUj0AfjJt3uNRQoL1tL2tMvj6Gp/6e39dnfT6uzpelGru8v1tPOGBzayOWbPJvujM8JojDk3E1LxeFisBNg==",
@@ -4055,7 +4055,7 @@
         "npm:uuid@13",
         "npm:vite@^6.2.0",
         "npm:vitest@^4.0.15",
-        "npm:zod@^4.1.13",
+        "npm:zod@^4.3.6",
         "npm:zustand@^5.0.9"
       ]
     }

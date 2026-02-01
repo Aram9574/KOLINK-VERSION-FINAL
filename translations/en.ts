@@ -11,7 +11,9 @@ export const en = {
       unlockNow: "Unlock Now",
       premiumFeature: "This is a premium feature",
       availableOn: "Available on Pro and Viral plans"
-    }
+    },
+    success: "Success",
+    postDeleted: "Post deleted"
   },
   auth: {
     welcomeHeadline: "Access Your Viral Command Center",
@@ -711,15 +713,14 @@ export const en = {
   },
   onboarding: {
     step1: {
-      title: "Welcome to Kolink!",
+      title: "Welcome to Kolink",
       subtitle: "Let's personalize your studio. What's your name?",
-      firstName: "First Name",
-      firstNamePlaceholder: "John",
-      lastName: "Last Name",
-      lastNamePlaceholder: "Doe",
+      fullName: "Full Name",
+      fullNamePlaceholder: "John Doe",
       jobTitle: "Profession / Job Title",
       jobTitlePlaceholder: "e.g. Founder, Marketing Manager, Developer",
       next: "Next Step",
+      socialProof: "Join +10,000 professionals"
     },
     step2: {
       title: "What is your goal?",
@@ -2172,6 +2173,38 @@ export const en = {
           a: "Absolutely. We use bank-grade encryption (AES-256) for all your data. We do not sell or share your information with third parties."
         }
       ]
+    }
+  },
+  exitIntentCRO: {
+    title: "2026 Resolution: grow your business on LinkedIn",
+    subtitle: "Turn your likes into leads with KOLINK Pro - 50% lifetime discount ⏰",
+    timerLabel: "Offer expires in:",
+    originalPrice: "€29/mo",
+    discountPrice: "€14.50/mo",
+    cta: "Upgrade instantly",
+    features: "Pro plan features",
+    noThanks: "No thanks, I'd rather stay where I am"
+  },
+  exclusiveOffer: {
+    modalTitle: "Your LinkedIn success starts here!",
+    modalSubtitle: "You've unlocked an exclusive launch offer. We are limiting spots with this lifetime discount to ensure the best service quality.",
+    offerDetail: "50% LIFETIME DISCOUNT ON PRO PLAN",
+    confirmationTitle: "Do you want to claim your discount code now?",
+    confirmationButton: "Yes, I want my discount",
+    couponTitle: "Here is your exclusive code!",
+    couponSubtitle: "Copy the code and use it when creating your account. This coupon will expire in 24 hours.",
+    copyButton: "Copy Code",
+    copiedFeedback: "Code copied!",
+    continueButton: "Continue to Sign Up",
+    expiryWarning: "Expires in: 24 hours",
+    couponCode: "KOLINK50PERCENT",
+    redemptionSteps: {
+      title: "How to redeem your offer:",
+      step1: "1. Create your account and log in.",
+      step2: "2. Go to the 'Settings' section in your dashboard.",
+      step3: "3. Select the Pro Annual or Monthly Plan.",
+      step4: "4. On the Stripe checkout screen, apply your coupon.",
+      step5: "5. Done! Enjoy your lifetime discount."
     }
   }
 };

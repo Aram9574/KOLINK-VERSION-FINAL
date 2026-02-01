@@ -64,6 +64,8 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
             unlockedAchievements: data.unlocked_achievements || [],
             autoPilot: data.auto_pilot as any || { enabled: false, topics: [], frequency: 'daily' },
             isPremium: isPremium,
+            totalGenerations: data.total_generations ?? 0,
+            lastAhaMomentAt: data.last_aha_moment_at ? new Date(data.last_aha_moment_at).getTime() : undefined,
         };
     } catch (err) {
         console.error("Exception in fetchUserProfile:", err);
@@ -94,6 +96,10 @@ export const updateUserProfile = async (userId: string, updates: Partial<UserPro
     if (updates.industry !== undefined) dbUpdates.industry = updates.industry;
     if (updates.position !== undefined) dbUpdates.position = updates.position;
     if (updates.language !== undefined) dbUpdates.language = updates.language;
+    if (updates.totalGenerations !== undefined) dbUpdates.total_generations = updates.totalGenerations;
+    if (updates.lastAhaMomentAt !== undefined) {
+        dbUpdates.last_aha_moment_at = updates.lastAhaMomentAt ? new Date(updates.lastAhaMomentAt).toISOString() : null;
+    }
 
     const { data, error } = await supabase
         .from('profiles')
@@ -130,6 +136,9 @@ export const deductUserCredit = async (userId: string): Promise<number> => {
         if (updateError) throw updateError;
         return newCredits;
     }
+
+    // Increment total generations for lifecycle tracking
+    await supabase.rpc('increment_total_generations', { target_user_id: userId });
 
     return data ?? 0;
 };

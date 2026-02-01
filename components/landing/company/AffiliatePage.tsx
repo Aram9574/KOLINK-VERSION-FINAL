@@ -22,7 +22,7 @@ const AffiliatePage: React.FC = () => {
     const t = translations[language].affiliatePage;
     const [isTermsOpen, setIsTermsOpen] = useState(false);
 
-    const scrollToSection = (e: any, id: string) => {
+    const scrollToSection = (_: any, id: string) => {
         const el = document.getElementById(id);
         if(el) el.scrollIntoView({ behavior: 'smooth' });
     };

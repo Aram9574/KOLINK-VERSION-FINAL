@@ -1,6 +1,5 @@
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import {
-    BrowserRouter as Router,
     Navigate,
     Route,
     Routes,
@@ -12,7 +11,6 @@ import { useUser } from "./context/UserContext";
 import { useSessionTimeout } from "./hooks/useSessionTimeout";
 import ProtectedRoute from "./components/features/auth/ProtectedRoute";
 import { Toaster } from "sonner";
-import { translations } from "./translations";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import { PostProvider } from "./context/PostContext";
 
@@ -22,23 +20,13 @@ const LoginPage = lazy(() => import("./components/features/auth/LoginPage"));
 const Dashboard = lazy(() =>
     import("./components/features/dashboard/Dashboard")
 );
-const CarouselStudio = lazy(() =>
-    import("./components/features/generation/CarouselStudio")
-);
 const OnboardingFlow = lazy(() =>
     import("./components/features/onboarding/OnboardingFlow")
-);
-const UpgradeModal = lazy(() => import("./components/modals/UpgradeModal"));
-const CancellationModal = lazy(() =>
-    import("./components/modals/CancellationModal")
 );
 // AutoPilotView is still in root or needs move. Assuming root for now or next move.
 // Ideally should be features/autopilot. Let's fix App.tsx assuming I will move it next.
 // Or wait, I haven't moved it yet. I will leave it as is or move it now?
 // I will move it now to avoid breaking.
-const AutoPostView = lazy(() =>
-    import("./components/features/autopost/AutoPostStudio")
-);
 
 const PrivacyPolicy = lazy(() => import("./components/legal/PrivacyPolicy"));
 const TermsOfService = lazy(() =>
@@ -72,10 +60,10 @@ import { ExitIntentModal } from "./components/modals/ExitIntentModal";
 import FomoToast from "./components/ui/FomoToast";
 import { ClickTracker } from "./components/common/ClickTracker";
 const AnalyticsDashboard = lazy(() => import("./components/admin/AnalyticsDashboard"));
+const WaitlistPage = lazy(() => import("./components/landing/WaitlistPage"));
 
 const App: React.FC = () => {
     const { user, language, loading } = useUser();
-    const t = translations[language];
     const location = useLocation();
 
     // Initialize session timeout monitoring
@@ -105,6 +93,33 @@ const App: React.FC = () => {
         }
     }, []);
 
+    // Check for unsubscription success (Action 22)
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("unsubscribed") === "true") {
+            const timer = setTimeout(() => {
+                import("sonner").then(({ toast }) => {
+                    toast.success(
+                        language === 'es' 
+                            ? "Baja confirmada con éxito. No recibirás más correos."
+                            : "Unsubscribed successfully. You won't receive more emails.",
+                        {
+                            duration: 8000,
+                            position: 'top-center',
+                        }
+                    );
+                });
+            }, 1000);
+
+            // Clean up URL
+            const url = new URL(window.location.href);
+            url.searchParams.delete('unsubscribed');
+            window.history.replaceState({}, '', url.toString());
+            
+            return () => clearTimeout(timer);
+        }
+    }, [language]);
+
     // Exit Intent Logic (Action 13)
     const { isVisible: isExitIntentVisible, setIsVisible: setIsExitIntentVisible } = useExitIntent(
         !user.id || user.id.startsWith('mock-')
@@ -129,12 +144,7 @@ const App: React.FC = () => {
             <Toaster 
                 richColors 
                 position="top-center" 
-                toastOptions={{
-                    className: '!bg-white/80 !backdrop-blur-xl !border-white/50 !shadow-soft-glow !rounded-2xl',
-                    style: {
-                        background: 'rgba(255, 255, 255, 0.8)',
-                    }
-                }}
+                theme="light"
             />
             <CookieConsent />
             <ClickTracker />
@@ -173,6 +183,7 @@ const App: React.FC = () => {
                         <Route path="/resources/common-faq" element={<FAQPage />} />
                         <Route path="/blog" element={<BlogListPage />} />
                         <Route path="/blog/:slug" element={<BlogPostPage />} />
+                        <Route path="/waitlist" element={<WaitlistPage />} />
                         
                         <Route
                             path="/login"

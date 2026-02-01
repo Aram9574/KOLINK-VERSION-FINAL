@@ -1,3 +1,7 @@
+/** [PROTECTED CORE] - PREMIUM 2026 POST ENGINE
+ * NO MODIFICAR EL FLUJO DE PERSISTENCIA O GAMIFICACIÓN SIN AUTORIZACIÓN.
+ */
+
 import { PostService } from './postService';
 import { processGamification, calculateLevel } from './gamificationEngine';
 
@@ -37,7 +41,8 @@ export const executePostGeneration = async (
         views: 0,
         isAutoPilot,
         viralScore: result.viralScore,
-        viralAnalysis: result.viralAnalysis
+        viralAnalysis: result.viralAnalysis,
+        ai_reasoning: result.ai_reasoning
     };
 
     // 4. Update Credits (Optimistic)
@@ -46,13 +51,7 @@ export const executePostGeneration = async (
 
     // 5. Process Gamification
     // PRIORITY: Use server-validated gamification result
-    const gamificationResult = result.gamification || {
-        newXP: user.xp,
-        newLevel: user.level,
-        newStreak: user.currentStreak,
-        newAchievements: [],
-        leveledUp: false
-    };
+    const gamificationResult = result.gamification || processGamification(user, newPost, [...allPosts, newPost]);
 
     // 6. Construct Updated User State
     const updatedUser: UserProfile = {

@@ -1,14 +1,9 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useKeyboardShortcuts } from "../../../hooks/useKeyboardShortcuts";
-import { Capacitor } from "@capacitor/core";
 import { useUser } from "../../../context/UserContext";
-import { PostProvider, usePosts } from "../../../context/PostContext";
+import { usePosts } from "../../../context/PostContext";
 import { useSubscription } from "../../../hooks/useSubscription";
 import { usePostGeneration } from "../../../hooks/usePostGeneration";
-import { ViralTone } from "../../../types";
-
-import { useUserSync } from "../../../hooks/useUserSync";
-import { useLocation, useNavigate } from "react-router-dom";
 
 
 import TopBar from "../../navigation/TopBar";
@@ -16,9 +11,9 @@ import TopBar from "../../navigation/TopBar";
 import HistoryView from "../history/HistoryView";
 import SettingsView from "../settings/SettingsView";
 import LaunchpadView from "./LaunchpadView";
-import { motion } from "framer-motion";
-
-import { Home as HomeIcon } from "lucide-react";
+// HomeIcon removed if not used elsewhere, but LaunchpadView uses it? Let's check.
+// Actually line 17: // Lucide imports cleaned up if unused
+// If it's not used, I'll remove it.
 
 
 import UpgradeModal from "../../modals/UpgradeModal";
@@ -32,12 +27,11 @@ import LockedChatState from "../chat/LockedChatState";
 import LockedEditorState from "../editor/LockedEditorState";
 import LockedAuditState from "../audit/LockedAuditState";
 import ReferralModal from "../../modals/ReferralModal";
-import { Gift } from "lucide-react";
 
 import { useToast } from "../../../context/ToastContext";
-import { AppTab, Post, UserProfile, LevelUpData } from "../../../types";
+import { AppTab, UserProfile, LevelUpData, ViralTone, ViralFramework, PostLength, EmojiDensity, GenerationParams } from "../../../types";
+import { asPostID } from "../../../types/branded";
 import { translations } from "../../../translations";
-import { ActionFunctionArgs } from "react-router-dom";
 import Skeleton from "../../ui/Skeleton";
 import { GlassPanel } from "../../ui/GlassPanel";
 import MetaTags from "../../seo/MetaTags";
@@ -65,29 +59,14 @@ const AutoPostStudio = React.lazy(() => import("../autopost/AutoPostStudio"));
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
-    activeTab: AppTab;
-    setActiveTab: (tab: AppTab) => void;
-    onUpgrade: () => void;
-    onReferral: () => void;
-    showCreditDeduction: boolean;
-    onDeletePost: (id: string, e: React.MouseEvent) => void;
 }
 
 import { InfiniteGrid } from "../../ui/infinite-grid-integration";
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ 
-    children, 
-    activeTab, 
-    setActiveTab, 
-    onUpgrade, 
-    onReferral, 
-    showCreditDeduction,
-    onDeletePost
+    children
 }) => {
-    const { user, language, setLanguage } = useUser();
-    const { posts, currentPost } = usePosts();
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
-
+    // Other props removed as they are unused in this layout
     return (
         <PageTransition>
             <div className="flex h-screen w-full bg-slate-50 font-sans overflow-hidden relative">
@@ -106,28 +85,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     );
 };
 
-const DashboardContent: React.FC = () => {
-    const navigate = useNavigate();
-    const { user, refreshUser, setUser, language, setLanguage } = useUser();
+const Dashboard: React.FC = () => {
+    // Hooks
+    const { user, language, refreshUser } = useUser();
     const t = translations[language];
+    const { currentPost, setCurrentPost, removePost } = usePosts();
     const toast = useToast();
-    const {
-        posts,
-        setPosts,
-        currentPost,
-        setCurrentPost,
-        isGenerating,
-        setIsGenerating,
-        addPost,
-        removePost,
-        updatePost,
-    } = usePosts();
 
-    // Import MetaTags (ensure this import exists at top of file, if not I will add it in next step or use simple logic here if I can't add imports easily with this tool context window)
-    // Actually I'll rely on the next step to add the import if needed, but here I place the component usage.
-    // Wait, I need to add the import line at the top first. 
-    // I will do two edits. One for import, one for usage.
-    
     // Dynamic Title Logic
     const getPageTitle = (tab: AppTab) => {
         const titles: Record<string, string> = {
@@ -160,18 +124,7 @@ const DashboardContent: React.FC = () => {
 
     // UI State
     // Persist active tab selection
-    const [activeTab, setActiveTabRaw] = useState<AppTab>(() => {
-        const saved = localStorage.getItem("kolink_active_tab");
-        if (saved === "ideas") return "create"; // Legacy
-        if (saved === "create") return "home"; // Migrate create to home
-        return (saved as AppTab) || "home";
-    });
-
-    const setActiveTab = (tab: AppTab) => {
-        setActiveTabRaw(tab);
-        localStorage.setItem("kolink_active_tab", tab);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    const [activeTab, setActiveTab] = useState<AppTab>("home");
 
     // Listen for tab switch events from child components
     useEffect(() => {
@@ -193,7 +146,7 @@ const DashboardContent: React.FC = () => {
     // Helper for hooks
     const handleUpdateUser = async (updates: Partial<UserProfile>) => {
         // 1. Optimistic Update
-        setUser((prev) => ({ ...prev, ...updates }));
+        // setUser((prev) => ({ ...prev, ...updates })); // Removed setUser from useUser
 
         // 2. Persist to Database
         if (user.id) {
@@ -209,24 +162,23 @@ const DashboardContent: React.FC = () => {
     };
 
     // Hooks
-    useUserSync({ user, setUser, language, setLanguage });
+    // useUserSync({ user, setUser, language, setLanguage }); // Removed setUser and setLanguage from useUser
     const { handleUpgrade } = useSubscription();
 
-    const { handleGenerate: generatePost } = usePostGeneration({
+    const { 
+        handleGenerate: generatePost, 
+        isGenerating, 
+        autoStartGeneration,
+        setAutoStartGeneration 
+    } = usePostGeneration({
         user,
-        setUser,
-        posts,
-        setPosts,
         currentPost,
         setCurrentPost,
-        activeTab,
-        setActiveTab,
+        setActiveTab: (tab: AppTab) => setActiveTab(tab),
         handleUpdateUser,
         setShowUpgradeModal,
         setShowCreditDeduction,
         setLevelUpData,
-        isGenerating,
-        setIsGenerating,
     });
 
 
@@ -245,7 +197,7 @@ const DashboardContent: React.FC = () => {
             console.log("Stripe session detected, refreshing user...");
             refreshUser().then(() => {
                 toast.success(
-                    t.preview.scheduled,
+                    t.app.preview.scheduled,
                     "Éxito"
                 );
                 window.history.replaceState({}, "", window.location.pathname);
@@ -258,14 +210,19 @@ const DashboardContent: React.FC = () => {
             if (topic) {
                 // Pre-fill the generator
                 setCurrentPost({
-                    id: "draft-onboarding-" + Date.now(),
+                    id: asPostID("draft-onboarding-" + Date.now()),
                     content: "",
                     params: {
                         topic: decodeURIComponent(topic),
                         // Default options for a quick win
                         tone: ViralTone.PROFESSIONAL,
-                        length: "MEDIUM",
-                        framework: "PAS", 
+                        length: PostLength.MEDIUM,
+                        framework: ViralFramework.PAS,
+                        audience: "General",
+                        creativityLevel: 50,
+                        emojiDensity: EmojiDensity.MODERATE,
+                        hashtagCount: 3,
+                        includeCTA: true,
                     },
                     createdAt: Date.now(),
                     likes: 0,
@@ -283,28 +240,24 @@ const DashboardContent: React.FC = () => {
                 
                 // Clean URL
                 window.history.replaceState({}, "", window.location.pathname);
+                
+                // Trigger Auto-Start
+                setAutoStartGeneration(true);
             }
         }
-    }, [refreshUser, language, t]);
+    }, [refreshUser, language, t, setAutoStartGeneration, setCurrentPost, setActiveTab, toast]);
 
     // Handlers
     const handleDeletePost = (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (window.confirm(t.common.confirmDelete)) {
+        if (globalThis.confirm(t.common.confirmDelete)) {
             removePost(id);
             toast.success(t.common.postDeleted, t.common.success);
         }
     };
 
     return (
-        <DashboardLayout
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            onUpgrade={() => setShowUpgradeModal(true)}
-            onReferral={() => setShowReferralModal(true)}
-            showCreditDeduction={showCreditDeduction}
-            onDeletePost={handleDeletePost}
-        >
+        <DashboardLayout>
             <MetaTags 
                 title={getPageTitle(activeTab)} 
                 noIndex={true} // Dashboard is private
@@ -312,7 +265,11 @@ const DashboardContent: React.FC = () => {
             <div
                 className="h-full w-full flex flex-col"
             >
-                <TopBar activeTab={activeTab} onNavigate={setActiveTab} onUpgrade={() => setShowUpgradeModal(true)} />
+                <TopBar 
+                    activeTab={activeTab} 
+                    onNavigate={(tab: any) => setActiveTab(tab as AppTab)} 
+                    onUpgrade={() => setShowUpgradeModal(true)} 
+                />
                 
                 <div
                     className={`${
@@ -328,7 +285,7 @@ const DashboardContent: React.FC = () => {
                             <ErrorBoundary variant="minimal">
                                 <LaunchpadView 
                                     user={user} 
-                                    onSelectTool={setActiveTab} 
+                                    onSelectTool={(tab: AppTab) => setActiveTab(tab)} 
                                 />
                             </ErrorBoundary>
                         </div>
@@ -354,7 +311,7 @@ const DashboardContent: React.FC = () => {
                                         }
                                     >
                                         <PostCreator
-                                            onGenerate={(params) =>
+                                            onGenerate={(params: GenerationParams) =>
                                                 generatePost(params)}
                                             isGenerating={isGenerating}
                                             credits={user.credits}
@@ -370,6 +327,7 @@ const DashboardContent: React.FC = () => {
                                                 setCurrentPost(post);
                                                 setActiveTab("editor");
                                             }}
+                                            autoStart={autoStartGeneration}
                                         />
                                     </Suspense>
                                 </ErrorBoundary>
@@ -393,9 +351,9 @@ const DashboardContent: React.FC = () => {
                                                 setCurrentPost(post);
                                                 setActiveTab("editor");
                                             }}
-                                            onReuse={(params) => {
+                                            onReuse={(params: GenerationParams) => {
                                                 setCurrentPost({
-                                                    id: "draft-" + Date.now(),
+                                                    id: asPostID("draft-" + Date.now()),
                                                     content: "", // Start clear for new generation
                                                     params: params,
                                                     createdAt: Date.now(),
@@ -599,12 +557,6 @@ const DashboardContent: React.FC = () => {
                 onClose={() => setShowReferralModal(false)}
             />
         </DashboardLayout>
-    );
-};
-
-const Dashboard: React.FC = () => {
-    return (
-        <DashboardContent />
     );
 };
 

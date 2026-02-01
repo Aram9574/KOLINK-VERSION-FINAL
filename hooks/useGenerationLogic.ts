@@ -3,11 +3,11 @@ import { useToast } from "../context/ToastContext";
 import { AppTab, GenerationParams, Post, UserProfile, LevelUpData } from "../types";
 import { executePostGeneration } from "../services/postWorkflow";
 import { supabase } from "../services/supabaseClient";
-import { fetchUserProfile } from "../services/userRepository";
+import { useUser } from "../context/UserContext";
+import { asPostID } from "../types/branded";
 
 interface UseGenerationLogicProps {
     user: UserProfile;
-    setUser: React.Dispatch<React.SetStateAction<UserProfile>>;
     posts: Post[];
     setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
     setCurrentPost: React.Dispatch<React.SetStateAction<Post | null>>;
@@ -30,7 +30,6 @@ interface UseGenerationLogicProps {
  */
 export const useGenerationLogic = ({
     user,
-    setUser,
     posts,
     setPosts,
     setCurrentPost,
@@ -39,10 +38,10 @@ export const useGenerationLogic = ({
     setShowUpgradeModal,
     setShowCreditDeduction,
     setLevelUpData,
-    isGenerating,
     setIsGenerating,
     savePostToHistory,
 }: UseGenerationLogicProps) => {
+    const { setUser } = useUser(); // Get from context instead of props
     const toast = useToast();
     const [prefilledParams, setPrefilledParams] = useState<
         GenerationParams | null
@@ -75,27 +74,27 @@ export const useGenerationLogic = ({
                             .limit(1);
 
                         if (latestPosts && latestPosts.length > 0) {
-                            const recoveredPost = latestPosts[0];
-                            const postTime = new Date(recoveredPost.created_at)
-                                .getTime();
+                                const recoveredPost = latestPosts[0] as any;
+                                const postTime = new Date(recoveredPost.created_at || Date.now())
+                                    .getTime();
 
-                            if (postTime > startTime) {
-                                toast.success(
-                                    "¡Post recuperado! Se generó mientras no estabas.",
-                                    "Recuperado"
-                                );
-                                const mappedPost: Post = {
-                                    id: recoveredPost.id,
-                                    content: recoveredPost.content,
-                                    params: recoveredPost.generation_params ||
-                                        {},
-                                    createdAt: postTime,
-                                    likes: 0,
-                                    views: 0,
-                                    isAutoPilot: false,
-                                    viralScore: recoveredPost.viral_score,
-                                    viralAnalysis: recoveredPost.viral_analysis,
-                                };
+                                if (postTime > startTime) {
+                                    toast.success(
+                                        "¡Post recuperado! Se generó mientras no estabas.",
+                                        "Recuperado"
+                                    );
+                                    const mappedPost: Post = {
+                                        id: asPostID(recoveredPost.id),
+                                        content: recoveredPost.content || "",
+                                        params: recoveredPost.generation_params ||
+                                            {},
+                                        createdAt: postTime,
+                                        likes: 0,
+                                        views: 0,
+                                        isAutoPilot: false,
+                                        viralScore: recoveredPost.viral_score || 0,
+                                        viralAnalysis: recoveredPost.viral_analysis,
+                                    };
 
                                 setCurrentPost(mappedPost);
                                 setPosts((prev) => {
@@ -191,14 +190,11 @@ export const useGenerationLogic = ({
 
                 const xpGained = gamificationResult.newXP - user.xp;
                 if (xpGained > 0) {
-                    toast.success(`+${xpGained} XP! Sigue así para subir de nivel!`, "Ganancia de XP");
+                    toast.success(
+                        `+${xpGained} XP Ganados! ✨ ¡Estás en el Nivel ${gamificationResult.newLevel}! ¡Qué gran ritmo llevas, ${user.name?.split(' ')[0] || 'Experto'}!`, 
+                        user.language === 'es' ? "Progreso de Carrera" : "Career Progress"
+                    );
                 }
-
-                fetchUserProfile(user.id).then((updatedProfile) => {
-                    if (updatedProfile) {
-                        setUser((prev) => ({ ...prev, ...updatedProfile }));
-                    }
-                });
             }
 
             setPrefilledParams(null);

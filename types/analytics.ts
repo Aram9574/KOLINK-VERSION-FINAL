@@ -3,6 +3,7 @@ export type AnalyticsEventName =
   | 'post_generated_success'
   | 'carousel_exported'
   | 'post_published_linkedin'
+  | 'post_saved_to_history'
   
   // Engagement
   | 'micro_edit_applied'

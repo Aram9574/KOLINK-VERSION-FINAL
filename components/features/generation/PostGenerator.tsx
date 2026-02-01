@@ -53,6 +53,7 @@ interface PostGeneratorProps {
   isCancelled?: boolean;
   onGoToCarousel?: (content: string) => void;
   onEdit?: (post: Post) => void;
+  autoStart?: boolean;
 }
 
 const PostGenerator: React.FC<PostGeneratorProps> = ({
@@ -66,6 +67,7 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
   isCancelled = false,
   onGoToCarousel,
   onEdit,
+  autoStart = false,
 }) => {
   const { user, setUser } = useUser();
   const [showLevelUp, setShowLevelUp] = useState(false);
@@ -82,6 +84,17 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
   useEffect(() => {
     if (user?.id) fetchBrandVoices(user.id);
   }, [user?.id]);
+
+  // Auto-Start (for Onboarding "Aha Moment")
+  useEffect(() => {
+    if (autoStart && !isGenerating && !currentPost?.content && credits > 0) {
+        // Little delay to ensure UI is ready and transition is smooth
+        const timer = setTimeout(() => {
+            handleGenerate();
+        }, 800);
+        return () => clearTimeout(timer);
+    }
+  }, [autoStart]);
 
   // Haptics
   const prevIsGenerating = useRef(isGenerating);
@@ -202,6 +215,7 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
                     onEdit={onEdit ? () => onEdit(currentPost) : undefined}
                     isMobilePreview={false} 
                     generationParams={params}
+                    postId={currentPost?.id}
                 />
             ))}
         </StudioLayout>

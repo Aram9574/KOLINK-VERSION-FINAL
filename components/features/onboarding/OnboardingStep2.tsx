@@ -2,6 +2,7 @@ import React from 'react';
 import { Target, Check, ArrowRight, User, Building2, Briefcase, UserPlus, Rocket } from 'lucide-react';
 import { useUser } from '../../../context/UserContext';
 import { translations } from '../../../translations';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface OnboardingStep2Props {
     usageIntent: string[];
@@ -38,37 +39,47 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ usageIntent, toggleUs
                     const intentData = t.intents[intent.id as keyof typeof t.intents];
 
                     return (
-                        <button
+                        <motion.button
                             key={intent.id}
+                            whileHover={{ y: -2, backgroundColor: 'var(--slate-50)' }}
+                            whileTap={{ scale: 0.98 }}
                             onClick={() => toggleUsage(intent.id)}
-                            className={`p-4 rounded-xl border text-left transition-all duration-200 relative group
+                            className={`p-4 rounded-2xl border text-left transition-all duration-200 relative group
                       ${isSelected
-                                    ? 'bg-brand-50 border-brand-500 text-brand-700 ring-1 ring-brand-500 shadow-sm'
-                                    : 'bg-white border-slate-200/60/60 text-slate-600 hover:bg-slate-50 hover:border-slate-300'}`}
+                                    ? 'bg-brand-50 border-brand-500 text-brand-700 ring-4 ring-brand-500/10 shadow-sm'
+                                    : 'bg-white border-slate-200/60 text-slate-600 hover:border-slate-300'}`}
                         >
-                            {isSelected && (
-                                <div className="absolute top-3 right-3 w-5 h-5 bg-brand-500 rounded-full flex items-center justify-center animate-in zoom-in duration-200">
-                                    <Check className="w-3 h-3 text-white stroke-[3]" />
-                                </div>
-                            )}
-                            <div className={`mb-2 ${isSelected ? 'text-brand-600' : 'text-slate-400 group-hover:text-slate-600'}`}>
+                            <AnimatePresence>
+                                {isSelected && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
+                                        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                                        className="absolute top-3 right-3 w-6 h-6 bg-brand-500 rounded-full flex items-center justify-center shadow-lg shadow-brand-500/20"
+                                    >
+                                        <Check className="w-3.5 h-3.5 text-white stroke-[3]" />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                            <div className={`mb-3 p-2 w-fit rounded-lg transition-colors ${isSelected ? 'bg-brand-100 text-brand-600' : 'bg-slate-50 text-slate-400 group-hover:text-slate-600'}`}>
                                 {intent.icon}
                             </div>
-                            <p className="text-sm font-bold mb-0.5">{intentData.label}</p>
-                            <p className="text-xs opacity-70 font-medium">{intentData.desc}</p>
-                        </button>
+                            <p className="text-sm font-bold mb-1">{intentData.label}</p>
+                            <p className="text-xs opacity-70 font-medium leading-relaxed">{intentData.desc}</p>
+                        </motion.button>
                     );
                 })}
             </div>
 
-            <button
+            <motion.button
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={onNext}
                 disabled={usageIntent.length === 0}
-                className="w-full mt-8 py-4 bg-brand-600 text-white font-bold rounded-xl shadow-xl shadow-brand-500/20 hover:bg-brand-700 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full mt-10 py-5 bg-brand-600 text-white font-bold rounded-2xl shadow-xl shadow-brand-500/25 hover:bg-brand-700 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
             >
                 {t.next}
                 <ArrowRight className="w-5 h-5" />
-            </button>
+            </motion.button>
         </div>
     );
 };

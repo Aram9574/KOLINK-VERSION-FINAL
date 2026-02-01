@@ -62,15 +62,28 @@ export interface IdeaParams {
 export const generatePostIdeas = async (user: UserProfile, language: AppLanguage = 'es', options?: IdeaParams): Promise<IdeaResult> => {
   try {
     // Call Supabase Edge Function
-    const { data, error } = await supabase.functions.invoke('generate-ideas', {
-      body: {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error("Sesión expirada");
+
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-ideas`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
         user_id: user.id,
         language,
         params: options
-      }
+      })
     });
 
-    if (error) throw new Error(error.message);
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Error ideas: ${response.statusText}`);
+    }
+
+    const data = await response.json();
     if (data.error) throw new Error(data.error);
 
     return {
@@ -102,14 +115,24 @@ export interface BrandVoiceAnalysisResult {
 }
 
 export const analyzeBrandVoice = async (payload: { contentSamples: string[], language: string, imageBase64?: string }): Promise<BrandVoiceAnalysisResult> => {
-  const { data, error } = await supabase.functions.invoke('analyze-brand-voice', {
-    body: payload
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("No hay sesión para análisis");
+
+  const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-brand-voice`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
   });
 
-  if (error) {
-    console.error("Analysis Error:", error);
-    throw new Error(error.message);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `Error análisis: ${response.statusText}`);
   }
+
+  const data = await response.json();
 
   if (data.error) throw new Error(data.error);
 
@@ -123,26 +146,60 @@ export const analyzeBrandVoice = async (payload: { contentSamples: string[], lan
 };
 
 export const generateHooks = async (idea: string, brandVoiceId: string, language: string = 'es'): Promise<string[]> => {
-    const { data, error } = await supabase.functions.invoke('generate-hooks', {
-        body: { idea, brandVoiceId, language }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error("Sesión requerida para hooks");
+
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-hooks`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ idea, brandVoiceId, language })
     });
 
-    if (error) throw new Error(error.message);
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Error hooks: ${response.statusText}`);
+    }
+
+    const data = await response.json();
     return data.hooks;
 };
 
-export interface InsightReplyResult {
-    reply: string;
-    analysis?: string;
+export interface InsightReplyItem {
+    type: string;
+    content: string;
+    score: number;
+    reasoning: string;
+    expected_outcome: string;
 }
 
-export const generateInsightReply = async (payload: { imageBase64?: string, textContext?: string, userIntent?: string, tone?: string }): Promise<InsightReplyResult> => {
-    const { data, error } = await supabase.functions.invoke<InsightReplyResult>('generate-insight-reply', {
-        body: payload
+export interface InsightReplyResult {
+    replies: InsightReplyItem[];
+}
+
+export const generateInsightReply = async (payload: { imageBase64?: string, textContext?: string, userIntent?: string, tone?: string }): Promise<InsightReplyItem[]> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error("No hay sesión activa. Por favor inicie sesión nuevamente.");
+
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-insight-reply`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
     });
 
-    if (error || !data) throw new Error(error?.message || "Insight reply failed");
-    return data;
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Insight reply error:", response.status, errorData);
+        throw new Error(errorData.error || `Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.replies || [];
 };
 
 export interface CloneVoiceResult {
@@ -151,11 +208,24 @@ export interface CloneVoiceResult {
 }
 
 export const cloneVoice = async (payload: { text_samples?: string[], url?: string, voice_name?: string }): Promise<CloneVoiceResult> => {
-    const { data, error } = await supabase.functions.invoke<CloneVoiceResult>('clone-voice', {
-        body: payload
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error("Sesión requerida para clonación");
+
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/clone-voice`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
     });
 
-    if (error || !data) throw new Error(error?.message || "Voice cloning failed");
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Error clonación: ${response.statusText}`);
+    }
+
+    const data = await response.json();
     return data;
 };
 
@@ -295,4 +365,18 @@ export const generatePostStream = async (
         viralAnalysis: result.auditor_report,
         gamification: result.gamification
     };
+};
+
+export const getPersonalizedTrend = async (userId: string, language: string = 'es'): Promise<string> => {
+    try {
+        const { data, error } = await supabase.functions.invoke('generate-daily-insight', {
+            body: { user_id: userId, language }
+        });
+
+        if (error) throw error;
+        return data.trend || "La IA en LinkedIn está cambiando el juego. ¡Publica ahora!";
+    } catch (error) {
+        console.error("Personalized Trend Error:", error);
+        return "El auge del contenido auténtico es tu ángulo hoy.";
+    }
 };

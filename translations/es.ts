@@ -163,7 +163,7 @@ export const es = {
     "Mientras otros pierden 10h/semana prompteando, tú generas autoridad viral en 30 segundos. No te quedes atrás en la era del contenido IA.",
     rotatingWords: [
       "posts que venden",
-      "carruseles magnéticos",
+      "carruseles visuales",
       "perfiles de autoridad",
       "voces ultra-reales",
       "alcance imbatible",
@@ -729,15 +729,14 @@ export const es = {
   },
   onboarding: {
     step1: {
-      title: "¡Bienvenido a Kolink!",
+      title: "Bienvenido a Kolink",
       subtitle: "Personalicemos tu estudio. ¿Cómo te llamas?",
-      firstName: "Nombre",
-      firstNamePlaceholder: "Juan",
-      lastName: "Apellido",
-      lastNamePlaceholder: "Pérez",
+      fullName: "Nombre Completo",
+      fullNamePlaceholder: "Juan Pérez",
       jobTitle: "Profesión / Cargo",
       jobTitlePlaceholder: "ej. Fundador, Marketing Manager, Desarrollador",
       next: "Siguiente Paso",
+      socialProof: "Únete a +10,000 profesionales"
     },
     step2: {
       title: "¿Cuál es tu objetivo?",
@@ -782,6 +781,16 @@ export const es = {
       start: "Empezar a Crear",
     },
     footer: "Usamos esta información para personalizar tus marcos virales.",
+  },
+  styleManager: {
+    title: "Memoria de Estilo de IA",
+    subtitle: "Estos son los ejemplos que la IA usa para imitar tu voz.",
+    empty: "No hay estilos guardados aún. Guarda tus mejores posts desde el editor.",
+    deleteConfirm: "¿Eliminar este estilo?",
+    deleteSuccess: "Estilo eliminado",
+    added: "Agregado el",
+    content: "Contenido",
+    source: "Fuente"
   },
   levelUp: {
     title: "¡Subiste de Nivel!",
@@ -1445,9 +1454,9 @@ export const es = {
       unlockNow: "Desbloquear Ahora",
       premiumFeature: "Esta es una función premium",
       availableOn: "Disponible en los planes Pro y Viral",
-      postDeleted: "Post eliminado",
-      success: "Éxito",
-    }
+    },
+    success: "Éxito",
+    postDeleted: "Post eliminado",
   },
   app: {
     sidebar: {
@@ -2260,6 +2269,38 @@ export const es = {
           a: "Absolutamente. Utilizamos encriptación de grado bancario (AES-256) para todos tus datos. No vendemos ni compartimos tu información con terceros."
         }
       ]
+    }
+  },
+  exitIntentCRO: {
+    title: "Propósito 2026: Haz despegar tu negocio en LinkedIn",
+    subtitle: "Convierte tus impresiones en clientes con KOLINK Pro - 50% de descuento DE POR VIDA ⏰",
+    timerLabel: "La oferta expira en:",
+    originalPrice: "€29/mes",
+    discountPrice: "€14.50/mes",
+    cta: "Activar descuento ahora",
+    features: "Ver funciones Pro",
+    noThanks: "No gracias, prefiero no crecer"
+  },
+  exclusiveOffer: {
+    modalTitle: "¡Tu éxito en LinkedIn comienza aquí!",
+    modalSubtitle: "Has desbloqueado una oferta exclusiva de lanzamiento. Estamos limitando las plazas con este descuento de por vida para asegurar la mejor calidad de servicio.",
+    offerDetail: "50% DE DESCUENTO DE POR VIDA EN EL PLAN PRO",
+    confirmationTitle: "¿Quieres reclamar tu código de descuento ahora?",
+    confirmationButton: "Sí, quiero mi descuento",
+    couponTitle: "¡Aquí tienes tu código exclusivo!",
+    couponSubtitle: "Copia el código y úsalo al crear tu cuenta. Este cupón expirará en 24 horas.",
+    copyButton: "Copiar Código",
+    copiedFeedback: "¡Código copiado!",
+    continueButton: "Continuar al Registro",
+    expiryWarning: "Vence en: 24 horas",
+    couponCode: "KOLINK50PERCENT",
+    redemptionSteps: {
+      title: "Cómo canjear tu oferta:",
+      step1: "1. Crea tu cuenta e inicia sesión.",
+      step2: "2. Ve a la sección de 'Ajustes' en tu panel.",
+      step3: "3. Selecciona el Plan Pro Anual o Mensual.",
+      step4: "4. En la pantalla de pago de Stripe, aplica tu cupón.",
+      step5: "5. ¡Listo! Disfruta de tu descuento de por vida."
     }
   }
 };

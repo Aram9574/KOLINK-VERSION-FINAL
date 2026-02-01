@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid, Zap, Sparkles, PenSquare } from 'lucide-react';
 import { MagicButton } from '../../../ui/MagicButton';
 import { UserProfile, AppTab } from '../../../../types';
+import { getPersonalizedTrend } from '../../../../services/geminiService';
+import Skeleton from '../../../ui/Skeleton';
 
 interface LaunchpadHeaderProps {
     user: UserProfile;
@@ -16,6 +18,24 @@ export const LaunchpadHeader: React.FC<LaunchpadHeaderProps> = ({
     t, 
     onSelectTool 
 }) => {
+    const [trend, setTrend] = useState<string>("");
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchTrend = async () => {
+            if (!user.id) return;
+            try {
+                const personalizedTrend = await getPersonalizedTrend(user.id, language);
+                setTrend(personalizedTrend);
+            } catch (error) {
+                console.error("Failed to load trend", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTrend();
+    }, [user.id, language]);
+
     return (
         <div className="mb-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6">
@@ -24,7 +44,11 @@ export const LaunchpadHeader: React.FC<LaunchpadHeaderProps> = ({
                         Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-indigo-600">{user.name?.split(' ')[0] || 'Experto'}</span>.
                     </h1>
                     <p className="text-slate-500 font-medium text-lg">
-                        {t.stats.hero}
+                        {user.headline ? (
+                            language === 'es'
+                                ? `Listo para liderar como ${user.headline}?`
+                                : `Ready to lead as ${user.headline}?`
+                        ) : t.stats.hero}
                     </p>
                 </div>
                 
@@ -42,19 +66,21 @@ export const LaunchpadHeader: React.FC<LaunchpadHeaderProps> = ({
 
              <div className="glass-premium w-full rounded-2xl p-1 flex">
                 <div className="w-full rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-slate-100 ring-1 ring-blue-50">
+                    <div className="flex items-center gap-4 flex-1">
+                        <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-slate-100 ring-1 ring-blue-50 shrink-0">
                             <Sparkles className="w-6 h-6" />
                         </div>
-                        <div>
+                        <div className="flex-1">
                             <h4 className="text-sm font-bold text-slate-900">
                                 {language === 'es' ? 'Oportunidad Detectada' : 'Opportunity Detected'}
                             </h4>
-                            <p className="text-sm text-slate-600">
-                                {language === 'es' 
-                                    ? 'El tema "IA en Real Estate" es tendencia. Crea un post ahora.' 
-                                    : 'Topic "AI in Real Estate" is trending. Draft a post now.'}
-                            </p>
+                            {loading ? (
+                                <Skeleton className="h-4 w-3/4 mt-1" />
+                            ) : (
+                                <p className="text-sm text-slate-600">
+                                    {trend}
+                                </p>
+                            )}
                         </div>
                     </div>
                     <MagicButton

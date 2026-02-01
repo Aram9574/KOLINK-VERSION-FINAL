@@ -1,6 +1,10 @@
 {
     "rewrites": [
         {
+            "source": "/unsubscribe",
+            "destination": "https://gwfjojgqzfjakahsopzm.supabase.co/functions/v1/unsubscribe"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }

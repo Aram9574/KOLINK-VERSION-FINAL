@@ -3,41 +3,34 @@ import { AppTab, GenerationParams, Post, UserProfile, LevelUpData } from "../typ
 import { useGenerationLogic } from "./useGenerationLogic";
 import { useLinkedInPublishing } from "./useLinkedInPublishing";
 import { usePostHistory } from "./usePostHistory";
+import { usePosts } from "../context/PostContext";
 
 interface UsePostGenerationProps {
     user: UserProfile;
-    setUser: React.Dispatch<React.SetStateAction<UserProfile>>;
-    posts: Post[];
-    setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
     currentPost: Post | null;
     setCurrentPost: React.Dispatch<React.SetStateAction<Post | null>>;
-    activeTab: AppTab;
     setActiveTab: (tab: AppTab) => void;
     handleUpdateUser: (updates: Partial<UserProfile>) => Promise<void>;
     setShowUpgradeModal: (show: boolean) => void;
     setShowCreditDeduction: (show: boolean) => void;
     setLevelUpData: (data: LevelUpData) => void;
-    isGenerating: boolean;
-    setIsGenerating: (isGenerating: boolean) => void;
 }
 
 export const usePostGeneration = ({
     user,
-    setUser,
-    posts,
-    setPosts,
     currentPost,
     setCurrentPost,
-    activeTab,
     setActiveTab,
     handleUpdateUser,
     setShowUpgradeModal,
     setShowCreditDeduction,
     setLevelUpData,
-    isGenerating,
-    setIsGenerating,
 }: UsePostGenerationProps) => {
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [autoStartGeneration, setAutoStartGeneration] = useState(false);
     const [prefilledTopic, setPrefilledTopic] = useState<string>("");
+
+    const { posts, setPosts } = usePosts(); // Get from context instead of props
 
     const { savePostToHistory, handleDeletePost, handleUpdatePostContent } =
         usePostHistory({
@@ -55,7 +48,6 @@ export const usePostGeneration = ({
         justGeneratedPostId,
     } = useGenerationLogic({
         user,
-        setUser,
         posts,
         setPosts,
         setCurrentPost,
@@ -115,5 +107,9 @@ export const usePostGeneration = ({
         handlePublish,
         handleUseIdea,
         handleReusePost,
+        isGenerating,
+        setIsGenerating,
+        autoStartGeneration,
+        setAutoStartGeneration,
     };
 };

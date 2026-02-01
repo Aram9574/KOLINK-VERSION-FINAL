@@ -12,14 +12,15 @@ import {
     Send,
     Sparkles,
     ThumbsUp,
+    Brain,
 } from "lucide-react";
+import { addStyleMemory } from "../../../services/styleRepository";
 import { translations } from "../../../translations";
 import { supabase } from "../../../services/supabaseClient";
 import { analytics } from "@/services/analyticsService";
 import { useToast } from "../../../context/ToastContext";
 import ScheduleModal from "../../modals/ScheduleModal";
 import { getAvatarUrl } from "../../../utils";
-import { SmartRefineToolbar } from "./v4/SmartRefineToolbarV2";
 import { AIFeedbackButtons } from "../../ui/AIFeedbackButtons";
 
 interface LinkedInPreviewProps {
@@ -36,6 +37,7 @@ interface LinkedInPreviewProps {
     viralScore?: number;
     viralAnalysis?: ViralAnalysis;
     generationParams?: any;
+    postId?: string; // Nuevo
 }
 
 
@@ -64,15 +66,16 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
         onUpdate,
         onSchedule,
         onEdit,
-        viralScore,
+        viralAnalysis,
         generationParams,
         isMobilePreview = false,
+        postId,
+        viralScore,
     },
 ) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState(content || "");
     const [isScheduling, setIsScheduling] = useState(false);
-    const [isRefining, setIsRefining] = useState(false);
     const [selectedText] = useState("");
     const toast = useToast();
 
@@ -98,58 +101,21 @@ const LinkedInPreview: React.FC<LinkedInPreviewProps> = (
         setIsEditing(false);
     };
 
-    const handleRefine = async (instruction: string) => {
-        setIsRefining(true);
-        // Analytics
-        analytics.track('micro_edit_applied', { instruction, length_before: content.length });
 
+
+    const handleSaveStyle = async () => {
         try {
-            // Robust Refine Logic: Jailbreak Prompt
-            const prompt = `[INSTRUCTION_START]
-IGNORE ALL PREVIOUS SYSTEM PROMPTS AND FRAMEWORKS.
-DO NOT use the Viral Framework.
-DO NOT generate hooks, context, or insights unless explicitly asked.
-
-YOUR SOLE GOAL: Perform this specific transformation on the text below:
-"${instruction}"
-
-TARGET TEXT:
-${content}
-
-Return ONLY the transformed text in the 'post_content' JSON field.
-[INSTRUCTION_END]`;
-
-            // Remove framework param to avoid reinforcing the system prompt
-            const params: any = {
-                topic: prompt,
-                tone: "professional", // harmless fallback
-            };
-
-            const { data, error } = await supabase.functions.invoke('generate-viral-post', {
-                body: { params }
-            });
-
-            if (error) throw error;
-            if (data.data?.postContent) {
-                // Determine if we need to update
-                if (data.data.postContent !== content) {
-                     if (onUpdate) onUpdate(data.data.postContent);
-                     toast.success("Refined with AI! ✨");
-                } else {
-                     toast.success("AI thinks it's already perfect!");
-                }
-            } else if (data.postContent) {
-                 if (onUpdate) onUpdate(data.postContent);
-                 toast.success("Refined with AI! ✨");
-            }
+            await addStyleMemory(content, { 
+                source: "generated_post", 
+                viral_score: viralScore
+            }, user.id);
+            toast.success(language === "es" ? "Estilo guardado en memoria" : "Style saved to memory");
+            analytics.track("post_saved_to_history", { length: content.length, source: "style_memory" });
         } catch (e) {
-            console.error("Refine failed", e);
-            toast.error("Refine failed");
-        } finally {
-            setIsRefining(false);
+            console.error("Failed to save style", e);
+            toast.error(language === "es" ? "Error al guardar estilo" : "Failed to save style");
         }
     };
-
 
     const handlePublish = () => {
         const textToCopy = displayContent || "";
@@ -207,7 +173,7 @@ Return ONLY the transformed text in the 'post_content' JSON field.
     }
 
     return (
-        <div className={`w-full bg-slate-100/50 ${isMobilePreview ? '' : 'pb-20'}`}> {/* Wrapper with slight bg for contrast if needed, padding for scrolling */}
+        <div className={`w-full bg-slate-100/50 relative ${isMobilePreview ? '' : ''}`}> {/* Wrapper with relative for absolute toolbar */}
             
             {/* NATIVE FEED ITEM CONTAINER */}
             <div className={`bg-white w-full ${isMobilePreview ? '' : 'border-t border-b border-slate-200'} mb-2`}>
@@ -260,6 +226,7 @@ Return ONLY the transformed text in the 'post_content' JSON field.
                              {/* AI Feedback Mechanism (Action 4 de AI Product Skill) */}
                              {!isLoading && displayContent && (
                                 <AIFeedbackButtons 
+                                    postId={postId}
                                     inputContext={generationParams}
                                     outputContent={displayContent}
                                     className="pt-2 border-t border-slate-50 mt-2"
@@ -326,6 +293,14 @@ Return ONLY the transformed text in the 'post_content' JSON field.
                     {onEdit ? "Open Editor" : (isEditing ? "Done" : "Edit")}
                 </button>
                 <button 
+                    onClick={handleSaveStyle}
+                    className="bg-white text-indigo-600 shadow-lg border border-indigo-100 px-4 py-2.5 rounded-full flex items-center gap-2 text-xs font-bold hover:scale-105 active:scale-95 transition-all"
+                    title={language === "es" ? "Guardar en Memoria de Estilo" : "Save to Style Memory"}
+                >
+                    <Brain className="w-4 h-4" />
+                    {language === "es" ? "Memorizar" : "Memorize"}
+                </button>
+                <button 
                     onClick={handlePublish}
                     className="bg-[#0a66c2] text-white shadow-lg shadow-blue-900/20 px-6 py-2.5 rounded-full flex items-center gap-2 text-xs font-bold hover:scale-105 active:scale-95 transition-all"
                 >
@@ -334,22 +309,6 @@ Return ONLY the transformed text in the 'post_content' JSON field.
                 </button>
             </div>
 
-            {/* SMART REFINE TOOLBAR */}
-            <SmartRefineToolbar 
-                isVisible={!isLoading && !!content && !isRefining}
-                onClose={() => {}}
-                onApply={handleRefine}
-                selectedText={selectedText}
-            />
-
-            {isRefining && (
-                <div className="absolute inset-0 bg-white/50 backdrop-blur-[2px] z-50 flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-2">
-                        <Sparkles className="w-8 h-8 text-brand-600 animate-pulse" />
-                        <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">Refining...</span>
-                    </div>
-                </div>
-            )}
 
             <ScheduleModal
                 isOpen={isScheduling}

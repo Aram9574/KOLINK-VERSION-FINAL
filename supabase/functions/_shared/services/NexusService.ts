@@ -39,7 +39,8 @@ export class NexusService extends BaseAIService {
     language: string = "es",
     imageBase64?: string,
     mode: "advisor" | "ghostwriter" = "advisor",
-    personalContext: string = ""
+    personalContext: string = "",
+    memoryContext: string = ""
   ) {
     const isSpanish = language === "es";
     
@@ -51,6 +52,10 @@ export class NexusService extends BaseAIService {
 
     if (personalContext) {
         roleDescription += `\n\nCONTEXTO PSICOLÓGICO Y CONDUCTUAL DEL USUARIO:\n${personalContext}\nUsa esto para que la conversación se sienta profundamente personal y proactiva.`;
+    }
+
+    if (memoryContext) {
+        roleDescription += `\n\n${memoryContext}`;
     }
 
     const prompt = `
@@ -123,5 +128,51 @@ export class NexusService extends BaseAIService {
 
       return this.extractJson(text);
     });
+  }
+
+  /**
+   * Analyzes the interaction to extract durable facts about the user.
+   */
+  async extractMemoriesFromInteraction(userMessage: string, aiResponse: string): Promise<Array<{key: string, value: string, category: string}>> {
+      const prompt = `
+      ANALYZE this interaction and extract DURABLE FACTS about the User.
+      
+      USER: "${userMessage}"
+      AI: "${aiResponse}"
+      
+      Rules:
+      1. Only extract facts that are PERMANENT or LONG-TERM (e.g., job title, industry, writing style preference, core values).
+      2. Ignore transient info (e.g., "write a post about coffee").
+      3. If no new facts are found, return empty array.
+      4. Key names should be snake_case (e.g., target_audience, brand_voice).
+      
+      OUTPUT JSON:
+      {
+        "facts": [
+          { "category": "preference" | "fact" | "goal", "key": "string", "value": "string" }
+        ]
+      }
+      `;
+
+      try {
+          // Use a faster/cheaper model if possible, or same model
+          const payload = {
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: { 
+                responseMimeType: "application/json",
+                temperature: 0.1 
+            }
+          };
+
+          const data: any = await this.generateViaFetch(this.model, payload);
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!text) return [];
+
+          const json = this.extractJson(text);
+          return json.facts || [];
+      } catch (e) {
+          console.error("Memory Extraction Error:", e);
+          return [];
+      }
   }
 }

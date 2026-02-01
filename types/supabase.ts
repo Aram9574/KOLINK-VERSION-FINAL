@@ -71,6 +71,33 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_events: {
+        Row: {
+          created_at: string | null
+          event_name: string
+          id: string
+          properties: Json | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_name: string
+          id?: string
+          properties?: Json | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_name?: string
+          id?: string
+          properties?: Json | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       autopost_schedule: {
         Row: {
           confidence_score: number | null
@@ -214,6 +241,13 @@ export type Database = {
             foreignKeyName: "brand_voices_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "mv_user_dashboard_stats"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "brand_voices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -338,6 +372,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "credit_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "mv_user_dashboard_stats"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "credit_transactions_user_id_fkey"
             columns: ["user_id"]
@@ -749,6 +790,13 @@ export type Database = {
             foreignKeyName: "posts_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "mv_user_dashboard_stats"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -780,6 +828,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "profile_audits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "mv_user_dashboard_stats"
+            referencedColumns: ["user_id"]
+          },
           {
             foreignKeyName: "profile_audits_user_id_fkey"
             columns: ["user_id"]
@@ -1120,6 +1175,13 @@ export type Database = {
             foreignKeyName: "user_behavior_analytics_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "mv_user_dashboard_stats"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_behavior_analytics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1242,9 +1304,71 @@ export type Database = {
         }
         Relationships: []
       }
+      waitlist: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          position: number | null
+          referral_code: string
+          referred_by: string | null
+          total_referrals: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          position?: number | null
+          referral_code: string
+          referred_by?: string | null
+          total_referrals?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          position?: number | null
+          referral_code?: string
+          referred_by?: string | null
+          total_referrals?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waitlist_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "waitlist"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      analytics_retention_cohorts: {
+        Row: {
+          active_users: number | null
+          cohort_date: string | null
+          cohort_size: number | null
+          weeks_after: number | null
+        }
+        Relationships: []
+      }
+      mv_user_dashboard_stats: {
+        Row: {
+          credits: number | null
+          full_name: string | null
+          level: number | null
+          pending_autoposts: number | null
+          published_posts: number | null
+          total_posts: number | null
+          user_id: string | null
+          xp: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       decrement_credit: { Args: { target_user_id: string }; Returns: undefined }
@@ -1262,12 +1386,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      generate_referral_code: { Args: never; Returns: string }
       get_onboarding_candidates: {
         Args: { max_hours: number; min_hours: number; template_id: string }
         Returns: {
           email: string
           id: string
           name: string
+        }[]
+      }
+      get_top_clicks: {
+        Args: { limit_count: number }
+        Returns: {
+          clicks: number
+          element: string
         }[]
       }
       match_benchmarks: {

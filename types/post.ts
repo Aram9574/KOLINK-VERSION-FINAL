@@ -8,13 +8,17 @@ export const PostContentSchema = z.object({
     id: z.string().optional(),
     content: z.string(),
     metadata: z.any().optional(),
+    meta: z.any().optional(), // Sincronización con Edge Function meta
     angle: z.enum(["visionary", "implementer", "analyst"]).optional(),
     viralScore: z.number().optional(),
     viralAnalysis: z.any().optional(),
+    ai_reasoning: z.string().optional(), // Razonamiento estratégico
     gamification: z.any().optional(),
     credits: z.number().optional(),
 });
 
+
+export type TrendCategory = "news" | "evergreen" | "prediction" | "story" | "social" | "search" | "regulatory";
 
 export interface Trend {
   id: string;
@@ -28,6 +32,7 @@ export interface Trend {
 }
 
 export interface ContentAngle {
+  type: "visionary" | "implementer" | "analyst";
   title: string;
   hook: string;
   description?: string;
@@ -113,6 +118,7 @@ export interface Post {
   isAutoPilot?: boolean;
   viralScore?: number;
   viralAnalysis?: ViralAnalysis;
+  ai_reasoning?: string;
   tags?: string[];
   isFavorite?: boolean;
   status?: "draft" | "scheduled" | "published";

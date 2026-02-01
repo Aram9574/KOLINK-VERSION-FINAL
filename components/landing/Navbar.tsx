@@ -74,7 +74,7 @@ const Navbar: React.FC<NavbarProps> = (
     ];
 
     return (
-        <nav className="fixed top-4 left-0 right-0 z-50 px-4">
+        <nav className="sticky top-4 left-0 right-0 z-50 px-4">
             <div className="max-w-fit mx-auto glass border border-slate-200/60 rounded-full pr-1.5 pl-6 py-1.5 flex items-center gap-4 lg:gap-8 shadow-xl shadow-slate-900/5 backdrop-blur-xl transition-all duration-300">
                 <div
                     className="flex items-center gap-2 font-display font-bold text-slate-900 tracking-tight cursor-pointer group"

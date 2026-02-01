@@ -9,8 +9,8 @@ import ValueMeter from './ValueMeter';
 import { translations } from '../../../translations';
 import { AppLanguage } from '../../../types';
 import { useCredits } from '../../../hooks/useCredits';
-
 import PremiumLockOverlay from "../../ui/PremiumLockOverlay";
+import Skeleton from "../../ui/Skeleton";
 
 const InsightResponderView: React.FC = () => {
     const { user, language } = useUser();
@@ -150,11 +150,17 @@ const InsightResponderView: React.FC = () => {
         setReplies([]);
         setActiveReply(null);
 
+        // Scroll to results area
+        const resultsSection = document.getElementById('ai-suggestions-results');
+        if (resultsSection) {
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
         try {
             const payload: any = {
                 userIntent: intent,
                 tone, 
-                textContext: !imageFile ? intent : undefined // Fallback if no image
+                textContext: !imageFile ? intent : undefined
             };
 
             if (imagePreview) {
@@ -165,12 +171,14 @@ const InsightResponderView: React.FC = () => {
             
             if (results && results.length > 0) {
                 setReplies(results);
-                setActiveReply(results[0]); // Default to first
-                toast.success("¡Insights generados con éxito!");
+                setActiveReply(results[0]);
+                toast.success("¡Insights generados con éxito! ✨");
+            } else {
+                toast.error("No se recibieron sugerencias. Inténtalo de nuevo.");
             }
-        } catch (error) {
-            console.error(error);
-            toast.error("Error al generar insights. Inténtalo de nuevo.");
+        } catch (error: any) {
+            console.error("Generation Error:", error);
+            toast.error(error.message || "Error al generar insights.");
         } finally {
             setIsGenerating(false);
         }
@@ -347,26 +355,46 @@ const InsightResponderView: React.FC = () => {
                     </div>
 
                     {/* Bottom Row: Results */}
-                    <div className="space-y-6">
+                    <div className="space-y-6" id="ai-suggestions-results">
                          <div className="flex items-center justify-between">
                             <h3 className="font-bold text-slate-900 flex items-center gap-2">
                                 {t.suggestions}
-                                {replies.length > 0 && <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full">{replies.length} opciones</span>}
+                                {replies.length > 0 && <span className="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-tight">{replies.length} opciones</span>}
                             </h3>
                             <div className="flex items-center gap-2">
-                                <span className="text-xs font-medium text-slate-400">Impulsado por</span>
-                                <span className="text-xs font-bold px-2 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 text-indigo-700 border border-indigo-100 rounded-lg flex items-center gap-1">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Algoritmo 2026</span>
+                                <span className="text-[10px] font-bold px-2 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 text-indigo-700 border border-indigo-100 rounded-lg flex items-center gap-1 shadow-sm">
                                     <Sparkles className="w-3 h-3" />
-                                    Gemini 2.0 Flash
+                                    Gemini 3.0 Flash
                                 </span>
                             </div>
                          </div>
                          
-                         {replies.length > 0 ? (
+                         {isGenerating ? (
+                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {[1, 2, 3].map((i) => (
+                                    <div key={i} className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+                                        <div className="flex justify-between">
+                                            <Skeleton className="h-6 w-24 rounded-full" />
+                                            <Skeleton className="h-6 w-8 rounded-md" />
+                                        </div>
+                                        <Skeleton className="h-20 w-full rounded-xl" />
+                                        <div className="space-y-2 pt-2">
+                                            <Skeleton className="h-3 w-3/4" />
+                                            <Skeleton className="h-3 w-1/2" />
+                                        </div>
+                                        <div className="flex gap-2 pt-2">
+                                            <Skeleton className="h-9 flex-1 rounded-lg" />
+                                            <Skeleton className="h-9 flex-1 rounded-lg" />
+                                        </div>
+                                    </div>
+                                ))}
+                             </div>
+                         ) : replies.length > 0 ? (
                              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <ReplyVariants 
                                     variants={replies} 
-                                    onCopy={(content) => toast.success("¡Copiado al portapapeles!")}
+                                    onCopy={(content) => toast.success("¡Copiado al portapapeles! 📋")}
                                 />
                                 {activeReply && (
                                     <div className="pt-4 border-t border-slate-200">
@@ -376,15 +404,19 @@ const InsightResponderView: React.FC = () => {
                              </div>
                          ) : (
                              // Empty State
-                             <div className="h-full min-h-[150px] border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-center p-8 bg-slate-50/50">
-                                <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center mb-3">
-                                    <MessageCircle className="w-6 h-6 text-slate-300" />
+                             <motion.div 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="h-full min-h-[200px] border-2 border-dashed border-slate-200 rounded-3xl flex flex-col items-center justify-center text-center p-12 bg-white/50 backdrop-blur-sm"
+                             >
+                                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-200">
+                                    <MessageCircle className="w-8 h-8" />
                                 </div>
-                                <h4 className="text-sm font-bold text-slate-900 mb-1">Sin Insights aún</h4>
-                                <p className="text-slate-500 text-xs max-w-sm">
-                                    Sube una captura de un post para generar opciones de respuesta de alta autoridad.
+                                <h4 className="text-lg font-bold text-slate-900 mb-1">Sin Insights aún</h4>
+                                <p className="text-slate-500 text-sm max-w-sm">
+                                    Sube una captura de un post o describe lo que quieres comentar para generar opciones de respuesta tácticas.
                                 </p>
-                             </div>
+                             </motion.div>
                          )}
                     </div>
                 </div>

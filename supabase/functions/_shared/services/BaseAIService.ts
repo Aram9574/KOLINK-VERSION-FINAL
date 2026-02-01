@@ -11,7 +11,7 @@ export interface GeminiResponse {
 }
 
 export class BaseAIService {
-  protected readonly MODEL = "gemini-2.0-flash-001";
+  protected readonly MODEL = "gemini-3-flash-preview";
   protected get model() { return this.MODEL; }
   protected geminiApiKey: string;
 

@@ -1,49 +1,44 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, CheckCircle2 } from 'lucide-react';
-import { feedbackRepository } from '../../services/feedbackRepository';
 import { useUser } from '../../context/UserContext';
-import { useToast } from '../../context/ToastContext';
 
 interface AIFeedbackButtonsProps {
+    postId?: string; // Nuevo
     inputContext: any;
     outputContent: string;
     metadata?: any;
     className?: string;
 }
 
+import { usePostFeedback } from '../../hooks/usePostFeedback';
+
 export const AIFeedbackButtons: React.FC<AIFeedbackButtonsProps> = ({
+    postId,
     inputContext,
     outputContent,
     metadata,
     className = ""
 }) => {
     const { user } = useUser();
-    const toast = useToast();
-    const [status, setStatus] = useState<'idle' | 'submitting' | 'submitted'>('idle');
+    const { submitFeedback, isSubmitting } = usePostFeedback();
+    const [status, setStatus] = useState<'idle' | 'submitted'>('idle');
     const [rating, setRating] = useState<1 | -1 | null>(null);
 
     const handleFeedback = async (val: 1 | -1) => {
-        if (!user?.id || status === 'submitting' || status === 'submitted') return;
+        if (!user?.id || isSubmitting || status === 'submitted') return;
+        if (!postId) {
+            console.warn("Feedback attempt without postId");
+            return;
+        }
 
-        setStatus('submitting');
         setRating(val);
-
-        const { success } = await feedbackRepository.submitAIFeedback({
-            user_id: user.id,
-            input_context: inputContext,
-            output_content: outputContent,
-            rating: val,
-            metadata: metadata || {}
-        });
+        const success = await submitFeedback(postId, val === 1 ? 'positive' : 'negative');
 
         if (success) {
             setStatus('submitted');
-            toast.success("¡Gracias! Tu feedback ayuda a entrenar mi IA.", "Feedback recibido");
         } else {
-            setStatus('idle');
             setRating(null);
-            toast.error("No se pudo enviar el feedback. Reintenta luego.", "Error");
         }
     };
 
@@ -73,7 +68,7 @@ export const AIFeedbackButtons: React.FC<AIFeedbackButtonsProps> = ({
                         <motion.button
                             whileHover={{ scale: 1.1, y: -2 }}
                             whileTap={{ scale: 0.9 }}
-                            disabled={status === 'submitting'}
+                            disabled={isSubmitting}
                             onClick={() => handleFeedback(1)}
                             className={`p-1.5 rounded-lg border transition-all ${
                                 rating === 1 
@@ -81,13 +76,13 @@ export const AIFeedbackButtons: React.FC<AIFeedbackButtonsProps> = ({
                                 : 'bg-white border-slate-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-100'
                             }`}
                         >
-                            <ThumbsUp className={`w-4 h-4 ${status === 'submitting' && rating === 1 ? 'animate-pulse' : ''}`} />
+                            <ThumbsUp className={`w-4 h-4 ${isSubmitting && rating === 1 ? 'animate-pulse' : ''}`} />
                         </motion.button>
 
                         <motion.button
                             whileHover={{ scale: 1.1, y: -2 }}
                             whileTap={{ scale: 0.9 }}
-                            disabled={status === 'submitting'}
+                            disabled={isSubmitting}
                             onClick={() => handleFeedback(-1)}
                             className={`p-1.5 rounded-lg border transition-all ${
                                 rating === -1 
@@ -95,7 +90,7 @@ export const AIFeedbackButtons: React.FC<AIFeedbackButtonsProps> = ({
                                 : 'bg-white border-slate-100 text-slate-400 hover:text-rose-600 hover:border-rose-100'
                             }`}
                         >
-                            <ThumbsDown className={`w-4 h-4 ${status === 'submitting' && rating === -1 ? 'animate-pulse' : ''}`} />
+                            <ThumbsDown className={`w-4 h-4 ${isSubmitting && rating === -1 ? 'animate-pulse' : ''}`} />
                         </motion.button>
                     </motion.div>
                 )}

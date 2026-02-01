@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { AppLanguage, UserProfile } from "../../../types";
 import { ACHIEVEMENTS } from "../../../constants";
-import { Check, Lock, Save, Trophy, Zap, User, CreditCard, Shield, ChevronRight } from "lucide-react";
+import { Check, Lock, Save, Trophy, Zap, User, CreditCard, Shield, ChevronRight, Brain } from "lucide-react";
 import { translations } from "../../../translations";
 import { toast } from "sonner";
 import ProfileSettings from "./ProfileSettings";
 import SecuritySettings from "./SecuritySettings";
 import BillingSettings from "./BillingSettings";
+import StyleManager from "../style-memory/StyleManager";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface SettingsViewProps {
@@ -16,7 +17,7 @@ interface SettingsViewProps {
     onLogout?: () => Promise<void>;
 }
 
-type SettingsTab = "profile" | "billing" | "security" | "achievements" | "support";
+type SettingsTab = "profile" | "billing" | "security" | "style-memory" | "achievements" | "support";
 
 const SettingsView: React.FC<SettingsViewProps> = (
     { user, onUpgrade, onSave, onLogout },
@@ -61,6 +62,7 @@ const SettingsView: React.FC<SettingsViewProps> = (
     const tabs = [
         { id: "profile", label: language === 'es' ? 'Perfil' : 'Profile', icon: User, color: "blue" },
         { id: "billing", label: language === 'es' ? 'Suscripción' : 'Subscription', icon: CreditCard, color: "amber" },
+        { id: "style-memory", label: language === 'es' ? 'Memoria IA' : 'AI Memory', icon: Brain, color: "purple" },
         { id: "security", label: language === 'es' ? 'Seguridad' : 'Security', icon: Shield, color: "rose" },
         { id: "achievements", label: language === 'es' ? 'Logros' : 'Achievements', icon: Trophy, color: "orange" },
         { id: "support", label: language === 'es' ? 'Soporte' : 'Support', icon: User, color: "indigo" },
@@ -157,6 +159,10 @@ const SettingsView: React.FC<SettingsViewProps> = (
                                     language={language}
                                     onSave={onSave}
                                 />
+                            )}
+
+                            {activeTab === "style-memory" && (
+                                <StyleManager language={language === 'es' ? 'es' : 'en'} />
                             )}
 
                             {activeTab === "achievements" && (

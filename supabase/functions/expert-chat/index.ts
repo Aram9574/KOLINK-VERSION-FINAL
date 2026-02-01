@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NexusService } from "../_shared/services/NexusService.ts";
 import { BehaviorService } from "../_shared/services/BehaviorService.ts";
+import { MemoryService } from "../_shared/services/MemoryService.ts";
 import { getCorsHeaders } from "../_shared/cors.ts"; // IMPORTACIÓN ACTUALIZADA
 
 interface KnowledgeMatch { content: string; }
@@ -45,6 +46,7 @@ Deno.serve(async (req: Request) => {
         Deno.env.get("SUPABASE_URL") ?? "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
+    const memoryService = new MemoryService(supabaseAdmin);
 
     // 1.5 Track Chat Event (Fire and forget, don't block chat)
     behaviorService.trackEvent(user.id, "chat_message", { query, mode }).catch(e => console.error(e));
@@ -65,6 +67,9 @@ Deno.serve(async (req: Request) => {
     const { data: profile } = await supabaseAdmin.from("profiles").select("language, behavioral_dna").eq("id", user.id).single();
     // const language = profile?.language || "es"; // Inlined
     // const personalContext = profile?.behavioral_dna ? JSON.stringify(profile.behavioral_dna) : ""; // Inlined
+    
+    // 3.5 Memory Context (Long Term Recall)
+    const memoryContext = await memoryService.getMemoryContextBlock(user.id);
 
     // 4. Generate Expert Response
     const result = await nexusService.generateExpertResponse(
@@ -73,10 +78,19 @@ Deno.serve(async (req: Request) => {
         profile?.language || "es", 
         imageBase64,
         mode || "advisor",
-        profile?.behavioral_dna ? JSON.stringify(profile.behavioral_dna) : ""
+        profile?.behavioral_dna ? JSON.stringify(profile.behavioral_dna) : "",
+        memoryContext
     );
 
-    // 5. Build and return result
+    // 5. Memory Reflection (extract and store facts)
+    if (result && typeof result.response === 'string') {
+        const newMemories = await nexusService.extractMemoriesFromInteraction(query || "IMAGEN", result.response);
+        for (const mem of newMemories) {
+            await memoryService.remember(user.id, mem.category, mem.key, mem.value);
+        }
+    }
+
+    // 6. Build and return result
     // if (!result || typeof result.response !== 'string') { // Removed
     //     throw new Error("INVALID_AI_RESPONSE"); // Removed
     // }

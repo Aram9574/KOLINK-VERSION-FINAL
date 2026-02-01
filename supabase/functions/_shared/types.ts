@@ -3,6 +3,7 @@ export interface UserContext {
     xp?: number | string;
     brand_voice?: string;
     company_name?: string;
+    style_examples?: string[];
 }
 
 export interface CarouselSlideData {
@@ -71,5 +72,24 @@ export interface LinkedInAuditResult {
     gap_analysis: {
         benchmark_comparison: string;
         percentile: string;
+    };
+}
+export interface GeneratedPost {
+    post_content: string;
+    auditor_report: {
+        viral_score: number;
+        hook_strength: string;
+        hook_score: number;
+        readability_score: number;
+        value_score: number;
+        pro_tip: string;
+        retention_estimate: string;
+        flags_triggered: string[];
+        predicted_archetype_resonance?: string;
+    };
+    strategy_reasoning: string;
+    meta: {
+        suggested_hashtags: string[];
+        character_count: number;
     };
 }

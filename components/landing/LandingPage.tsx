@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import Navbar from "./Navbar.tsx";
 import { Hero as AnimatedHero } from "../ui/animated-hero.tsx";
 import { FeaturesBento } from './FeaturesBento.tsx';
@@ -14,15 +13,15 @@ import Footer from "./Footer.tsx";
 import { useUser } from "../../context/UserContext.tsx";
 import LogoCarousel from "./LogoCarousel.tsx";
 import TestimonialsSection from "../ui/testimonial-v2.tsx";
-import { InfiniteGrid } from "../ui/infinite-grid-integration.tsx";
 import VideoDemoSection from "./VideoDemoSection.tsx";
 import { motion } from "framer-motion";
 import SmartCursor from "../ui/SmartCursor.tsx";
-import { lazy, Suspense } from "react";
+
 
 import { translations } from "../../translations";
 import { StickyCTAHeader } from "../marketing/StickyCTAHeader.tsx";
 import { SchemaMarkup } from "../seo/SchemaMarkup";
+import { LaunchCountdown } from "../marketing/LaunchCountdown";
 import MetaTags from "../seo/MetaTags";
 import { PageTransition } from "../ui/PageTransition";
 
@@ -43,7 +42,6 @@ const LandingPage: React.FC = () => {
     const { user, language, setLanguage } = useUser();
     const [activeSection, setActiveSection] = useState<string>("hero");
     const t = translations[language];
-    const isEs = language === "es";
 
     // Redirect to dashboard if user is already logged in
     if (user && user.id && !user.id.startsWith("mock-")) {
@@ -135,6 +133,8 @@ const LandingPage: React.FC = () => {
                     keywords={t.landing.meta.keywords}
                 />
 
+                <LaunchCountdown language={language} />
+
                 <Navbar
                     language={language}
                     setLanguage={setLanguage}
@@ -147,7 +147,7 @@ const LandingPage: React.FC = () => {
                 {/* <StickyCTA /> Replaced by Header strategy */}
                 <StickyCTAHeader showAfterScrollY={700} />
 
-                <main className="pt-20">
+                <main className="pt-8">
                     <SectionReveal id="hero">
                         <section aria-label="Hero">
                             <AnimatedHero language={language} />

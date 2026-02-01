@@ -1,3 +1,7 @@
+/** [PROTECTED CORE] - PREMIUM 2026 POST ENGINE
+ * NO MODIFICAR LA LÓGICA DE VALIDACIÓN O EXTRACCIÓN DE DATOS.
+ */
+
 import { supabase } from './supabaseClient';
 import { GenerationParams, PostContentSchema } from '../types';
 import { z } from 'zod';
@@ -46,12 +50,14 @@ export const PostService = {
                 throw new PostServiceError(`Failed to invoke generation function: ${error.message}`, error);
             }
 
+            // La Edge Function devuelve { success: true, data: { ... } }
+            const resultData = data?.data || data;
+
             // Runtime validation using Zod
-            const validation = PostContentSchema.safeParse(data);
+            const validation = PostContentSchema.safeParse(resultData);
             
             if (!validation.success) {
                 console.error("Validation Error:", validation.error);
-                // Fallback for partial data or throw descriptive error
                 throw new PostServiceError("Invalid response format from AI", validation.error);
             }
 

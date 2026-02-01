@@ -1,21 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Save,
-  History,
-  ChevronDown,
-  FileText,
   Eye,
   Sparkles,
-  Zap,
-  Bookmark,
-  RefreshCcw,
-  Quote,
-  Layout,
-  Plus,
-  AlertTriangle,
-  Trash2,
-  Copy,
-  Code
 } from "lucide-react";
 import EditorHeader from "./layout/EditorHeader";
 import EditorToolbar from "./layout/EditorToolbar";
@@ -26,16 +12,12 @@ import { usePosts } from "../../../context/PostContext";
 import { useUser } from "../../../context/UserContext";
 import { translations } from "../../../translations";
 import { toast } from "sonner";
-import { type Post, type AppLanguage } from "../../../types";
+import { type Post, type AppLanguage, ViralTone, ViralFramework, PostLength, EmojiDensity } from "../../../types";
 import {
   clearUnicodeFormatting,
   convertToUnicode,
 } from "../../../utils/unicode";
 import {
-  createPost,
-  createSnippet,
-  deleteSnippet,
-  fetchSnippets,
   fetchHooks,
   fetchClosures,
   updatePost as updatePostInDb,
@@ -68,22 +50,19 @@ const PostEditorView: React.FC = () => {
   const [sidebarTab, setSidebarTab] = useState<
     "preview" | "hooks" | "endings" | "snippets" | "viral"
   >("preview");
-  const [previewMode, setPreviewMode] = useState<"mobile" | "desktop">(
-    "mobile",
-  );
-  const [showMetricsMenu, setShowMetricsMenu] = useState(false);
-  const [showGradeInfo, setShowGradeInfo] = useState(false);
-  const [showLimitWarning, setShowLimitWarning] = useState(false);
-  const [showDraftsMenu, setShowDraftsMenu] = useState(false);
-  const [selectedMetric, setSelectedMetric] = useState<
-    "characters" | "words" | "paragraphs" | "sentences" | "readTime"
-  >("characters");
   const [charCount, setCharCount] = useState(0);
   const [wordCount, setWordCount] = useState(0);
   const [paragraphCount, setParagraphCount] = useState(0);
   const [sentenceCount, setSentenceCount] = useState(0);
   const [readTime, setReadTime] = useState("");
   const [grade, setGrade] = useState(1);
+  const [showGradeInfo, setShowGradeInfo] = useState(false);
+  const [showLimitWarning, setShowLimitWarning] = useState(false);
+  const [showMetricsMenu, setShowMetricsMenu] = useState(false);
+  const [showDraftsMenu, setShowDraftsMenu] = useState(false);
+  const [selectedMetric] = useState<
+    "characters" | "words" | "paragraphs" | "sentences" | "readTime"
+  >("characters");
 
   // Persistence: Load from localStorage on mount
   useEffect(() => {
@@ -169,15 +148,10 @@ const PostEditorView: React.FC = () => {
     }
   };
 
-  // Snippets State
   const [snippets, setSnippets] = useState<
     { id: string; text: string; createdAt: number; lastUsed?: number }[]
   >([]);
-  const [snippetSearch, setSnippetSearch] = useState("");
-  const [selectedEditorText, setSelectedEditorText] = useState("");
-  const [snippetSort, setSnippetSort] = useState<
-    "newest" | "oldest" | "last_used"
-  >("newest");
+  const [snippetSearch] = useState("");
 
   // History Context
   const [history, setHistory] = useState<string[]>([""]);
@@ -243,63 +217,15 @@ const PostEditorView: React.FC = () => {
     loadSnippets();
   }, [user]);
 
-  const handleCreateSnippet = async () => {
-    if (!selectedEditorText.trim() || !user || !user.id) return;
-
-    const snippet = await createSnippet(user.id, selectedEditorText.trim());
-    if (snippet) {
-      setSnippets((prev: typeof snippets) => [snippet, ...prev]);
-      setSelectedEditorText("");
-      toast.success(
-        language === "es" ? "Fragmento guardado" : "Snippet saved",
-      );
-    } else {
-      toast.error(
-        language === "es"
-          ? "Error al guardar fragmento"
-          : "Error saving snippet",
-      );
-    }
-  };
-
-  const handleDeleteSnippet = async (id: string) => {
-    const success = await deleteSnippet(id);
-    if (success) {
-      setSnippets((prev: typeof snippets) => prev.filter((s) => s.id !== id));
-      toast.success(
-        language === "es" ? "Fragmento eliminado" : "Snippet deleted",
-      );
-    } else {
-      toast.error(
-        language === "es"
-          ? "Error al eliminar fragmento"
-          : "Error deleting snippet",
-      );
-    }
-  };
-
-  const handleEditorSelect = () => {
-    const selectionStart = editorRef.current?.selectionStart || 0;
-    const selectionEnd = editorRef.current?.selectionEnd || 0;
-    const text = editorContent.substring(selectionStart, selectionEnd);
-    setSelectedEditorText(text);
-  };
-
-  const handleInjectSnippet = (snippet: typeof snippets[0]) => {
-    injectText("\n\n" + snippet.text);
-    const updatedSnippets = snippets.map((s: typeof snippets[0]) =>
-      s.id === snippet.id ? { ...s, lastUsed: Date.now() } : s
-    );
-    setSnippets(updatedSnippets);
-  };
+  // Snippet and editor handlers removed as they were unsused or moved to direct injections
 
   // Hooks & Closures State (Dynamic)
   const [hooksList, setHooksList] = useState<any[]>([]);
   const [closuresList, setClosuresList] = useState<any[]>([]);
   const [shuffledHooks, setShuffledHooks] = useState<any[]>([]);
-  const [hookSearch, setHookSearch] = useState("");
-  const [selectedHookTag, setSelectedHookTag] = useState("all");
-  const [visibleHooksCount, setVisibleHooksCount] = useState(6);
+  const [hookSearch] = useState("");
+  const [selectedHookTag] = useState("all");
+  const [visibleHooksCount] = useState(6);
 
   // Load Library Data
   useEffect(() => {
@@ -327,9 +253,9 @@ const PostEditorView: React.FC = () => {
   }, [hookSearch, selectedHookTag, hooksList]);
 
 
-  const [endingSearch, setEndingSearch] = useState("");
-  const [selectedEndingTag, setSelectedEndingTag] = useState("all");
-  const [visibleEndingsCount, setVisibleEndingsCount] = useState(6);
+  const [endingSearch] = useState("");
+  const [selectedEndingTag] = useState("all");
+  const [visibleEndingsCount] = useState(6);
   const [shuffledEndings, setShuffledEndings] = useState<any[]>([]);
 
   const handleShuffleEndings = () => {
@@ -575,11 +501,11 @@ const PostEditorView: React.FC = () => {
             topic: postTitle ||
               (language === "es" ? "Borrador sin título" : "Untitled Draft"),
             audience: "General",
-            tone: "Professional",
-            framework: "STANDARD",
-            length: "MEDIUM",
+            tone: ViralTone.PROFESSIONAL,
+            framework: ViralFramework.STANDARD,
+            length: PostLength.MEDIUM,
             creativityLevel: 50,
-            emojiDensity: "MODERATE",
+            emojiDensity: EmojiDensity.MODERATE,
             hashtagCount: 3,
             includeCTA: true,
           },
@@ -630,7 +556,7 @@ const PostEditorView: React.FC = () => {
         await streamMicroEdit({
             topic: selectedText,
             action: action, // e.g., "Make shorter", "More professional"
-            tone: currentPost?.params?.tone || "Professional",
+            tone: currentPost?.params?.tone || ViralTone.PROFESSIONAL,
             stream: true
         }, (chunk) => {
             accumulated += chunk;
@@ -716,7 +642,7 @@ const PostEditorView: React.FC = () => {
           content={editorContent}
           onChange={(e) => setEditorContent(e.target.value)}
           placeholder={t.placeholder}
-          editorRef={editorRef}
+          editorRef={editorRef as unknown as React.RefObject<HTMLTextAreaElement>}
         />
 
         <EditorFooter
@@ -742,9 +668,9 @@ const PostEditorView: React.FC = () => {
             readability: t.status.readability,
             limitWarning: t.limitWarning
           }}
-          gradeInfoRef={gradeInfoRef}
-          metricsMenuRef={metricsMenuRef}
-          limitWarningRef={limitWarningRef}
+          gradeInfoRef={gradeInfoRef as unknown as React.RefObject<HTMLDivElement>}
+          metricsMenuRef={metricsMenuRef as unknown as React.RefObject<HTMLDivElement>}
+          limitWarningRef={limitWarningRef as unknown as React.RefObject<HTMLDivElement>}
         />
 
       </div>
@@ -753,10 +679,8 @@ const PostEditorView: React.FC = () => {
       {isSplitView && (
           <div className="w-[380px] bg-slate-100/50 border-r border-slate-200/60 flex flex-col relative shrink-0">
                <div className="p-3 border-b border-slate-200/60 bg-white/50 backdrop-blur-sm sticky top-0 z-10 flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                        <Eye className="w-3 h-3" />
-                        Mobile Preview
-                    </span>
+                    <Eye className="w-3 h-3" />
+                    Mobile Preview
                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" title="Live Sync" />
                </div>
                <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">

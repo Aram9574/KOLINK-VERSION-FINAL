@@ -28,24 +28,6 @@ export interface TourStep {
   position?: "top" | "right" | "bottom" | "left";
 }
 
-export interface Trend {
-    id: string;
-    title: string;
-    summary: string;
-    source: string;
-    category: "news" | "social" | "search" | "regulatory";
-    matchScore: number;
-    timestamp: number;
-    url?: string;
-}
-
-export interface ContentAngle {
-    type: "visionary" | "implementer" | "analyst";
-    title: string;
-    hook: string;
-    description: string;
-}
-
 export interface AIFeedback {
     id?: string;
     user_id: string;
