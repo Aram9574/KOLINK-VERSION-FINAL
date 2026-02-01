@@ -1480,8 +1480,14 @@ export const es = {
       insight: {
         title: "Respuesta Inteligente",
         subtitle: "Convierte capturas en comentarios de alta autoridad usando",
+        modes: {
+          image: "Captura de Post",
+          text: "Texto del Post"
+        },
         uploadTitle: "Subir Post de LinkedIn",
         uploadDesc: "Arrastra una captura aquí o pega una imagen (Cmd+V).",
+        textLabel: "Contenido del Post o Comentario",
+        textPlaceholder: "Pega aquí el contenido que deseas responder para que la IA lo analice...",
         intentLabel: "Mi Intención (Opcional)",
         intentPlaceholder: "ej. Quiero discrepar respetuosamente sobre...",
         toneLabel: "Tono de Respuesta",
