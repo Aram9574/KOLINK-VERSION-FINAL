@@ -65,6 +65,7 @@ export const ToolsGrid: React.FC<ToolsGridProps> = ({ tools, isLoading, user, la
                 tools.map((tool) => (
                     <motion.button
                         key={tool.id}
+                        id={`tool-${tool.id}`}
                         variants={item}
                         onClick={tool.disabled ? undefined : tool.onClick}
                         disabled={tool.disabled}

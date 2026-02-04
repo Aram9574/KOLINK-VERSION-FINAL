@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Rocket, Timer, ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,6 +42,8 @@ export const ExitIntentModal: React.FC<ExitIntentModalProps> = ({ isOpen, onClos
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden border-0 bg-transparent shadow-none">
+                <DialogTitle className="sr-only">{t.title}</DialogTitle>
+                <DialogDescription className="sr-only">{t.subtitle}</DialogDescription>
                 <motion.div 
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}

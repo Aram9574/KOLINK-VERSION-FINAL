@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { 
     PenSquare,
 } from 'lucide-react';
 import { UserProfile, AppTab } from '../../../types';
 import { ExpandableTabs } from '../../ui/expandable-tabs';
-import HelpModal from '../../modals/HelpModal';
-import { FeedbackModal } from '../../modals/FeedbackModal';
+// Lazy load modals
+const HelpModal = React.lazy(() => import('../../modals/HelpModal'));
+const FeedbackModal = React.lazy(() => import('../../modals/FeedbackModal').then(module => ({ default: module.FeedbackModal })));
 import { OnboardingChecklist } from '../onboarding/OnboardingChecklist';
 import { LaunchpadHeader } from './launchpad/LaunchpadHeader';
 import { GamificationCard } from './GamificationCard';
@@ -14,6 +15,7 @@ import { MissionLog } from './launchpad/MissionLog';
 import { InsightWidget } from './launchpad/InsightWidget';
 import { AccountWidget } from './launchpad/AccountWidget';
 import { useLaunchpad } from '../../../hooks/useLaunchpad';
+import { OnboardingTour } from '../onboarding/OnboardingTour';
 
 interface LaunchpadProps {
     user: UserProfile;
@@ -48,21 +50,8 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                 onSelectTool={onSelectTool} 
             />
 
-            {/* Gamification & Progress */}
-            <div className="mb-10">
-                <GamificationCard user={user} language={language} />
-            </div>
-
-            {/* Activation Checklist */}
-            <div className="mb-10">
-                <OnboardingChecklist 
-                    user={user} 
-                    onSelectTool={onSelectTool} 
-                />
-            </div>
-
             {/* Launch Grid */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-6 mb-10">
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                          <span className="w-2 h-6 bg-brand-500 rounded-full" />
@@ -84,15 +73,26 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                     </div>
                 </div>
 
-                <div className="mb-10">
-                    <ToolsGrid 
-                        tools={tools} 
-                        isLoading={isLoading} 
-                        user={user}
-                        language={language}
-                        onFeedbackOpen={() => setIsFeedbackOpen(true)}
-                    />
-                </div>
+                <ToolsGrid 
+                    tools={tools} 
+                    isLoading={isLoading} 
+                    user={user}
+                    language={language}
+                    onFeedbackOpen={() => setIsFeedbackOpen(true)}
+                />
+            </div>
+
+            {/* Gamification & Progress */}
+            <div className="mb-10">
+                <GamificationCard user={user} language={language} />
+            </div>
+
+            {/* Activation Checklist */}
+            <div className="mb-10">
+                <OnboardingChecklist 
+                    user={user} 
+                    onSelectTool={onSelectTool} 
+                />
             </div>
 
             {/* Bottom Section: Recent Work & Stats */}
@@ -116,9 +116,15 @@ const LaunchpadView: React.FC<LaunchpadProps> = ({
                 <AccountWidget user={user} logout={logout} />
             </div>
 
+            {/* Onboarding Tour */}
+            <OnboardingTour />
+
             {/* Modals */}
-            <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
-            <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
+            {/* Modals with Suspense */}
+            <Suspense fallback={null}>
+                <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+                <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
+            </Suspense>
         </div>
     );
 };

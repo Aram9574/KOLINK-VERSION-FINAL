@@ -4,6 +4,8 @@ export type AnalyticsEventName =
   | 'carousel_exported'
   | 'post_published_linkedin'
   | 'post_saved_to_history'
+  | 'voice_cloning_success'
+  | 'profile_audit_completed'
   
   // Engagement
   | 'micro_edit_applied'

@@ -30,44 +30,52 @@ const TermsOfService = () => {
           <section>
             <h2 className="flex items-center gap-3 text-2xl">
               <CreditCard className="w-6 h-6 text-brand-500" />
-              2. Suscripciones y Pagos
+              2. Suscripciones y Sistema de Créditos
             </h2>
             <p>
-              Algunas partes del Servicio se facturan mediante suscripción ("Suscripción(es)"). Se te facturará por adelantado de forma recurrente y periódica ("Ciclo de Facturación").
+              El Servicio utiliza un sistema de créditos para la generación de contenido mediante IA.
             </p>
             <ul className="list-disc pl-5 space-y-2">
-              <li>Puedes cancelar tu suscripción en cualquier momento desde el Dashboard.</li>
-              <li>No ofrecemos reembolsos por periodos parciales de suscripción, salvo excepciones legales.</li>
+              <li><strong>Créditos:</strong> Cada generación consume una cantidad específica de créditos según el módulo utilizado. Los créditos no son transferibles y caducan al final del ciclo de facturación si no se indica lo contrario.</li>
+              <li><strong>Suscripciones:</strong> Se facturan por adelantado de forma recurrente. Puedes cancelar en cualquier momento, manteniendo el acceso hasta el final del periodo pagado.</li>
+              <li><strong>Reembolsos:</strong> Debido a los costes de computación de la IA, solo se procesarán reembolsos si el servicio técnico no ha funcionado correctamente y bajo revisión del equipo de soporte.</li>
             </ul>
           </section>
 
           <section>
             <h2 className="flex items-center gap-3 text-2xl">
               <Ban className="w-6 h-6 text-brand-500" />
-              3. Uso Prohibido
+              3. Uso Prohibido y Contenido IA
             </h2>
             <p>
-              Aceptas no utilizar el Servicio:
+              Aceptas no utilizar el Servicio para generar:
             </p>
             <ul className="list-disc pl-5 space-y-2">
-              <li>Para cualquier propósito ilegal o no autorizado.</li>
-              <li>Para generar contenido spam, engañoso u ofensivo en LinkedIn.</li>
-              <li>Para intentar ingeniería inversa o vulnerar la seguridad de la plataforma.</li>
+              <li>Contenido que infrinja las políticas de comunidad de LinkedIn.</li>
+              <li>Material engañoso, difamatorio o que incite al odio.</li>
+              <li>Interferir con la seguridad de la plataforma o intentar eludir los límites de créditos.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl">4. Propiedad Intelectual</h2>
+            <h2 className="text-2xl">4. Propiedad Intelectual y Contenido IA</h2>
             <p>
-              El Servicio y su contenido original, características y funcionalidad son y seguirán siendo propiedad exclusiva de Kolink y sus licenciantes. El contenido que tú generes te pertenece a ti.
+              <strong>Tu Contenido:</strong> Eres el propietario de los derechos sobre el contenido final generado por la IA de Kolink. Sin embargo, reconoces que la IA puede generar resultados similares para otros usuarios debido al entrenamiento del modelo.
+            </p>
+            <p>
+              <strong>Uso del Servicio:</strong> Kolink otorga una licencia limitada e intransferible para usar la herramienta. No tienes derecho a revender el software como propio.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl">5. Limitación de Responsabilidad</h2>
             <p>
-              En ningún caso Kolink, ni sus directores, empleados, socios, agentes, proveedores o afiliados, serán responsables de daños indirectos, incidentales, especiales, consecuentes o punitivos.
+              Kolink es una herramienta de asistencia. **No garantizamos resultados específicos de alcance, ventas o crecimiento en LinkedIn.** El uso del contenido generado es responsabilidad exclusiva del usuario. No nos hacemos responsables de acciones tomadas por LinkedIn contra el perfil del usuario por el uso de automatizaciones externas.
             </p>
+          </section>
+
+          <section className="text-sm text-slate-400 italic">
+            <p>Este documento es una plantilla informativa. Se recomienda consultar con un abogado especializado para asesoramiento legal específico.</p>
           </section>
         </div>
       </div>

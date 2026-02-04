@@ -133,18 +133,13 @@ const LinkedInExpertChat: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Prepare payload
       const payload: any = { 
           query: userMessage,
           mode: isGhostwriter ? 'ghostwriter' : 'advisor'
       };
       if (currentImage) {
-          payload.imageBase64 = currentImage; // Send base64 to backend
+          payload.imageBase64 = currentImage;
       }
-
-      // @ts-ignore
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("NO_SESSION");
 
       const { data, error } = await supabase.functions.invoke(
         "expert-chat",

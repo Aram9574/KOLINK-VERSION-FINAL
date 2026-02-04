@@ -1,75 +1,48 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ArrowRight, Copy, RefreshCw, ChevronRight, CheckCircle, Type, Briefcase, Zap, Rocket, Star, Quote } from 'lucide-react';
+import { Sparkles, ArrowRight, Copy, RefreshCw, ChevronRight, CheckCircle, Type, Briefcase, Zap, Rocket, Star, Quote, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/services/supabaseClient';
 import { Helmet } from 'react-helmet-async';
 
 import { useUser } from '@/context/UserContext';
 import { translations } from '@/translations';
+import { publicToolsService } from '@/services/publicToolsService';
 
 const HeadlineGeneratorTool = () => {
     const { language } = useUser();
     const t = translations[language]?.toolsPage || translations['en'].toolsPage; 
     
-    const [topic, setTopic] = useState('');
+    const [currentHeadline, setCurrentHeadline] = useState('');
     const [role, setRole] = useState('');
     const [industry, setIndustry] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
-    const [generatedHeadlines, setGeneratedHeadlines] = useState<string[]>([]); // Changed to array
+    const [generatedHeadlines, setGeneratedHeadlines] = useState<string[]>([]);
+    const [usageInfo, setUsageInfo] = useState<{ currentCount: number; limit: number; resetAt: string } | null>(null);
+    const [showLimitModal, setShowLimitModal] = useState(false);
 
     const handleGenerate = async () => {
-        if (!topic.trim()) {
-            toast.error(language === 'es' ? "¡Ingresa un tema!" : "Please enter a topic!");
-            return;
-        }
-
         setIsGenerating(true);
         setGeneratedHeadlines([]);
 
         try {
-            const langInstruction = language === 'es' ? "OUTPUT LANGUAGE: SPANISH (Español). Translate role/industry if needed." : "OUTPUT LANGUAGE: ENGLISH.";
-            
-            const prompt = `Act as a Viral LinkedIn Ghostwriter. Generate 10 high-converting LinkedIn Headlines (Hooks) for a "${role || 'Professional'}" in the "${industry || 'General'}" industry writing about "${topic}".
-            
-            Rules:
-            1. Use viral frameworks (Contrarian, Listicle, Story).
-            2. Keep them under 2 lines.
-            3. Use specific numbers where applicable.
-            4. Return strictly a JSON array of strings. Example: ["Headline 1", "Headline 2"].
-            5. ${langInstruction}`;
-
-            const { data, error } = await supabase.functions.invoke('generate-viral-post', {
-                body: {
-                    params: {
-                        instructions: prompt,
-                        response_format: 'json_object' 
-                    }
-                }
+            const result = await publicToolsService.generateHeadline({
+                currentHeadline: currentHeadline || undefined,
+                role: role || undefined,
+                industry: industry || undefined
             });
 
-            if (error) throw error;
-
-            console.log("Raw Response:", data?.data?.postContent);
-
-            // Parsing Logic (Simulated for safety if API returns unstructured text, but aim for JSON)
-            let headlines = [];
-            try {
-                const parsed = JSON.parse(data?.data?.postContent);
-                if (Array.isArray(parsed)) headlines = parsed;
-                else if (parsed.headlines) headlines = parsed.headlines;
-                else headlines = data?.data?.postContent.split('\n').filter(l => l.length > 10).map(l => l.replace(/^\d+\.\s*/, ''));
-            } catch (e) {
-                // Fallback split
-                headlines = data?.data?.postContent.split('\n').filter(l => l.length > 10).map(l => l.replace(/^\d+\.\s*/, ''));
-            }
-
-            setGeneratedHeadlines(headlines.slice(0, 10)); // Take top 10
+            setGeneratedHeadlines(result.headlines);
+            setUsageInfo(result.usageInfo);
             toast.success(language === 'es' ? "¡Headlines generados!" : "Headlines generated!");
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            toast.error(language === 'es' ? "Error al generar" : "Generation failed.");
+            if (err.message === 'RATE_LIMIT_EXCEEDED') {
+                setShowLimitModal(true);
+                toast.error(language === 'es' ? "Límite alcanzado. Regístrate para más usos." : "Limit reached. Sign up for more uses.");
+            } else {
+                toast.error(language === 'es' ? "Error al generar" : "Generation failed.");
+            }
         } finally {
             setIsGenerating(false);
         }
@@ -185,8 +158,8 @@ const HeadlineGeneratorTool = () => {
                             <div className="flex flex-col md:flex-row gap-4 mb-12">
                                 <input
                                     type="text"
-                                    value={topic}
-                                    onChange={(e) => setTopic(e.target.value)}
+                                    value={currentHeadline}
+                                    onChange={(e) => setCurrentHeadline(e.target.value)}
                                     placeholder={t.headlineGenerator.topicPlaceholder}
                                     className="flex-1 px-6 py-5 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-brand-100 focus:border-brand-500 outline-none text-xl font-bold shadow-sm placeholder:text-slate-300 transition-all"
                                     onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
@@ -210,6 +183,25 @@ const HeadlineGeneratorTool = () => {
                                     )}
                                 </button>
                             </div>
+                            
+                            {usageInfo && (
+                                <div className="flex items-center justify-center gap-2 mb-4 bg-white/50 backdrop-blur-sm py-2 px-4 rounded-full border border-slate-100 w-fit mx-auto">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                        Usos diarios:
+                                    </span>
+                                    <div className="flex gap-1">
+                                        {[...Array(usageInfo.limit)].map((_, i) => (
+                                            <div 
+                                                key={i} 
+                                                className={`w-2 h-2 rounded-full ${i < usageInfo.currentCount ? 'bg-brand-500 shadow-[0_0_8px_rgba(37,99,235,0.4)]' : 'bg-slate-200'}`}
+                                            />
+                                        ))}
+                                    </div>
+                                    <span className="text-[10px] font-bold text-slate-500 ml-1">
+                                        {usageInfo.limit - usageInfo.currentCount} restantes
+                                    </span>
+                                </div>
+                            )}
                         </div>
 
                          {/* Results Area */}
@@ -262,7 +254,7 @@ const HeadlineGeneratorTool = () => {
                                         <div className="flex -space-x-2">
                                             {[1,2,3,4].map(i => (
                                                 <div key={i} className="w-8 h-8 rounded-full bg-slate-200 border-2 border-slate-50 relative overflow-hidden" >
-                                                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i+topic}`} alt="User" />
+                                                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i+currentHeadline}`} alt="User" />
                                                 </div>
                                             ))}
                                             <div className="w-8 h-8 rounded-full bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center border-2 border-slate-50">
@@ -318,6 +310,71 @@ const HeadlineGeneratorTool = () => {
                     </p>
                 </div>
             </footer>
+            {/* Limit Reached Modal */}
+            <AnimatePresence>
+                {showLimitModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowLimitModal(false)}
+                            className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+                        />
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl border border-white p-8 overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                            
+                            <div className="w-16 h-16 bg-brand-100 text-brand-600 rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-lg shadow-brand-500/10">
+                                <Zap size={32} fill="currentColor" />
+                            </div>
+                            
+                            <h2 className="text-3xl font-black text-slate-900 text-center mb-4 tracking-tight leading-tight">
+                                {language === 'es' ? '¡Has alcanzado el límite!' : 'Limit Reached!'}
+                            </h2>
+                            
+                            <p className="text-slate-600 text-center mb-8 font-medium leading-relaxed">
+                                {language === 'es' 
+                                    ? 'Has usado tus 3 generaciones gratuitas por hoy. Únete a miles de profesionales y obtén acceso ilimitado.' 
+                                    : 'You have used your 3 free generations for today. Join thousands of professionals and get unlimited access.'}
+                            </p>
+                            
+                            <div className="space-y-3">
+                                <Link 
+                                    to="/login" 
+                                    className="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold transition-all shadow-xl shadow-brand-600/20 flex items-center justify-center gap-2 text-lg active:scale-[0.98]"
+                                >
+                                    {language === 'es' ? 'Crear Cuenta Gratis' : 'Create Free Account'}
+                                    <ArrowRight size={20} />
+                                </Link>
+                                <button 
+                                    onClick={() => setShowLimitModal(false)}
+                                    className="w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-2xl font-bold transition-all flex items-center justify-center text-sm"
+                                >
+                                    {language === 'es' ? 'Quizás más tarde' : 'Maybe later'}
+                                </button>
+                            </div>
+                            
+                             <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-center gap-2">
+                                <div className="flex -space-x-1">
+                                    {[1,2,3].map(i => (
+                                        <div key={i} className="w-6 h-6 rounded-full bg-slate-200 border-2 border-white overflow-hidden shadow-sm" >
+                                            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=user${i}`} alt="User" />
+                                        </div>
+                                    ))}
+                                </div>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                    +5,000 Usuarios Pro
+                                </span>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

@@ -33,6 +33,7 @@ import { GamificationService } from "../../../services/gamificationService";
 import { CreditService } from "../../../services/creditService";
 import LevelUpModal from "../gamification/LevelUpModal";
 import { ThinkingState } from "../../ui/ThinkingState";
+import { analytics } from "../../../services/analyticsService";
 
 // Helper to pick random from array
 const pickRandom = <T extends { value: string }>(options: T[]): string => {
@@ -109,6 +110,16 @@ const PostGenerator: React.FC<PostGeneratorProps> = ({
         Haptics.notification({ type: NotificationType.Success }).catch(() => {});
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, zIndex: 1000 });
         
+        // ANALYTICS: Track success
+        analytics.track('post_generated_success', {
+            topic: params.topic,
+            framework: params.framework,
+            tone: params.tone,
+            length: params.length,
+            language: language,
+            has_carousel: params.generateCarousel
+        });
+
         // GAMIFICATION: Award XP
         if (user?.id) {
             GamificationService.awardXP(user.id, 'post_generated').then(res => {

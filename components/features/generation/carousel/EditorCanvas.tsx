@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { SlideRenderer } from './SlideRenderer';
 import { useCarouselStore } from '@/lib/store/useCarouselStore';
 import { Button } from '@/components/ui/button';
@@ -21,14 +21,11 @@ import {
     Maximize2,
     Languages
 } from 'lucide-react';
-import { TranslateDialog } from './TranslateDialog';
-import { FullscreenPreview } from './FullscreenPreview';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { exportToPDF } from '@/lib/utils/export';
 import { toast } from 'sonner';
 import { supabase } from '@/services/supabaseClient';
-import { LinkedInPreviewModal } from './LinkedInPreviewModal';
 import { 
     Dialog, 
     DialogContent, 
@@ -37,10 +34,15 @@ import {
     DialogDescription,
     DialogFooter 
 } from '@/components/ui/dialog';
-import { ExportModal } from './ExportModal';
 import { useUser } from '@/context/UserContext';
 import { translations } from '@/translations';
 import { ViralGauge } from './ViralGauge';
+
+// Lazy loaded modals and heavy components
+const ExportModal = React.lazy(() => import('./ExportModal').then(module => ({ default: module.ExportModal })));
+const LinkedInPreviewModal = React.lazy(() => import('./LinkedInPreviewModal').then(module => ({ default: module.LinkedInPreviewModal })));
+const TranslateDialog = React.lazy(() => import('./TranslateDialog').then(module => ({ default: module.TranslateDialog })));
+const FullscreenPreview = React.lazy(() => import('./FullscreenPreview').then(module => ({ default: module.FullscreenPreview })));
 
 export const EditorCanvas = () => {
   const { language } = useUser();
@@ -372,32 +374,40 @@ export const EditorCanvas = () => {
 
       {/* Fullscreen Modal Overlay */}
       {isFullscreen && (
-          <FullscreenPreview 
-            slides={slides} 
-            design={design} 
-            author={author}
-            initialSlideIndex={slides.findIndex(s => s.id === activeSlideId) !== -1 ? slides.findIndex(s => s.id === activeSlideId) : 0}
-            onClose={() => setIsFullscreen(false)} 
-          />
+          <Suspense fallback={null}>
+            <FullscreenPreview 
+                slides={slides} 
+                design={design} 
+                author={author}
+                initialSlideIndex={slides.findIndex(s => s.id === activeSlideId) !== -1 ? slides.findIndex(s => s.id === activeSlideId) : 0}
+                onClose={() => setIsFullscreen(false)} 
+            />
+          </Suspense>
       )}
 
-      <ExportModal 
-        isOpen={isExportModalOpen} 
-        onClose={() => setIsExportModalOpen(false)} 
-      />
+      <Suspense fallback={null}>
+        <ExportModal 
+            isOpen={isExportModalOpen} 
+            onClose={() => setIsExportModalOpen(false)} 
+        />
+      </Suspense>
 
-      <LinkedInPreviewModal
-        isOpen={isLinkedInPreviewOpen}
-        onClose={() => setIsLinkedInPreviewOpen(false)}
-        slides={slides}
-        design={design}
-        author={author}
-      />
+      <Suspense fallback={null}>
+        <LinkedInPreviewModal
+            isOpen={isLinkedInPreviewOpen}
+            onClose={() => setIsLinkedInPreviewOpen(false)}
+            slides={slides}
+            design={design}
+            author={author}
+        />
+      </Suspense>
 
-      <TranslateDialog 
-        isOpen={isTranslateOpen} 
-        onClose={() => setIsTranslateOpen(false)} 
-      />
+      <Suspense fallback={null}>
+        <TranslateDialog 
+            isOpen={isTranslateOpen} 
+            onClose={() => setIsTranslateOpen(false)} 
+        />
+      </Suspense>
 
       {/* Confirmation Dialog for New Project */}
       <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>

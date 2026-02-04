@@ -1,29 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import { Navigate } from "react-router-dom";
 import Navbar from "./Navbar.tsx";
 import { Hero as AnimatedHero } from "../ui/animated-hero.tsx";
-import { FeaturesBento } from './FeaturesBento.tsx';
-import HowItWorksSection from "./HowItWorksSection.tsx";
-import ComparisonSection from "./ComparisonSection.tsx";
-import StrategicComparison from "./StrategicComparison.tsx";
-import RoiSection from "./RoiSection.tsx";
-import PricingSection from "./PricingSection.tsx";
-import FaqSection from "./FaqSection.tsx";
-import Footer from "./Footer.tsx";
-import { useUser } from "../../context/UserContext.tsx";
-import LogoCarousel from "./LogoCarousel.tsx";
-import TestimonialsSection from "../ui/testimonial-v2.tsx";
-import VideoDemoSection from "./VideoDemoSection.tsx";
 import { motion } from "framer-motion";
 import SmartCursor from "../ui/SmartCursor.tsx";
-
-
 import { translations } from "../../translations";
 import { StickyCTAHeader } from "../marketing/StickyCTAHeader.tsx";
 import { SchemaMarkup } from "../seo/SchemaMarkup";
 import { LaunchCountdown } from "../marketing/LaunchCountdown";
 import MetaTags from "../seo/MetaTags";
 import { PageTransition } from "../ui/PageTransition";
+import Skeleton from "../ui/Skeleton";
+import { useUser } from "../../context/UserContext.tsx";
+
+// Lazy loaded sections
+const FeaturesBento = React.lazy(() => import('./FeaturesBento.tsx').then(m => ({ default: m.FeaturesBento })));
+const HowItWorksSection = React.lazy(() => import("./HowItWorksSection.tsx"));
+const ComparisonSection = React.lazy(() => import("./ComparisonSection.tsx"));
+const StrategicComparison = React.lazy(() => import("./StrategicComparison.tsx"));
+const RoiSection = React.lazy(() => import("./RoiSection.tsx"));
+const PricingSection = React.lazy(() => import("./PricingSection.tsx"));
+const FaqSection = React.lazy(() => import("./FaqSection.tsx"));
+const Footer = React.lazy(() => import("./Footer.tsx"));
+const LogoCarousel = React.lazy(() => import("./LogoCarousel.tsx"));
+const TestimonialsSection = React.lazy(() => import("../ui/testimonial-v2.tsx"));
+const VideoDemoSection = React.lazy(() => import("./VideoDemoSection.tsx"));
 
 
 const SectionReveal = ({ children, id }: { children: React.ReactNode; id?: string }) => (
@@ -34,7 +35,9 @@ const SectionReveal = ({ children, id }: { children: React.ReactNode; id?: strin
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-        {children}
+        <Suspense fallback={<div className="w-full h-64 flex items-center justify-center"><Skeleton className="w-full h-full max-w-7xl rounded-3xl" /></div>}>
+            {children}
+        </Suspense>
     </motion.div>
 );
 
@@ -127,10 +130,68 @@ const LandingPage: React.FC = () => {
                         "description": "The AI partner for LinkedIn creators. Generate viral carousels, audit profiles, and schedule posts."
                     }}
                 />
+                <SchemaMarkup 
+                    type="FAQPage"
+                    data={{
+                        "mainEntity": [
+                            {
+                                "@type": "Question",
+                                "name": t.faq.q1,
+                                "acceptedAnswer": { "@type": "Answer", "text": t.faq.a1 }
+                            },
+                            {
+                                "@type": "Question",
+                                "name": t.faq.q2,
+                                "acceptedAnswer": { "@type": "Answer", "text": t.faq.a2 }
+                            },
+                            {
+                                "@type": "Question",
+                                "name": t.faq.q3,
+                                "acceptedAnswer": { "@type": "Answer", "text": t.faq.a3 }
+                            },
+                            {
+                                "@type": "Question",
+                                "name": t.faq.q4,
+                                "acceptedAnswer": { "@type": "Answer", "text": t.faq.a4 }
+                            }
+                        ]
+                    }}
+                />
+                <SchemaMarkup 
+                    type="HowTo"
+                    data={{
+                        "name": t.howItWorks.title,
+                        "description": t.howItWorks.subtitle,
+                        "step": [
+                            {
+                                "@type": "HowToStep",
+                                "name": language === 'es' ? "Semilla de Idea" : "Idea Seed",
+                                "text": language === 'es' 
+                                    ? "Nunca más te quedes mirando la página en blanco. Genera 50 ideas de alto impacto en segundos."
+                                    : "Never stare at a blank page again. Generate 50 high-impact ideas in seconds."
+                            },
+                            {
+                                "@type": "HowToStep",
+                                "name": language === 'es' ? "Arquitectura Viral" : "Viral Architecture",
+                                "text": language === 'es'
+                                    ? "Estructuras probadas por el Top 1% (AIDA, PAS, Storytelling). Escribe como un experto, al instante."
+                                    : "Frameworks proven by the Top 1%. Write like an expert, instantly."
+                            },
+                            {
+                                "@type": "HowToStep",
+                                "name": language === 'es' ? "Lanzamiento y Escala" : "Launch & Scale",
+                                "text": language === 'es'
+                                    ? "Publica con absoluta confianza. Convierte los likes en leads y los leads en ingresos."
+                                    : "Publish with total confidence. Turn likes into leads and leads into revenue."
+                            }
+                        ]
+                    }}
+                />
                 <MetaTags 
                     title={t.landing.meta.title}
                     description={t.landing.meta.description}
                     keywords={t.landing.meta.keywords}
+                    language={language}
                 />
 
                 <LaunchCountdown language={language} />
@@ -156,14 +217,14 @@ const LandingPage: React.FC = () => {
 
                     {/* Logos - Trust */}
                     <SectionReveal>
-                        <section aria-label="Trusted By" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+                        <section aria-label="Trusted By" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10">
                             <LogoCarousel language={language} />
                         </section>
                     </SectionReveal>
 
                     {/* Value Prop - What is it? */}
                     <SectionReveal id="tools">
-                         <section aria-label="Features" className="py-16 lg:py-24">
+                         <section aria-label="Features" className="py-8 lg:py-12">
                             <FeaturesBento language={language} />
                          </section>
                     </SectionReveal>
@@ -171,21 +232,21 @@ const LandingPage: React.FC = () => {
 
                     {/* Deep Dive - Demo */}
                     <SectionReveal id="demo">
-                        <section aria-label="Product Demo" className="py-16 lg:py-24">
+                        <section aria-label="Product Demo" className="py-8 lg:py-12">
                             <VideoDemoSection language={language} />
                         </section>
                     </SectionReveal>
 
                     {/* How It Works - Logic */}
                     <SectionReveal id="howitworks">
-                        <section aria-label="How It Works" className="py-16 lg:py-24">
+                        <section aria-label="How It Works" className="py-8 lg:py-12">
                             <HowItWorksSection language={language} />
                         </section>
                     </SectionReveal>
 
                     {/* Comparison - Objection Handling */}
                     <SectionReveal id="comparison">
-                        <section aria-label="Comparison" className="py-16 lg:py-24">
+                        <section aria-label="Comparison" className="py-8 lg:py-12">
                             <ComparisonSection
                                 language={language}
                                 mockContent={mockContent}
@@ -194,35 +255,35 @@ const LandingPage: React.FC = () => {
                     </SectionReveal>
 
                     <SectionReveal>
-                        <section aria-label="Strategy" className="pb-16 lg:pb-24">
+                        <section aria-label="Strategy" className="pb-8 lg:pb-12">
                             <StrategicComparison language={language} />
                         </section>
                     </SectionReveal>
 
                     {/* Social Proof - Verification */}
                     <SectionReveal id="results">
-                         <section aria-label="Testimonials" className="py-16 lg:py-24">
+                         <section aria-label="Testimonials" className="py-8 lg:py-12">
                             <TestimonialsSection />
                         </section>
                     </SectionReveal>
 
                     {/* ROI - Rationalization */}
                     <SectionReveal>
-                        <section aria-label="ROI Analysis" className="py-16 lg:py-24">
+                        <section aria-label="ROI Analysis" className="py-8 lg:py-12">
                             <RoiSection language={language} />
                         </section>
                     </SectionReveal>
 
                     {/* Pricing - Conversion */}
                     <SectionReveal id="pricing">
-                        <section aria-label="Pricing" className="py-16 lg:py-24">
+                        <section aria-label="Pricing" className="py-8 lg:py-12">
                             <PricingSection language={language} />
                         </section>
                     </SectionReveal>
 
                     {/* FAQ - Closing */}
                     <SectionReveal id="faq">
-                        <section aria-label="FAQ" className="py-16 lg:py-24">
+                        <section aria-label="FAQ" className="py-8 lg:py-12">
                             <FaqSection language={language} />
                         </section>
                     </SectionReveal>

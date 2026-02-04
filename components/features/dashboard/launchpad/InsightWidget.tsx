@@ -25,6 +25,7 @@ export const InsightWidget: React.FC<InsightWidgetProps> = ({
 }) => {
     return (
         <motion.div 
+            id="insight-widget"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.6 }}

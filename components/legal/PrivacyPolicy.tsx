@@ -51,30 +51,42 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="flex items-center gap-3 text-2xl">
               <FileText className="w-6 h-6 text-brand-500" />
-              3. Compartición de Datos
+              3. Compartición de Datos y Sub-procesadores
             </h2>
             <p>
-              No vendemos tus datos a terceros. Compartimos información solo con proveedores de servicios esenciales:
+              No vendemos tus datos a terceros. Los datos se comparten con sub-procesadores solo para la prestación del servicio:
             </p>
             <ul className="list-disc pl-5 space-y-2">
-              <li><strong>Supabase:</strong> Para almacenamiento de base de datos y autenticación.</li>
-              <li><strong>Google Gemini (Vertex AI):</strong> Para el procesamiento de lenguaje natural y generación de contenido.</li>
-              <li><strong>Stripe:</strong> Para el procesamiento seguro de pagos.</li>
+              <li><strong>Supabase:</strong> Infraestructura técnica y seguridad de datos.</li>
+              <li><strong>Google Cloud (Gemini IA):</strong> Procesamiento de texto para generación de contenido. Tus datos no se utilizan para re-entrenar modelos públicos.</li>
+              <li><strong>Stripe:</strong> Gestión de pagos y cumplimiento fiscal.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl">4. Seguridad de Datos</h2>
+            <h2 className="text-2xl">4. Seguridad y Retención</h2>
             <p>
-              Implementamos medidas de seguridad robustas, incluyendo encriptación en tránsito y en reposo, y autenticación estricta. Sin embargo, ningún método de transmisión por Internet es 100% seguro.
+              Mantenemos tus datos mientras tu cuenta esté activa o sea necesario para cumplir obligaciones legales. Si solicitas la eliminación, procederemos a borrar tu información personal en un plazo de 30 días, salvo los datos de facturación que la ley nos obliga a conservar.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl">5. Tus Derechos</h2>
+            <h2 className="text-2xl">5. Tus Derechos (RGPD)</h2>
             <p>
-              Tienes derecho a acceder, corregir o eliminar tus datos personales en cualquier momento desde la sección de Configuración de tu cuenta o contactando a soporte@kolink.ai.
+              De acuerdo con el Reglamento General de Protección de Datos (RGPD), tienes los siguientes derechos:
             </p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Derecho de acceso, rectificación y supresión de tus datos.</li>
+              <li>Derecho a la portabilidad de los datos.</li>
+              <li>Derecho a retirar el consentimiento en cualquier momento.</li>
+            </ul>
+            <p className="mt-4">
+              Para ejercer estos derechos, utiliza el panel de configuración o contacta a **soporte@kolink.ai**.
+            </p>
+          </section>
+
+          <section className="text-sm text-slate-400 italic mt-20 border-t pt-8">
+            <p>Este documento es una plantilla informativa. Se recomienda consultar con un abogado especializado para asesoramiento legal específico.</p>
           </section>
         </div>
       </div>

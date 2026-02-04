@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ArrowRight, Copy, RefreshCw, ChevronRight, UserCheck, Briefcase, Target, User, CheckCircle2, MapPin, Building2, ExternalLink } from 'lucide-react';
+import { Sparkles, ArrowRight, Copy, RefreshCw, ChevronRight, UserCheck, Briefcase, Target, User, CheckCircle2, MapPin, Building2, ExternalLink, AlertCircle, Zap } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/services/supabaseClient';
 import { Helmet } from 'react-helmet-async';
 
 import { useUser } from '@/context/UserContext';
 import { translations } from '@/translations';
+import { publicToolsService } from '@/services/publicToolsService';
 
 const BioGeneratorTool = () => {
     const { language } = useUser();
@@ -20,6 +20,8 @@ const BioGeneratorTool = () => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedBios, setGeneratedBios] = useState<string[]>([]);
     const [selectedBio, setSelectedBio] = useState<string | null>(null);
+    const [usageInfo, setUsageInfo] = useState<{ currentCount: number; limit: number; resetAt: string } | null>(null);
+    const [showLimitModal, setShowLimitModal] = useState(false);
 
     const handleGenerate = async () => {
         if (!role.trim()) {
@@ -32,48 +34,25 @@ const BioGeneratorTool = () => {
         setSelectedBio(null);
 
         try {
-            const langInstruction = language === 'es' ? "OUTPUT LANGUAGE: SPANISH (Español). Translate keywords/role if needed." : "OUTPUT LANGUAGE: ENGLISH.";
-
-            const prompt = `Act as a LinkedIn Profile Expert. Generate 5 high-converting LinkedIn Bios (Headlines) for a "${role}" targeting "${niche || 'General Audience'}".
-            
-            Keywords to Include: ${keywords || 'None'}
-            Style: ${style}
-            
-            Rules:
-            1. Use the provided keywords naturally for SEO.
-            2. Follow the formula: [Role] | [Value Proposition] | [Social Proof/CTA].
-            3. Keep under 220 characters.
-            4. Return strictly a JSON array of strings. Example: ["Bio 1", "Bio 2"].
-            5. ${langInstruction}`;
-
-            const { data, error } = await supabase.functions.invoke('generate-viral-post', {
-                body: {
-                    params: {
-                        instructions: prompt,
-                        response_format: 'json_object'
-                    }
-                }
+            const result = await publicToolsService.generateBio({
+                currentBio: role || undefined, // Using role as primary input for bio generation
+                role: role || undefined,
+                expertise: niche || keywords || undefined
             });
 
-            if (error) throw error;
-            
-            let bios = [];
-            try {
-                const parsed = JSON.parse(data?.data?.postContent);
-                if (Array.isArray(parsed)) bios = parsed;
-                else if (parsed.bios) bios = parsed.bios;
-                else bios = data?.data?.postContent.split('\n').filter(l => l.length > 20).map(l => l.replace(/^\d+\.\s*/, ''));
-            } catch (e) {
-                 bios = data?.data?.postContent.split('\n').filter(l => l.length > 20).map(l => l.replace(/^\d+\.\s*/, ''));
-            }
-
-            setGeneratedBios(bios.slice(0, 5));
-            if (bios.length > 0) setSelectedBio(bios[0]);
+            setGeneratedBios(result.bios);
+            if (result.bios.length > 0) setSelectedBio(result.bios[0]);
+            setUsageInfo(result.usageInfo);
 
             toast.success(language === 'es' ? "¡Bios generadas!" : "Bios generated!");
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            toast.error(language === 'es' ? "Error al generar" : "Generation failed.");
+            if (err.message === 'RATE_LIMIT_EXCEEDED') {
+                setShowLimitModal(true);
+                toast.error(language === 'es' ? "Límite alcanzado. Regístrate para más usos." : "Limit reached. Sign up for more uses.");
+            } else {
+                toast.error(language === 'es' ? "Error al generar" : "Generation failed.");
+            }
         } finally {
             setIsGenerating(false);
         }
@@ -217,6 +196,25 @@ const BioGeneratorTool = () => {
                                     {isGenerating ? <RefreshCw className="animate-spin w-5 h-5" /> : <Sparkles size={20} />}
                                     {isGenerating ? t.bioGenerator.generating : t.bioGenerator.button}
                                 </button>
+                                
+                                {usageInfo && (
+                                    <div className="flex items-center justify-center gap-2 mt-4 bg-slate-50 py-2 px-4 rounded-xl border border-slate-100">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                            Límite:
+                                        </span>
+                                        <div className="flex gap-1">
+                                            {[...Array(usageInfo.limit)].map((_, i) => (
+                                                <div 
+                                                    key={i} 
+                                                    className={`w-1.5 h-1.5 rounded-full ${i < usageInfo.currentCount ? 'bg-blue-500 shadow-[0_0_5px_rgba(37,99,235,0.3)]' : 'bg-slate-200'}`}
+                                                />
+                                            ))}
+                                        </div>
+                                        <span className="text-[10px] font-bold text-slate-500 ml-1">
+                                            {usageInfo.limit - usageInfo.currentCount} libres
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -338,6 +336,59 @@ const BioGeneratorTool = () => {
                     </p>
                 </div>
             </footer>
+
+            {/* Limit Reached Modal */}
+            <AnimatePresence>
+                {showLimitModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowLimitModal(false)}
+                            className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+                        />
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl border border-white p-8 overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                            
+                            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-lg shadow-blue-500/10">
+                                <Zap size={32} fill="currentColor" />
+                            </div>
+                            
+                            <h2 className="text-3xl font-black text-slate-900 text-center mb-4 tracking-tight leading-tight">
+                                {language === 'es' ? '¡Límite Alcanzado!' : 'Limit Reached!'}
+                            </h2>
+                            
+                            <p className="text-slate-600 text-center mb-8 font-medium leading-relaxed">
+                                {language === 'es' 
+                                    ? 'Has agotado tus 3 generaciones de Bio gratuitas por hoy. ¡Únete a Kolink Pro para acceso ilimitado!' 
+                                    : 'You have used your 3 free Bio generations for today. Join Kolink Pro for unlimited access!'}
+                            </p>
+                            
+                            <div className="space-y-3">
+                                <Link 
+                                    to="/login" 
+                                    className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition-all shadow-xl shadow-blue-600/20 flex items-center justify-center gap-2 text-lg active:scale-[0.98]"
+                                >
+                                    {language === 'es' ? 'Empezar Gratis' : 'Get Started Free'}
+                                    <ArrowRight size={20} />
+                                </Link>
+                                <button 
+                                    onClick={() => setShowLimitModal(false)}
+                                    className="w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-2xl font-bold transition-all flex items-center justify-center text-sm"
+                                >
+                                    {language === 'es' ? 'Cerrar' : 'Close'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

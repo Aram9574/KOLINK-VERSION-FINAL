@@ -47,6 +47,7 @@ export const LinkedInPost = ({
           src={avatar}
           alt={name}
           className="w-12 h-12 rounded-full object-cover border border-slate-100"
+          loading="lazy"
         />
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">

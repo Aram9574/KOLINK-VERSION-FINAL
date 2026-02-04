@@ -127,30 +127,48 @@ export const es = {
         ],
       },
       alternatives: {
-        title: "Alternativas",
+        title: "Comparativas",
         links: [
           { label: "Kolink vs Taplio", href: "/#comparison" },
           { label: "Kolink vs Supergrow", href: "/#comparison" },
           { label: "Kolink vs AuthoredUp", href: "/#comparison" },
+          { label: "Alternativa a Jasper AI", href: "/#comparison" },
+          { label: "Alternativa a Buffer", href: "/#comparison" },
         ],
       },
       solutions: {
-        title: "Sectores",
+        title: "Especialidades",
         links: [
-          { label: "Agentes Inmobiliarios", href: "/tools/agentes-inmobiliarios" },
-          { label: "Abogados y Legal", href: "/tools/abogados-y-legal" },
-          { label: "Fundadores SaaS", href: "/tools/fundadores-saas" },
-          { label: "Marketing", href: "/tools/especialistas-marketing" },
-          { label: "Salud y Doctores", href: "/tools/doctores-y-salud" },
-          { label: "Ver todos los sectores →", href: "/tools" },
+          { label: "IA para Inmobiliarias", href: "/tools/agentes-inmobiliarios" },
+          { label: "IA para Abogados", href: "/tools/abogados-y-legal" },
+          { label: "IA para Fundadores SaaS", href: "/tools/fundadores-saas" },
+          { label: "IA para Marketers", href: "/tools/especialistas-marketing" },
+          { label: "IA para Ingenieros IT", href: "/tools/ingenieros-software" },
+          { label: "IA para Vendedores B2B", href: "/tools/vendedores-b2b" },
+          { label: "Ver todos los sectores →", href: "/#tools" },
         ],
       },
       freeTools: {
-        title: "Herramientas Gratuitas",
+        title: "Lead Magnets",
         links: [
-            { label: "Generador de Hooks", href: "/tools/headline-generator" },
+            { label: "Generador de Ganchos", href: "/tools/headline-generator" },
             { label: "Generador de Bios", href: "/tools/bio-generator" },
             { label: "Carousel Studio", href: "/tools/carousel-studio" },
+            { label: "Auditoría de Perfil IA", href: "/tools/profile-auditor" },
+            { label: "Calculadora de Viralidad", href: "/tools/viral-calculator" },
+        ]
+      },
+      roles: {
+        title: "Soluciones por Rol",
+        links: [
+          { label: "IA para Fundadores SaaS", href: "/tools/fundadores-saas" },
+          { label: "IA para Ingenieros IT", href: "/tools/ingenieros-software" },
+          { label: "IA para Marketers", href: "/tools/especialistas-marketing" },
+          { label: "IA para Inmobiliarias", href: "/tools/agentes-inmobiliarios" },
+          { label: "IA para Abogados", href: "/tools/abogados-y-legal" },
+          { label: "IA para Ventas B2B", href: "/tools/vendedores-b2b" },
+          { label: "IA para Diseñadores UX", href: "/tools/ux-ui-designers" },
+          { label: "Directorio de Herramientas", href: "/#tools" }
         ]
       }
     },
@@ -158,9 +176,9 @@ export const es = {
   hero: {
     badge: "EL MOTOR DE CRECIMIENTO #1 EN HABLA HISPANA",
     titleLine1: "Domina LinkedIn con",
-    titleLine2: "",
+    titleLine2: "Todo-en-uno.",
     subtitle:
-    "Mientras otros pierden 10h/semana prompteando, tú generas autoridad viral en 30 segundos. No te quedes atrás en la era del contenido IA.",
+    "La plataforma definitiva para dominar LinkedIn. Genera posts virales, carruseles visuales y auditorías de perfil en segundos, no en horas.",
     rotatingWords: [
       "posts que venden",
       "carruseles visuales",
@@ -2087,6 +2105,30 @@ export const es = {
           desc: "Visuales impactantes sin esfuerzo.",
         },
       },
+    },
+    tour: {
+      next: "Siguiente",
+      prev: "Anterior",
+      finish: "Finalizar Tour",
+      skip: "Saltar",
+      steps: {
+        welcome: {
+          title: "¡Bienvenido a Kolink! 🚀",
+          content: "Tu centro de comando para dominar LinkedIn. Permítenos mostrarte cómo multiplicar tu alcance en minutos."
+        },
+        create: {
+          title: "Arquitectura Viral",
+          content: "Aquí es donde ocurre la magia. Usa nuestra IA para redactar posts que enganchen y vendan sin romperte la cabeza."
+        },
+        carousel: {
+          title: "Storyteller Visual",
+          content: "¿Quieres destacar? Convierte tus ideas en carruseles profesionales con un par de clics. ¡El formato favorito del algoritmo!"
+        },
+        analytics: {
+          title: "Métricas de Autoridad",
+          content: "Lo que no se mide no mejora. Controla tu progreso, racha y engagement semanal aquí mismo."
+        }
+      }
     },
     launchpad: {
       tools: {

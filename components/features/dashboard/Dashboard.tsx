@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Suspense } from "react";
-import { useKeyboardShortcuts } from "../../../hooks/useKeyboardShortcuts";
+
 import { useUser } from "../../../context/UserContext";
 import { usePosts } from "../../../context/PostContext";
 import { useSubscription } from "../../../hooks/useSubscription";
@@ -16,9 +16,11 @@ import LaunchpadView from "./LaunchpadView";
 // If it's not used, I'll remove it.
 
 
-import UpgradeModal from "../../modals/UpgradeModal";
-import CancellationModal from "../../modals/CancellationModal";
-import LevelUpModal from "../../modals/LevelUpModal";
+// Lazy load modals and views
+const UpgradeModal = React.lazy(() => import("../../modals/UpgradeModal"));
+const CancellationModal = React.lazy(() => import("../../modals/CancellationModal"));
+const LevelUpModal = React.lazy(() => import("../../modals/LevelUpModal"));
+const ReferralModal = React.lazy(() => import("../../modals/ReferralModal"));
 import { updateUserProfile } from "../../../services/userRepository";
 
 
@@ -26,7 +28,6 @@ import LockedHistoryState from "../history/LockedHistoryState";
 import LockedChatState from "../chat/LockedChatState";
 import LockedEditorState from "../editor/LockedEditorState";
 import LockedAuditState from "../audit/LockedAuditState";
-import ReferralModal from "../../modals/ReferralModal";
 
 import { useToast } from "../../../context/ToastContext";
 import { AppTab, UserProfile, LevelUpData, ViralTone, ViralFramework, PostLength, EmojiDensity, GenerationParams } from "../../../types";
@@ -185,8 +186,7 @@ const Dashboard: React.FC = () => {
 
     // Effects
 
-    // Handle Keyboard Shortcuts
-    useKeyboardShortcuts({ onNavigate: setActiveTab });
+    // Keyboard shortcuts disabled by user request
 
     // Handle Stripe Success Redirect and Onboarding Actions
     useEffect(() => {
@@ -524,38 +524,40 @@ const Dashboard: React.FC = () => {
                 </div>
             </div>
 
-            {/* Modals */}
-            {showUpgradeModal && (
-                <UpgradeModal
-                    isOpen={showUpgradeModal}
-                    onClose={() => setShowUpgradeModal(false)}
-                    currentPlanId={user.planTier}
-                    onUpgrade={handleUpgrade}
-                />
-            )}
+            {/* Modals with Suspense */}
+            <Suspense fallback={null}>
+                {showUpgradeModal && (
+                    <UpgradeModal
+                        isOpen={showUpgradeModal}
+                        onClose={() => setShowUpgradeModal(false)}
+                        currentPlanId={user.planTier}
+                        onUpgrade={handleUpgrade}
+                    />
+                )}
 
-            {showCancelModal && (
-                <CancellationModal
-                    isOpen={showCancelModal}
-                    onClose={() => setShowCancelModal(false)}
-                    userEmail={user.email || ""}
-                    planPrice={19}
-                    language={user.language || "en"}
-                />
-            )}
+                {showCancelModal && (
+                    <CancellationModal
+                        isOpen={showCancelModal}
+                        onClose={() => setShowCancelModal(false)}
+                        userEmail={user.email || ""}
+                        planPrice={19}
+                        language={user.language || "en"}
+                    />
+                )}
 
-            {levelUpData && (
-                <LevelUpModal
-                    onClose={() => setLevelUpData(null)}
-                    data={levelUpData}
-                    language={language}
-                />
-            )}
+                {levelUpData && (
+                    <LevelUpModal
+                        onClose={() => setLevelUpData(null)}
+                        data={levelUpData}
+                        language={language}
+                    />
+                )}
 
-            <ReferralModal
-                isOpen={showReferralModal}
-                onClose={() => setShowReferralModal(false)}
-            />
+                <ReferralModal
+                    isOpen={showReferralModal}
+                    onClose={() => setShowReferralModal(false)}
+                />
+            </Suspense>
         </DashboardLayout>
     );
 };

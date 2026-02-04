@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Scan, ChevronRight, Zap, Target, TrendingUp, Lock, CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck, Sparkles, MessageSquare, Briefcase, RefreshCw } from 'lucide-react';
+import { Scan, ChevronRight, Zap, Target, TrendingUp, Lock, CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck, Sparkles, MessageSquare, Briefcase, RefreshCw, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/services/supabaseClient';
 
 import { useUser } from '@/context/UserContext';
 import { translations } from '@/translations';
+import { publicToolsService } from '@/services/publicToolsService';
 
 const PremiumGauge = ({ score }: { score: number }) => {
     const radius = 80;
@@ -70,6 +70,8 @@ const ProfileScorecardTool = () => {
     const [about, setAbout] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [result, setResult] = useState<{ score: number; diagnosis: string; tips: string[] } | null>(null);
+    const [usageInfo, setUsageInfo] = useState<{ currentCount: number; limit: number; resetAt: string } | null>(null);
+    const [showLimitModal, setShowLimitModal] = useState(false);
 
     const handleAudit = async () => {
         if (!headline || headline.length < 10) {
@@ -81,49 +83,28 @@ const ProfileScorecardTool = () => {
         setResult(null);
 
         try {
-            const langInstruction = language === 'es' ? "OUTPUT LANGUAGE: SPANISH (Español). IMPORTANT: Diagnosis and tips MUST be in Spanish." : "OUTPUT LANGUAGE: ENGLISH.";
-
-            const prompt = `
-                Audit this LinkedIn Profile Section:
-                HEADLINE: "${headline}"
-                ABOUT SUMMARY: "${about}"
-
-                Task: Provide a "Viral Authority Score" (0-100) and 3 specific, actionable improvements.
-                Return strictly a JSON object: { "score": number, "diagnosis": "string", "tips": ["string", "string", "string"] }
-                
-                ${langInstruction}
-            `;
-            
-            const { data, error } = await supabase.functions.invoke('generate-viral-post', {
-                body: {
-                    params: {
-                        instructions: prompt,
-                        response_format: 'json_object'
-                    }
-                }
+            const data = await publicToolsService.analyzeProfile({
+                profileUrl: headline // Using headline input as 'profile data' for the public tool
             });
 
-            if (error) throw error;
-            
-            let parsedResult;
-            try {
-                const content = data?.data?.postContent; 
-                parsedResult = JSON.parse(content);
-            } catch (e) {
-                console.warn("AI didn't return JSON, attempting split fallback");
-                parsedResult = { score: 65, diagnosis: "Detailed analysis below.", tips: ["Add metrics", "Define niche", "Use keywords"] };
-            }
+            const { scorecard, usageInfo: usage } = data;
 
             setResult({
-                score: parsedResult.score || 65,
-                diagnosis: parsedResult.diagnosis || (language === 'es' ? "Perfil con potencial pero falta posicionamiento." : "Profile shows potential but lacks clear positioning."),
-                tips: parsedResult.tips || []
+                score: scorecard.overallScore || 65,
+                diagnosis: scorecard.immediateAction || (language === 'es' ? "Perfil con potencial pero falta posicionamiento." : "Profile shows potential but lacks clear positioning."),
+                tips: [...scorecard.strengths.slice(0, 2), ...scorecard.improvements.slice(0, 1)]
             });
             
+            setUsageInfo(usage);
             toast.success(language === 'es' ? "¡Auditoría Completa!" : "Audit Complete!");
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            toast.error(language === 'es' ? "Error en la auditoría" : "Audit failed.");
+            if (err.message === 'RATE_LIMIT_EXCEEDED') {
+                setShowLimitModal(true);
+                toast.error(language === 'es' ? "Límite de 2 análisis alcanzado." : "Limit of 2 analyses reached.");
+            } else {
+                toast.error(language === 'es' ? "Error en la auditoría" : "Audit failed.");
+            }
         } finally {
             setIsAnalyzing(false);
         }
@@ -230,6 +211,25 @@ const ProfileScorecardTool = () => {
                                 {isAnalyzing ? <RefreshCw className="animate-spin" /> : <Zap size={20} className="group-hover:scale-125 transition-transform" /> }
                                 {isAnalyzing ? t.profileScorecard.analyzing : t.profileScorecard.button}
                             </button>
+
+                            {usageInfo && (
+                                <div className="flex items-center justify-center gap-2 mt-6 bg-white py-2 px-4 rounded-xl border border-slate-100 w-fit mx-auto shadow-sm">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                        Análisis hoy:
+                                    </span>
+                                    <div className="flex gap-1.5">
+                                        {[...Array(usageInfo.limit)].map((_, i) => (
+                                            <div 
+                                                key={i} 
+                                                className={`w-2 h-2 rounded-full ${i < usageInfo.currentCount ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'bg-slate-200'}`}
+                                            />
+                                        ))}
+                                    </div>
+                                    <span className="text-[10px] font-bold text-slate-500 ml-1">
+                                        {usageInfo.limit - usageInfo.currentCount} restantes
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -328,6 +328,59 @@ const ProfileScorecardTool = () => {
                     </div>
                 </div>
             </main>
+
+            {/* Limit Reached Modal */}
+            <AnimatePresence>
+                {showLimitModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowLimitModal(false)}
+                            className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+                        />
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl border border-white p-8 overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                            
+                            <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-lg shadow-amber-500/10">
+                                <ShieldCheck size={32} fill="currentColor" />
+                            </div>
+                            
+                            <h2 className="text-3xl font-black text-slate-900 text-center mb-4 tracking-tight leading-tight">
+                                {language === 'es' ? '¡Límite Alcanzado!' : 'Limit Reached!'}
+                            </h2>
+                            
+                            <p className="text-slate-600 text-center mb-8 font-medium leading-relaxed">
+                                {language === 'es' 
+                                    ? 'Has agotado tus 2 auditorías gratuitas por hoy. ¡El acceso completo está a un clic de distancia!' 
+                                    : 'You have used your 2 free audits for today. Full access is just one click away!'}
+                            </p>
+                            
+                            <div className="space-y-3">
+                                <Link 
+                                    to="/login" 
+                                    className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold transition-all shadow-xl shadow-amber-500/20 flex items-center justify-center gap-2 text-lg active:scale-[0.98]"
+                                >
+                                    {language === 'es' ? 'Optimizar mi Perfil Pro' : 'Optimize Profile Pro'}
+                                    <ArrowRight size={20} />
+                                </Link>
+                                <button 
+                                    onClick={() => setShowLimitModal(false)}
+                                    className="w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-2xl font-bold transition-all flex items-center justify-center text-sm"
+                                >
+                                    {language === 'es' ? 'Cerrar' : 'Close'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

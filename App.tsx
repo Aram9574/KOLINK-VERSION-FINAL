@@ -32,6 +32,7 @@ const PrivacyPolicy = lazy(() => import("./components/legal/PrivacyPolicy"));
 const TermsOfService = lazy(() =>
     import("./components/legal/TermsOfService")
 );
+const LegalNotice = lazy(() => import("./components/legal/LegalNotice"));
 const CookiesPage = lazy(() => import("./components/landing/CookiesPage"));
 const AuthCallback = lazy(() => import("./components/features/auth/AuthCallback"));
 const InfiniteGridDemo = lazy(() => import("./demo"));
@@ -205,6 +206,10 @@ const App: React.FC = () => {
                         <Route
                             path="/cookies"
                             element={<CookiesPage language={language} />}
+                        />
+                        <Route
+                            path="/legal"
+                            element={<LegalNotice />}
                         />
                         <Route
                             path="/auth/callback"

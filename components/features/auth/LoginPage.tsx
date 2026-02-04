@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../../services/supabaseClient";
 import { APP_DOMAIN } from "../../../constants";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useToast } from "../../../context/ToastContext";
 import { Helmet } from "react-helmet-async";
 import { useUser } from "../../../context/UserContext";
@@ -70,7 +70,6 @@ const sampleTestimonials: Testimonial[] = [
 
 const LoginPage: React.FC = () => {
     const { language } = useUser();
-    const navigate = useNavigate();
     const toast = useToast();
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [isResetMode, setIsResetMode] = useState(false); // New State for Reset Password
@@ -251,6 +250,17 @@ const LoginPage: React.FC = () => {
                     alreadyMemberLabel={t.alreadyMember}
                     registerLinkText={t.ctaSignup}
                     loginLinkText={t.ctaLogin}
+                    legalConsentLabel={
+                        language === "es" ? (
+                            <>
+                                He leído y acepto los <Link to="/terms" className="text-brand-600 font-bold hover:underline">Términos de Servicio</Link> y la <Link to="/privacy" className="text-brand-600 font-bold hover:underline">Política de Privacidad</Link>.
+                            </>
+                        ) : (
+                            <>
+                                I have read and agree to the <Link to="/terms" className="text-brand-600 font-bold hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-brand-600 font-bold hover:underline">Privacy Policy</Link>.
+                            </>
+                        )
+                    }
                     trustBadges={t.trust}
                 />
             )}

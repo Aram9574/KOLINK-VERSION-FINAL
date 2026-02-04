@@ -96,11 +96,11 @@ export const en = {
     }
   },
   hero: {
-    badge: "#1 AI Tool for LinkedIn Growth",
-    titleLine1: "Stop staring at a",
-    titleLine2: "blank page.",
+    badge: "#1 AI TOOL FOR LINKEDIN GROWTH",
+    titleLine1: "Your All-in-one",
+    titleLine2: "Authority Engine.",
     subtitle:
-      "Turn loose ideas into viral posts that connect. Your AI studio to dominate LinkedIn in seconds, not hours.",
+      "The ultimate LinkedIn domination platform. Generate viral posts, visual carousels, and profile audits in seconds, not hours.",
     rotatingWords: [
       "on LinkedIn 10x faster",
       "that builds authority",
@@ -1651,6 +1651,29 @@ export const en = {
             { label: "Terms and Conditions", href: "/terms" },
           ],
         },
+        freeTools: {
+        title: "Lead Magnets",
+        links: [
+            { label: "Hook Generator", href: "/tools/headline-generator" },
+            { label: "Bio Generator", href: "/tools/bio-generator" },
+            { label: "Carousel Studio", href: "/tools/carousel-studio" },
+            { label: "Profile Audit AI", href: "/tools/profile-auditor" },
+            { label: "Virality Calculator", href: "/tools/viral-calculator" },
+        ]
+      },
+      roles: {
+        title: "Solutions by Role",
+        links: [
+          { label: "AI for SaaS Founders", href: "/tools/fundadores-saas" },
+          { label: "AI for IT Engineers", href: "/tools/ingenieros-software" },
+          { label: "AI for Marketers", href: "/tools/especialistas-marketing" },
+          { label: "AI for Real Estate", href: "/tools/agentes-inmobiliarios" },
+          { label: "AI for Lawyers", href: "/tools/abogados-y-legal" },
+          { label: "AI for B2B Sales", href: "/tools/vendedores-b2b" },
+          { label: "AI for UX Designers", href: "/tools/ux-ui-designers" },
+          { label: "Tools Directory", href: "/#tools" }
+        ]
+      },
         resources: {
           title: "Resources",
           links: [

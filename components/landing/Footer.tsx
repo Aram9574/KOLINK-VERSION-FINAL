@@ -27,14 +27,6 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
         { icon: <Youtube className="w-5 h-5" />, href: "#", name: "YouTube" },
     ];
     
-    // Programmatic SEO Links (Top Priorities)
-    const roleLinks = [
-        { label: "IA para Inmobiliarias", href: "/tools/generar-posts-linkedin-para-inmobiliaria" },
-        { label: "IA para CEOs", href: "/tools/analisis-perfil-linkedin-para-ceos" },
-        { label: "IA para Recruiters", href: "/tools/ganchos-virales-para-recruiters" },
-        { label: "Ver todos los nichos", href: "/tools" }
-    ];
-
     return (
         <footer className="bg-transparent pt-24 pb-12 border-t border-slate-100 font-sans">
             <div className="max-w-7xl mx-auto px-6">
@@ -103,26 +95,7 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
                     </div>
 
                     {/* Links Columns */}
-                    <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-8">
-                         {/* Static SEO Directory Column */}
-                         <div className="flex flex-col gap-6">
-                            <h4 className="font-bold text-slate-900 text-sm uppercase tracking-wider">
-                                Soluciones por Rol
-                            </h4>
-                            <ul className="flex flex-col gap-4">
-                                {roleLinks.map((link, idx) => (
-                                    <li key={idx}>
-                                        <Link
-                                            to={link.href}
-                                            className="text-slate-500 hover:text-brand-600 transition-colors text-sm font-medium"
-                                        >
-                                            {link.label}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
+                    <nav className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-8" aria-label="Enlaces de navegación del pie de página">
                         {Object.entries(footer.columns).map((
                             [key, column]: [string, any],
                         ) => (
@@ -147,7 +120,7 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
                                                                     "#",
                                                                 )[1],
                                                             )}
-                                                        className="text-slate-500 hover:text-brand-600 transition-colors text-sm font-medium"
+                                                        className="text-slate-500 hover:text-brand-600 transition-all text-sm font-medium hover:translate-x-1 inline-block"
                                                     >
                                                         {link.label}
                                                     </a>
@@ -156,7 +129,7 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
                                                 ? (
                                                     <Link
                                                         to={link.href}
-                                                        className="text-slate-500 hover:text-brand-600 transition-colors text-sm font-medium"
+                                                        className="text-slate-500 hover:text-brand-600 transition-all text-sm font-medium hover:translate-x-1 inline-block"
                                                     >
                                                         {link.label}
                                                     </Link>
@@ -164,7 +137,7 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
                                                 : (
                                                     <a
                                                         href={link.href}
-                                                        className="text-slate-500 hover:text-brand-600 transition-colors text-sm font-medium"
+                                                        className="text-slate-500 hover:text-brand-600 transition-all text-sm font-medium hover:translate-x-1 inline-block"
                                                     >
                                                         {link.label}
                                                     </a>
@@ -174,7 +147,7 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
                                 </ul>
                             </div>
                         ))}
-                    </div>
+                    </nav>
                 </div>
 
                 {/* Bottom Bar */}
@@ -202,11 +175,13 @@ const Footer: React.FC<FooterProps> = ({ language, scrollToSection }) => {
                         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-sm border-t border-slate-50 pt-8">
                             <p>{footer.rights}</p>
                             <div className="flex items-center gap-4 text-xs font-semibold">
-                                <Link to="/privacy" className="hover:text-brand-600 transition-colors">Privacy</Link>
+                                <Link to="/privacy" className="hover:text-brand-600 transition-colors">Privacidad</Link>
                                 <span className="text-slate-300">•</span>
-                                <Link to="/terms" className="hover:text-brand-600 transition-colors">Terms</Link>
+                                <Link to="/terms" className="hover:text-brand-600 transition-colors">Términos</Link>
                                 <span className="text-slate-300">•</span>
-                                <Link to="/trust" className="hover:text-brand-600 transition-colors">Trust</Link>
+                                <Link to="/legal" className="hover:text-brand-600 transition-colors">Aviso Legal</Link>
+                                <span className="text-slate-300">•</span>
+                                <Link to="/trust" className="hover:text-brand-600 transition-colors">Confianza</Link>
                                 <span className="text-slate-300">•</span>
                                 <p className="font-medium">
                                     {footer.madeWith}

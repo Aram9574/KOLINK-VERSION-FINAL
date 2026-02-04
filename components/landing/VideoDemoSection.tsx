@@ -80,6 +80,7 @@ const VideoDemoSection: React.FC<VideoDemoSectionProps> = ({ language }) => {
                             controls
                             playsInline
                             loop
+                            preload="none"
                         >
                             <source src="/kolink-demo.mp4" type="video/mp4" />
                             Your browser does not support the video tag.

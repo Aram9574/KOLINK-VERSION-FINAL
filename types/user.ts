@@ -54,6 +54,7 @@ export interface UserProfile {
   nextBillingDate?: number;
   cancelAtPeriodEnd?: boolean;
   hasOnboarded?: boolean;
+  hasCompletedTour?: boolean;
   stripeCustomerId?: string;
   subscriptionId?: string;
   brandVoice?: string;

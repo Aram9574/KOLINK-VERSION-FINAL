@@ -65,6 +65,7 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
             autoPilot: data.auto_pilot as any || { enabled: false, topics: [], frequency: 'daily' },
             isPremium: isPremium,
             totalGenerations: data.total_generations ?? 0,
+            hasCompletedTour: data.has_completed_tour ?? false,
             lastAhaMomentAt: data.last_aha_moment_at ? new Date(data.last_aha_moment_at).getTime() : undefined,
         };
     } catch (err) {
@@ -100,6 +101,7 @@ export const updateUserProfile = async (userId: string, updates: Partial<UserPro
     if (updates.lastAhaMomentAt !== undefined) {
         dbUpdates.last_aha_moment_at = updates.lastAhaMomentAt ? new Date(updates.lastAhaMomentAt).toISOString() : null;
     }
+    if (updates.hasCompletedTour !== undefined) dbUpdates.has_completed_tour = updates.hasCompletedTour;
 
     const { data, error } = await supabase
         .from('profiles')

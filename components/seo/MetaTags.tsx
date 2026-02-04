@@ -8,6 +8,7 @@ interface MetaTagsProps {
   keywords?: string;
   image?: string;
   noIndex?: boolean;
+  language?: string;
 }
 
 const MetaTags: React.FC<MetaTagsProps> = ({ 
@@ -15,16 +16,19 @@ const MetaTags: React.FC<MetaTagsProps> = ({
   description, 
   keywords, 
   image,
-  noIndex = false
+  noIndex = false,
+  language = 'en'
 }) => {
   const location = useLocation();
   const currentUrl = `https://kolink.ai${location.pathname}`;
-  const defaultTitle = "Kolink AI - Viral Content & LinkedIn Growth";
-  const defaultDescription = "Create viral LinkedIn posts, audit your profile, and grow your audience with AI-powered tools.";
+  const defaultTitle = language === 'es' ? "Kolink AI - Herramientas de Viralidad para LinkedIn" : "Kolink AI - Viral Content & LinkedIn Growth";
+  const defaultDescription = language === 'es' 
+    ? "Crea carruseles virales, audita tu perfil de LinkedIn y escala tu marca personal con IA. La plataforma definitiva para creadores." 
+    : "Create viral LinkedIn posts, audit your profile, and grow your audience with AI-powered tools. Built for creators.";
   const defaultImage = "https://kolink.ai/og-image.png";
 
   const finalTitle = title ? `${title} | Kolink AI` : defaultTitle;
-  const finalDescription = description || defaultDescription;
+  const finalDescription = (description || defaultDescription).slice(0, 160);
 
   return (
     <Helmet>

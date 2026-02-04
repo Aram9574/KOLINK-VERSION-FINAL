@@ -23,6 +23,7 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { SlideRenderer } from './SlideRenderer';
 import { supabase } from '@/services/supabaseClient';
+import { analytics } from '@/services/analyticsService';
 
 interface ExportModalProps {
     isOpen: boolean;

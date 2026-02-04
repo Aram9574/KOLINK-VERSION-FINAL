@@ -16,17 +16,23 @@ Deno.serve(async (req: Request) => {
 
   try {
     const authHeader = req.headers.get("Authorization");
-    // console.log("[Nexus] Authorization header present:", !!authHeader); // Removed
+    if (!authHeader) {
+        return new Response(
+            JSON.stringify({ error: "MISSING_AUTH_HEADER" }),
+            { status: 401, headers: { ...headers, "Content-Type": "application/json" } }
+        );
+    }
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { global: { headers: authHeader ? { Authorization: authHeader } : {} } },
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
     );
 
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     
     if (authError || !user) {
-        // console.error("[Nexus] Auth Error:", authError?.message || "User not found"); // Removed
+        console.error("[Nexus] Auth Error:", authError?.message || "User not found");
         return new Response(
             JSON.stringify({ error: "UNAUTHORIZED", details: authError?.message }),
             { status: 401, headers: { ...headers, "Content-Type": "application/json" } }

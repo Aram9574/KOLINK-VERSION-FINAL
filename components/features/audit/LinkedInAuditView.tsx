@@ -4,6 +4,7 @@ import { translations } from "../../../translations";
 import { LinkedInAuditResult } from "../../../types";
 import { toast } from "sonner";
 import { supabase } from "../../../services/supabaseClient";
+import { analytics } from "../../../services/analyticsService";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, FileText, Loader2, Maximize2, Sparkles, TrendingUp, Users, BookOpen, UserCircle, Scan, CheckCircle2, ChevronRight, BarChart3, Target, Zap } from "lucide-react";
 
@@ -148,6 +149,13 @@ const LinkedInAuditView: React.FC = () => {
                 setAuditData(data);
                 setStatus("results");
                 toast.success("Análisis completado con éxito");
+                
+                // ANALYTICS: Track success
+                analytics.track('profile_audit_completed', {
+                    score: data.total_score || data.authority_score || 0,
+                    source_type: data.source_type,
+                    has_experiences: !!data.processed_data?.experiences?.length
+                });
             };
             
             reader.onerror = () => {

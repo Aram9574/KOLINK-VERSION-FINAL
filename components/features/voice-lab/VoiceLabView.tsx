@@ -8,6 +8,7 @@ import { updateUserProfile } from '../../../services/userRepository';
 import { BrandVoice } from '../../../types';
 import { BrandVoiceAnalysisResult } from '../../../services/geminiService';
 import { toast } from 'sonner';
+import { analytics } from '../../../services/analyticsService';
 
 import MimicVault from './MimicVault';
 import DNAScanner from './DNAScanner';
@@ -88,8 +89,15 @@ const VoiceLabView: React.FC = () => {
                  setUser(prev => ({ ...prev, brandVoice: result.toneDescription }));
                  await updateUserProfile(user.id, { brandVoice: result.toneDescription });
 
-                toast.success("Voice DNA Saved!");
-                setActiveTab('vault');
+                 toast.success("Voice DNA Saved!");
+                 
+                 // ANALYTICS: Track success
+                 analytics.track('voice_cloning_success', {
+                     style_name: result.styleName,
+                     has_dna: !!result.stylisticDNA
+                 });
+
+                 setActiveTab('vault');
             }
         } catch (e) {
             toast.error("Failed to save voice");

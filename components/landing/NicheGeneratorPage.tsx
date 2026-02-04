@@ -5,6 +5,11 @@ import { motion } from 'framer-motion';
 import { Sparkles, ArrowRight, CheckCircle, Copy, RefreshCw, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '../../services/supabaseClient';
+import { usePublicRateLimit } from '../../hooks/usePublicRateLimit';
+import { publicToolsService } from '../../services/publicToolsService';
+import { AnimatePresence } from 'framer-motion';
+import { useUser } from '../../context/UserContext';
+import { translations } from '../../translations';
 
 const NicheGeneratorPage = () => {
     const { nicheSlug } = useParams<{ nicheSlug: string }>();
@@ -13,6 +18,23 @@ const NicheGeneratorPage = () => {
     const [topic, setTopic] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedPost, setGeneratedPost] = useState<string | null>(null);
+    const [usageInfoState, setUsageInfoState] = useState<{ currentCount: number; limit: number; resetAt: string } | null>(null);
+    const [showLimitModal, setShowLimitModal] = useState(false);
+
+    const { usageInfo, checkLimit } = usePublicRateLimit('niche_content');
+    const { language } = useUser();
+    const t = translations[language];
+
+    // Sync usageInfo from hook to local state for immediate updates after generation
+    React.useEffect(() => {
+        if (usageInfo) {
+            setUsageInfoState({
+                currentCount: usageInfo.currentCount,
+                limit: usageInfo.limit,
+                resetAt: usageInfo.resetAt.toISOString()
+            });
+        }
+    }, [usageInfo]);
 
     // SEO Dynamic Update
     React.useEffect(() => {
@@ -75,7 +97,7 @@ const NicheGeneratorPage = () => {
 
     const handleGenerate = async () => {
         if (!topic.trim()) {
-            toast.error("¡Por favor ingresa un tema!");
+            toast.error(language === 'es' ? "¡Por favor ingresa un tema!" : "Please enter a topic!");
             return;
         }
 
@@ -83,24 +105,24 @@ const NicheGeneratorPage = () => {
         setGeneratedPost(null);
 
         try {
-            const { data, error } = await supabase.functions.invoke('generate-viral-post', {
-                body: {
-                    params: {
-                        topic: topic,
-                        tone: "Professional yet engaging",
-                        target_audience: niche.title,
-                        instructions: `Actúa como ${niche.roleContext}. Escribe un post de LinkedIn en ESPAÑOL sobre ${topic}. Enfócate en resolver este problema: ${niche.painPoint}. Usa ganchos virales.`
-                    }
-                }
+            const result = await publicToolsService.generateNicheContent({
+                topic: topic,
+                nicheTitle: niche.title,
+                roleContext: niche.roleContext,
+                painPoint: niche.painPoint
             });
 
-            if (error) throw error;
-            setGeneratedPost(data?.data?.postContent || "Error: No se pudo generar el post.");
-            toast.success("¡Post generado!");
-        } catch (err) {
+            setGeneratedPost(result.postContent);
+            setUsageInfoState(result.usageInfo);
+            toast.success(language === 'es' ? "¡Post generado!" : "Post generated!");
+        } catch (err: any) {
             console.error(err);
-            toast.error("Falló la generación. Intenta de nuevo.");
-            setGeneratedPost(`(Borrador para ${niche.title} sobre "${topic}")\n\nEmpieza con un gancho sobre ${niche.painPoint}...\n[La generación por IA requiere conexión al backend]`);
+            if (err.message === 'RATE_LIMIT_EXCEEDED') {
+                setShowLimitModal(true);
+                toast.error(language === 'es' ? "Límite alcanzado. Regístrate para más usos." : "Limit reached. Sign up for more uses.");
+            } else {
+                toast.error(language === 'es' ? "Error al generar" : "Generation failed.");
+            }
         } finally {
             setIsGenerating(false);
         }
@@ -246,9 +268,24 @@ const NicheGeneratorPage = () => {
                                             {isGenerating ? "Creando..." : "Generar Post"}
                                         </button>
                                     </div>
-                                    <p className="text-[11px] text-slate-400 mt-4 flex items-center gap-2">
-                                        <CheckCircle size={12} className="text-brand-500" />
-                                        Contexto IA: {niche.roleContext}
+                                    <p className="text-[11px] text-slate-400 mt-4 flex items-center justify-between">
+                                        <span className="flex items-center gap-2">
+                                            <CheckCircle size={12} className="text-brand-500" />
+                                            Contexto IA: {niche.roleContext}
+                                        </span>
+                                        {usageInfoState && (
+                                            <span className="flex items-center gap-1">
+                                                {[...Array(usageInfoState.limit)].map((_, i) => (
+                                                    <div 
+                                                        key={i} 
+                                                        className={`w-1.5 h-1.5 rounded-full transition-colors ${i < usageInfoState.currentCount ? 'bg-brand-500' : 'bg-slate-200'}`} 
+                                                    />
+                                                ))}
+                                                <span className="ml-2 bg-slate-100 px-1.5 py-0.5 rounded text-[9px] font-black uppercase">
+                                                    {usageInfoState.limit - usageInfoState.currentCount} {language === 'es' ? 'Libres' : 'Free'}
+                                                </span>
+                                            </span>
+                                        )}
                                     </p>
                                 </div>
                             </div>
@@ -259,43 +296,66 @@ const NicheGeneratorPage = () => {
                                 className="space-y-6"
                             >
                                 <div className="flex justify-between items-center mb-4 border-b border-slate-50 pb-4">
-                                    <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                                        <div className="w-2 h-2 bg-brand-500 rounded-full" />
+                                    <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-brand-500 rounded-full animate-pulse" />
                                         Tu Estrategia de Contenido
                                     </h3>
-                                    <button 
+                                    <motion.button 
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
                                         onClick={() => { setGeneratedPost(null); setTopic(''); }}
-                                        className="text-xs font-bold text-brand-600 hover:text-brand-700 uppercase tracking-wider"
+                                        className="text-xs font-bold text-brand-600 hover:text-brand-700 uppercase tracking-wider bg-brand-50 px-3 py-1 rounded-full transition-colors"
                                     >
                                         Nuevo Borrador
-                                    </button>
+                                    </motion.button>
                                 </div>
 
-                                <div className="bg-slate-50 p-6 md:p-8 rounded-3xl border border-slate-100 text-slate-800 whitespace-pre-wrap leading-relaxed font-medium text-lg relative group">
-                                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Sparkles className="text-brand-200" size={32} />
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="bg-white p-6 md:p-8 rounded-[32px] border border-slate-200/60 shadow-sm text-slate-800 whitespace-pre-wrap leading-relaxed font-medium text-lg relative group overflow-hidden"
+                                >
+                                    <div className="absolute top-4 right-4 text-brand-100 opacity-20 group-hover:opacity-50 transition-opacity">
+                                        <Sparkles size={32} />
                                     </div>
-                                    {generatedPost}
-                                </div>
+
+                                    <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-50">
+                                        <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+                                            <img src="/logo.png" alt="Kolink" className="w-6 h-6 grayscale opacity-50" />
+                                        </div>
+                                        <div>
+                                            <div className="w-24 h-3 bg-slate-100 rounded-full mb-1" />
+                                            <div className="w-16 h-2 bg-slate-50 rounded-full" />
+                                        </div>
+                                    </div>
+
+                                    <div className="relative z-10">
+                                        {generatedPost}
+                                    </div>
+                                </motion.div>
 
                                 <div className="flex flex-col sm:flex-row gap-4">
-                                    <button 
+                                    <motion.button 
+                                        whileHover={{ y: -1, backgroundColor: "#f8fafc" }}
+                                        whileTap={{ scale: 0.98 }}
                                         onClick={() => {
                                             navigator.clipboard.writeText(generatedPost);
                                             toast.success("¡Copiado! Listo para LinkedIn");
                                         }}
-                                        className="flex-1 py-4 bg-white border-2 border-slate-100 hover:border-brand-200 text-slate-700 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all"
+                                        className="flex-1 py-4 bg-white border border-slate-200 text-slate-700 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all shadow-sm"
                                     >
                                         <Copy size={18} />
                                         Copiar
-                                    </button>
-                                    <Link 
-                                        to="/login"
-                                        className="flex-[2] py-4 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-2xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-brand-500/25"
-                                    >
-                                        Programar en Kolink Pro
-                                        <ArrowRight size={18} />
-                                    </Link>
+                                    </motion.button>
+                                    <motion.div className="flex-[2]" whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                                        <Link 
+                                            to="/login"
+                                            className="w-full h-full py-4 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-2xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-brand-500/20"
+                                        >
+                                            Programar en Kolink Pro
+                                            <ArrowRight size={18} />
+                                        </Link>
+                                    </motion.div>
                                 </div>
                             </motion.div>
                         )}
@@ -405,6 +465,72 @@ const NicheGeneratorPage = () => {
                     </p>
                 </div>
             </footer>
+
+            {/* Limit Reached Modal */}
+            <AnimatePresence>
+                {showLimitModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowLimitModal(false)}
+                            className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+                        />
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl border border-white p-8 overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                            
+                            <div className="w-16 h-16 bg-brand-100 text-brand-600 rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-lg shadow-brand-500/10">
+                                <Zap size={32} fill="currentColor" />
+                            </div>
+                            
+                            <h2 className="text-3xl font-black text-slate-900 text-center mb-4 tracking-tight leading-tight">
+                                {language === 'es' ? '¡Has alcanzado el límite!' : 'Limit Reached!'}
+                            </h2>
+                            
+                            <p className="text-slate-600 text-center mb-8 font-medium leading-relaxed">
+                                {language === 'es' 
+                                    ? 'Has usado tus 3 generaciones gratuitas por hoy. Únete a miles de profesionales y obtén acceso ilimitado.' 
+                                    : 'You have used your 3 free generations for today. Join thousands of professionals and get unlimited access.'}
+                            </p>
+                            
+                            <div className="space-y-3">
+                                <Link 
+                                    to="/login" 
+                                    className="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold transition-all shadow-xl shadow-brand-600/20 flex items-center justify-center gap-2 text-lg active:scale-[0.98]"
+                                >
+                                    {language === 'es' ? 'Crear Cuenta Gratis' : 'Create Free Account'}
+                                    <ArrowRight size={20} />
+                                </Link>
+                                <button 
+                                    onClick={() => setShowLimitModal(false)}
+                                    className="w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-2xl font-bold transition-all flex items-center justify-center text-sm"
+                                >
+                                    {language === 'es' ? 'Quizás más tarde' : 'Maybe later'}
+                                </button>
+                            </div>
+                            
+                             <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-center gap-2">
+                                <div className="flex -space-x-1">
+                                    {[1,2,3].map(i => (
+                                        <div key={i} className="w-6 h-6 rounded-full bg-slate-200 border-2 border-white overflow-hidden shadow-sm" >
+                                            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=user${i}`} alt="User" />
+                                        </div>
+                                    ))}
+                                </div>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                    +5,000 Usuarios Pro
+                                </span>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

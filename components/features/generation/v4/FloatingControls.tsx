@@ -13,6 +13,7 @@ import {
 import { AppLanguage, GenerationParams } from "../../../../types";
 import { TONES, FRAMEWORKS, LENGTH_OPTIONS, EMOJI_OPTIONS } from "../../../../constants";
 import { translations } from "../../../../translations";
+import { analytics } from "../../../../services/analyticsService";
 import { CustomSelect } from "../../../ui/CustomSelect"; 
 
 interface FloatingControlsProps {
@@ -52,7 +53,11 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
                    {TONES.map(tone => (
                        <button
                            key={tone.value}
-                           onClick={() => { onUpdateParams({ tone: tone.value }); setActiveMenu(null); }}
+                           onClick={() => { 
+                               onUpdateParams({ tone: tone.value }); 
+                               setActiveMenu(null); 
+                               analytics.track('tone_changed', { tone: tone.value });
+                           }}
                            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-all ${params.tone === tone.value ? "bg-brand-50 text-brand-700 shadow-sm" : "hover:bg-slate-50 text-slate-600 hover:text-slate-900"}`}
                        >
                            {tConstants.tones[tone.value]?.label || tone.label}
@@ -71,7 +76,11 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
                    {FRAMEWORKS.map(fw => (
                        <button
                            key={fw.value}
-                           onClick={() => { onUpdateParams({ framework: fw.value }); setActiveMenu(null); }}
+                           onClick={() => { 
+                               onUpdateParams({ framework: fw.value }); 
+                               setActiveMenu(null); 
+                               analytics.track('feature_viewed', { feature: 'framework', value: fw.value });
+                           }}
                            className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all group ${params.framework === fw.value ? "bg-brand-50 shadow-sm" : "hover:bg-slate-50"}`}
                        >
                            <span className={`block font-bold ${params.framework === fw.value ? "text-brand-700" : "text-slate-700 group-hover:text-slate-900"}`}>

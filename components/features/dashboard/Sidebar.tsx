@@ -16,6 +16,7 @@ import { translations } from '../../../translations';
 import { AppTab } from '../../../types';
 import { supabase } from '../../../services/supabaseClient'; // Ensure this path is correct or import from context
 import { toast } from 'sonner';
+import { analytics } from '../../../services/analyticsService';
 
 interface SidebarProps {
     activeTab: AppTab;
@@ -111,7 +112,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                     return (
                         <button 
                             key={item.id} 
-                            onClick={() => setActiveTab(item.id as AppTab)}
+                            onClick={() => {
+                                setActiveTab(item.id as AppTab);
+                                analytics.track('feature_viewed', { feature: item.id });
+                            }}
                             className={`${containerClass} w-full text-left`}
                         >
                             {content}

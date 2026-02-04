@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, ArrowLeft, ArrowRight, ShieldCheck, Zap, Globe, CheckCircle2, Users, Layout, Calendar, BarChart3, Search } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Zap, Layout, Calendar, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -34,6 +34,7 @@ interface SignInPageProps {
   alreadyMemberLabel?: string;
   registerLinkText?: string;
   loginLinkText?: string;
+  legalConsentLabel?: React.ReactNode;
   trustBadges?: {
     security: string;
     noCard: string;
@@ -85,21 +86,10 @@ const AuthInput = ({
   </div>
 );
 
-const FeatureItem = ({ icon: Icon, title, desc }: { icon: any, title: string, desc: string }) => (
-  <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors">
-    <div className="p-2 rounded-lg bg-brand-500/20 text-brand-300 shrink-0">
-      <Icon className="w-5 h-5" />
-    </div>
-    <div>
-      <h4 className="text-white font-bold text-sm tracking-tight">{title}</h4>
-      <p className="text-slate-400 text-xs mt-1 leading-relaxed">{desc}</p>
-    </div>
-  </div>
-);
 
 // --- MAIN COMPONENT ---
 
-export const SignInPage: React.FC<SignInPageProps> = ({
+export const SignInPage: React.FC<SignInPageProps & { language?: string }> = ({
   title = "Bienvenido de nuevo",
   description = "Ingresa a tu panel de control.",
   onSignIn,
@@ -119,7 +109,8 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   alreadyMemberLabel = "¿Ya tienes cuenta?",
   registerLinkText = "Regístrate",
   loginLinkText = "Inicia sesión",
-  trustBadges
+  legalConsentLabel,
+  language = 'en'
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -216,12 +207,29 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                    initial={{ opacity: 0, y: 10 }}
                    animate={{ opacity: 1, y: 0 }}
                    transition={{ delay: 0.5 }}
-                   className="flex items-center"
+                   className="flex flex-col gap-3"
                 >
-                   <input type="checkbox" id="remember" name="rememberMe" className="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500" />
-                   <label htmlFor="remember" className="ml-2 text-sm font-medium text-slate-600 cursor-pointer select-none">
-                     {rememberMeLabel}
-                   </label>
+                   <div className="flex items-center">
+                       <input type="checkbox" id="remember" name="rememberMe" className="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500" />
+                       <label htmlFor="remember" className="ml-2 text-sm font-medium text-slate-600 cursor-pointer select-none">
+                         {rememberMeLabel}
+                       </label>
+                   </div>
+
+                   {!isLoginMode && legalConsentLabel && (
+                       <div className="flex items-start gap-2">
+                            <input 
+                               type="checkbox" 
+                               id="legalConsent" 
+                               name="legalConsent" 
+                               required 
+                               className="mt-1 w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500" 
+                           />
+                            <label htmlFor="legalConsent" className="text-xs font-medium text-slate-500 leading-relaxed cursor-pointer select-none">
+                               {legalConsentLabel}
+                            </label>
+                       </div>
+                   )}
                 </motion.div>
 
                 <motion.button 
@@ -274,11 +282,12 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             </motion.div>
 
              {/* Footer Links */}
-             <div className="mt-12 flex items-center justify-center gap-6 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                <Link to="/" className="hover:text-slate-600 transition-colors">Start</Link>
-                <Link to="#" className="hover:text-slate-600 transition-colors">Privacy</Link>
-                <Link to="#" className="hover:text-slate-600 transition-colors">Terms</Link>
-             </div>
+              <div className="mt-12 flex items-center justify-center gap-6 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                <Link to="/" className="hover:text-slate-600 transition-colors">{language === 'es' ? 'Inicio' : 'Start'}</Link>
+                <Link to="/privacy" className="hover:text-slate-600 transition-colors">{language === 'es' ? 'Privacidad' : 'Privacy'}</Link>
+                <Link to="/terms" className="hover:text-slate-600 transition-colors">{language === 'es' ? 'Términos' : 'Terms'}</Link>
+                <Link to="/legal" className="hover:text-slate-600 transition-colors">{language === 'es' ? 'Aviso Legal' : 'Legal'}</Link>
+              </div>
         </div>
       </motion.div>
 
